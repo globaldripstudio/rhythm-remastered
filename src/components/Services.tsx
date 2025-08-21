@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Euro, ArrowRight, Waves, Settings, Volume2 } from "lucide-react";
+import { Clock, Euro, ArrowRight, Waves, Settings, Volume2, Mic } from "lucide-react";
 import mixingConsole from "@/assets/mixing-console.jpg";
 import studioEquipment from "@/assets/studio-equipment.jpg";
 import masteringSuite from "@/assets/mastering-suite.jpg";
@@ -50,6 +50,51 @@ const Services = () => {
         "Processing analogique premium",
         "2 révisions incluses",
         "Stems disponibles"
+      ]
+    },
+    {
+      id: "enregistrement",
+      title: "Enregistrement",
+      description: "Enregistrement professionnel en studio",
+      duration: "2 h",
+      price: "60",
+      icon: Mic,
+      image: mixingConsole,
+      features: [
+        "Microphones premium",
+        "Cabine d'enregistrement traitée",
+        "Direction artistique incluse",
+        "Session temps réel"
+      ]
+    },
+    {
+      id: "captation-sonore",
+      title: "Captation Sonore | Tournage",
+      description: "Captation audio pour événements et tournages",
+      duration: "8 h",
+      price: "350/j",
+      icon: Volume2,
+      image: studioEquipment,
+      features: [
+        "Équipement portable professionnel",
+        "Mixage live multicanaux",
+        "Enregistrement multi-pistes",
+        "Post-production incluse"
+      ]
+    },
+    {
+      id: "composition",
+      title: "Composition | Beatmaking",
+      description: "Création musicale et production de beats",
+      duration: "10 h",
+      price: "300+",
+      icon: Settings,
+      image: masteringSuite,
+      features: [
+        "Composition originale",
+        "Production complète",
+        "Arrangements personnalisés",
+        "Droits d'auteur inclus"
       ]
     }
   ];

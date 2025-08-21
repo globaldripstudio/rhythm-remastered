@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { 
   Headphones, 
   Mic, 
@@ -12,61 +14,85 @@ import {
 } from "lucide-react";
 
 const Equipment = () => {
-  const equipmentCategories = [
-    {
-      title: "Consoles de Mixage",
-      icon: Settings,
-      items: [
-        { name: "SSL AWS 948", type: "Console analogique", status: "premium" },
-        { name: "Neve 88R", type: "Console large format", status: "premium" },
-        { name: "API 1608-II", type: "Console boutique", status: "new" }
-      ]
-    },
-    {
-      title: "Microphones",
-      icon: Mic,
-      items: [
-        { name: "Neumann U87 Ai", type: "Condensateur", status: "classic" },
-        { name: "AKG C414 XLS", type: "Multi-pattern", status: "premium" },
-        { name: "Shure SM7B", type: "Dynamique", status: "standard" }
-      ]
-    },
-    {
-      title: "Écoute de Référence",
-      icon: Headphones,
-      items: [
-        { name: "Yamaha NS-10M", type: "Near-field", status: "classic" },
-        { name: "Genelec 8351B", type: "Tri-amplifiées", status: "premium" },
-        { name: "Barefoot MM27", type: "Main monitors", status: "new" }
-      ]
-    },
-    {
-      title: "Traitement Analogique",
-      icon: Zap,
-      items: [
-        { name: "1176 Rev A", type: "Compresseur", status: "vintage" },
-        { name: "Pultec EQP-1A", type: "Égaliseur", status: "vintage" },
-        { name: "Lexicon 480L", type: "Reverb", status: "classic" }
-      ]
-    },
-    {
-      title: "Audio Numérique",
-      icon: HardDrive,
-      items: [
-        { name: "Pro Tools HDX", type: "DAW System", status: "premium" },
-        { name: "Antelope Galaxy 64", type: "Interface", status: "new" },
-        { name: "Universal Audio Apollo", type: "Processing", status: "premium" }
-      ]
-    },
-    {
-      title: "Acoustique Studio",
-      icon: Volume2,
-      items: [
-        { name: "Primacoustic", type: "Traitement acoustique", status: "standard" },
-        { name: "Auralex Studiofoam", type: "Absorption", status: "standard" },
-        { name: "GIK Acoustics", type: "Bass traps", status: "premium" }
-      ]
-    }
+  const equipmentData = {
+    microphones: [
+      { name: "Neumann U87 Ai", type: "Condensateur large membrane", status: "premium" },
+      { name: "AKG C414 XLS", type: "Condensateur multi-pattern", status: "premium" },
+      { name: "Shure SM7B", type: "Dynamique broadcast", status: "classic" },
+      { name: "Rode NTK", type: "Condensateur à lampe", status: "vintage" },
+      { name: "Audio-Technica AT4050", type: "Condensateur multi-pattern", status: "standard" },
+      { name: "Electro-Voice RE20", type: "Dynamique broadcast", status: "classic" },
+      { name: "Coles 4038", type: "Ruban vintage", status: "vintage" },
+      { name: "Royer R-121", type: "Ruban moderne", status: "premium" },
+      { name: "Shure SM57", type: "Dynamique polyvalent", status: "standard" },
+      { name: "Neumann TLM 103", type: "Condensateur compact", status: "premium" }
+    ],
+    preamps: [
+      { name: "Neve 1073", type: "Préampli vintage", status: "vintage" },
+      { name: "API 3124+", type: "Préampli 4 canaux", status: "premium" },
+      { name: "Universal Audio 610", type: "Préampli à lampe", status: "vintage" },
+      { name: "Focusrite ISA430", type: "Préampli/processeur", status: "premium" },
+      { name: "Great River MP-500", type: "Préampli Neve-style", status: "premium" },
+      { name: "Chandler Limited TG2", type: "Préampli EMI", status: "vintage" }
+    ],
+    compressors: [
+      { name: "Universal Audio 1176", type: "Compresseur FET", status: "vintage" },
+      { name: "Teletronix LA-2A", type: "Compresseur opto", status: "vintage" },
+      { name: "DBX 160X", type: "Compresseur VCA", status: "classic" },
+      { name: "Empirical Labs Distressor", type: "Compresseur multimode", status: "premium" },
+      { name: "SSL G-Comp", type: "Compresseur bus", status: "premium" },
+      { name: "Tube-Tech CL 1B", type: "Compresseur opto à lampe", status: "vintage" }
+    ],
+    equalizers: [
+      { name: "Pultec EQP-1A", type: "Égaliseur passif", status: "vintage" },
+      { name: "Neve 1081", type: "Égaliseur 4 bandes", status: "vintage" },
+      { name: "API 550A", type: "Égaliseur proportionnel", status: "classic" },
+      { name: "Maag EQ4", type: "Égaliseur air band", status: "premium" },
+      { name: "Manley Massive Passive", type: "Égaliseur passif stéréo", status: "premium" }
+    ],
+    effects: [
+      { name: "Lexicon 480L", type: "Reverb numérique", status: "classic" },
+      { name: "AMS DMX 15-80S", type: "Delay numérique", status: "vintage" },
+      { name: "Eventide H3000", type: "Harmonizer", status: "vintage" },
+      { name: "TC Electronic System 6000", type: "Multi-effets", status: "premium" },
+      { name: "Bricasti M7", type: "Reverb convolution", status: "premium" },
+      { name: "Universal Audio EMT 140", type: "Émulation plaque", status: "classic" }
+    ],
+    monitors: [
+      { name: "Yamaha NS-10M", type: "Near-field classiques", status: "classic" },
+      { name: "Genelec 8351B", type: "3-voies actives", status: "premium" },
+      { name: "Adam A7X", type: "Near-field ruban", status: "premium" },
+      { name: "Focal Twin6 Be", type: "Mid-field actives", status: "premium" },
+      { name: "Dynaudio BM15A", type: "3-voies passives", status: "classic" },
+      { name: "KRK Rokit 8", type: "Near-field actives", status: "standard" }
+    ],
+    interfaces: [
+      { name: "Universal Audio Apollo x16", type: "Interface Thunderbolt 16x22", status: "premium" },
+      { name: "Antelope Galaxy 64", type: "Interface 64x64 Synergy Core", status: "new" },
+      { name: "RME Fireface UFX+", type: "Interface USB/Firewire", status: "premium" },
+      { name: "Focusrite Red 4Pre", type: "Interface Thunderbolt", status: "premium" },
+      { name: "MOTU 828es", type: "Interface AVB", status: "standard" }
+    ],
+    daw: [
+      { name: "Pro Tools HDX", type: "DAW professionnel", status: "premium" },
+      { name: "Logic Pro X", type: "DAW Apple", status: "standard" },
+      { name: "Ableton Live Suite", type: "DAW production", status: "premium" },
+      { name: "Cubase Pro", type: "DAW Steinberg", status: "premium" },
+      { name: "Reaper", type: "DAW polyvalent", status: "standard" }
+    ]
+  };
+
+  const [selectedCategory, setSelectedCategory] = useState('microphones');
+
+  const categories = [
+    { key: 'microphones', title: 'Microphones', icon: Mic },
+    { key: 'preamps', title: 'Préamplis', icon: Settings },
+    { key: 'compressors', title: 'Compresseurs', icon: Zap },
+    { key: 'equalizers', title: 'Égaliseurs', icon: Monitor },
+    { key: 'effects', title: 'Effets', icon: Volume2 },
+    { key: 'monitors', title: 'Écoute', icon: Headphones },
+    { key: 'interfaces', title: 'Interfaces', icon: HardDrive },
+    { key: 'daw', title: 'Logiciels', icon: Cpu }
   ];
 
   const getStatusColor = (status: string) => {
@@ -103,40 +129,41 @@ const Equipment = () => {
           </p>
         </div>
 
-        {/* Equipment Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {equipmentCategories.map((category, categoryIndex) => (
-            <Card 
-              key={category.title} 
-              className="equipment-card group"
-              style={{ animationDelay: `${categoryIndex * 0.1}s` }}
+        {/* Category Navigation */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
+          {categories.map((category) => (
+            <Button
+              key={category.key}
+              variant={selectedCategory === category.key ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(category.key)}
+              className="flex items-center gap-2"
             >
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center text-xl">
-                  <div className="w-10 h-10 bg-gradient-accent rounded-lg flex items-center justify-center mr-3 animate-equipment-float">
-                    <category.icon className="w-5 h-5 text-white" />
-                  </div>
-                  {category.title}
-                </CardTitle>
-              </CardHeader>
+              <category.icon className="w-4 h-4" />
+              {category.title}
+            </Button>
+          ))}
+        </div>
 
-              <CardContent>
-                <div className="space-y-4">
-                  {category.items.map((item, itemIndex) => (
-                    <div 
-                      key={item.name}
-                      className="flex items-center justify-between p-3 rounded-lg bg-background/50 hover:bg-background/80 transition-colors duration-300"
-                    >
-                      <div>
-                        <div className="font-medium text-foreground">{item.name}</div>
-                        <div className="text-sm text-muted-foreground">{item.type}</div>
-                      </div>
-                      <Badge className={`${getStatusColor(item.status)} text-xs`}>
-                        {getStatusLabel(item.status)}
-                      </Badge>
-                    </div>
-                  ))}
+        {/* Equipment List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-16">
+          {equipmentData[selectedCategory as keyof typeof equipmentData].map((item, index) => (
+            <Card 
+              key={item.name}
+              className="equipment-item hover:shadow-lg transition-all duration-300"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge 
+                    className={`${getStatusColor(item.status)} text-xs`}
+                    variant="secondary"
+                  >
+                    {getStatusLabel(item.status)}
+                  </Badge>
                 </div>
+                <h4 className="font-semibold text-sm mb-1 text-foreground">{item.name}</h4>
+                <p className="text-xs text-muted-foreground">{item.type}</p>
               </CardContent>
             </Card>
           ))}
