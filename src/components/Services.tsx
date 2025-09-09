@@ -11,70 +11,38 @@ const Services = () => {
       id: "mixage-mastering",
       title: "Mixage + Mastering",
       description: "Service complet pour donner vie à vos créations musicales",
-      duration: "10 h",
       price: "290",
       icon: Waves,
-      image: mixingConsole,
+      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
       features: [
         "Mixage professionnel multi-pistes",
-        "Mastering hybride analogique/numérique",
+        "Mastering hybride analogique/numérique", 
         "3 révisions incluses",
         "Formats de livraison multiples"
       ]
     },
     {
-      id: "mastering-hybride",
-      title: "Mastering Hybride",
-      description: "Mastering professionnel avec traitement analogique et numérique",
-      duration: "2 h",
-      price: "60",
+      id: "sound-design",
+      title: "Sound Design",
+      description: "Création sonore et design audio pour tous vos projets créatifs",
+      price: "Sur devis",
       icon: Settings,
-      image: masteringSuite,
+      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+      featured: true,
       features: [
-        "Traitement analogique haute qualité",
-        "Optimisation pour streaming",
-        "Analyse spectrale complète",
-        "Référence industrie"
-      ]
-    },
-    {
-      id: "mixage",
-      title: "Mixage Studio",
-      description: "Mixage professionnel de vos enregistrements",
-      duration: "8 h",
-      price: "230",
-      icon: Volume2,
-      image: studioEquipment,
-      features: [
-        "Console SSL ou Neve",
-        "Processing analogique premium",
-        "2 révisions incluses",
-        "Stems disponibles"
-      ]
-    },
-    {
-      id: "enregistrement",
-      title: "Enregistrement",
-      description: "Enregistrement professionnel en studio",
-      duration: "2 h",
-      price: "60",
-      icon: Mic,
-      image: mixingConsole,
-      features: [
-        "Microphones premium",
-        "Cabine d'enregistrement traitée",
-        "Direction artistique incluse",
-        "Session temps réel"
+        "Sound design pour films et jeux",
+        "Création d'ambiances sonores",
+        "Effets sonores sur mesure",
+        "Post-production audio avancée"
       ]
     },
     {
       id: "captation-sonore",
-      title: "Captation Sonore | Tournage",
-      description: "Captation audio pour événements et tournages",
-      duration: "8 h",
+      title: "Captation Sonore",
+      description: "Captation audio professionnelle pour événements et tournages",
       price: "350/j",
-      icon: Volume2,
-      image: studioEquipment,
+      icon: Mic,
+      image: "/lovable-uploads/c2397d66-8252-43dd-b6b5-13da38c2a814.png",
       features: [
         "Équipement portable professionnel",
         "Mixage live multicanaux",
@@ -84,17 +52,44 @@ const Services = () => {
     },
     {
       id: "composition",
-      title: "Composition | Beatmaking",
-      description: "Création musicale et production de beats",
-      duration: "10 h",
+      title: "Composition / Beatmaking",
+      description: "Création musicale et production de beats personnalisés",
       price: "300+",
-      icon: Settings,
-      image: masteringSuite,
+      icon: Volume2,
+      image: "/lovable-uploads/64615fd6-368c-466a-a669-f5140677e476.png",
       features: [
         "Composition originale",
         "Production complète",
         "Arrangements personnalisés",
         "Droits d'auteur inclus"
+      ]
+    },
+    {
+      id: "direction-artistique",
+      title: "Direction Artistique / Arrangement",
+      description: "Accompagnement artistique et arrangements musicaux sur mesure",
+      price: "Sur devis",
+      icon: Settings,
+      image: "/lovable-uploads/35c8540d-ce59-433e-87fd-f1b8b1527941.png",
+      features: [
+        "Direction artistique complète",
+        "Arrangements instrumentaux",
+        "Conseils créatifs personnalisés",
+        "Suivi de projet de A à Z"
+      ]
+    },
+    {
+      id: "formation",
+      title: "Formation MAO / Mixage",
+      description: "Formations personnalisées en production musicale et techniques de mixage",
+      price: "150/h",
+      icon: Volume2,
+      image: "/lovable-uploads/6ed6bc90-04bb-4040-9e0b-26b3c13bba5d.png",
+      features: [
+        "Cours particuliers ou en groupe",
+        "Formation sur logiciels MAO",
+        "Techniques de mixage avancées",
+        "Support pédagogique inclus"
       ]
     }
   ];
@@ -118,7 +113,9 @@ const Services = () => {
           {services.map((service, index) => (
             <Card 
               key={service.id} 
-              className="service-card group cursor-pointer relative overflow-hidden"
+              className={`service-card group cursor-pointer relative overflow-hidden ${
+                service.featured ? 'ring-2 ring-primary ring-opacity-50' : ''
+              }`}
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               {/* Service Image */}
@@ -140,11 +137,7 @@ const Services = () => {
                 <div className="flex justify-between items-start mb-2">
                   <CardTitle className="text-xl font-bold">{service.title}</CardTitle>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">{service.price}€</div>
-                    <div className="text-sm text-muted-foreground flex items-center">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {service.duration}
-                    </div>
+                    <div className="text-2xl font-bold text-primary">{service.price.includes('€') ? service.price : `${service.price}€`}</div>
                   </div>
                 </div>
                 <CardDescription className="text-muted-foreground">
@@ -173,8 +166,13 @@ const Services = () => {
                 </Button>
               </CardContent>
 
-              {/* Glow Effect on Hover */}
+              {/* Glow Effect on Hover & Featured Badge */}
               <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
+              {service.featured && (
+                <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-bold">
+                  Spécialité
+                </div>
+              )}
             </Card>
           ))}
         </div>

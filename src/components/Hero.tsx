@@ -8,9 +8,10 @@ const Hero = () => {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src={studioHero}
+          src="/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png"
           alt="Global Drip Studio - Professional Recording Studio"
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover object-center opacity-40"
+          style={{ aspectRatio: '16/9' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background/90" />
       </div>

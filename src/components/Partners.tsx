@@ -4,10 +4,10 @@ const Partners = () => {
   const partners = [
     { name: "Porsche", logo: "https://upload.wikimedia.org/wikipedia/commons/1/17/Porsche_logo.svg" },
     { name: "Canyon Bicycles", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Canyon_bicycles_logo.svg" },
-    { name: "Commencal", logo: "https://www.commencal.com/media/logo/default/commencal_logo_black.svg" },
+    { name: "Commencal", logo: "/lovable-uploads/fd1b44e8-bc02-4bd0-b187-ab685c182ccc.png" },
     { name: "Ambit Components", logo: "/placeholder-logo.svg" },
-    { name: "Pulsor Agency", logo: "/placeholder-logo.svg" },
-    { name: "Ultrack Agency", logo: "/placeholder-logo.svg" }
+    { name: "Pulsor Agency", logo: "/lovable-uploads/45cee96e-8f90-46a9-91f2-033aa5006d67.png" },
+    { name: "Ultrack Agency", logo: "/lovable-uploads/6ce6d0b8-6814-46e2-9e0c-e8762479e4b7.png" }
   ];
 
   return (

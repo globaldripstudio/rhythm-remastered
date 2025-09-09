@@ -13,12 +13,14 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-accent flex items-center justify-center">
-              <span className="text-xl font-bold text-white">GW</span>
-            </div>
+            <img 
+              src="/lovable-uploads/493b7d12-09ef-4eb1-a8f1-6575bee3334a.png" 
+              alt="Global Drip Studio"
+              className="w-12 h-12 object-contain"
+            />
             <div>
               <div className="text-lg font-bold">GLOBAL DRIP</div>
-              <div className="text-sm text-muted-foreground">Worldwide</div>
+              <div className="text-sm text-muted-foreground">Studio</div>
             </div>
           </div>
 
@@ -35,7 +37,7 @@ const Header = () => {
           <div className="hidden lg:flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <Phone className="w-4 h-4" />
-              <span>+33 1 23 45 67 89</span>
+              <span>+33 6 59 79 73 42</span>
             </div>
             <Button variant="default" className="studio-button">
               Réserver
@@ -63,7 +65,7 @@ const Header = () => {
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />
-                  <span>+33 1 23 45 67 89</span>
+                  <span>+33 6 59 79 73 42</span>
                 </div>
                 <Button variant="default" className="studio-button w-full">
                   Réserver

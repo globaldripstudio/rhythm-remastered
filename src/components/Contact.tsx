@@ -128,8 +128,8 @@ const Contact = () => {
                   <div>
                     <div className="font-medium">Adresse du studio</div>
                     <div className="text-muted-foreground">
-                      123 Rue de la Musique<br />
-                      75001 Paris, France
+                      8 allée des ajoncs<br />
+                      13500 Martigues, France
                     </div>
                   </div>
                 </div>
@@ -140,7 +140,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <div className="font-medium">Téléphone</div>
-                    <div className="text-muted-foreground">+33 1 23 45 67 89</div>
+                    <div className="text-muted-foreground">+33 6 59 79 73 42</div>
                   </div>
                 </div>
 
@@ -150,7 +150,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <div className="font-medium">Email</div>
-                    <div className="text-muted-foreground">contact@globaldripstudio.fr</div>
+                    <div className="text-muted-foreground">globaldripstudio@gmail.com</div>
                   </div>
                 </div>
 
