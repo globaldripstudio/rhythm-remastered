@@ -92,24 +92,24 @@ const Equipment = () => {
     ],
     plugins: [
       { name: "Universal Audio Effects", type: "Suite d'effets premium", status: "premium" },
-      { name: "Antares AutoTune", type: "Correction pitch", status: "premium" },
-      { name: "Celemony Melodyne 5", type: "Éditeur audio avancé", status: "premium" },
-      { name: "Arturia Fx & VST Collection 3", type: "Suite d'instruments", status: "premium" },
-      { name: "Suite Waves 10", type: "Suite d'effets", status: "premium" },
-      { name: "Suite FabFilter", type: "Suite d'effets", status: "premium" },
+      { name: "Antares AutoTune", type: "Correction pitch", status: "industry" },
+      { name: "Celemony Melodyne 5", type: "Éditeur audio avancé", status: "professional" },
+      { name: "Arturia Fx & VST Collection 3", type: "Suite d'instruments", status: "creative" },
+      { name: "Suite Waves 10", type: "Suite d'effets", status: "industry" },
+      { name: "Suite FabFilter", type: "Suite d'effets", status: "professional" },
       { name: "Suite bx", type: "Suite d'effets", status: "premium" },
-      { name: "Suite Acustica", type: "Émulations analogiques", status: "premium" },
-      { name: "Soundtoys Effects Rack", type: "Effets créatifs", status: "premium" },
-      { name: "Izotope Ozone 9 Suite", type: "Suite mastering", status: "premium" },
-      { name: "Izotope RX 8 & 9", type: "Restauration audio", status: "premium" },
-      { name: "Izotope VocalSynth", type: "Synthèse vocale", status: "premium" },
-      { name: "Neural DSP Archetype Tim Henson X", type: "Amplificateur guitare", status: "premium" },
+      { name: "Suite Acustica", type: "Émulations analogiques", status: "boutique" },
+      { name: "Soundtoys Effects Rack", type: "Effets créatifs", status: "creative" },
+      { name: "Izotope Ozone 9 Suite", type: "Suite mastering", status: "industry" },
+      { name: "Izotope RX 8 & 9", type: "Restauration audio", status: "professional" },
+      { name: "Izotope VocalSynth", type: "Synthèse vocale", status: "creative" },
+      { name: "Neural DSP Archetype Tim Henson X", type: "Amplificateur guitare", status: "boutique" },
       { name: "Native Instruments Guitar Rig 7", type: "Amplificateur guitare", status: "standard" },
-      { name: "NI Kontakt", type: "Sampler", status: "premium" },
-      { name: "Klanghelm MJUC Compressor", type: "Compresseur vintage", status: "premium" },
+      { name: "NI Kontakt", type: "Sampler", status: "industry" },
+      { name: "Klanghelm MJUC Compressor", type: "Compresseur vintage", status: "boutique" },
       { name: "Nicky Romero Kickstart", type: "Sidechain", status: "standard" },
-      { name: "Drip Plugin", type: "Effet signature", status: "premium" },
-      { name: "Nasty DLA Mk II", type: "Delay créatif", status: "premium" }
+      { name: "Drip Plugin", type: "Effet signature", status: "signature" },
+      { name: "Nasty DLA Mk II", type: "Delay créatif", status: "boutique" }
     ]
   };
 
@@ -133,6 +133,11 @@ const Equipment = () => {
       case "premium": return "bg-primary text-primary-foreground";
       case "vintage": return "bg-secondary text-secondary-foreground";
       case "classic": return "bg-accent text-accent-foreground";
+      case "industry": return "bg-gradient-to-r from-blue-500 to-blue-600 text-white";
+      case "professional": return "bg-gradient-to-r from-green-500 to-green-600 text-white";
+      case "creative": return "bg-gradient-to-r from-purple-500 to-purple-600 text-white";
+      case "boutique": return "bg-gradient-to-r from-amber-500 to-amber-600 text-white";
+      case "signature": return "bg-gradient-to-r from-orange-500 to-orange-600 text-white";
       default: return "bg-muted text-muted-foreground";
     }
   };
@@ -142,6 +147,11 @@ const Equipment = () => {
       case "premium": return "Premium";
       case "vintage": return "Vintage";
       case "classic": return "Classique";
+      case "industry": return "Industry Standard";
+      case "professional": return "Pro";
+      case "creative": return "Créatif";
+      case "boutique": return "Boutique";
+      case "signature": return "Signature";
       default: return "Standard";
     }
   };
