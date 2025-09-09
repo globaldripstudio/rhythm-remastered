@@ -15,92 +15,124 @@ import {
 
 const Equipment = () => {
   const equipmentData = {
-    microphones: [
-      { name: "Neumann U87 Ai", type: "Condensateur large membrane", status: "premium" },
-      { name: "AKG C414 XLS", type: "Condensateur multi-pattern", status: "premium" },
-      { name: "Shure SM7B", type: "Dynamique broadcast", status: "classic" },
-      { name: "Rode NTK", type: "Condensateur à lampe", status: "vintage" },
-      { name: "Audio-Technica AT4050", type: "Condensateur multi-pattern", status: "standard" },
-      { name: "Electro-Voice RE20", type: "Dynamique broadcast", status: "classic" },
-      { name: "Coles 4038", type: "Ruban vintage", status: "vintage" },
-      { name: "Royer R-121", type: "Ruban moderne", status: "premium" },
-      { name: "Shure SM57", type: "Dynamique polyvalent", status: "standard" },
-      { name: "Neumann TLM 103", type: "Condensateur compact", status: "premium" }
-    ],
-    preamps: [
-      { name: "Neve 1073", type: "Préampli vintage", status: "vintage" },
-      { name: "API 3124+", type: "Préampli 4 canaux", status: "premium" },
-      { name: "Universal Audio 610", type: "Préampli à lampe", status: "vintage" },
-      { name: "Focusrite ISA430", type: "Préampli/processeur", status: "premium" },
-      { name: "Great River MP-500", type: "Préampli Neve-style", status: "premium" },
-      { name: "Chandler Limited TG2", type: "Préampli EMI", status: "vintage" }
-    ],
-    compressors: [
-      { name: "Universal Audio 1176", type: "Compresseur FET", status: "vintage" },
-      { name: "Teletronix LA-2A", type: "Compresseur opto", status: "vintage" },
-      { name: "DBX 160X", type: "Compresseur VCA", status: "classic" },
-      { name: "Empirical Labs Distressor", type: "Compresseur multimode", status: "premium" },
-      { name: "SSL G-Comp", type: "Compresseur bus", status: "premium" },
-      { name: "Tube-Tech CL 1B", type: "Compresseur opto à lampe", status: "vintage" }
-    ],
-    equalizers: [
-      { name: "Pultec EQP-1A", type: "Égaliseur passif", status: "vintage" },
-      { name: "Neve 1081", type: "Égaliseur 4 bandes", status: "vintage" },
-      { name: "API 550A", type: "Égaliseur proportionnel", status: "classic" },
-      { name: "Maag EQ4", type: "Égaliseur air band", status: "premium" },
-      { name: "Manley Massive Passive", type: "Égaliseur passif stéréo", status: "premium" }
-    ],
-    effects: [
-      { name: "Lexicon 480L", type: "Reverb numérique", status: "classic" },
-      { name: "AMS DMX 15-80S", type: "Delay numérique", status: "vintage" },
-      { name: "Eventide H3000", type: "Harmonizer", status: "vintage" },
-      { name: "TC Electronic System 6000", type: "Multi-effets", status: "premium" },
-      { name: "Bricasti M7", type: "Reverb convolution", status: "premium" },
-      { name: "Universal Audio EMT 140", type: "Émulation plaque", status: "classic" }
-    ],
-    monitors: [
-      { name: "Yamaha NS-10M", type: "Near-field classiques", status: "classic" },
-      { name: "Genelec 8351B", type: "3-voies actives", status: "premium" },
-      { name: "Adam A7X", type: "Near-field ruban", status: "premium" },
-      { name: "Focal Twin6 Be", type: "Mid-field actives", status: "premium" },
-      { name: "Dynaudio BM15A", type: "3-voies passives", status: "classic" },
-      { name: "KRK Rokit 8", type: "Near-field actives", status: "standard" }
-    ],
-    interfaces: [
-      { name: "Universal Audio Apollo x16", type: "Interface Thunderbolt 16x22", status: "premium" },
-      { name: "Antelope Galaxy 64", type: "Interface 64x64 Synergy Core", status: "new" },
-      { name: "RME Fireface UFX+", type: "Interface USB/Firewire", status: "premium" },
-      { name: "Focusrite Red 4Pre", type: "Interface Thunderbolt", status: "premium" },
-      { name: "MOTU 828es", type: "Interface AVB", status: "standard" }
+    sommation: [
+      { name: "Dangerous Music 2Bus+", type: "Sommation analogique", status: "premium" },
+      { name: "Universal Audio Apollo (x2)", type: "Interface/Convertisseur", status: "premium" },
+      { name: "Quad Core DSP Accelerator", type: "Processeur DSP", status: "premium" }
     ],
     daw: [
-      { name: "Pro Tools HDX", type: "DAW professionnel", status: "premium" },
-      { name: "Logic Pro X", type: "DAW Apple", status: "standard" },
-      { name: "Ableton Live Suite", type: "DAW production", status: "premium" },
-      { name: "Cubase Pro", type: "DAW Steinberg", status: "premium" },
-      { name: "Reaper", type: "DAW polyvalent", status: "standard" }
+      { name: "Pro Tools", type: "DAW professionnel", status: "premium" },
+      { name: "FL Studio", type: "DAW production", status: "standard" }
+    ],
+    ecoutes: [
+      { name: "Adam A77x", type: "Monitoring near-field", status: "premium" },
+      { name: "KRK Rp6 Rokit G3", type: "Monitoring near-field", status: "standard" },
+      { name: "Beyerdynamic DT770-Pro 250ohm", type: "Casque studio", status: "classic" },
+      { name: "Sony MDRV500", type: "Casque monitoring", status: "standard" },
+      { name: "AKG K52 (x2)", type: "Casque studio", status: "standard" }
+    ],
+    microphones: [
+      { name: "Griffon Microphones GMT12", type: "Condensateur", status: "premium" },
+      { name: "Audio-Technica AT4050", type: "Condensateur multi-pattern", status: "premium" },
+      { name: "Shure PG81", type: "Condensateur", status: "standard" },
+      { name: "Shure SM57", type: "Dynamique polyvalent", status: "classic" },
+      { name: "Sennheiser E906", type: "Dynamique guitare", status: "standard" },
+      { name: "Melodynamic 75A", type: "Dynamique vintage", status: "vintage" },
+      { name: "Shure CR80R", type: "Dynamique", status: "standard" },
+      { name: "Griffon Microphones Fuzzyphone", type: "Micro créatif", status: "premium" },
+      { name: "Griffon Microphones Saturne (x2)", type: "Condensateur", status: "premium" },
+      { name: "LOM Geofon", type: "Géophone contact", status: "premium" }
+    ],
+    preamps: [
+      { name: "Neve 1073", type: "Préampli vintage légendaire", status: "vintage" },
+      { name: "DBX 286s", type: "Préampli/processeur voix", status: "standard" },
+      { name: "Unison Pre (x8)", type: "Préamplis UA", status: "premium" }
+    ],
+    equalizers: [
+      { name: "Klark Teknik EQP-KT (x2)", type: "Égaliseur Pultec-style", status: "premium" },
+      { name: "GAR VAULTEC EQP-2A3SS", type: "Égaliseur passif", status: "premium" },
+      { name: "Behringer Ultragraph Pro", type: "Égaliseur graphique", status: "standard" }
+    ],
+    compressors: [
+      { name: "IGS S-Type 500VU Buss Compressor", type: "Compresseur bus", status: "premium" },
+      { name: "GAR Sonar 500", type: "Compresseur analogique", status: "premium" },
+      { name: "DBX 160a (x2)", type: "Compresseur VCA", status: "classic" },
+      { name: "Alesis 3630", type: "Compresseur/limiteur", status: "standard" },
+      { name: "DBX 286s", type: "Processeur voix", status: "standard" },
+      { name: "Klark Teknik 3rd Dimension BBD-320", type: "Effet BBD", status: "premium" },
+      { name: "Behringer Virtualizer Pro", type: "Multi-effets", status: "standard" },
+      { name: "tc.electronics Sentry", type: "Gate/Expander", status: "standard" },
+      { name: "Digitech Whammy 5", type: "Effet guitare", status: "standard" }
+    ],
+    instruments: [
+      { name: "ESP E-II Horizon", type: "Guitare électrique", status: "premium" },
+      { name: "Lag Roxane RR-1500", type: "Guitare électrique", status: "standard" },
+      { name: "Fender Stratocaster Player Series", type: "Guitare électrique", status: "classic" },
+      { name: "Ibanez Tod10n", type: "Guitare électrique", status: "standard" },
+      { name: "Washburn D15", type: "Guitare acoustique", status: "standard" },
+      { name: "Guitare classique Pro Natura", type: "Guitare classique", status: "standard" },
+      { name: "Guitare manouche Di Mauro", type: "Guitare manouche", status: "vintage" },
+      { name: "Fender Jazz Bass Special", type: "Basse électrique", status: "classic" },
+      { name: "Nektar Impact LX49/LX49+", type: "Clavier MIDI", status: "standard" },
+      { name: "Yamaha PSS-50", type: "Synthétiseur vintage", status: "vintage" },
+      { name: "Melodica Hohner Student 32", type: "Mélodica", status: "standard" }
+    ],
+    backline: [
+      { name: "EVH 5150 6l6 50w", type: "Amplificateur guitare", status: "premium" },
+      { name: "Orange Rockerverb MkIII", type: "Amplificateur guitare", status: "premium" },
+      { name: "Victory VX The Kraken MK I 50w", type: "Amplificateur guitare", status: "premium" },
+      { name: "ENGL 2x12 V30", type: "Baffle guitare", status: "premium" },
+      { name: "EVH 2x12 G12-H", type: "Baffle guitare", status: "premium" },
+      { name: "VOX V2x12C", type: "Baffle guitare", status: "classic" },
+      { name: "Laney Linebacker KB80", type: "Amplificateur clavier", status: "standard" },
+      { name: "Fender Bassman 100", type: "Amplificateur basse", status: "classic" },
+      { name: "Marshall AS50D", type: "Amplificateur acoustique", status: "standard" },
+      { name: "GAR TU-DI MK1 / FE-DI MK3", type: "Boîte de direct", status: "premium" },
+      { name: "Millenium DI-E DI Box (x2)", type: "Boîte de direct", status: "standard" }
+    ],
+    plugins: [
+      { name: "Universal Audio Effects", type: "Suite d'effets premium", status: "premium" },
+      { name: "Antares AutoTune", type: "Correction pitch", status: "premium" },
+      { name: "Celemony Melodyne 5", type: "Éditeur audio avancé", status: "premium" },
+      { name: "Arturia Fx & VST Collection 3", type: "Suite d'instruments", status: "premium" },
+      { name: "Suite Waves 10", type: "Suite d'effets", status: "premium" },
+      { name: "Suite FabFilter", type: "Suite d'effets", status: "premium" },
+      { name: "Suite bx", type: "Suite d'effets", status: "premium" },
+      { name: "Suite Acustica", type: "Émulations analogiques", status: "premium" },
+      { name: "Soundtoys Effects Rack", type: "Effets créatifs", status: "premium" },
+      { name: "Izotope Ozone 9 Suite", type: "Suite mastering", status: "premium" },
+      { name: "Izotope RX 8 & 9", type: "Restauration audio", status: "premium" },
+      { name: "Izotope VocalSynth", type: "Synthèse vocale", status: "premium" },
+      { name: "Neural DSP Archetype Tim Henson X", type: "Amplificateur guitare", status: "premium" },
+      { name: "Native Instruments Guitar Rig 7", type: "Amplificateur guitare", status: "standard" },
+      { name: "NI Kontakt", type: "Sampler", status: "premium" },
+      { name: "Klanghelm MJUC Compressor", type: "Compresseur vintage", status: "premium" },
+      { name: "Nicky Romero Kickstart", type: "Sidechain", status: "standard" },
+      { name: "Drip Plugin", type: "Effet signature", status: "premium" },
+      { name: "Nasty DLA Mk II", type: "Delay créatif", status: "premium" }
     ]
   };
 
-  const [selectedCategory, setSelectedCategory] = useState('microphones');
+  const [selectedCategory, setSelectedCategory] = useState('sommation');
 
   const categories = [
+    { key: 'sommation', title: 'Sommation & Conversion', icon: HardDrive },
+    { key: 'daw', title: 'Logiciels', icon: Cpu },
+    { key: 'ecoutes', title: 'Écoutes', icon: Headphones },
     { key: 'microphones', title: 'Microphones', icon: Mic },
-    { key: 'preamps', title: 'Préamplis', icon: Settings },
-    { key: 'compressors', title: 'Compresseurs', icon: Zap },
+    { key: 'preamps', title: 'Préamplificateurs', icon: Settings },
     { key: 'equalizers', title: 'Égaliseurs', icon: Monitor },
-    { key: 'effects', title: 'Effets', icon: Volume2 },
-    { key: 'monitors', title: 'Écoute', icon: Headphones },
-    { key: 'interfaces', title: 'Interfaces', icon: HardDrive },
-    { key: 'daw', title: 'Logiciels', icon: Cpu }
+    { key: 'compressors', title: 'Compresseurs & Effets', icon: Zap },
+    { key: 'instruments', title: 'Instruments', icon: Volume2 },
+    { key: 'backline', title: 'Backline', icon: Volume2 },
+    { key: 'plugins', title: 'Plugins', icon: Cpu }
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "premium": return "bg-primary text-primary-foreground";
       case "vintage": return "bg-secondary text-secondary-foreground";
-      case "new": return "bg-accent text-accent-foreground";
-      case "classic": return "bg-muted text-muted-foreground";
+      case "classic": return "bg-accent text-accent-foreground";
       default: return "bg-muted text-muted-foreground";
     }
   };
@@ -109,7 +141,6 @@ const Equipment = () => {
     switch (status) {
       case "premium": return "Premium";
       case "vintage": return "Vintage";
-      case "new": return "Nouveau";
       case "classic": return "Classique";
       default: return "Standard";
     }
@@ -169,44 +200,6 @@ const Equipment = () => {
           ))}
         </div>
 
-        {/* Technical Specs */}
-        <div className="mt-16 p-8 rounded-2xl bg-gradient-hero border border-border">
-          <h3 className="text-2xl font-bold text-center mb-8">Spécifications Techniques</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Monitor className="w-8 h-8 text-primary" />
-              </div>
-              <div className="text-2xl font-bold text-primary mb-2">192 kHz</div>
-              <div className="text-sm text-muted-foreground">Fréquence d'échantillonnage</div>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Cpu className="w-8 h-8 text-secondary" />
-              </div>
-              <div className="text-2xl font-bold text-secondary mb-2">32-Bit</div>
-              <div className="text-sm text-muted-foreground">Résolution audio</div>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <HardDrive className="w-8 h-8 text-primary" />
-              </div>
-              <div className="text-2xl font-bold text-primary mb-2">128</div>
-              <div className="text-sm text-muted-foreground">Pistes simultanées</div>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Volume2 className="w-8 h-8 text-secondary" />
-              </div>
-              <div className="text-2xl font-bold text-secondary mb-2">-130dB</div>
-              <div className="text-sm text-muted-foreground">Plancher de bruit</div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
