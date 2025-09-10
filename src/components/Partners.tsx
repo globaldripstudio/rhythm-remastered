@@ -10,27 +10,27 @@ const Partners = () => {
     { 
       name: "Canyon Bicycles", 
       logo: "/lovable-uploads/63018b78-410b-4c9b-be7a-1d154385bcce.png",
-      url: "https://www.canyon.com"
+      url: "https://www.canyon.com/fr-fr/"
     },
     { 
       name: "Commencal", 
       logo: "/lovable-uploads/fd1b44e8-bc02-4bd0-b187-ab685c182ccc.png",
-      url: "https://www.commencal.com"
+      url: "https://www.commencal.com/"
     },
     { 
       name: "Ambit Components", 
-      logo: "/lovable-uploads/57c6ffc9-dcdf-4ce7-aff2-fa72c549251e.png",
-      url: "#"
+      logo: "/lovable-uploads/b41bc377-8dfa-48ff-a405-e45df64873b3.png",
+      url: "https://ambit-components.com/en/"
     },
     { 
       name: "Pulsor Agency", 
-      logo: "/lovable-uploads/81894cd3-d81a-4636-bbf5-c0e1a5732d57.png",
-      url: "#"
+      logo: "/lovable-uploads/a2f9923a-a28c-46c2-b041-324fea7c7fd2.png",
+      url: "https://www.pulsor.agency/"
     },
     { 
       name: "Ultrack Agency", 
       logo: "/lovable-uploads/ea14cd8f-e603-4737-8f61-3a6eb2dfac23.png",
-      url: "#"
+      url: "https://ultrack.webflow.io/"
     }
   ];
 

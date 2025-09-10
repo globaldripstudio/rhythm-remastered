@@ -38,38 +38,38 @@ const Equipment = () => {
       { name: "Shure SM57", type: "Dynamique polyvalent", status: "classic" },
       { name: "Sennheiser E906", type: "Dynamique guitare", status: "standard" },
       { name: "Melodynamic 75A", type: "Dynamique vintage", status: "vintage" },
-      { name: "Shure CR80R", type: "Dynamique", status: "standard" },
+      { name: "Shure CR80R", type: "Dynamique", status: "vintage" },
       { name: "Griffon Microphones Fuzzyphone", type: "Micro créatif", status: "premium" },
       { name: "Griffon Microphones Saturne (x2)", type: "Condensateur", status: "premium" },
-      { name: "LOM Geofon", type: "Géophone contact", status: "premium" }
+      { name: "LOM Geofon", type: "Géophone contact", status: "creative" }
     ],
     preamps: [
       { name: "Neve 1073", type: "Préampli vintage légendaire", status: "vintage" },
-      { name: "DBX 286s", type: "Préampli/processeur voix", status: "standard" },
-      { name: "Unison Pre (x8)", type: "Préamplis UA", status: "premium" }
+      { name: "Unison Pre (x8)", type: "Préamplis UA", status: "premium" },
+      { name: "DBX 286s", type: "Préampli/processeur voix", status: "standard" }
     ],
     equalizers: [
       { name: "Klark Teknik EQP-KT (x2)", type: "Égaliseur Pultec-style", status: "premium" },
-      { name: "GAR VAULTEC EQP-2A3SS", type: "Égaliseur passif", status: "premium" },
+      { name: "General Audio Research VAULTEC EQP-2A3SS", type: "Égaliseur passif", status: "premium" },
       { name: "Behringer Ultragraph Pro", type: "Égaliseur graphique", status: "standard" }
     ],
     compressors: [
       { name: "IGS S-Type 500VU Buss Compressor", type: "Compresseur bus", status: "premium" },
-      { name: "GAR Sonar 500", type: "Compresseur analogique", status: "premium" },
+      { name: "General Audio Research Sonar 500", type: "Compresseur analogique", status: "premium" },
       { name: "DBX 160a (x2)", type: "Compresseur VCA", status: "classic" },
-      { name: "Alesis 3630", type: "Compresseur/limiteur", status: "standard" },
+      { name: "Alesis 3630", type: "Compresseur/limiteur", status: "classic" },
       { name: "DBX 286s", type: "Processeur voix", status: "standard" },
-      { name: "Klark Teknik 3rd Dimension BBD-320", type: "Effet BBD", status: "premium" },
+      { name: "Klark Teknik 3rd Dimension BBD-320", type: "Chorus", status: "premium" },
       { name: "Behringer Virtualizer Pro", type: "Multi-effets", status: "standard" },
       { name: "tc.electronics Sentry", type: "Gate/Expander", status: "standard" },
-      { name: "Digitech Whammy 5", type: "Effet guitare", status: "standard" }
+      { name: "Digitech Whammy 5", type: "Effet guitare", status: "creative" }
     ],
     instruments: [
       { name: "ESP E-II Horizon", type: "Guitare électrique", status: "premium" },
       { name: "Lag Roxane RR-1500", type: "Guitare électrique", status: "standard" },
       { name: "Fender Stratocaster Player Series", type: "Guitare électrique", status: "classic" },
-      { name: "Ibanez Tod10n", type: "Guitare électrique", status: "standard" },
-      { name: "Washburn D15", type: "Guitare acoustique", status: "standard" },
+      { name: "Ibanez Tod10n", type: "Guitare électro-classique", status: "standard" },
+      { name: "Washburn D15", type: "Guitare folk", status: "standard" },
       { name: "Guitare classique Pro Natura", type: "Guitare classique", status: "standard" },
       { name: "Guitare manouche Di Mauro", type: "Guitare manouche", status: "vintage" },
       { name: "Fender Jazz Bass Special", type: "Basse électrique", status: "classic" },
@@ -87,7 +87,7 @@ const Equipment = () => {
       { name: "Laney Linebacker KB80", type: "Amplificateur clavier", status: "standard" },
       { name: "Fender Bassman 100", type: "Amplificateur basse", status: "classic" },
       { name: "Marshall AS50D", type: "Amplificateur acoustique", status: "standard" },
-      { name: "GAR TU-DI MK1 / FE-DI MK3", type: "Boîte de direct", status: "premium" },
+      { name: "General Audio Research TU-DI MK1 / FE-DI MK3", type: "Boîte de direct", status: "premium" },
       { name: "Millenium DI-E DI Box (x2)", type: "Boîte de direct", status: "standard" }
     ],
     plugins: [
@@ -98,7 +98,7 @@ const Equipment = () => {
       { name: "Suite Waves 10", type: "Suite d'effets", status: "industry" },
       { name: "Suite FabFilter", type: "Suite d'effets", status: "premium" },
       { name: "Suite bx", type: "Suite d'effets", status: "premium" },
-      { name: "Suite Acustica", type: "Émulations analogiques", status: "vintage" },
+      { name: "Suite Acustica", type: "Émulations analogiques", status: "premium" },
       { name: "Soundtoys Effects Rack", type: "Effets créatifs", status: "creative" },
       { name: "Izotope Ozone 9 Suite", type: "Suite mastering", status: "industry" },
       { name: "Izotope RX 8 & 9", type: "Restauration audio", status: "premium" },
@@ -108,7 +108,7 @@ const Equipment = () => {
       { name: "NI Kontakt", type: "Sampler", status: "industry" },
       { name: "Klanghelm MJUC Compressor", type: "Compresseur vintage", status: "vintage" },
       { name: "Nicky Romero Kickstart", type: "Sidechain", status: "standard" },
-      { name: "Drip Plugin", type: "Effet signature", status: "signature" },
+      { name: "Drip Plugin", type: "Effet signature", status: "creative" },
       { name: "Nasty DLA Mk II", type: "Delay créatif", status: "creative" }
     ]
   };

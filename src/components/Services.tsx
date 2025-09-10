@@ -18,8 +18,7 @@ const Services = () => {
       features: [
         "Mixage professionnel multi-pistes",
         "Mastering hybride analogique/numérique", 
-        "3 révisions incluses",
-        "Formats de livraison multiples"
+        "3 révisions incluses"
       ]
     },
     {
@@ -40,14 +39,14 @@ const Services = () => {
     {
       id: "captation-sonore",
       title: "Captation Sonore",
-      description: "Captation audio professionnelle pour événements et tournages",
-      price: "350/j",
+      description: "Captation audio professionnelle en studio, ou pour évènements et tournages",
+      price: "30€/h - 350€/j",
       icon: Mic,
-      image: "/lovable-uploads/c2397d66-8252-43dd-b6b5-13da38c2a814.png",
+      image: "/lovable-uploads/92466e48-6f78-46d4-bb9b-2bc8c6a50017.png",
       features: [
-        "Équipement portable professionnel",
-        "Mixage live multicanaux",
-        "Enregistrement multi-pistes",
+        "Enregistrement studio professionnel",
+        "Captation événementielle mobile",
+        "Équipement haute qualité",
         "Post-production incluse"
       ]
     },
@@ -61,8 +60,7 @@ const Services = () => {
       features: [
         "Composition originale",
         "Production complète",
-        "Arrangements personnalisés",
-        "Droits d'auteur inclus"
+        "Arrangements personnalisés"
       ]
     },
     {
@@ -76,7 +74,7 @@ const Services = () => {
         "Direction artistique complète",
         "Arrangements instrumentaux",
         "Conseils créatifs personnalisés",
-        "Suivi de projet de A à Z"
+        "Suivi de projet personnalisable"
       ]
     },
     {

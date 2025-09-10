@@ -8,9 +8,11 @@ const Footer = () => {
           {/* Brand & Description */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-accent flex items-center justify-center">
-                <span className="text-xl font-bold text-white">GW</span>
-              </div>
+              <img 
+                src="/lovable-uploads/c3273283-75da-434d-bae5-5d290e816d14.png" 
+                alt="Global Drip Studio Logo" 
+                className="w-12 h-12 object-contain"
+              />
               <div>
                 <div className="text-lg font-bold">GLOBAL DRIP</div>
                 <div className="text-sm text-muted-foreground">Worldwide</div>

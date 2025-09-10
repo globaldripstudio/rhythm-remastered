@@ -199,7 +199,7 @@ const Contact = () => {
               <div className="text-center">
                 <div className="flex justify-center mb-4">
                   <img 
-                    src="/lovable-uploads/b1d688ef-83fd-45c5-b0be-5c8a827cb179.png"
+                    src="/lovable-uploads/09b9130f-1cda-4dba-8f4f-7a80c5da17ec.png"
                     alt="Global Drip Studio - Professional Audio"
                     className="h-16 object-contain opacity-80"
                   />
