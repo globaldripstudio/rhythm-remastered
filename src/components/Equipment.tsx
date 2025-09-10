@@ -130,12 +130,12 @@ const Equipment = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "premium": return "bg-primary text-primary-foreground";
+      case "premium": return "bg-orange-premium text-white";
       case "vintage": return "bg-secondary text-secondary-foreground"; 
-      case "classic": return "bg-accent text-accent-foreground";
-      case "industry": return "bg-gradient-to-r from-primary to-accent text-white";
-      case "creative": return "bg-gradient-to-r from-accent to-primary text-white";
-      case "signature": return "bg-gradient-to-r from-secondary to-primary text-white";
+      case "classic": return "bg-orange-classic text-white";
+      case "industry": return "bg-gradient-to-r from-orange-premium to-secondary text-white";
+      case "creative": return "bg-gradient-to-r from-orange-classic to-orange-premium text-white";
+      case "signature": return "bg-gradient-to-r from-secondary to-orange-premium text-white";
       default: return "bg-muted text-muted-foreground";
     }
   };

@@ -17,16 +17,26 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-muted-foreground mb-6 max-w-md">
-              Studio d'enregistrement professionnel spécialisé dans le mixage et mastering audio. 
-              Plus de 10 années d'expérience au service de votre créativité musicale.
+              Studio d'enregistrement professionnel spécialisé dans le mixage, mastering audio et sound design. 
+              Plus de 10 années d'expérience au service de votre créativité.
             </p>
             
             {/* Social Links */}
             <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
+              <a 
+                href="https://www.instagram.com/globaldripstudio/?hl=fr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61561645792033" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
                 <Facebook className="w-5 h-5" />
               </a>
               <a href="#" className="w-10 h-10 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
@@ -55,15 +65,15 @@ const Footer = () => {
             <div className="space-y-3 text-muted-foreground">
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm">123 Rue de la Musique<br />75001 Paris</span>
+                <span className="text-sm">8 allée des ajoncs<br />13500 Martigues</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm">+33 1 23 45 67 89</span>
+                <span className="text-sm">+33 6 59 79 73 42</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm">contact@globaldripstudio.fr</span>
+                <span className="text-sm">globaldripstudio@gmail.com</span>
               </div>
             </div>
           </div>

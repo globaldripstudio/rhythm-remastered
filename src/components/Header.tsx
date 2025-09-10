@@ -29,7 +29,7 @@ const Header = () => {
             <a href="#accueil" className="hover:text-primary transition-colors">Accueil</a>
             <a href="#services" className="hover:text-primary transition-colors">Services</a>
             <a href="#equipement" className="hover:text-primary transition-colors">Équipement</a>
-            <a href="#projets" className="hover:text-primary transition-colors">Projets</a>
+            <a href="/blog" className="hover:text-primary transition-colors">Blog</a>
             <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
           </nav>
 
@@ -60,7 +60,7 @@ const Header = () => {
               <a href="#accueil" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Accueil</a>
               <a href="#services" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Services</a>
               <a href="#equipement" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Équipement</a>
-              <a href="#projets" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Projets</a>
+              <a href="/blog" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Blog</a>
               <a href="#contact" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Contact</a>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">

@@ -14,6 +14,7 @@ const Services = () => {
       price: "290",
       icon: Waves,
       image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
+      featured: true,
       features: [
         "Mixage professionnel multi-pistes",
         "Mastering hybride analogique/numérique", 
@@ -103,8 +104,8 @@ const Services = () => {
             Nos <span className="hero-text">Services</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Des prestations professionnelles adaptées à tous vos besoins musicaux,
-            du simple mixage au mastering haute fidélité
+            Des prestations professionnelles adaptées à tous vos besoins musicaux, 
+            du mixage/mastering haute fidélité à la composition, en passant par la formation
           </p>
         </div>
 

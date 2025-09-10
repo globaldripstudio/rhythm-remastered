@@ -52,6 +52,8 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				'orange-premium': 'hsl(var(--orange-premium))',
+				'orange-classic': 'hsl(var(--orange-classic))',
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif'],

@@ -34,13 +34,13 @@ const Hero = () => {
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Magnifiez votre musique avec notre expertise en enregistrement, mixage et mastering professionnel
+            Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel
           </p>
 
           {/* Stats */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">500+</div>
+              <div className="text-3xl font-bold text-primary">200+</div>
               <div className="text-sm text-muted-foreground">Projets réalisés</div>
             </div>
             <div className="text-center">
@@ -69,7 +69,7 @@ const Hero = () => {
           <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center">
               <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-glow-pulse" />
-              Studio ouvert 24h/24
+              Expertise reconnue depuis 2014
             </div>
             <div className="flex items-center">
               <div className="w-2 h-2 bg-secondary rounded-full mr-2" />
@@ -77,7 +77,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center">
               <div className="w-2 h-2 bg-primary rounded-full mr-2" />
-              Ingénieurs certifiés
+              Ingénieur certifié
             </div>
           </div>
         </div>

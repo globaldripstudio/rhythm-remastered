@@ -2,42 +2,70 @@ import { Card } from "@/components/ui/card";
 
 const Partners = () => {
   const partners = [
-    { name: "Porsche", logo: "https://upload.wikimedia.org/wikipedia/commons/1/17/Porsche_logo.svg" },
-    { name: "Canyon Bicycles", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Canyon_bicycles_logo.svg" },
-    { name: "Commencal", logo: "/lovable-uploads/fd1b44e8-bc02-4bd0-b187-ab685c182ccc.png" },
-    { name: "Ambit Components", logo: "/placeholder-logo.svg" },
-    { name: "Pulsor Agency", logo: "/lovable-uploads/45cee96e-8f90-46a9-91f2-033aa5006d67.png" },
-    { name: "Ultrack Agency", logo: "/lovable-uploads/6ce6d0b8-6814-46e2-9e0c-e8762479e4b7.png" }
+    { 
+      name: "Porsche", 
+      logo: "/lovable-uploads/8d7d8e6d-4601-4ace-9397-7e40b97799f7.png",
+      url: "https://www.porsche.com"
+    },
+    { 
+      name: "Canyon Bicycles", 
+      logo: "/lovable-uploads/63018b78-410b-4c9b-be7a-1d154385bcce.png",
+      url: "https://www.canyon.com"
+    },
+    { 
+      name: "Commencal", 
+      logo: "/lovable-uploads/fd1b44e8-bc02-4bd0-b187-ab685c182ccc.png",
+      url: "https://www.commencal.com"
+    },
+    { 
+      name: "Ambit Components", 
+      logo: "/lovable-uploads/57c6ffc9-dcdf-4ce7-aff2-fa72c549251e.png",
+      url: "#"
+    },
+    { 
+      name: "Pulsor Agency", 
+      logo: "/lovable-uploads/81894cd3-d81a-4636-bbf5-c0e1a5732d57.png",
+      url: "#"
+    },
+    { 
+      name: "Ultrack Agency", 
+      logo: "/lovable-uploads/ea14cd8f-e603-4737-8f61-3a6eb2dfac23.png",
+      url: "#"
+    }
   ];
 
   return (
     <section className="py-16 bg-muted/5">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-4">
             Nous avons les <span className="hero-text">meilleurs partenaires</span>
           </h2>
-          <p className="text-muted-foreground">
-            Ils nous font confiance pour leurs projets audio
-          </p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {partners.map((partner, index) => (
-            <Card 
+            <a 
               key={partner.name}
-              className="p-6 flex items-center justify-center hover:shadow-lg transition-all duration-300 group"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              href={partner.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
             >
-              <div className="w-full h-12 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
-                <img 
-                  src={partner.logo}
-                  alt={`${partner.name} logo`}
-                  className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
-                  style={{ maxHeight: '40px' }}
-                />
-              </div>
-            </Card>
+              <Card 
+                className="p-6 flex items-center justify-center hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="w-full h-12 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
+                  <img 
+                    src={partner.logo}
+                    alt={`${partner.name} logo`}
+                    className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    style={{ maxHeight: '40px' }}
+                  />
+                </div>
+              </Card>
+            </a>
           ))}
         </div>
       </div>

@@ -33,6 +33,10 @@ All colors MUST be HSL for perfect theming.
     --accent: 18 100% 60%; /* Orange accent */
     --accent-foreground: 0 0% 100%;
 
+    /* Equipment Status Colors */
+    --orange-premium: 18 100% 58%; /* Slightly deeper orange */
+    --orange-classic: 25 100% 65%; /* Slightly lighter, more yellow-orange */
+
     /* Status Colors */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;

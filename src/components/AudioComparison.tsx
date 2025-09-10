@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2, Headphones } from "lucide-react";
+import { Play, Pause, Volume2, Headphones, Mic } from "lucide-react";
 
 const AudioComparison = () => {
   const [selectedGenre, setSelectedGenre] = useState('hiphop');
@@ -188,15 +188,21 @@ const AudioComparison = () => {
             </Card>
           </div>
 
-          <div className="text-center mt-12">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-6">
-              <Headphones className="w-4 h-4 mr-2 text-primary" />
-              <span className="text-sm text-muted-foreground">Casque ou moniteurs recommandés pour une meilleure expérience</span>
-            </div>
-            <Button size="lg" className="studio-button text-lg px-8 py-6">
-              Réserver une Session Mixage
-            </Button>
+        {/* Listening Recommendation */}
+        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4 mb-12">
+          <div className="flex items-center justify-center text-sm text-muted-foreground">
+            <Headphones className="w-4 h-4 mr-2" />
+            Casque ou moniteurs recommandés pour une meilleure expérience
           </div>
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="text-center">
+          <Button size="lg" className="studio-button">
+            <Mic className="w-5 h-5 mr-2" />
+            Réserver une session de mixage
+          </Button>
+        </div>
         </div>
       </div>
     </section>

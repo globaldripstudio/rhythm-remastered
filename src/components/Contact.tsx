@@ -161,8 +161,8 @@ const Contact = () => {
                   <div>
                     <div className="font-medium">Heures d'ouverture</div>
                     <div className="text-muted-foreground">
-                      Lun - Ven : 9h00 - 22h00<br />
-                      Sam - Dim : 10h00 - 20h00
+                      Lun - Ven : 10h00 - 20h00<br />
+                      Sam - Dim : Fermé
                     </div>
                   </div>
                 </div>
@@ -194,16 +194,21 @@ const Contact = () => {
               </Card>
             </div>
 
-            {/* Emergency Contact */}
-            <Card className="service-card bg-gradient-accent text-white">
-              <CardContent className="p-6 text-center">
-                <Phone className="w-8 h-8 mx-auto mb-3" />
-                <h3 className="font-bold text-lg mb-2">Urgence ou session tardive ?</h3>
-                <p className="text-sm opacity-90 mb-4">
-                  Contactez notre ligne d'urgence 24h/24
+            {/* Logo Display */}
+            <Card className="p-8 bg-gradient-to-br from-card to-muted/20 border-border/50">
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  <img 
+                    src="/lovable-uploads/b1d688ef-83fd-45c5-b0be-5c8a827cb179.png"
+                    alt="Global Drip Studio - Professional Audio"
+                    className="h-16 object-contain opacity-80"
+                  />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Global Drip Studio</h3>
+                <p className="text-muted-foreground">
+                  Excellence audio depuis 2014
                 </p>
-                <div className="text-xl font-bold">+33 6 12 34 56 78</div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         </div>
