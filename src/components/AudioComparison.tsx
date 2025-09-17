@@ -23,8 +23,8 @@ const AudioComparison = () => {
       key: 'rock', 
       title: 'Rock',
       description: 'Puissance et dynamique pour le rock',
-      beforeSrc: '/audio/rock-before.mp3',
-      afterSrc: '/audio/rock-after.mp3'
+      beforeSrc: '/audio/excalibur-no-mix.wav',
+      afterSrc: '/audio/excalibur-mixed.wav'
     },
     { 
       key: 'edm', 
@@ -189,7 +189,7 @@ const AudioComparison = () => {
           </div>
 
         {/* Listening Recommendation */}
-        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4 mb-12">
+        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-4 mb-8">
           <div className="flex items-center justify-center text-sm text-muted-foreground">
             <Headphones className="w-4 h-4 mr-2" />
             Casque ou moniteurs recommandés pour une meilleure expérience

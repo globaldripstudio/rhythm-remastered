@@ -9,7 +9,7 @@ const Partners = () => {
     },
     { 
       name: "Canyon Bicycles", 
-      logo: "/lovable-uploads/63018b78-410b-4c9b-be7a-1d154385bcce.png",
+      logo: "/lovable-uploads/canyon-new.png",
       url: "https://www.canyon.com/fr-fr/"
     },
     { 
@@ -19,7 +19,7 @@ const Partners = () => {
     },
     { 
       name: "Ambit Components", 
-      logo: "/lovable-uploads/b41bc377-8dfa-48ff-a405-e45df64873b3.png",
+      logo: "/lovable-uploads/ambit-new.png",
       url: "https://ambit-components.com/en/"
     },
     { 
@@ -53,14 +53,16 @@ const Partners = () => {
               className="block"
             >
               <Card 
-                className="p-6 flex items-center justify-center hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                className="p-6 flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-pointer animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-full h-12 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
                   <img 
                     src={partner.logo}
                     alt={`${partner.name} logo`}
-                    className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    className={`max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 ${
+                      partner.name === "Pulsor Agency" ? "scale-125" : ""
+                    }`}
                     style={{ maxHeight: '40px' }}
                   />
                 </div>

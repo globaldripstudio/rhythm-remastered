@@ -13,7 +13,7 @@ const Services = () => {
       description: "Service complet pour donner vie à vos créations musicales",
       price: "290",
       icon: Waves,
-      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
+      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
       featured: true,
       features: [
         "Mixage professionnel multi-pistes",
@@ -27,7 +27,7 @@ const Services = () => {
       description: "Création sonore et design audio pour tous vos projets créatifs",
       price: "Sur devis",
       icon: Settings,
-      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
       featured: true,
       features: [
         "Sound design pour films et jeux",
@@ -54,7 +54,7 @@ const Services = () => {
       id: "composition",
       title: "Composition / Beatmaking",
       description: "Création musicale et production de beats personnalisés",
-      price: "300+",
+      price: "Sur devis",
       icon: Volume2,
       image: "/lovable-uploads/64615fd6-368c-466a-a669-f5140677e476.png",
       features: [
@@ -81,7 +81,7 @@ const Services = () => {
       id: "formation",
       title: "Formation MAO / Mixage",
       description: "Formations personnalisées en production musicale et techniques de mixage",
-      price: "150/h",
+      price: "39€/h",
       icon: Volume2,
       image: "/lovable-uploads/6ed6bc90-04bb-4040-9e0b-26b3c13bba5d.png",
       features: [
@@ -155,10 +155,10 @@ const Services = () => {
                   ))}
                 </ul>
 
-                {/* Action Button */}
                 <Button 
                   className="w-full group-hover:studio-button transition-all duration-300"
                   variant="outline"
+                  onClick={() => window.location.href = '/services'}
                 >
                   Plus d'infos
                   <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
