@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -9,6 +9,17 @@ import { useNavigate } from "react-router-dom";
 const Services = () => {
   const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState<string | null>(null);
+
+  // Open detail directly when URL hash is present
+  useEffect(() => {
+    const setFromHash = () => {
+      const id = window.location.hash?.replace('#', '');
+      if (id) setSelectedService(id);
+    };
+    setFromHash();
+    window.addEventListener('hashchange', setFromHash);
+    return () => window.removeEventListener('hashchange', setFromHash);
+  }, []);
 
   const services = [
     {
@@ -71,7 +82,7 @@ const Services = () => {
       ],
       process: "Préparation → Installation → Captation → Monitoring → Post-production",
       details: "Service complet d'enregistrement en studio ou en extérieur. Nous nous adaptons à tous vos besoins avec un équipement mobile de qualité professionnelle.",
-      equipment: ["Microphones Neumann", "Préamplis Focusrite", "Enregistreurs portables", "Monitoring professionnel"],
+      equipment: ["ProTools Ultimate", "Microphones Griffon", "Préamplis Neve et Unison", "Monitoring professionnel"],
       deliverables: ["Pistes brutes multitrack", "Écoutes de travail", "Fichiers synchronisés"]
     },
     {
@@ -87,13 +98,12 @@ const Services = () => {
       included: [
         "Composition originale",
         "Production complète",
-        "Arrangements personnalisés",
-        "Stems de qualité studio"
+        "Arrangements personnalisés"
       ],
       process: "Brief artistique → Création → Arrangements → Production → Finalisation",
       details: "De l'idée à la réalisation complète, nous créons des compositions originales adaptées à votre style et vos besoins artistiques.",
-      equipment: ["Stations audio pro", "Bibliothèques sonores premium", "Instruments virtuels", "Synthétiseurs hardware"],
-      deliverables: ["Composition complète", "Stems instrumentaux", "Versions alternatives"]
+      equipment: ["FL Studio", "VSTs", "Banques de sons Splice", "Instruments réels"],
+      deliverables: ["Composition complète", "Version concert (PBO)", "Multistems négociable"]
     },
     {
       id: "direction-artistique",
@@ -113,7 +123,7 @@ const Services = () => {
       ],
       process: "Analyse artistique → Conseil stratégique → Arrangements → Suivi → Optimisation",
       details: "Accompagnement complet de votre projet artistique, de la conception à la réalisation, avec une expertise technique et créative.",
-      equipment: ["Analyse spectrale", "Références du marché", "Outils de création", "Monitoring critique"],
+      equipment: ["Direction artistique stratégique", "Réseau de musiciens et ingénieurs", "Références & benchmarks professionnels", "Méthodologies de production"],
       deliverables: ["Plan artistique détaillé", "Arrangements finalisés", "Rapport de suivi"]
     },
     {
@@ -160,7 +170,7 @@ const Services = () => {
               <img 
                 src={service.image}
                 alt={service.title}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover ${service.id === 'composition' ? 'object-top' : ''}`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
@@ -200,7 +210,7 @@ const Services = () => {
                     <CardTitle>Processus de travail</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                       {service.process.split(' → ').map((step, index, array) => (
                         <div key={index} className="flex items-center gap-2">
                           <span className="px-3 py-1 bg-primary/10 rounded-full">{step}</span>

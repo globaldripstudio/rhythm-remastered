@@ -59,7 +59,7 @@ const Hero = () => {
               <Mic className="w-5 h-5 mr-2" />
               Réserver une session
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-muted">
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-muted" onClick={() => (window.location.href = '/projets')}>
               <Play className="w-5 h-5 mr-2" />
               Écouter nos réalisations
             </Button>
@@ -69,7 +69,7 @@ const Hero = () => {
           <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center">
               <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-glow-pulse" />
-              Expertise reconnue depuis 2014
+              Expertise reconnue depuis 2019
             </div>
             <div className="flex items-center">
               <div className="w-2 h-2 bg-secondary rounded-full mr-2" />
