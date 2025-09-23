@@ -29,7 +29,7 @@ const Services = () => {
       ],
       process: "Analyse → Mixage → Mastering → Révisions → Livraison finale",
       details: "Notre service phare combine mixage professionnel et mastering de haute qualité. Nous utilisons une approche hybride combinant le meilleur de l'analogique et du numérique pour sublimer vos productions.",
-      equipment: ["Console SSL", "Compresseurs 1176", "EQ Neve", "Moniteurs Genelec"],
+      equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "EQP-KTs & EQP-2A3SS", "Moniteurs Adam A77x & RP6 Rokit G3"],
       deliverables: ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps", "Version streaming optimisée"]
     },
     {

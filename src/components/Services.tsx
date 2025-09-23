@@ -13,7 +13,7 @@ const Services = () => {
       description: "Service complet pour donner vie à vos créations musicales",
       price: "290",
       icon: Waves,
-      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
       featured: true,
       features: [
         "Mixage professionnel multi-pistes",
@@ -27,7 +27,7 @@ const Services = () => {
       description: "Création sonore et design audio pour tous vos projets créatifs",
       price: "Sur devis",
       icon: Settings,
-      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
+      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
       featured: true,
       features: [
         "Sound design pour films et jeux",
@@ -54,13 +54,14 @@ const Services = () => {
       id: "composition",
       title: "Composition / Beatmaking",
       description: "Création musicale et production de beats personnalisés",
-      price: "Sur devis",
+      price: "A partir de 300€",
       icon: Volume2,
       image: "/lovable-uploads/64615fd6-368c-466a-a669-f5140677e476.png",
       features: [
         "Composition originale",
         "Production complète",
-        "Arrangements personnalisés"
+        "Arrangements personnalisés",
+        "Composition Exclusive"
       ]
     },
     {
@@ -122,7 +123,11 @@ const Services = () => {
                 <img 
                   src={service.image}
                   alt={service.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
+                    ['mixage-mastering', 'captation-sonore', 'direction-artistique'].includes(service.id) 
+                      ? 'object-top' 
+                      : ''
+                  }`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
                 <div className="absolute top-4 right-4">
@@ -158,7 +163,7 @@ const Services = () => {
                 <Button 
                   className="w-full group-hover:studio-button transition-all duration-300"
                   variant="outline"
-                  onClick={() => window.location.href = '/services'}
+                  onClick={() => window.location.href = `/services#${service.id}`}
                 >
                   Plus d'infos
                   <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />

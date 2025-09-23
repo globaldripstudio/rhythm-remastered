@@ -16,22 +16,25 @@ const AudioComparison = () => {
       key: 'hiphop', 
       title: 'Hip-Hop',
       description: 'Punch et clarté pour le rap moderne',
-      beforeSrc: '/audio/hiphop-before.mp3',
-      afterSrc: '/audio/hiphop-after.mp3'
+      beforeSrc: '/audio/hef-no-mix.wav',
+      afterSrc: '/audio/hef-mixed.wav',
+      credits: '"HEFNER" by Tany, produit au Global Drip Studio et paru le 1er décembre 2023'
     },
     { 
       key: 'rock', 
       title: 'Rock',
       description: 'Puissance et dynamique pour le rock',
       beforeSrc: '/audio/excalibur-no-mix.wav',
-      afterSrc: '/audio/excalibur-mixed.wav'
+      afterSrc: '/audio/excalibur-mixed.wav',
+      credits: '"Excalibur" by Venin, édité/enregistré (voix)/mixé/masterisé au Global Drip Studio et paru le 15 mai 2025'
     },
     { 
       key: 'edm', 
       title: 'EDM',
       description: 'Impact et largeur pour l\'électronique',
-      beforeSrc: '/audio/edm-before.mp3',
-      afterSrc: '/audio/edm-after.mp3'
+      beforeSrc: '/audio/bigbass-no-mix.wav',
+      afterSrc: '/audio/bigbass-mixed.wav',
+      credits: '"BIG BASS" by Eddy de Mart, mixé et masterisé au Global Drip Studio, unreleased'
     }
   ];
 
@@ -122,7 +125,10 @@ const AudioComparison = () => {
               <span className="text-sm text-muted-foreground">Genre sélectionné</span>
             </div>
             <h3 className="text-3xl font-bold mb-3">{currentGenre?.title}</h3>
-            <p className="text-lg text-muted-foreground">{currentGenre?.description}</p>
+            <p className="text-lg text-muted-foreground mb-4">{currentGenre?.description}</p>
+            <div className="text-sm text-muted-foreground italic bg-card/30 backdrop-blur-sm rounded-lg p-3 max-w-2xl mx-auto">
+              {currentGenre?.credits}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
