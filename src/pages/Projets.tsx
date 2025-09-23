@@ -23,9 +23,8 @@ const Projets = () => {
       <main className="pt-28">
         <section className="container mx-auto px-6 mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Écouter nos réalisations</h1>
-          <p className="text-muted-foreground max-w-2xl">Parcourez une sélection de projets avec comparaison avant/après. Chaque extrait reflète notre approche exigeante du mixage et du mastering.</p>
+          <p className="text-muted-foreground max-w-2xl">Page en cours de développement. Cette section sera bientôt disponible avec des exemples de nos réalisations.</p>
         </section>
-        <AudioComparison />
       </main>
       <Footer />
     </div>

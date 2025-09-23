@@ -157,11 +157,11 @@ const Services = () => {
         <div className="container mx-auto px-6 py-12">
           <Button 
             variant="ghost" 
-            onClick={() => setSelectedService(null)}
+            onClick={() => window.location.href = '/#services'}
             className="mb-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour aux services
+            Retour à la page principale
           </Button>
 
           <div className="max-w-4xl mx-auto">
@@ -170,7 +170,13 @@ const Services = () => {
               <img 
                 src={service.image}
                 alt={service.title}
-                className={`w-full h-full object-cover ${service.id === 'composition' ? 'object-top' : ''}`}
+                className={`w-full h-full object-cover ${
+                  service.id === 'composition' ? 'object-center' :
+                  service.id === 'captation-sonore' ? 'object-center' :  
+                  service.id === 'direction-artistique' ? 'object-center' :
+                  service.id === 'mixage-mastering' ? 'object-top' :
+                  ''
+                }`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">

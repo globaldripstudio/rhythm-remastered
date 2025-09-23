@@ -124,9 +124,10 @@ const Services = () => {
                   src={service.image}
                   alt={service.title}
                   className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
-                    ['mixage-mastering', 'captation-sonore', 'direction-artistique'].includes(service.id) 
-                      ? 'object-top' 
-                      : ''
+                    service.id === 'captation-sonore' ? 'object-center' :
+                    service.id === 'direction-artistique' ? 'object-center' :
+                    service.id === 'mixage-mastering' ? 'object-top' :
+                    ''
                   }`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
