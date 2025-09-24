@@ -20,7 +20,7 @@ const BlogArticle = () => {
               <img 
                 src="/lovable-uploads/venin-album-cover.jpg"
                 alt="Album Le Premier Sang de Venin"
-                className="w-full h-64 object-cover rounded-lg"
+                className="w-full max-w-none h-auto rounded-lg"
               />
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
                 Le double vinyl de l'album "Le Premier Sang" est disponible sur Bandcamp.
@@ -72,7 +72,7 @@ const BlogArticle = () => {
               <img 
                 src="/lovable-uploads/jean-marc-battini.jpg"
                 alt="Jean-Marc Battini en concert"
-                className="w-full h-80 object-cover rounded-lg"
+                className="w-full max-w-none h-auto rounded-lg"
               />
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
                 Jean-Marc Battini, fondateur de Venin
@@ -108,7 +108,7 @@ const BlogArticle = () => {
               <img 
                 src="/lovable-uploads/venin-logo.jpg"
                 alt="Logo du groupe Venin"
-                className="w-full max-w-md mx-auto h-48 object-contain rounded-lg bg-black"
+                className="w-full max-w-none h-auto rounded-lg bg-black"
               />
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
                 L'emblématique logo du groupe Venin

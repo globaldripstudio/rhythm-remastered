@@ -42,7 +42,7 @@ const Services = () => {
       description: "Captation audio professionnelle en studio, ou pour évènements et tournages",
       price: "30€/h - 350€/j",
       icon: Mic,
-      image: "/lovable-uploads/92466e48-6f78-46d4-bb9b-2bc8c6a50017.png",
+      image: "/lovable-uploads/_edited.jpg.png",
       features: [
         "Enregistrement studio professionnel",
         "Captation événementielle mobile",

@@ -102,7 +102,25 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full studio-button">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="w-full studio-button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const form = (e.target as HTMLElement).closest('form') as HTMLFormElement;
+                    const formData = new FormData(form);
+                    const subject = encodeURIComponent('Demande de réservation - Global Drip Studio');
+                    const body = encodeURIComponent(`
+                      Nom: ${formData.get('firstName')} ${formData.get('lastName')}
+                      Email: ${formData.get('email')}
+                      Téléphone: ${formData.get('phone')}
+                      Service: ${formData.get('service')}
+                      Message: ${formData.get('message')}
+                    `);
+                    window.location.href = `mailto:globaldripstudio@gmail.com?subject=${subject}&body=${body}`;
+                  }}
+                >
                   <Send className="w-4 h-4 mr-2" />
                   Envoyer la demande
                 </Button>
@@ -206,7 +224,7 @@ const Contact = () => {
                 </div>
                 <h3 className="font-bold text-lg mb-2">Global Drip Studio</h3>
                 <p className="text-muted-foreground">
-                  Excellence audio depuis 2019
+                  Passion audio & Innovation constante
                 </p>
               </div>
             </Card>

@@ -227,21 +227,90 @@ const Services = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Équipement utilisé</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      {service.equipment.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <Star className="w-4 h-4 text-primary" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+        {service.id === "sound-design" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Plus d'infos - Nos réalisations Sound Design</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h4 className="font-semibold mb-2">THE HOLY LAND - Tomas Lemoine</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Collaboration with Commencal - Post-production/sound design/global mixing
+                </p>
+                <div className="bg-card rounded-lg p-4 border border-border/50">
+                  <iframe 
+                    width="100%" 
+                    height="200"
+                    src="https://www.youtube.com/embed/u44cDLJWeFc"
+                    title="THE HOLY LAND - Tomas Lemoine"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">To the next chapter - Tomas Lemoine</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Collaboration with Canyon Bicycles - Chef opérateur son sur place et en post-prod/sound design/global mixing
+                </p>
+                <div className="bg-card rounded-lg p-4 border border-border/50">
+                  <iframe 
+                    width="100%" 
+                    height="200"
+                    src="https://www.youtube.com/embed/A7s0pP0D3Po"
+                    title="To the next chapter - Tomas Lemoine"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Théo Bachelier</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Post production/sound design/global mixing
+                </p>
+                <div className="bg-card rounded-lg p-4 border border-border/50">
+                  <iframe 
+                    width="100%" 
+                    height="200"
+                    src="https://www.youtube.com/embed/M-eW6rpRklU"
+                    title="Théo Bachelier"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Théo Pulsor</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Young and successful entrepreneur (220k+ views in 4 months) - Post production/sound design/global mixing
+                </p>
+                <div className="bg-card rounded-lg p-4 border border-border/50">
+                  <iframe 
+                    width="100%" 
+                    height="200"
+                    src="https://www.youtube.com/embed/kFEacVd-iMs"
+                    title="Théo Pulsor"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
               </div>
 
               {/* Sidebar */}

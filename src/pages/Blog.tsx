@@ -19,33 +19,36 @@ const Blog = () => {
     },
     {
       id: 2,
-      title: "Les secrets d'un mixage professionnel",
-      excerpt: "Découvrez les techniques avancées utilisées dans notre studio pour sublimer vos productions musicales.",
+      title: "Bien mixer une voix : les 7 étapes essentielles",
+      excerpt: "Maîtrisez l'art du mixage vocal avec ces techniques professionnelles utilisées dans notre studio. De l'égalisation à la compression, découvrez nos secrets.",
       author: "Global Drip Studio",
-      date: "2024-03-15",
-      readTime: "5 min",
+      date: "2024-12-15",
+      readTime: "6 min",
       category: "Mixage",
-      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png"
+      image: "/lovable-uploads/_edited.jpg.png",
+      slug: "bien-mixer-une-voix"
     },
     {
       id: 3,
-      title: "Sound Design : créer l'univers sonore parfait",
-      excerpt: "Comment nous créons des ambiances sonores uniques pour vos projets créatifs et audiovisuels.",
-      author: "Global Drip Studio",
-      date: "2024-03-10",
-      readTime: "7 min",
-      category: "Sound Design",
-      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png"
+      title: "Comprendre la compression en 5 minutes",
+      excerpt: "La compression démystifiée : ratio, attack, release, knee. Apprenez à utiliser cet outil indispensable pour contrôler la dynamique de vos enregistrements.",
+      author: "Global Drip Studio", 
+      date: "2024-12-10",
+      readTime: "5 min",
+      category: "Techniques",
+      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+      slug: "comprendre-la-compression"
     },
     {
       id: 4,
-      title: "Guide complet du mastering hybride",
-      excerpt: "L'alliance parfaite entre l'analogique et le numérique pour un mastering de qualité studio.",
+      title: "10 techniques de sound design pour créer des ambiances uniques",
+      excerpt: "Explorez les techniques avancées de création sonore : field recording, granular synthesis, convolution reverb et manipulation spectrale pour des univers sonores immersifs.",
       author: "Global Drip Studio",
-      date: "2024-03-05",
-      readTime: "6 min",
-      category: "Mastering",
-      image: "/lovable-uploads/35c8540d-ce59-433e-87fd-f1b8b1527941.png"
+      date: "2024-12-05", 
+      readTime: "9 min",
+      category: "Sound Design",
+      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
+      slug: "10-techniques-sound-design"
     }
   ];
 
