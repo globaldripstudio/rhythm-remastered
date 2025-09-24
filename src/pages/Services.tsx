@@ -172,8 +172,8 @@ const Services = () => {
                 alt={service.title}
                 className={`w-full h-full object-cover ${
                   service.id === 'composition' ? 'object-center' :
-                  service.id === 'captation-sonore' ? 'object-center' :  
-                  service.id === 'direction-artistique' ? 'object-center' :
+                  service.id === 'captation-sonore' ? 'object-bottom' :  
+                  service.id === 'direction-artistique' ? 'object-bottom' :
                   service.id === 'mixage-mastering' ? 'object-top' :
                   ''
                 }`}

@@ -206,7 +206,7 @@ const Contact = () => {
                 </div>
                 <h3 className="font-bold text-lg mb-2">Global Drip Studio</h3>
                 <p className="text-muted-foreground">
-                  Excellence audio depuis 2014
+                  Excellence audio depuis 2019
                 </p>
               </div>
             </Card>

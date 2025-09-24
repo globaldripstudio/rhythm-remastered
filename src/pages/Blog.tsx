@@ -8,6 +8,17 @@ const Blog = () => {
   const posts = [
     {
       id: 1,
+      title: '"Le Premier Sang", le nouvel album du groupe Venin, est enfin disponible',
+      excerpt: "Découvrez l'album \"Le Premier Sang\" de Venin, entièrement enregistré, mixé et masterisé au Global Drip Studio.",
+      author: "Global Drip Studio",
+      date: "2024-12-20",
+      readTime: "8 min",
+      category: "Réalisations",
+      image: "/lovable-uploads/venin-album-cover.jpg",
+      slug: "venin-le-premier-sang"
+    },
+    {
+      id: 2,
       title: "Les secrets d'un mixage professionnel",
       excerpt: "Découvrez les techniques avancées utilisées dans notre studio pour sublimer vos productions musicales.",
       author: "Global Drip Studio",
@@ -17,7 +28,7 @@ const Blog = () => {
       image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png"
     },
     {
-      id: 2,
+      id: 3,
       title: "Sound Design : créer l'univers sonore parfait",
       excerpt: "Comment nous créons des ambiances sonores uniques pour vos projets créatifs et audiovisuels.",
       author: "Global Drip Studio",
@@ -27,7 +38,7 @@ const Blog = () => {
       image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png"
     },
     {
-      id: 3,
+      id: 4,
       title: "Guide complet du mastering hybride",
       excerpt: "L'alliance parfaite entre l'analogique et le numérique pour un mastering de qualité studio.",
       author: "Global Drip Studio",
@@ -46,7 +57,7 @@ const Blog = () => {
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-3">
               <img 
-                src="/lovable-uploads/b1d688ef-83fd-45c5-b0be-5c8a827cb179.png"
+                src="/lovable-uploads/logo-blanc-sans-fond.png"
                 alt="Global Drip Studio"
                 className="h-8 object-contain"
               />
@@ -122,7 +133,9 @@ const Blog = () => {
                     </div>
                   </div>
                   <Button variant="outline" className="w-full">
-                    Lire l'article
+                    <Link to={post.slug ? `/blog/${post.slug}` : "#"}>
+                      Lire l'article
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>

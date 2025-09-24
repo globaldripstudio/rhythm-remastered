@@ -13,7 +13,7 @@ const Services = () => {
       description: "Service complet pour donner vie à vos créations musicales",
       price: "290",
       icon: Waves,
-      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
+      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
       featured: true,
       features: [
         "Mixage professionnel multi-pistes",
@@ -27,7 +27,7 @@ const Services = () => {
       description: "Création sonore et design audio pour tous vos projets créatifs",
       price: "Sur devis",
       icon: Settings,
-      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
       featured: true,
       features: [
         "Sound design pour films et jeux",
@@ -124,8 +124,8 @@ const Services = () => {
                   src={service.image}
                   alt={service.title}
                   className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
-                    service.id === 'captation-sonore' ? 'object-center' :
-                    service.id === 'direction-artistique' ? 'object-center' :
+                    service.id === 'captation-sonore' ? 'object-bottom' :
+                    service.id === 'direction-artistique' ? 'object-bottom' :
                     service.id === 'mixage-mastering' ? 'object-top' :
                     ''
                   }`}
