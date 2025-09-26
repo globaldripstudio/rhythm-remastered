@@ -34,16 +34,16 @@ const Projets = () => {
       description: "Collaborations créatives avec un artiste hip-hop émergent aux flows authentiques.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/6Ppunn0oij7cXSsQRefvrx?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "J'ai composé et enregistré 'JDAY', ainsi qu'enregistré 'J'DEVRAIS' et 'RARE' avec ZEU. Une collaboration créative intense qui a donné naissance à des tracks authentiques mêlant flows accrocheurs et productions soignées.",
-      services: ["Composition", "Enregistrement", "Mixage", "Mastering"]
+      services: ["Composition", "Enregistrement"]
     },
     {
       id: "tany",
       name: "TANY",
       leftImage: "/lovable-uploads/IMG_3108.JPEG.png",
       rightImage: "/lovable-uploads/IMG_0902.JPG.png",
-      description: "Partenariat artistique exclusif depuis plusieurs années, toutes ses sorties sous Global Drip Records.",
+      description: "Partenariat privilégié et relation artistique forte avec direction artistique unique.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/4w5z9GsBwZuzIxHr46SuIc?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
-      collaborationDetails: "Partenariat privilégié avec Tany depuis plusieurs années. Je produis pratiquement tout pour lui car nous travaillons en étroite collaboration. Ses releases sont labellisées 'Global Drip Records', témoignant de notre relation artistique forte et durable.",
+      collaborationDetails: "Partenariat privilégié avec Tany, nous avons développé une relation artistique forte et durable. Ensemble, nous construisons une direction artistique unique qui définit son identité musicale.",
       services: ["Production complète", "Enregistrement", "Mixage", "Mastering", "Direction artistique"]
     },
     {
@@ -54,7 +54,7 @@ const Projets = () => {
       description: "Collaboration rapprochée depuis 2020, production quasi-exclusive de ses tracks et projets.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/2TfrHGAo7z0KBG1XjJeSJq?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Collaboration privilégiée depuis 2020 avec Lil Moine. Je produis presque chaque track et projet pour lui, créant un son cohérent et évolutif. Cette relation artistique durable nous permet d'explorer constamment de nouvelles sonorités tout en gardant son identité musicale forte.",
-      services: ["Production", "Composition", "Enregistrement", "Mixage", "Mastering"]
+      services: ["Production", "Composition", "Enregistrement", "Mixage", "Mastering", "Direction artistique", "Ingénieur son live", "Sound Design"]
     },
     {
       id: "eddy-de-mart",
@@ -64,7 +64,7 @@ const Projets = () => {
       description: "Mixage et mastering professionnel depuis 2022, apportant dimension technique à ses créations.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/2MdVNVBxr9PxNWgu7bZee9?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Depuis 2022, je m'occupe du mixage et mastering des projets d'Eddy de Mart. Notre collaboration se concentre sur l'obtention d'un son professionnel et impactant, mettant en valeur ses compositions avec une approche technique rigoureuse.",
-      services: ["Mixage", "Mastering", "Post-production"]
+      services: ["Mixage", "Mastering", "Post-production", "Arrangement"]
     },
     {
       id: "black-beanie-dub",
@@ -73,7 +73,7 @@ const Projets = () => {
       rightImage: "/lovable-uploads/69460379_2898404826842269_7605137112588877824_n.jpg",
       description: "Projet co-fondé avec Mathieu Battini en 2017, notre réalisation la plus reconnue.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/1FfVZW1oMogo3tooMmLuG8?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
-      collaborationDetails: "Black Beanie Dub est un projet que j'ai fondé avec Mathieu Battini en 2017. C'est devenu notre projet le plus réussi, explorant les territoires du dub, de l'électronique et de l'expérimentation sonore. Une aventure artistique qui continue d'évoluer.",
+      collaborationDetails: "Black Beanie Dub est un projet que j'ai fondé avec Mathieu Battini en 2017. C'est devenu notre projet le plus réussi, explorant les territoires du dub et du roots reggae, de l'électronique et de l'expérimentation sonore, toujours en respectant les fondements traditionnels du genre. Une aventure artistique qui continue d'évoluer.",
       services: ["Co-fondateur", "Production", "Composition", "Sound Design"]
     },
     {
@@ -83,8 +83,8 @@ const Projets = () => {
       rightImage: "/lovable-uploads/PP_YT_LOFAI.png",
       description: "Projet collaboratif explorant l'intersection entre intelligence artificielle et musique lofi.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/05Ss7BSPsb2HJNXIsbVWii?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
-      collaborationDetails: "LOFAI est un projet collaboratif fascinant qui explore l'intersection entre l'intelligence artificielle et la musique lofi. Nous expérimentons avec des outils d'IA pour créer des textures sonores uniques tout en gardant l'authenticité et la chaleur du lofi traditionnel.",
-      services: ["Expérimentation IA", "Production", "Sound Design", "Mixage"]
+      collaborationDetails: "LOFAI est un projet collaboratif fascinant qui explore l'intersection entre l'intelligence artificielle et la musique lofi. Nous travaillons avec des musiciens talentueux et des jazzmen exceptionnels - LOFAI n'existerait pas sans eux. Nous expérimentons avec des outils d'IA pour créer des textures sonores uniques tout en gardant l'authenticité et la chaleur du lofi traditionnel.",
+      services: ["Expérimentation IA", "Production", "Sound Design", "Mixage", "Mastering", "Direction artistique", "Management"]
     },
     {
       id: "ekzo",
@@ -109,8 +109,8 @@ const Projets = () => {
     {
       id: "mamood",
       name: "MAMOOD",
-      leftImage: "/lovable-uploads/09b9130f-1cda-4dba-8f4f-7a80c5da17ec.png",
-      rightImage: "/lovable-uploads/09b9130f-1cda-4dba-8f4f-7a80c5da17ec.png",
+      leftImage: "/lovable-uploads/450172737_1233005707693009_8303727533697657373_n.jpg",
+      rightImage: "/lovable-uploads/4CD5F5BC-16B6-4B48-8063-7422452F39C1.jpeg",
       description: "Collaboration sur l'enregistrement et mixage d'Adios et MPLPVP.",
       spotifyLink: "https://open.spotify.com/intl-fr/artist/2YkxhCLm6u50qBodau4R1z?si=VlQzbb3DQHmrPrhjui7_hg",
       collaborationDetails: "J'ai enregistré et mixé 'Adios' et 'MPLPVP' pour Mamood. Ces sessions ont été particulièrement enrichissantes, permettant d'explorer des sonorités urbaines contemporaines avec une approche technique précise pour capturer l'énergie de ses performances.",
@@ -119,8 +119,8 @@ const Projets = () => {
     {
       id: "theo-bachelier",
       name: "THÉO BACHELIER",
-      leftImage: "/lovable-uploads/09b9130f-1cda-4dba-8f4f-7a80c5da17ec.png",
-      rightImage: "/lovable-uploads/09b9130f-1cda-4dba-8f4f-7a80c5da17ec.png",
+      leftImage: "/lovable-uploads/WhatsApp_Image_2025-03-19_à_17.13.14_25767dda.jpg",
+      rightImage: "/lovable-uploads/ULTRACK.jpg",
       description: "Collaboration privilégiée autour du sound design, post-production et mixage créatif.",
       youtubeUrl: "https://www.youtube.com/@theobachelier",
       collaborationDetails: "Collaboration privilégiée avec Théo Bachelier autour du sound design. Je travaille sur la post-production, le sound design et le mixage de ses projets créatifs. Une synergie artistique qui nous permet d'explorer les limites de la création sonore contemporaine.",
@@ -129,12 +129,12 @@ const Projets = () => {
     {
       id: "timothe-chatenoud",
       name: "TIMOTHÉ CHATENOUD",
-      leftImage: "/lovable-uploads/09b9130f-1cda-4dba-8f4f-7a80c5da17ec.png",
-      rightImage: "/lovable-uploads/09b9130f-1cda-4dba-8f4f-7a80c5da17ec.png",
+      leftImage: "/lovable-uploads/336901015_913434623316199_2830527649959552654_n.jpg",
+      rightImage: "/lovable-uploads/Sans_titre13.png",
       description: "Artiste émergent, développement d'un son unique et identité musicale personnelle.",
       spotifyLink: "https://open.spotify.com/intl-fr/artist/1PWnN16t7B2Ee2GJd648og?si=pp6ocRAfRzqeDwKnTMoe3w",
       collaborationDetails: "Timothé Chatenoud est un artiste émergent avec qui nous travaillons pour développer son identité sonore unique. Nos sessions se concentrent sur la recherche créative et l'expérimentation pour créer un univers musical qui lui est propre.",
-      services: ["Développement artistique", "Production", "Mixage"]
+      services: ["Mastering"]
     },
     {
       id: "venin",
@@ -144,7 +144,7 @@ const Projets = () => {
       description: "Groupe de rock légendaire, édition/mixage/mastering de l'album 'Le Premier Sang'.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/6RSIzijNFeHFmv4vLWhxgL?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Pour leur album 'Le Premier Sang', j'ai eu l'honneur d'accueillir Venin au Global Drip Studio. J'ai assuré l'édition, le mixage et le mastering des 9 titres inédits, ainsi que l'enregistrement des voix, des parties solo, et quelques arrangements claviers. Un projet entièrement pensé pour sonner eighties avec une approche authentique sans copier-coller ni trig.",
-      services: ["Édition", "Mixage", "Mastering", "Enregistrement voix", "Arrangements"]
+      services: ["Édition", "Mixage", "Mastering", "Enregistrement voix et guitares", "Arrangements"]
     }
   ];
 
@@ -193,10 +193,20 @@ const Projets = () => {
                   {/* Left Image - Artist Photo */}
                   <div className="lg:col-span-2 relative overflow-hidden group">
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out group-hover:scale-110 group-hover:brightness-110"
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out transform-gpu"
                       style={{ 
                         backgroundImage: `url(${project.leftImage})`,
-                        backgroundAttachment: 'fixed'
+                        backgroundAttachment: 'fixed',
+                        transform: 'scale(1.1)',
+                        filter: 'brightness(1.1)'
+                      }}
+                    />
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
+                      style={{ 
+                        backgroundImage: `url(${project.leftImage})`,
+                        transform: 'scale(1.2)',
+                        filter: 'brightness(1.2)'
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent group-hover:from-background/70 group-hover:via-background/30 transition-all duration-700" />
@@ -227,13 +237,14 @@ const Projets = () => {
                   </div>
 
                   {/* Right Image - Project Cover */}
-                  <div className="relative overflow-hidden group/right">
+                  <div className="relative overflow-hidden group/right cursor-pointer">
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover/right:scale-105 group-hover/right:rotate-1 group-hover/right:brightness-110"
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 transform-gpu hover:scale-105 hover:rotate-1 hover:brightness-110 hover:saturate-110"
                       style={{ backgroundImage: `url(${project.rightImage})` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent group-hover/right:from-background/40 transition-all duration-500" />
-                    <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover/right:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent hover:from-background/40 transition-all duration-500" />
+                    <div className="absolute inset-0 bg-primary/10 opacity-0 hover:opacity-100 transition-all duration-500 shadow-inner" />
+                    <div className="absolute inset-0 border-2 border-primary/20 opacity-0 hover:opacity-100 transition-all duration-300" />
                   </div>
                 </div>
 

@@ -1,12 +1,39 @@
 import { Button } from "@/components/ui/button";
 import { Play, Headphones, Mic } from "lucide-react";
+import { useState, useEffect } from "react";
 import studioHero from "@/assets/studio-hero.jpg";
 
 const Hero = () => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      setImageLoaded(true);
+      setTimeout(() => setShowContent(true), 300);
+    };
+    img.src = "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png";
+  }, []);
+
   return (
     <section id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Loading Screen */}
+      {!imageLoaded && (
+        <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
+          <div className="text-center">
+            <div className="relative">
+              <div className="w-20 h-20 border-4 border-primary/20 rounded-full animate-spin">
+                <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            </div>
+            <p className="mt-6 text-muted-foreground animate-pulse">Chargement du studio...</p>
+          </div>
+        </div>
+      )}
+
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className={`absolute inset-0 z-0 transition-opacity duration-1000 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
         <img 
           src="/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png"
           alt="Global Drip Studio - Professional Recording Studio"
@@ -17,7 +44,7 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 text-center">
+      <div className={`relative z-10 container mx-auto px-6 text-center transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="animate-fade-in">
           {/* Welcome Badge */}
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-6">
