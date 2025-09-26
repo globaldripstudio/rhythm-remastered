@@ -48,8 +48,8 @@ const Hero = () => {
               <div className="text-sm text-muted-foreground">Années d'expérience</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">24/7</div>
-              <div className="text-sm text-muted-foreground">Support client</div>
+              <div className="text-3xl font-bold text-primary">50+</div>
+              <div className="text-sm text-muted-foreground">Artistes accompagnés</div>
             </div>
           </div>
 
@@ -59,10 +59,12 @@ const Hero = () => {
               <Mic className="w-5 h-5 mr-2" />
               Réserver une session
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-muted" onClick={() => (window.location.href = '/projets')}>
-              <Play className="w-5 h-5 mr-2" />
-              Écouter nos réalisations
-            </Button>
+            <a href="/projets">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-muted">
+                <Play className="w-5 h-5 mr-2" />
+                Écouter nos réalisations
+              </Button>
+            </a>
           </div>
 
           {/* Trust Indicators */}
