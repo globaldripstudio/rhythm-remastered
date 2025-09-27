@@ -114,8 +114,55 @@ const BlogArticle = () => {
                 L'emblématique logo du groupe Venin
               </p>
             </div>
+
+            <div className="mb-8">
+              <img 
+                src="/lovable-uploads/460172525_1040830691386194_6418285011960484228_n.jpg"
+                alt="Venin en studio"
+                className="w-full max-w-none h-auto rounded-lg"
+              />
+              <p className="text-sm italic text-muted-foreground mt-2 text-center">
+                Le groupe Venin en session d'enregistrement
+              </p>
+            </div>
           </div>
         )
+      };
+    }
+
+    if (slug === "bien-mixer-une-voix") {
+      const BienMixerUneVoix = require("./BlogArticles/BienMixerUneVoix").default;
+      return {
+        title: "Bien mixer une voix : les 7 étapes essentielles",
+        author: "Global Drip Studio",
+        date: "2024-12-15", 
+        readTime: "6 min",
+        category: "Mixage",
+        content: <BienMixerUneVoix />
+      };
+    }
+
+    if (slug === "comprendre-la-compression") {
+      const ComprendreCompression = require("./BlogArticles/ComprendreCompression").default;
+      return {
+        title: "Comprendre la compression en 5 minutes",
+        author: "Global Drip Studio",
+        date: "2024-12-10",
+        readTime: "5 min", 
+        category: "Techniques",
+        content: <ComprendreCompression />
+      };
+    }
+
+    if (slug === "10-techniques-sound-design") {
+      const TechniquesSoundDesign = require("./BlogArticles/TechniquesSoundDesign").default;
+      return {
+        title: "10 techniques de sound design pour créer des ambiances uniques",
+        author: "Global Drip Studio",
+        date: "2024-12-05",
+        readTime: "9 min",
+        category: "Sound Design", 
+        content: <TechniquesSoundDesign />
       };
     }
     

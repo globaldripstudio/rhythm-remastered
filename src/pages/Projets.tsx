@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, Play, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useEffect } from "react";
 
 const Projets = () => {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setImageLoaded(true);
+      setTimeout(() => setShowContent(true), 300);
+    }, 500);
+  }, []);
 
   useEffect(() => {
     document.title = "Nos Projets | Global Drip Studio - Collaborations Artistiques";
@@ -92,7 +100,7 @@ const Projets = () => {
       leftImage: "/lovable-uploads/Image-27.jpg",
       rightImage: "/lovable-uploads/Ekzo_-_b.png",
       description: "Mon alias de beatmaker/producteur depuis 2022 pour mes projets personnels créatifs.",
-      spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/4zVgcBTAWBxJW9WOfdEPDo?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
+      spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3zjaPFIW17OKA0XGhr2TQn?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Ekzo est mon nom de beatmaker/producteur depuis 2022. Sous cet alias, je sors tous mes projets personnels, explorant différents styles et approches de production. C'est mon laboratoire créatif où j'exprime ma vision artistique personnelle.",
       services: ["Beatmaking", "Production personnelle", "Expérimentation"]
     },
@@ -119,7 +127,7 @@ const Projets = () => {
     {
       id: "theo-bachelier",
       name: "THÉO BACHELIER",
-      leftImage: "/lovable-uploads/WhatsApp_Image_2025-03-19_à_17.13.14_25767dda.jpg",
+      leftImage: "/lovable-uploads/WhatsApp_Image_2025-03-19_à_17.13.14_25767dda-2.jpg",
       rightImage: "/lovable-uploads/ULTRACK.jpg",
       description: "Collaboration privilégiée autour du sound design, post-production et mixage créatif.",
       youtubeUrl: "https://www.youtube.com/@theobachelier",
@@ -131,9 +139,9 @@ const Projets = () => {
       name: "TIMOTHÉ CHATENOUD",
       leftImage: "/lovable-uploads/336901015_913434623316199_2830527649959552654_n.jpg",
       rightImage: "/lovable-uploads/Sans_titre13.png",
-      description: "Artiste émergent, développement d'un son unique et identité musicale personnelle.",
-      spotifyLink: "https://open.spotify.com/intl-fr/artist/1PWnN16t7B2Ee2GJd648og?si=pp6ocRAfRzqeDwKnTMoe3w",
-      collaborationDetails: "Timothé Chatenoud est un artiste émergent avec qui nous travaillons pour développer son identité sonore unique. Nos sessions se concentrent sur la recherche créative et l'expérimentation pour créer un univers musical qui lui est propre.",
+      description: "Artiste autoproduit muni d'une identité musicale unique, nous apportons la touche finale aux créations de Timothé.",
+      spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/1PWnN16t7B2Ee2GJd648og?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
+      collaborationDetails: "Timothé Chatenoud est un artiste autoproduit avec une identité musicale forte et unique. Nous intervenons pour apporter la touche finale professionnelle à ses créations, préservant son authenticité tout en optimisant la qualité sonore.",
       services: ["Mastering"]
     },
     {
@@ -150,6 +158,23 @@ const Projets = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Loading Screen */}
+      {!imageLoaded && (
+        <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+          <div className="text-center">
+            <div className="relative mb-8">
+              <div className="relative w-24 h-24">
+                <div className="absolute inset-0 border-4 border-primary/20 rounded-full animate-spin"></div>
+                <div className="absolute inset-2 border-4 border-secondary border-t-transparent rounded-full animate-spin animate-reverse" style={{ animationDuration: '1.5s' }}></div>
+                <div className="absolute inset-4 bg-primary/20 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-primary mb-2">NOS PROJETS</h3>
+            <p className="text-muted-foreground animate-pulse">Chargement des collaborations artistiques...</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
@@ -183,7 +208,7 @@ const Projets = () => {
       </section>
 
       {/* Projects */}
-      <section className="py-8">
+      <section className={`py-8 transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="container mx-auto px-6 space-y-8">
           {projects.map((project) => (
             <div key={project.id} className="mb-12">
@@ -192,21 +217,24 @@ const Projets = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[400px]">
                   {/* Left Image - Artist Photo */}
                   <div className="lg:col-span-2 relative overflow-hidden group">
+                    {/* Base parallax layer */}
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out transform-gpu"
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out transform-gpu group-hover:scale-110"
                       style={{ 
                         backgroundImage: `url(${project.leftImage})`,
                         backgroundAttachment: 'fixed',
-                        transform: 'scale(1.1)',
-                        filter: 'brightness(1.1)'
+                        transform: 'scale(1.05) translateZ(0)',
+                        filter: 'brightness(0.9) contrast(1.1)'
                       }}
                     />
+                    {/* Hover enhancement layer */}
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"
                       style={{ 
                         backgroundImage: `url(${project.leftImage})`,
-                        transform: 'scale(1.2)',
-                        filter: 'brightness(1.2)'
+                        backgroundAttachment: 'scroll',
+                        transform: 'scale(1.15) translateZ(0)',
+                        filter: 'brightness(1.1) contrast(1.2) saturate(1.1)'
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent group-hover:from-background/70 group-hover:via-background/30 transition-all duration-700" />
@@ -239,12 +267,14 @@ const Projets = () => {
                   {/* Right Image - Project Cover */}
                   <div className="relative overflow-hidden group/right cursor-pointer">
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 transform-gpu hover:scale-105 hover:rotate-1 hover:brightness-110 hover:saturate-110"
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-500 transform-gpu hover:scale-105 hover:rotate-1 hover:brightness-110 hover:saturate-110 hover:blur-[0.5px]"
                       style={{ backgroundImage: `url(${project.rightImage})` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent hover:from-background/40 transition-all duration-500" />
-                    <div className="absolute inset-0 bg-primary/10 opacity-0 hover:opacity-100 transition-all duration-500 shadow-inner" />
-                    <div className="absolute inset-0 border-2 border-primary/20 opacity-0 hover:opacity-100 transition-all duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent hover:from-background/30 transition-all duration-500" />
+                    <div className="absolute inset-0 bg-primary/5 hover:bg-primary/15 transition-all duration-500" />
+                    <div className="absolute inset-0 border-2 border-primary/10 hover:border-primary/30 transition-all duration-300" />
+                    {/* Floating glow effect */}
+                    <div className="absolute inset-0 shadow-lg shadow-primary/0 hover:shadow-primary/20 transition-all duration-500" />
                   </div>
                 </div>
 

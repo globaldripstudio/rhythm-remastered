@@ -230,7 +230,7 @@ const Services = () => {
         {service.id === "sound-design" && (
           <Card>
             <CardHeader>
-              <CardTitle>Plus d'infos - Nos réalisations Sound Design</CardTitle>
+              <CardTitle>Nos réalisations Sound Design</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>

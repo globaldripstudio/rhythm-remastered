@@ -22,12 +22,39 @@ const Hero = () => {
       {!imageLoaded && (
         <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
           <div className="text-center">
-            <div className="relative">
-              <div className="w-20 h-20 border-4 border-primary/20 rounded-full animate-spin">
-                <div className="absolute top-0 left-0 w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="relative mb-8">
+              {/* Complex loading animation */}
+              <div className="relative w-32 h-32">
+                {/* Outer ring */}
+                <div className="absolute inset-0 border-4 border-primary/10 rounded-full"></div>
+                {/* Rotating elements */}
+                <div className="absolute inset-0 border-4 border-primary border-t-transparent border-r-transparent rounded-full animate-spin"></div>
+                <div className="absolute inset-2 border-4 border-secondary border-b-transparent border-l-transparent rounded-full animate-spin animate-reverse" style={{ animationDuration: '1.5s' }}></div>
+                <div className="absolute inset-4 border-4 border-primary/60 border-r-transparent border-t-transparent rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
+                {/* Center pulsing circle */}
+                <div className="absolute inset-8 bg-gradient-to-r from-primary to-secondary rounded-full animate-pulse"></div>
+                {/* Sound waves */}
+                <div className="absolute inset-6 border-2 border-primary/30 rounded-full animate-ping"></div>
+                <div className="absolute inset-4 border-2 border-secondary/20 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+              </div>
+              {/* Floating elements */}
+              <div className="absolute -top-2 -right-2 w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="absolute -bottom-2 -left-2 w-2 h-2 bg-secondary rounded-full animate-bounce" style={{ animationDelay: '0.8s' }}></div>
+            </div>
+            
+            <div className="space-y-3">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-pulse">
+                GLOBAL DRIP STUDIO
+              </h3>
+              <p className="text-muted-foreground animate-pulse">Initialisation du studio professionnel...</p>
+              <div className="flex justify-center">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
               </div>
             </div>
-            <p className="mt-6 text-muted-foreground animate-pulse">Chargement du studio...</p>
           </div>
         </div>
       )}

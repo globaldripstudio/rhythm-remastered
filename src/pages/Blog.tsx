@@ -36,7 +36,7 @@ const Blog = () => {
       date: "2024-12-10",
       readTime: "5 min",
       category: "Techniques",
-      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+      image: "/lovable-uploads/Image-23.jpg",
       slug: "comprendre-la-compression"
     },
     {
