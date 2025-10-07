@@ -215,25 +215,26 @@ const Projets = () => {
               {/* Project Card */}
               <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500">
                 <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[400px]">
-                  {/* Left Image - Artist Photo */}
+                  {/* Left Image - Artist Photo with Parallax */}
                   <div className="lg:col-span-2 relative overflow-hidden group">
-                    {/* Base parallax layer */}
+                    {/* Parallax background layer */}
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out transform-gpu group-hover:scale-110"
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out transform-gpu"
                       style={{ 
                         backgroundImage: `url(${project.leftImage})`,
                         backgroundAttachment: 'fixed',
+                        backgroundPositionY: `${window.scrollY * 0.3}px`,
                         transform: 'scale(1.05) translateZ(0)',
                         filter: 'brightness(0.9) contrast(1.1)'
                       }}
                     />
-                    {/* Hover enhancement layer */}
+                    {/* On hover - smoothly transition to full size */}
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
                       style={{ 
                         backgroundImage: `url(${project.leftImage})`,
                         backgroundAttachment: 'scroll',
-                        transform: 'scale(1.15) translateZ(0)',
+                        transform: 'scale(1) translateZ(0)',
                         filter: 'brightness(1.1) contrast(1.2) saturate(1.1)'
                       }}
                     />
@@ -264,17 +265,27 @@ const Projets = () => {
                     </div>
                   </div>
 
-                  {/* Right Image - Project Cover */}
+                  {/* Right Image - Project Cover with Dynamic Effects */}
                   <div className="relative overflow-hidden group/right cursor-pointer">
+                    {/* Parallax scrolling effect */}
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-500 transform-gpu hover:scale-105 hover:rotate-1 hover:brightness-110 hover:saturate-110 hover:blur-[0.5px]"
-                      style={{ backgroundImage: `url(${project.rightImage})` }}
+                      className="absolute inset-0 bg-cover bg-center transition-all duration-500 transform-gpu group-hover/right:scale-110 group-hover/right:rotate-2"
+                      style={{ 
+                        backgroundImage: `url(${project.rightImage})`,
+                        backgroundPositionY: `${window.scrollY * -0.2}px`,
+                        filter: 'brightness(0.95)'
+                      }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent hover:from-background/30 transition-all duration-500" />
-                    <div className="absolute inset-0 bg-primary/5 hover:bg-primary/15 transition-all duration-500" />
-                    <div className="absolute inset-0 border-2 border-primary/10 hover:border-primary/30 transition-all duration-300" />
-                    {/* Floating glow effect */}
-                    <div className="absolute inset-0 shadow-lg shadow-primary/0 hover:shadow-primary/20 transition-all duration-500" />
+                    {/* Animated gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/30 to-transparent group-hover/right:from-background/40 group-hover/right:via-background/10 transition-all duration-500" />
+                    {/* Color tint on hover */}
+                    <div className="absolute inset-0 bg-primary/0 group-hover/right:bg-primary/15 transition-all duration-500" />
+                    {/* Border glow effect */}
+                    <div className="absolute inset-0 border-2 border-primary/10 group-hover/right:border-primary/40 transition-all duration-300" />
+                    {/* Shadow glow */}
+                    <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.3)] group-hover/right:shadow-[inset_0_0_60px_rgba(var(--primary),0.2)] transition-all duration-500" />
+                    {/* Floating animation on scroll */}
+                    <div className="absolute inset-0 animate-float-subtle" />
                   </div>
                 </div>
 

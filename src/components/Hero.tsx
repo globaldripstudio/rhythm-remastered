@@ -46,7 +46,7 @@ const Hero = () => {
               <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-pulse">
                 GLOBAL DRIP STUDIO
               </h3>
-              <p className="text-muted-foreground animate-pulse">Initialisation du studio professionnel...</p>
+              <p className="text-muted-foreground animate-pulse">Initialisation du studio...</p>
               <div className="flex justify-center">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>

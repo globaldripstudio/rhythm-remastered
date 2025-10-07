@@ -10,6 +10,7 @@ import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
 import Projets from "./pages/Projets";
 import NotFound from "./pages/NotFound";
+import LiveChat from "./components/LiveChat";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <LiveChat />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

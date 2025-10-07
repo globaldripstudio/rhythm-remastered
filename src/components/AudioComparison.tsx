@@ -3,6 +3,80 @@ import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, Headphones, Mic } from "lucide-react";
 
+// Audio visualizer component
+const AudioVisualizer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<HTMLAudioElement>, isPlaying: boolean }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
+  const analyserRef = useRef<AnalyserNode>();
+  const audioContextRef = useRef<AudioContext>();
+
+  useEffect(() => {
+    if (!audioRef.current || !canvasRef.current) return;
+
+    const audio = audioRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Initialize audio context and analyser
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      const source = audioContextRef.current.createMediaElementSource(audio);
+      source.connect(analyserRef.current);
+      analyserRef.current.connect(audioContextRef.current.destination);
+      analyserRef.current.fftSize = 256;
+    }
+
+    const analyser = analyserRef.current;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    const draw = () => {
+      if (!isPlaying) return;
+      
+      animationRef.current = requestAnimationFrame(draw);
+      analyser.getByteFrequencyData(dataArray);
+
+      ctx.fillStyle = "hsl(var(--background))";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const barWidth = (canvas.width / bufferLength) * 2.5;
+      let barHeight;
+      let x = 0;
+
+      for (let i = 0; i < bufferLength; i++) {
+        barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
+
+        const hue = (i / bufferLength) * 60 + 200;
+        ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+        x += barWidth + 1;
+      }
+    };
+
+    if (isPlaying) {
+      draw();
+    }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPlaying, audioRef]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={300}
+      height={80}
+      className="w-full h-20 rounded-lg bg-muted/30"
+    />
+  );
+};
+
 const AudioComparison = () => {
   const [selectedGenre, setSelectedGenre] = useState('hiphop');
   const [playingBefore, setPlayingBefore] = useState(false);
@@ -147,7 +221,9 @@ const AudioComparison = () => {
                   src={currentGenre?.beforeSrc}
                   onEnded={() => setPlayingBefore(false)}
                   onLoadStart={() => setPlayingBefore(false)}
+                  crossOrigin="anonymous"
                 />
+                <AudioVisualizer audioRef={beforeRef} isPlaying={playingBefore} />
                 <Button
                   onClick={handleBeforePlay}
                   size="lg"
@@ -157,9 +233,6 @@ const AudioComparison = () => {
                   {playingBefore ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
                   {playingBefore ? 'Pause' : 'Écouter l\'original'}
                 </Button>
-                <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-                  <div className={`h-full bg-muted-foreground/40 rounded-full transition-all duration-300 ${playingBefore ? 'animate-pulse' : ''}`}></div>
-                </div>
               </CardContent>
             </Card>
 
@@ -178,7 +251,9 @@ const AudioComparison = () => {
                   src={currentGenre?.afterSrc}
                   onEnded={() => setPlayingAfter(false)}
                   onLoadStart={() => setPlayingAfter(false)}
+                  crossOrigin="anonymous"
                 />
+                <AudioVisualizer audioRef={afterRef} isPlaying={playingAfter} />
                 <Button
                   onClick={handleAfterPlay}
                   size="lg"
@@ -187,9 +262,6 @@ const AudioComparison = () => {
                   {playingAfter ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
                   {playingAfter ? 'Pause' : 'Écouter le résultat'}
                 </Button>
-                <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-                  <div className={`h-full bg-primary rounded-full transition-all duration-300 ${playingAfter ? 'animate-pulse' : ''}`}></div>
-                </div>
               </CardContent>
             </Card>
           </div>
