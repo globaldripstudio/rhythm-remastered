@@ -197,12 +197,12 @@ const Projets = () => {
                 className="h-8 object-contain"
               />
             </a>
-            <a href="/">
-              <Button variant="outline" size="sm">
-                ← Retour à l'accueil
-              </Button>
-            </a>
           </div>
+          <a href="/">
+            <Button variant="outline" size="sm">
+              ← Retour à l'accueil
+            </Button>
+          </a>
         </div>
       </header>
 
@@ -226,38 +226,30 @@ const Projets = () => {
               {/* Project Card */}
               <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500">
                 <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[400px]">
-                  {/* Left Image - Artist Photo with Parallax */}
+                  {/* Left Image - Artist Photo */}
                   <div 
-                    className="lg:col-span-2 relative overflow-hidden group"
+                    className="lg:col-span-2 relative overflow-hidden group min-h-[400px]"
                     onMouseEnter={() => setHoveredProject(project.id)}
                     onMouseLeave={() => setHoveredProject(null)}
                   >
-                    {/* Full-size image with parallax */}
-                    <div 
-                      className={`absolute inset-0 transition-all duration-700 ease-out ${
-                        hoveredProject === project.id ? 'scale-100' : 'scale-110'
+                    <img 
+                      src={project.leftImage}
+                      alt={project.name}
+                      className={`w-full h-full object-cover transition-all duration-700 ease-out ${
+                        hoveredProject === project.id 
+                          ? 'scale-105 brightness-110' 
+                          : 'scale-100 brightness-90'
                       }`}
-                      style={{ 
-                        backgroundImage: `url(${project.leftImage})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        backgroundPositionY: hoveredProject === project.id 
-                          ? 'center' 
-                          : `calc(50% + ${scrollY * 0.1}px)`,
-                        filter: hoveredProject === project.id 
-                          ? 'brightness(1.1) contrast(1.1) saturate(1.1)' 
-                          : 'brightness(0.85) contrast(1.05)'
-                      }}
                     />
                     {/* Gradient overlay */}
                     <div className={`absolute inset-0 transition-all duration-500 ${
                       hoveredProject === project.id 
-                        ? 'bg-gradient-to-r from-background/60 via-background/30 to-transparent' 
-                        : 'bg-gradient-to-r from-background/80 via-background/40 to-transparent'
+                        ? 'bg-gradient-to-r from-background/50 via-background/20 to-transparent' 
+                        : 'bg-gradient-to-r from-background/70 via-background/30 to-transparent'
                     }`} />
                     
                     {/* Content */}
-                    <div className={`relative z-10 flex flex-col justify-end h-full p-8 transition-all duration-500 ${
+                    <div className={`absolute inset-0 flex flex-col justify-end p-8 transition-all duration-500 ${
                       hoveredProject === project.id ? 'translate-y-[-8px]' : ''
                     }`}>
                       <h2 className={`text-4xl md:text-5xl font-bold text-foreground mb-4 transition-all duration-300 ${
