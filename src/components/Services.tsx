@@ -153,11 +153,25 @@ const Services = () => {
           {services.map((service, index) => (
             <Card 
               key={service.id} 
-              className={`service-card group cursor-pointer relative overflow-hidden ${
+              className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 ${
                 service.featured ? 'ring-2 ring-primary ring-opacity-50' : ''
-              }`}
+              } ${(service.id === "mixage-mastering" || service.id === "mixage-mastering-express") ? 'animate-fade-in' : ''}`}
               style={{ animationDelay: `${index * 0.2}s` }}
             >
+              {/* Switch Button for Mixage + Mastering - Top Left */}
+              {(service.id === "mixage-mastering" || service.id === "mixage-mastering-express") && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowExpress(!showExpress);
+                  }}
+                  className="absolute top-4 left-4 z-30 w-10 h-10 bg-background/95 backdrop-blur-sm border-2 border-primary rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg hover:shadow-primary/30 hover:scale-110"
+                  title={showExpress ? "Voir version Standard" : "Voir version Express"}
+                >
+                  <RefreshCw className={`w-5 h-5 transition-transform duration-500 ${showExpress ? 'rotate-180' : ''}`} />
+                </button>
+              )}
+              
               {/* Service Image */}
               <div className="relative h-48 overflow-hidden">
                 <img 
@@ -166,7 +180,7 @@ const Services = () => {
                   className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
                     service.id === 'captation-sonore' ? 'object-bottom' :
                     service.id === 'direction-artistique' ? 'object-bottom' :
-                    service.id === 'mixage-mastering' ? 'object-top' :
+                    service.id === 'mixage-mastering' || service.id === 'mixage-mastering-express' ? 'object-top' :
                     ''
                   }`}
                 />
@@ -214,23 +228,9 @@ const Services = () => {
               {/* Glow Effect on Hover & Featured Badge */}
               <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
               {service.featured && (
-                <div className={`absolute top-4 left-4 ${service.badgeColor || 'bg-primary'} text-primary-foreground px-2 py-1 rounded-full text-xs font-bold`}>
+                <div className={`absolute top-14 left-4 ${service.badgeColor || 'bg-primary'} text-primary-foreground px-2 py-1 rounded-full text-xs font-bold`}>
                   {service.badgeText || 'Spécialité'}
                 </div>
-              )}
-              
-              {/* Switch Button for Mixage + Mastering */}
-              {(service.id === "mixage-mastering" || service.id === "mixage-mastering-express") && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowExpress(!showExpress);
-                  }}
-                  className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 bg-background/90 backdrop-blur-sm border border-border rounded-full text-xs font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-300 group/switch"
-                >
-                  <RefreshCw className="w-3 h-3 group-hover/switch:rotate-180 transition-transform duration-500" />
-                  {showExpress ? "Version Standard" : "Version Express"}
-                </button>
               )}
             </Card>
           ))}
