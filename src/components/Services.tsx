@@ -1,26 +1,52 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Euro, ArrowRight, Waves, Settings, Volume2, Mic } from "lucide-react";
+import { Clock, Euro, ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw } from "lucide-react";
 import mixingConsole from "@/assets/mixing-console.jpg";
 import studioEquipment from "@/assets/studio-equipment.jpg";
 import masteringSuite from "@/assets/mastering-suite.jpg";
 
 const Services = () => {
+  const [showExpress, setShowExpress] = useState(false);
+
+  const mixageMasteringStandard = {
+    id: "mixage-mastering",
+    title: "Mixage + Mastering",
+    description: "Service complet pour donner vie à vos créations musicales",
+    price: "290",
+    icon: Waves,
+    image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+    featured: true,
+    badgeText: "Spécialité",
+    badgeColor: "bg-primary",
+    features: [
+      "Mixage professionnel multi-pistes",
+      "Mastering hybride analogique/numérique", 
+      "3 révisions incluses"
+    ]
+  };
+
+  const mixageMasteringExpress = {
+    id: "mixage-mastering-express",
+    title: "Mixage + Mastering Express",
+    description: "Solution efficace pour budgets serrés",
+    price: "120",
+    icon: Waves,
+    image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+    featured: true,
+    badgeText: "Budget",
+    badgeColor: "bg-emerald-500",
+    features: [
+      "Mixage professionnel instru + multipistes voix",
+      "Mastering",
+      "2 révisions incluses"
+    ]
+  };
+
+  const currentMixageService = showExpress ? mixageMasteringExpress : mixageMasteringStandard;
+
   const services = [
-    {
-      id: "mixage-mastering",
-      title: "Mixage + Mastering",
-      description: "Service complet pour donner vie à vos créations musicales",
-      price: "290",
-      icon: Waves,
-      image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
-      featured: true,
-      features: [
-        "Mixage professionnel multi-pistes",
-        "Mastering hybride analogique/numérique", 
-        "3 révisions incluses"
-      ]
-    },
+    currentMixageService,
     {
       id: "sound-design",
       title: "Sound Design",
@@ -29,6 +55,8 @@ const Services = () => {
       icon: Settings,
       image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
       featured: true,
+      badgeText: "Spécialité",
+      badgeColor: "bg-primary",
       features: [
         "Sound design pour films et jeux",
         "Création d'ambiances sonores",
@@ -43,6 +71,9 @@ const Services = () => {
       price: "30€/h - 350€/j",
       icon: Mic,
       image: "/lovable-uploads/_edited.jpg.png",
+      featured: false,
+      badgeText: "",
+      badgeColor: "",
       features: [
         "Enregistrement studio professionnel",
         "Captation événementielle mobile",
@@ -57,6 +88,9 @@ const Services = () => {
       price: "A partir de 300€",
       icon: Volume2,
       image: "/lovable-uploads/64615fd6-368c-466a-a669-f5140677e476.png",
+      featured: false,
+      badgeText: "",
+      badgeColor: "",
       features: [
         "Composition originale",
         "Production complète",
@@ -71,6 +105,9 @@ const Services = () => {
       price: "Sur devis",
       icon: Settings,
       image: "/lovable-uploads/35c8540d-ce59-433e-87fd-f1b8b1527941.png",
+      featured: false,
+      badgeText: "",
+      badgeColor: "",
       features: [
         "Direction artistique complète",
         "Arrangements instrumentaux",
@@ -85,6 +122,9 @@ const Services = () => {
       price: "39€/h",
       icon: Volume2,
       image: "/lovable-uploads/6ed6bc90-04bb-4040-9e0b-26b3c13bba5d.png",
+      featured: false,
+      badgeText: "",
+      badgeColor: "",
       features: [
         "Cours particuliers ou en groupe",
         "Formation sur logiciels MAO",
@@ -174,9 +214,23 @@ const Services = () => {
               {/* Glow Effect on Hover & Featured Badge */}
               <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
               {service.featured && (
-                <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-bold">
-                  Spécialité
+                <div className={`absolute top-4 left-4 ${service.badgeColor || 'bg-primary'} text-primary-foreground px-2 py-1 rounded-full text-xs font-bold`}>
+                  {service.badgeText || 'Spécialité'}
                 </div>
+              )}
+              
+              {/* Switch Button for Mixage + Mastering */}
+              {(service.id === "mixage-mastering" || service.id === "mixage-mastering-express") && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowExpress(!showExpress);
+                  }}
+                  className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 bg-background/90 backdrop-blur-sm border border-border rounded-full text-xs font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-300 group/switch"
+                >
+                  <RefreshCw className="w-3 h-3 group-hover/switch:rotate-180 transition-transform duration-500" />
+                  {showExpress ? "Version Standard" : "Version Express"}
+                </button>
               )}
             </Card>
           ))}
