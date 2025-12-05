@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Play, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,17 @@ const Projets = () => {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [hoveredProject, setHoveredProject] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -216,34 +227,47 @@ const Projets = () => {
               <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500">
                 <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[400px]">
                   {/* Left Image - Artist Photo with Parallax */}
-                  <div className="lg:col-span-2 relative overflow-hidden group">
-                    {/* Parallax background layer */}
+                  <div 
+                    className="lg:col-span-2 relative overflow-hidden group"
+                    onMouseEnter={() => setHoveredProject(project.id)}
+                    onMouseLeave={() => setHoveredProject(null)}
+                  >
+                    {/* Full-size image with parallax */}
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out transform-gpu"
+                      className={`absolute inset-0 transition-all duration-700 ease-out ${
+                        hoveredProject === project.id ? 'scale-100' : 'scale-110'
+                      }`}
                       style={{ 
                         backgroundImage: `url(${project.leftImage})`,
-                        backgroundAttachment: 'fixed',
-                        backgroundPositionY: `${window.scrollY * 0.3}px`,
-                        transform: 'scale(1.05) translateZ(0)',
-                        filter: 'brightness(0.9) contrast(1.1)'
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundPositionY: hoveredProject === project.id 
+                          ? 'center' 
+                          : `calc(50% + ${scrollY * 0.1}px)`,
+                        filter: hoveredProject === project.id 
+                          ? 'brightness(1.1) contrast(1.1) saturate(1.1)' 
+                          : 'brightness(0.85) contrast(1.05)'
                       }}
                     />
-                    {/* On hover - smoothly transition to full size */}
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
-                      style={{ 
-                        backgroundImage: `url(${project.leftImage})`,
-                        backgroundAttachment: 'scroll',
-                        transform: 'scale(1) translateZ(0)',
-                        filter: 'brightness(1.1) contrast(1.2) saturate(1.1)'
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent group-hover:from-background/70 group-hover:via-background/30 transition-all duration-700" />
-                    <div className="relative z-10 flex flex-col justify-end h-full p-8 transform group-hover:translate-y-[-10px] transition-transform duration-500">
-                      <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 transform group-hover:scale-105 transition-transform duration-300">
+                    {/* Gradient overlay */}
+                    <div className={`absolute inset-0 transition-all duration-500 ${
+                      hoveredProject === project.id 
+                        ? 'bg-gradient-to-r from-background/60 via-background/30 to-transparent' 
+                        : 'bg-gradient-to-r from-background/80 via-background/40 to-transparent'
+                    }`} />
+                    
+                    {/* Content */}
+                    <div className={`relative z-10 flex flex-col justify-end h-full p-8 transition-all duration-500 ${
+                      hoveredProject === project.id ? 'translate-y-[-8px]' : ''
+                    }`}>
+                      <h2 className={`text-4xl md:text-5xl font-bold text-foreground mb-4 transition-all duration-300 ${
+                        hoveredProject === project.id ? 'scale-[1.02]' : ''
+                      }`}>
                         {project.name}
                       </h2>
-                      <p className="text-muted-foreground mb-6 max-w-xl transform group-hover:text-foreground transition-all duration-300">
+                      <p className={`mb-6 max-w-xl transition-all duration-300 ${
+                        hoveredProject === project.id ? 'text-foreground' : 'text-muted-foreground'
+                      }`}>
                         {project.description}
                       </p>
                       <Collapsible 
@@ -253,7 +277,9 @@ const Projets = () => {
                         <CollapsibleTrigger asChild>
                           <Button 
                             variant="outline" 
-                            className="w-fit bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/25"
+                            className={`w-fit bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300 ${
+                              hoveredProject === project.id ? 'shadow-lg shadow-primary/25' : ''
+                            }`}
                           >
                             En savoir plus
                             <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-300 ${
