@@ -150,90 +150,107 @@ const Services = () => {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {services.map((service, index) => (
-            <Card 
-              key={service.id} 
-              className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 ${
-                service.featured ? 'ring-2 ring-primary ring-opacity-50' : ''
-              } ${(service.id === "mixage-mastering" || service.id === "mixage-mastering-express") ? 'animate-fade-in' : ''}`}
-              style={{ animationDelay: `${index * 0.2}s` }}
-            >
-              {/* Switch Button for Mixage + Mastering - Top Left */}
-              {(service.id === "mixage-mastering" || service.id === "mixage-mastering-express") && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowExpress(!showExpress);
+          {services.map((service, index) => {
+            const isMixageCard = service.id === "mixage-mastering" || service.id === "mixage-mastering-express";
+            
+            return (
+              <div 
+                key={service.id}
+                className="relative"
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
+                {/* Switch Button - Outside card frame */}
+                {isMixageCard && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowExpress(!showExpress);
+                    }}
+                    className="absolute -top-3 -left-3 z-40 w-12 h-12 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110"
+                    title={showExpress ? "Voir version Standard" : "Voir version Express"}
+                  >
+                    <RefreshCw className={`w-6 h-6 transition-transform duration-700 ${showExpress ? 'rotate-[360deg]' : ''}`} />
+                  </button>
+                )}
+                
+                {/* Card with 3D flip animation */}
+                <div 
+                  className={`relative transition-all duration-700 ${isMixageCard ? '[transform-style:preserve-3d]' : ''}`}
+                  style={{
+                    transform: isMixageCard && showExpress ? 'rotateY(10deg) scale(0.98)' : 'rotateY(0deg) scale(1)',
                   }}
-                  className="absolute top-4 left-4 z-30 w-10 h-10 bg-background/95 backdrop-blur-sm border-2 border-primary rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg hover:shadow-primary/30 hover:scale-110"
-                  title={showExpress ? "Voir version Standard" : "Voir version Express"}
                 >
-                  <RefreshCw className={`w-5 h-5 transition-transform duration-500 ${showExpress ? 'rotate-180' : ''}`} />
-                </button>
-              )}
-              
-              {/* Service Image */}
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={service.image}
-                  alt={service.title}
-                  className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
-                    service.id === 'captation-sonore' ? 'object-bottom' :
-                    service.id === 'direction-artistique' ? 'object-bottom' :
-                    service.id === 'mixage-mastering' || service.id === 'mixage-mastering-express' ? 'object-top' :
-                    ''
-                  }`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-                <div className="absolute top-4 right-4">
-                  <div className="w-12 h-12 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <service.icon className="w-6 h-6 text-primary" />
-                  </div>
+                  <Card 
+                    className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 ${
+                      service.featured ? 'ring-2 ring-primary ring-opacity-50' : ''
+                    } ${isMixageCard ? 'animate-fade-in' : ''}`}
+                  >
+                    {/* Service Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img 
+                        src={service.image}
+                        alt={service.title}
+                        className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
+                          service.id === 'captation-sonore' ? 'object-bottom' :
+                          service.id === 'direction-artistique' ? 'object-bottom' :
+                          isMixageCard ? 'object-top' :
+                          ''
+                        }`}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                      <div className="absolute top-4 right-4">
+                        <div className="w-12 h-12 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center">
+                          <service.icon className="w-6 h-6 text-primary" />
+                        </div>
+                      </div>
+                      {/* Featured Badge - Top left of image */}
+                      {service.featured && service.badgeText && (
+                        <div className={`absolute top-4 left-4 ${service.badgeColor || 'bg-primary'} text-primary-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
+                          {service.badgeText}
+                        </div>
+                      )}
+                    </div>
+
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <CardTitle className="text-xl font-bold">{service.title}</CardTitle>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">{/\d/.test(service.price) ? (service.price.includes('€') ? service.price : `${service.price}€`) : service.price}</div>
+                        </div>
+                      </div>
+                      <CardDescription className="text-muted-foreground">
+                        {service.description}
+                      </CardDescription>
+                    </CardHeader>
+
+                    <CardContent>
+                      {/* Features List */}
+                      <ul className="space-y-2 mb-6">
+                        {service.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-center text-sm">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+
+                      <Button 
+                        className="w-full group-hover:studio-button transition-all duration-300"
+                        variant="outline"
+                        onClick={() => window.location.href = `/services#${service.id}`}
+                      >
+                        Plus d'infos
+                        <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                      </Button>
+                    </CardContent>
+
+                    {/* Glow Effect on Hover */}
+                    <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
+                  </Card>
                 </div>
               </div>
-
-              <CardHeader className="pb-4">
-                <div className="flex justify-between items-start mb-2">
-                  <CardTitle className="text-xl font-bold">{service.title}</CardTitle>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">{/\d/.test(service.price) ? (service.price.includes('€') ? service.price : `${service.price}€`) : service.price}</div>
-                  </div>
-                </div>
-                <CardDescription className="text-muted-foreground">
-                  {service.description}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent>
-                {/* Features List */}
-                <ul className="space-y-2 mb-6">
-                  {service.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-sm">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <Button 
-                  className="w-full group-hover:studio-button transition-all duration-300"
-                  variant="outline"
-                  onClick={() => window.location.href = `/services#${service.id}`}
-                >
-                  Plus d'infos
-                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </CardContent>
-
-              {/* Glow Effect on Hover & Featured Badge */}
-              <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
-              {service.featured && (
-                <div className={`absolute top-14 left-4 ${service.badgeColor || 'bg-primary'} text-primary-foreground px-2 py-1 rounded-full text-xs font-bold`}>
-                  {service.badgeText || 'Spécialité'}
-                </div>
-              )}
-            </Card>
-          ))}
+            );
+          })}
         </div>
 
         {/* Bottom CTA */}

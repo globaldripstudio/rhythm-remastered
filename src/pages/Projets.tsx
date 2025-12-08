@@ -190,19 +190,21 @@ const Projets = () => {
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <a href="/" className="flex items-center space-x-3">
-              <img 
-                src="/lovable-uploads/logo-blanc-sans-fond.png"
-                alt="Global Drip Studio"
-                className="h-8 object-contain"
-              />
-            </a>
+            <div className="flex items-center gap-6">
+              <a href="/" className="flex items-center space-x-3">
+                <img 
+                  src="/lovable-uploads/logo-blanc-sans-fond.png"
+                  alt="Global Drip Studio"
+                  className="h-8 object-contain"
+                />
+              </a>
+              <a href="/">
+                <Button variant="outline" size="sm">
+                  ← Retour à l'accueil
+                </Button>
+              </a>
+            </div>
           </div>
-          <a href="/">
-            <Button variant="outline" size="sm">
-              ← Retour à l'accueil
-            </Button>
-          </a>
         </div>
       </header>
 
@@ -225,21 +227,21 @@ const Projets = () => {
             <div key={project.id} className="mb-12">
               {/* Project Card */}
               <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500">
-                <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[400px]">
-                  {/* Left Image - Artist Photo */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 h-[400px]">
+                  {/* Left Image - Artist Photo with Vertical Parallax */}
                   <div 
-                    className="lg:col-span-2 relative overflow-hidden group min-h-[400px]"
+                    className="lg:col-span-2 relative overflow-hidden group h-full"
                     onMouseEnter={() => setHoveredProject(project.id)}
                     onMouseLeave={() => setHoveredProject(null)}
                   >
-                    <img 
-                      src={project.leftImage}
-                      alt={project.name}
-                      className={`w-full h-full object-cover transition-all duration-700 ease-out ${
-                        hoveredProject === project.id 
-                          ? 'scale-105 brightness-110' 
-                          : 'scale-100 brightness-90'
-                      }`}
+                    <div 
+                      className="absolute inset-0 w-full h-[120%] transition-all duration-700 ease-out"
+                      style={{
+                        backgroundImage: `url(${project.leftImage})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        transform: `translateY(${Math.max(-50, Math.min(0, -scrollY * 0.05))}px)`,
+                      }}
                     />
                     {/* Gradient overlay */}
                     <div className={`absolute inset-0 transition-all duration-500 ${
@@ -283,27 +285,21 @@ const Projets = () => {
                     </div>
                   </div>
 
-                  {/* Right Image - Project Cover with Dynamic Effects */}
-                  <div className="relative overflow-hidden group/right cursor-pointer">
-                    {/* Parallax scrolling effect */}
+                  {/* Right Image - Project Cover with Horizontal Slide */}
+                  <div className="relative overflow-hidden group/right cursor-pointer h-full">
                     <div 
-                      className="absolute inset-0 bg-cover bg-center transition-all duration-500 transform-gpu group-hover/right:scale-110 group-hover/right:rotate-2"
+                      className="absolute inset-0 w-full h-full transition-all duration-700 ease-out group-hover/right:scale-105"
                       style={{ 
                         backgroundImage: `url(${project.rightImage})`,
-                        backgroundPositionY: `${window.scrollY * -0.2}px`,
-                        filter: 'brightness(0.95)'
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        transform: `translateX(${Math.sin(scrollY * 0.01) * 10}px)`,
                       }}
                     />
-                    {/* Animated gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/30 to-transparent group-hover/right:from-background/40 group-hover/right:via-background/10 transition-all duration-500" />
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/20 to-transparent group-hover/right:from-background/30 transition-all duration-500" />
                     {/* Color tint on hover */}
                     <div className="absolute inset-0 bg-primary/0 group-hover/right:bg-primary/15 transition-all duration-500" />
-                    {/* Border glow effect */}
-                    <div className="absolute inset-0 border-2 border-primary/10 group-hover/right:border-primary/40 transition-all duration-300" />
-                    {/* Shadow glow */}
-                    <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.3)] group-hover/right:shadow-[inset_0_0_60px_rgba(var(--primary),0.2)] transition-all duration-500" />
-                    {/* Floating animation on scroll */}
-                    <div className="absolute inset-0 animate-float-subtle" />
                   </div>
                 </div>
 
