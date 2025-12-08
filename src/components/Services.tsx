@@ -32,7 +32,7 @@ const Services = () => {
     description: "Solution efficace pour budgets serrés",
     price: "120",
     icon: Waves,
-    image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
+    image: "/lovable-uploads/Image-10.jpg",
     featured: true,
     badgeText: "Budget",
     badgeColor: "bg-emerald-500",
@@ -166,20 +166,23 @@ const Services = () => {
                       e.stopPropagation();
                       setShowExpress(!showExpress);
                     }}
-                    className="absolute -top-3 -left-3 z-40 w-12 h-12 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110"
+                    className="absolute -top-5 -left-5 z-40 w-14 h-14 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
                     title={showExpress ? "Voir version Standard" : "Voir version Express"}
                   >
-                    <RefreshCw className={`w-6 h-6 transition-transform duration-700 ${showExpress ? 'rotate-[360deg]' : ''}`} />
+                    <RefreshCw className="w-7 h-7 transition-transform duration-500 group-hover/switch:rotate-180" />
                   </button>
                 )}
                 
                 {/* Card with 3D flip animation */}
                 <div 
-                  className={`relative transition-all duration-700 ${isMixageCard ? '[transform-style:preserve-3d]' : ''}`}
-                  style={{
-                    transform: isMixageCard && showExpress ? 'rotateY(10deg) scale(0.98)' : 'rotateY(0deg) scale(1)',
-                  }}
+                  className={`relative [perspective:1000px]`}
                 >
+                  <div
+                    className={`relative transition-all duration-700 [transform-style:preserve-3d] ${
+                      isMixageCard ? (showExpress ? '[transform:rotateY(180deg)]' : '[transform:rotateY(0deg)]') : ''
+                    }`}
+                  >
+                    <div className={`${isMixageCard ? '[backface-visibility:hidden]' : ''}`}>
                   <Card 
                     className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 ${
                       service.featured ? 'ring-2 ring-primary ring-opacity-50' : ''
@@ -247,6 +250,68 @@ const Services = () => {
                     {/* Glow Effect on Hover */}
                     <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
                   </Card>
+                    </div>
+                    
+                    {/* Back face for flip animation */}
+                    {isMixageCard && (
+                      <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                        <Card 
+                          className={`service-card group cursor-pointer relative overflow-hidden h-full transition-all duration-500 ring-2 ring-primary ring-opacity-50`}
+                        >
+                          <div className="relative h-48 overflow-hidden">
+                            <img 
+                              src={showExpress ? mixageMasteringExpress.image : mixageMasteringStandard.image}
+                              alt={showExpress ? mixageMasteringExpress.title : mixageMasteringStandard.title}
+                              className="w-full h-full object-cover object-top"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                            <div className="absolute top-4 right-4">
+                              <div className="w-12 h-12 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center">
+                                <Waves className="w-6 h-6 text-primary" />
+                              </div>
+                            </div>
+                            <div className={`absolute top-4 left-4 ${showExpress ? mixageMasteringExpress.badgeColor : mixageMasteringStandard.badgeColor} text-primary-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
+                              {showExpress ? mixageMasteringExpress.badgeText : mixageMasteringStandard.badgeText}
+                            </div>
+                          </div>
+
+                          <CardHeader className="pb-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <CardTitle className="text-xl font-bold">{showExpress ? mixageMasteringExpress.title : mixageMasteringStandard.title}</CardTitle>
+                              <div className="text-right">
+                                <div className="text-2xl font-bold text-primary">{showExpress ? mixageMasteringExpress.price : mixageMasteringStandard.price}€</div>
+                              </div>
+                            </div>
+                            <CardDescription className="text-muted-foreground">
+                              {showExpress ? mixageMasteringExpress.description : mixageMasteringStandard.description}
+                            </CardDescription>
+                          </CardHeader>
+
+                          <CardContent>
+                            <ul className="space-y-2 mb-6">
+                              {(showExpress ? mixageMasteringExpress.features : mixageMasteringStandard.features).map((feature, featureIndex) => (
+                                <li key={featureIndex} className="flex items-center text-sm">
+                                  <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
+                                  {feature}
+                                </li>
+                              ))}
+                            </ul>
+
+                            <Button 
+                              className="w-full group-hover:studio-button transition-all duration-300"
+                              variant="outline"
+                              onClick={() => window.location.href = `/services#${showExpress ? mixageMasteringExpress.id : mixageMasteringStandard.id}`}
+                            >
+                              Plus d'infos
+                              <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                            </Button>
+                          </CardContent>
+
+                          <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
+                        </Card>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
