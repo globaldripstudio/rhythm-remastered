@@ -223,8 +223,31 @@ const Projets = () => {
       {/* Projects */}
       <section className={`py-8 transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="container mx-auto px-6 space-y-8">
-          {projects.map((project, projectIndex) => (
-            <div key={project.id} className="mb-12">
+          {projects.map((project, projectIndex) => {
+            // Calculate card position for parallax
+            const cardRef = useRef<HTMLDivElement>(null);
+            const [cardTop, setCardTop] = useState(0);
+            const [isVisible, setIsVisible] = useState(false);
+            
+            useEffect(() => {
+              if (cardRef.current) {
+                const rect = cardRef.current.getBoundingClientRect();
+                const scrollTop = window.scrollY;
+                setCardTop(rect.top + scrollTop);
+                setIsVisible(rect.top < window.innerHeight && rect.bottom > 0);
+              }
+            }, [scrollY]);
+
+            // Calculate parallax only when card is visible
+            const parallaxOffset = isVisible ? (scrollY - cardTop + window.innerHeight / 2) * 0.1 : 0;
+            const clampedParallax = Math.max(-40, Math.min(40, parallaxOffset));
+            
+            // Horizontal slide for right images - alternating direction
+            const horizontalOffset = isVisible ? (scrollY - cardTop + window.innerHeight / 2) * 0.03 : 0;
+            const clampedHorizontal = Math.max(-20, Math.min(20, horizontalOffset)) * (projectIndex % 2 === 0 ? 1 : -1);
+
+            return (
+            <div key={project.id} ref={cardRef} className="mb-12">
               {/* Project Card */}
               <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500">
                 <div className="grid grid-cols-1 lg:grid-cols-3 h-[400px]">
@@ -235,12 +258,12 @@ const Projets = () => {
                     onMouseLeave={() => setHoveredProject(null)}
                   >
                     <div 
-                      className="absolute inset-[-15%] w-[130%] h-[130%] transition-all duration-300 ease-out"
+                      className="absolute inset-[-20%] w-[140%] h-[140%] transition-all duration-500 ease-out"
                       style={{
                         backgroundImage: `url(${project.leftImage})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        transform: `translateY(${Math.max(-60, Math.min(60, (scrollY - 400) * 0.08))}px)`,
+                        transform: isVisible ? `translateY(${clampedParallax}px)` : 'translateY(0px)',
                       }}
                     />
                     {/* Gradient overlay */}
@@ -288,12 +311,12 @@ const Projets = () => {
                   {/* Right Image - Project Cover with Horizontal Slide */}
                   <div className="relative overflow-hidden group/right cursor-pointer h-full">
                     <div 
-                      className="absolute inset-[-10%] w-[120%] h-full transition-all duration-300 ease-out group-hover/right:scale-105"
+                      className="absolute inset-0 w-full h-full transition-all duration-500 ease-out group-hover/right:scale-105"
                       style={{ 
                         backgroundImage: `url(${project.rightImage})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        transform: `translateX(${(projectIndex % 2 === 0 ? 1 : -1) * Math.max(-30, Math.min(30, (scrollY - 400) * 0.04))}px)`,
+                        transform: isVisible ? `translateX(${clampedHorizontal}px)` : 'translateX(0px)',
                       }}
                     />
                     {/* Gradient overlay */}
@@ -402,7 +425,8 @@ const Projets = () => {
                 </Collapsible>
               </Card>
             </div>
-          ))}
+          );
+          })}
         </div>
       </section>
 

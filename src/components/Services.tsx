@@ -29,7 +29,7 @@ const Services = () => {
   const mixageMasteringExpress = {
     id: "mixage-mastering-express",
     title: "Mixage + Mastering Express",
-    description: "Solution efficace pour budgets serrés",
+    description: "Solution professionnelle full numérique pour les artistes travaillant sur instrumentales en .wav",
     price: "120",
     icon: Waves,
     image: "/lovable-uploads/Image-10.jpg",
@@ -166,10 +166,10 @@ const Services = () => {
                       e.stopPropagation();
                       setShowExpress(!showExpress);
                     }}
-                    className="absolute -top-6 -left-6 z-40 w-14 h-14 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
+                    className="absolute -top-8 -left-8 z-40 w-12 h-12 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
                     title={showExpress ? "Voir version Standard" : "Voir version Express"}
                   >
-                    <RefreshCw className="w-7 h-7 transition-transform duration-500 group-hover/switch:rotate-180" />
+                    <RefreshCw className="w-5 h-5 transition-transform duration-500 group-hover/switch:rotate-180" />
                   </button>
                 )}
                 
@@ -184,7 +184,7 @@ const Services = () => {
                   >
                     <div className={`${isMixageCard ? '[backface-visibility:hidden]' : ''}`}>
                   <Card 
-                    className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 h-full flex flex-col ${
+                    className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 min-h-[520px] flex flex-col ${
                       service.featured ? 'ring-2 ring-primary ring-opacity-50' : ''
                     } ${isMixageCard ? 'animate-fade-in' : ''}`}
                   >
@@ -256,7 +256,7 @@ const Services = () => {
                     {isMixageCard && (
                       <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
                         <Card 
-                          className={`service-card group cursor-pointer relative overflow-hidden h-full flex flex-col transition-all duration-500 ring-2 ring-primary ring-opacity-50`}
+                          className={`service-card group cursor-pointer relative overflow-hidden min-h-[520px] flex flex-col transition-all duration-500 ring-2 ring-primary ring-opacity-50`}
                         >
                           <div className="relative h-48 overflow-hidden">
                             <img 
