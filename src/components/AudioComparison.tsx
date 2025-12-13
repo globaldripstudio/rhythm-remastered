@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, Headphones, Mic } from "lucide-react";
 
-// Audio visualizer component
-const AudioVisualizer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<HTMLAudioElement>, isPlaying: boolean }) => {
+// Waveform visualizer component
+const WaveformVisualizer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<HTMLAudioElement>, isPlaying: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const analyserRef = useRef<AnalyserNode>();
@@ -25,39 +25,58 @@ const AudioVisualizer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<HT
       const source = audioContextRef.current.createMediaElementSource(audio);
       source.connect(analyserRef.current);
       analyserRef.current.connect(audioContextRef.current.destination);
-      analyserRef.current.fftSize = 256;
+      analyserRef.current.fftSize = 2048;
     }
 
     const analyser = analyserRef.current;
-    const bufferLength = analyser.frequencyBinCount;
+    const bufferLength = analyser.fftSize;
     const dataArray = new Uint8Array(bufferLength);
 
     const draw = () => {
       if (!isPlaying) return;
       
       animationRef.current = requestAnimationFrame(draw);
-      analyser.getByteFrequencyData(dataArray);
+      analyser.getByteTimeDomainData(dataArray);
 
       ctx.fillStyle = "hsl(var(--background))";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const barWidth = (canvas.width / bufferLength) * 2.5;
-      let barHeight;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "hsl(var(--primary))";
+      ctx.beginPath();
+
+      const sliceWidth = canvas.width / bufferLength;
       let x = 0;
 
       for (let i = 0; i < bufferLength; i++) {
-        barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
+        const v = dataArray[i] / 128.0;
+        const y = (v * canvas.height) / 2;
 
-        const hue = (i / bufferLength) * 60 + 200;
-        ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
-        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
 
-        x += barWidth + 1;
+        x += sliceWidth;
       }
+
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
     };
 
     if (isPlaying) {
       draw();
+    } else {
+      // Draw a static line when not playing
+      ctx.fillStyle = "hsl(var(--background))";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "hsl(var(--muted-foreground))";
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
     }
 
     return () => {
@@ -223,7 +242,7 @@ const AudioComparison = () => {
                   onLoadStart={() => setPlayingBefore(false)}
                   crossOrigin="anonymous"
                 />
-                <AudioVisualizer audioRef={beforeRef} isPlaying={playingBefore} />
+                <WaveformVisualizer audioRef={beforeRef} isPlaying={playingBefore} />
                 <Button
                   onClick={handleBeforePlay}
                   size="lg"
@@ -253,7 +272,7 @@ const AudioComparison = () => {
                   onLoadStart={() => setPlayingAfter(false)}
                   crossOrigin="anonymous"
                 />
-                <AudioVisualizer audioRef={afterRef} isPlaying={playingAfter} />
+                <WaveformVisualizer audioRef={afterRef} isPlaying={playingAfter} />
                 <Button
                   onClick={handleAfterPlay}
                   size="lg"
