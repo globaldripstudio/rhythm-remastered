@@ -44,6 +44,27 @@ const Services = () => {
       deliverables: ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps", "Version streaming optimisée"]
     },
     {
+      id: "mixage-mastering-express",
+      title: "Mixage + Mastering Express",
+      description: "Service complet pour donner vie à vos créations musicales",
+      price: "120€",
+      icon: Music,
+      image: "/lovable-uploads/Image-10.jpg",
+      featured: true,
+      category: "Production",
+      duration: "2-3 jours",
+      included: [
+        "Mixage professionnel multi-pistes",
+        "Mastering full numérique",
+        "2 révisions incluses",
+        "Livraison formats HD (WAV, MP3)"
+      ],
+      process: "Analyse → Mixage → Mastering → Révisions → Livraison finale",
+      details: "Notre service express s'adresse principalement aux artistes travaillant sur des instrumentales. Offrez vous le luxe d'un mixage et mastering professionnel tout numérique à coût réduit.",
+      equipment: ["Apollo Quad Converters", "Plugins professionnels", "Monitoring Adam A77x"],
+      deliverables: ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps"]
+    },
+    {
       id: "sound-design",
       title: "Sound Design",
       description: "Création sonore et design audio pour tous vos projets créatifs",

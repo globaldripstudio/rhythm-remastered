@@ -166,7 +166,7 @@ const Services = () => {
                       e.stopPropagation();
                       setShowExpress(!showExpress);
                     }}
-                    className="absolute -top-5 -left-5 z-40 w-14 h-14 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
+                    className="absolute -top-6 -left-6 z-40 w-14 h-14 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
                     title={showExpress ? "Voir version Standard" : "Voir version Express"}
                   >
                     <RefreshCw className="w-7 h-7 transition-transform duration-500 group-hover/switch:rotate-180" />
@@ -184,7 +184,7 @@ const Services = () => {
                   >
                     <div className={`${isMixageCard ? '[backface-visibility:hidden]' : ''}`}>
                   <Card 
-                    className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 ${
+                    className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 h-full flex flex-col ${
                       service.featured ? 'ring-2 ring-primary ring-opacity-50' : ''
                     } ${isMixageCard ? 'animate-fade-in' : ''}`}
                   >
@@ -226,10 +226,10 @@ const Services = () => {
                       </CardDescription>
                     </CardHeader>
 
-                    <CardContent>
+                    <CardContent className="flex-1 flex flex-col">
                       {/* Features List */}
-                      <ul className="space-y-2 mb-6">
-                        {service.features.map((feature, featureIndex) => (
+                      <ul className="space-y-2 mb-6 flex-1">
+                        {service.features.slice(0, 4).map((feature, featureIndex) => (
                           <li key={featureIndex} className="flex items-center text-sm">
                             <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
                             {feature}
@@ -256,7 +256,7 @@ const Services = () => {
                     {isMixageCard && (
                       <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
                         <Card 
-                          className={`service-card group cursor-pointer relative overflow-hidden h-full transition-all duration-500 ring-2 ring-primary ring-opacity-50`}
+                          className={`service-card group cursor-pointer relative overflow-hidden h-full flex flex-col transition-all duration-500 ring-2 ring-primary ring-opacity-50`}
                         >
                           <div className="relative h-48 overflow-hidden">
                             <img 
@@ -287,9 +287,9 @@ const Services = () => {
                             </CardDescription>
                           </CardHeader>
 
-                          <CardContent>
-                            <ul className="space-y-2 mb-6">
-                              {(showExpress ? mixageMasteringExpress.features : mixageMasteringStandard.features).map((feature, featureIndex) => (
+                          <CardContent className="flex-1 flex flex-col">
+                            <ul className="space-y-2 mb-6 flex-1">
+                              {(showExpress ? mixageMasteringExpress.features : mixageMasteringStandard.features).slice(0, 4).map((feature, featureIndex) => (
                                 <li key={featureIndex} className="flex items-center text-sm">
                                   <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
                                   {feature}
