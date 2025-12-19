@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, Headphones, Mic } from "lucide-react";
 
-// Waveform visualizer component
-const WaveformVisualizer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<HTMLAudioElement>, isPlaying: boolean }) => {
+// Spectrum analyzer component
+const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<HTMLAudioElement>, isPlaying: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const analyserRef = useRef<AnalyserNode>();
@@ -25,58 +25,84 @@ const WaveformVisualizer = ({ audioRef, isPlaying }: { audioRef: React.RefObject
       const source = audioContextRef.current.createMediaElementSource(audio);
       source.connect(analyserRef.current);
       analyserRef.current.connect(audioContextRef.current.destination);
-      analyserRef.current.fftSize = 2048;
+      analyserRef.current.fftSize = 256;
+      analyserRef.current.smoothingTimeConstant = 0.8;
     }
 
     const analyser = analyserRef.current;
-    const bufferLength = analyser.fftSize;
+    const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
 
     const draw = () => {
       if (!isPlaying) return;
       
       animationRef.current = requestAnimationFrame(draw);
-      analyser.getByteTimeDomainData(dataArray);
+      analyser.getByteFrequencyData(dataArray);
 
+      // Clear canvas with background
       ctx.fillStyle = "hsl(var(--background))";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "hsl(var(--primary))";
-      ctx.beginPath();
+      const barCount = 48;
+      const barWidth = (canvas.width / barCount) * 0.7;
+      const gap = (canvas.width / barCount) * 0.3;
+      const step = Math.floor(bufferLength / barCount);
 
-      const sliceWidth = canvas.width / bufferLength;
-      let x = 0;
+      for (let i = 0; i < barCount; i++) {
+        const dataIndex = i * step;
+        const value = dataArray[dataIndex];
+        const barHeight = (value / 255) * canvas.height * 0.9;
+        
+        const x = i * (barWidth + gap);
+        const y = canvas.height - barHeight;
 
-      for (let i = 0; i < bufferLength; i++) {
-        const v = dataArray[i] / 128.0;
-        const y = (v * canvas.height) / 2;
+        // Create gradient for each bar
+        const gradient = ctx.createLinearGradient(x, canvas.height, x, y);
+        gradient.addColorStop(0, "hsl(var(--primary))");
+        gradient.addColorStop(0.5, "hsl(var(--primary) / 0.7)");
+        gradient.addColorStop(1, "hsl(var(--primary) / 0.4)");
+        
+        ctx.fillStyle = gradient;
+        
+        // Draw rounded bars
+        const radius = barWidth / 2;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, [radius, radius, 0, 0]);
+        ctx.fill();
 
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-
-        x += sliceWidth;
+        // Add glow effect
+        ctx.shadowColor = "hsl(var(--primary))";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
       }
-
-      ctx.lineTo(canvas.width, canvas.height / 2);
-      ctx.stroke();
+      
+      // Reset shadow
+      ctx.shadowBlur = 0;
     };
 
     if (isPlaying) {
       draw();
     } else {
-      // Draw a static line when not playing
+      // Draw static idle bars when not playing
       ctx.fillStyle = "hsl(var(--background))";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "hsl(var(--muted-foreground))";
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height / 2);
-      ctx.lineTo(canvas.width, canvas.height / 2);
-      ctx.stroke();
+      
+      const barCount = 48;
+      const barWidth = (canvas.width / barCount) * 0.7;
+      const gap = (canvas.width / barCount) * 0.3;
+
+      for (let i = 0; i < barCount; i++) {
+        const x = i * (barWidth + gap);
+        const idleHeight = 4 + Math.sin(i * 0.3) * 2;
+        const y = canvas.height - idleHeight;
+        
+        ctx.fillStyle = "hsl(var(--muted-foreground) / 0.3)";
+        const radius = barWidth / 2;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, idleHeight, [radius, radius, 0, 0]);
+        ctx.fill();
+      }
     }
 
     return () => {
@@ -89,9 +115,9 @@ const WaveformVisualizer = ({ audioRef, isPlaying }: { audioRef: React.RefObject
   return (
     <canvas
       ref={canvasRef}
-      width={300}
-      height={80}
-      className="w-full h-20 rounded-lg bg-muted/30"
+      width={400}
+      height={100}
+      className="w-full h-24 rounded-xl bg-background/50 backdrop-blur-sm border border-border/30"
     />
   );
 };
@@ -242,7 +268,7 @@ const AudioComparison = () => {
                   onLoadStart={() => setPlayingBefore(false)}
                   crossOrigin="anonymous"
                 />
-                <WaveformVisualizer audioRef={beforeRef} isPlaying={playingBefore} />
+                <SpectrumAnalyzer audioRef={beforeRef} isPlaying={playingBefore} />
                 <Button
                   onClick={handleBeforePlay}
                   size="lg"
@@ -272,7 +298,7 @@ const AudioComparison = () => {
                   onLoadStart={() => setPlayingAfter(false)}
                   crossOrigin="anonymous"
                 />
-                <WaveformVisualizer audioRef={afterRef} isPlaying={playingAfter} />
+                <SpectrumAnalyzer audioRef={afterRef} isPlaying={playingAfter} />
                 <Button
                   onClick={handleAfterPlay}
                   size="lg"
