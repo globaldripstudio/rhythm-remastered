@@ -66,6 +66,7 @@ const Equipment = () => {
     ],
     instruments: [
       { name: "ESP E-II Horizon", type: "Guitare électrique", status: "premium" },
+      { name: "ESP Vintage Plus", type: "Guitare électrique", status: "premium" },
       { name: "Lag Roxane RR-1500", type: "Guitare électrique", status: "standard" },
       { name: "Fender Stratocaster Player Series", type: "Guitare électrique", status: "classic" },
       { name: "Ibanez Tod10n", type: "Guitare électro-classique", status: "standard" },

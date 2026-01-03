@@ -42,7 +42,7 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               <span>+33 6 59 79 73 42</span>
             </div>
-            <Button variant="default" className="studio-button">
+            <Button variant="default" className="studio-button" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
               Réserver
             </Button>
           </div>
@@ -73,7 +73,7 @@ const Header = () => {
                   <Phone className="w-4 h-4" />
                   <span>+33 6 59 79 73 42</span>
                 </div>
-                <Button variant="default" className="studio-button w-full">
+                <Button variant="default" className="studio-button w-full" onClick={() => { toggleMenu(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}>
                   Réserver
                 </Button>
               </div>

@@ -52,7 +52,7 @@ const Services = () => {
       image: "/lovable-uploads/Image-10.jpg",
       featured: true,
       category: "Production",
-      duration: "2-3 jours",
+      duration: "4 heures",
       included: [
         "Mixage professionnel multi-pistes",
         "Mastering full numérique",
@@ -322,6 +322,25 @@ const Services = () => {
                     height="200"
                     src="https://www.youtube.com/embed/kFEacVd-iMs"
                     title="Théo Pulsor"
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">The Silver Coast: Olivier Saint-Jours on Finding Silence in Les Landes • A Type 7 Film</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Collaboration with Type7 - Post-production/sound design/global mixing
+                </p>
+                <div className="bg-card rounded-lg p-4 border border-border/50">
+                  <iframe 
+                    width="100%" 
+                    height="200"
+                    src="https://www.youtube.com/embed/W-GAqmI96ro"
+                    title="The Silver Coast - Type 7 Film"
                     frameBorder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowFullScreen
