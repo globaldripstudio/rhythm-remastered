@@ -33,6 +33,17 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
 
+    // Get computed colors from CSS variables
+    const computedStyle = getComputedStyle(document.documentElement);
+    const primaryColor = computedStyle.getPropertyValue('--primary').trim();
+    const bgColor = "#0a0a0b"; // Dark background fallback
+    const mutedColor = "rgba(255, 255, 255, 0.3)";
+    
+    // Parse primary HSL and convert to usable format
+    const primaryHsl = `hsl(${primaryColor})`;
+    const primaryHsl70 = `hsla(${primaryColor} / 0.7)`;
+    const primaryHsl40 = `hsla(${primaryColor} / 0.4)`;
+
     const draw = () => {
       if (!isPlaying) return;
       
@@ -40,7 +51,7 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
       analyser.getByteFrequencyData(dataArray);
 
       // Clear canvas with background
-      ctx.fillStyle = "hsl(var(--background))";
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const barCount = 48;
@@ -56,11 +67,11 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
         const x = i * (barWidth + gap);
         const y = canvas.height - barHeight;
 
-        // Create gradient for each bar
+        // Create gradient for each bar with actual color values
         const gradient = ctx.createLinearGradient(x, canvas.height, x, y);
-        gradient.addColorStop(0, "hsl(var(--primary))");
-        gradient.addColorStop(0.5, "hsl(var(--primary) / 0.7)");
-        gradient.addColorStop(1, "hsl(var(--primary) / 0.4)");
+        gradient.addColorStop(0, primaryHsl);
+        gradient.addColorStop(0.5, primaryHsl70);
+        gradient.addColorStop(1, primaryHsl40);
         
         ctx.fillStyle = gradient;
         
@@ -71,7 +82,7 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
         ctx.fill();
 
         // Add glow effect
-        ctx.shadowColor = "hsl(var(--primary))";
+        ctx.shadowColor = primaryHsl;
         ctx.shadowBlur = 10;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
@@ -85,7 +96,7 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
       draw();
     } else {
       // Draw static idle bars when not playing
-      ctx.fillStyle = "hsl(var(--background))";
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       const barCount = 48;
@@ -97,7 +108,7 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
         const idleHeight = 4 + Math.sin(i * 0.3) * 2;
         const y = canvas.height - idleHeight;
         
-        ctx.fillStyle = "hsl(var(--muted-foreground) / 0.3)";
+        ctx.fillStyle = mutedColor;
         const radius = barWidth / 2;
         ctx.beginPath();
         ctx.roundRect(x, y, barWidth, idleHeight, [radius, radius, 0, 0]);
