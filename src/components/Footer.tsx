@@ -41,12 +41,6 @@ const Footer = () => {
               >
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
-                <Youtube className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
             </div>
           </div>
 
@@ -88,9 +82,9 @@ const Footer = () => {
               © 2024 Global Drip Worldwide. Tous droits réservés.
             </div>
             <div className="flex space-x-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-primary transition-colors">Mentions légales</a>
-              <a href="#" className="hover:text-primary transition-colors">Politique de confidentialité</a>
-              <a href="#" className="hover:text-primary transition-colors">CGV</a>
+              <a href="/mentions-legales" className="hover:text-primary transition-colors">Mentions légales</a>
+              <a href="/politique-confidentialite" className="hover:text-primary transition-colors">Politique de confidentialité</a>
+              <a href="/cgv" className="hover:text-primary transition-colors">CGV</a>
             </div>
           </div>
         </div>

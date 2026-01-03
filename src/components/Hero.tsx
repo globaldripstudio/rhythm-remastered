@@ -109,7 +109,7 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="studio-button text-lg px-8 py-6">
+            <Button size="lg" className="studio-button text-lg px-8 py-6" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
               <Mic className="w-5 h-5 mr-2" />
               Réserver une session
             </Button>

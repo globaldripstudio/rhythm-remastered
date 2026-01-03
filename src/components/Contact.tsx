@@ -83,13 +83,19 @@ const Contact = () => {
                   <Label htmlFor="service">Service souhaité</Label>
                   <select 
                     id="service"
+                    name="service"
                     className="w-full mt-2 px-3 py-2 bg-input border border-border rounded-md text-foreground"
                   >
                     <option value="">Sélectionnez un service</option>
-                    <option value="mixage-mastering">Mixage + Mastering (290€)</option>
-                    <option value="mastering">Mastering Hybride (60€)</option>
-                    <option value="mixage">Mixage Studio (230€)</option>
-                    <option value="custom">Projet sur mesure</option>
+                    <option value="mixage">Mixage</option>
+                    <option value="mixage-mastering">Mixage + Mastering</option>
+                    <option value="mixage-mastering-express">Mixage + Mastering Express</option>
+                    <option value="sound-design">Sound Design</option>
+                    <option value="enregistrement-studio">Enregistrement Studio</option>
+                    <option value="enregistrement-terrain">Enregistrement Terrain</option>
+                    <option value="composition-beatmaking">Composition/Beatmaking</option>
+                    <option value="direction-artistique">Direction Artistique/Arrangement</option>
+                    <option value="formation">Formation MAO/Mixage</option>
                   </select>
                 </div>
 
@@ -187,30 +193,6 @@ const Contact = () => {
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="service-card text-center p-6">
-                <Calendar className="w-8 h-8 text-primary mx-auto mb-3" />
-                <h3 className="font-bold mb-2">Réservation rapide</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Consultez nos créneaux disponibles
-                </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  Voir le planning
-                </Button>
-              </Card>
-
-              <Card className="service-card text-center p-6">
-                <Users className="w-8 h-8 text-secondary mx-auto mb-3" />
-                <h3 className="font-bold mb-2">Visite du studio</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Découvrez nos installations
-                </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  Planifier visite
-                </Button>
-              </Card>
-            </div>
 
             {/* Logo Display */}
             <Card className="p-8 bg-gradient-to-br from-card to-muted/20 border-border/50">
