@@ -56,12 +56,12 @@ const Partners = () => {
                 className="p-6 flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-pointer animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="w-full h-12 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
+                <div className="w-full h-12 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity overflow-hidden">
                     <img 
                       src={partner.logo}
                       alt={`${partner.name} logo`}
                       className={`max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 ${
-                        partner.name === "Pulsor Agency" ? "scale-[2]" : 
+                        partner.name === "Pulsor Agency" ? "scale-[3] translate-x-2" : 
                         partner.name === "Ultrack Agency" ? "scale-125" : ""
                       }`}
                       style={{ maxHeight: '40px' }}
