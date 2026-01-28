@@ -262,7 +262,7 @@ const Services = () => {
                             <img 
                               src={showExpress ? mixageMasteringExpress.image : mixageMasteringStandard.image}
                               alt={showExpress ? mixageMasteringExpress.title : mixageMasteringStandard.title}
-                              className="w-full h-full object-cover object-top"
+                              className="w-full h-full object-cover object-center"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
                             <div className="absolute top-4 right-4">
