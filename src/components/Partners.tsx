@@ -19,17 +19,17 @@ const Partners = () => {
     },
     { 
       name: "Ambit Components", 
-      logo: "/lovable-uploads/ambit-new.png",
+      logo: "/lovable-uploads/ambit-inverted.png",
       url: "https://ambit-components.com/en/"
     },
     { 
       name: "Pulsor Agency", 
-      logo: "/lovable-uploads/a2f9923a-a28c-46c2-b041-324fea7c7fd2.png",
+      logo: "/lovable-uploads/pulsor-inverted.png",
       url: "https://www.pulsor.agency/"
     },
     { 
       name: "Ultrack Agency", 
-      logo: "/lovable-uploads/ea14cd8f-e603-4737-8f61-3a6eb2dfac23.png",
+      logo: "/lovable-uploads/ultrack-inverted.png",
       url: "https://ultrack.webflow.io/"
     }
   ];
