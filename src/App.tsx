@@ -13,6 +13,8 @@ import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
+import Ebook from "./pages/Ebook";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import LiveChat from "./components/LiveChat";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/mentions-legales" element={<MentionsLegales />} />
           <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
           <Route path="/cgv" element={<CGV />} />
+          <Route path="/ebook" element={<Ebook />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
