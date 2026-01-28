@@ -50,7 +50,7 @@ const Projets = () => {
       name: "ZEU",
       leftImage: "/lovable-uploads/maxresdefault.jpg.png",
       rightImage: "/lovable-uploads/WATERGATE_I.jpg",
-      description: "Collaborations créatives avec un artiste hip-hop émergent aux flows authentiques.",
+      description: "Collaborations créatives avec un artiste reconnu du rap underground aux flows authentiques.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/6Ppunn0oij7cXSsQRefvrx?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "J'ai composé et enregistré 'JDAY', ainsi qu'enregistré 'J'DEVRAIS' et 'RARE' avec ZEU. Une collaboration créative intense qui a donné naissance à des tracks authentiques mêlant flows accrocheurs et productions soignées.",
       services: ["Composition", "Enregistrement"]
@@ -60,7 +60,7 @@ const Projets = () => {
       name: "TANY",
       leftImage: "/lovable-uploads/IMG_3108.JPEG.png",
       rightImage: "/lovable-uploads/IMG_0902.JPG.png",
-      description: "Partenariat privilégié et relation artistique forte avec direction artistique unique.",
+      description: "Partenariat privilégié et relation artistique forte avec une direction sur mesure.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/4w5z9GsBwZuzIxHr46SuIc?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Partenariat privilégié avec Tany, nous avons développé une relation artistique forte et durable. Ensemble, nous construisons une direction artistique unique qui définit son identité musicale.",
       services: ["Production complète", "Enregistrement", "Mixage", "Mastering", "Direction artistique"]
@@ -70,7 +70,7 @@ const Projets = () => {
       name: "LIL MOINE",
       leftImage: "/lovable-uploads/image00010.jpeg.png",
       rightImage: "/lovable-uploads/image00016.jpeg.png",
-      description: "Collaboration rapprochée depuis 2020, production quasi-exclusive de ses tracks et projets.",
+      description: "Collaboration rapprochée depuis 2020, production quasi-exclusive de ses tracks et projets audiovisuels.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/2TfrHGAo7z0KBG1XjJeSJq?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Collaboration privilégiée depuis 2020 avec Lil Moine. Je produis presque chaque track et projet pour lui, créant un son cohérent et évolutif. Cette relation artistique durable nous permet d'explorer constamment de nouvelles sonorités tout en gardant son identité musicale forte.",
       services: ["Production", "Composition", "Enregistrement", "Mixage", "Mastering", "Direction artistique", "Ingénieur son live", "Sound Design"]
@@ -80,7 +80,7 @@ const Projets = () => {
       name: "EDDY DE MART",
       leftImage: "/lovable-uploads/image00001.jpeg.png",
       rightImage: "/lovable-uploads/image00002.jpeg.png",
-      description: "Mixage et mastering professionnel depuis 2022, apportant dimension technique à ses créations.",
+      description: "Mixage et mastering depuis 2022, apportant dimension technique à ses créations.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/2MdVNVBxr9PxNWgu7bZee9?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Depuis 2022, je m'occupe du mixage et mastering des projets d'Eddy de Mart. Notre collaboration se concentre sur l'obtention d'un son professionnel et impactant, mettant en valeur ses compositions avec une approche technique rigoureuse.",
       services: ["Mixage", "Mastering", "Post-production", "Arrangement"]
@@ -130,7 +130,7 @@ const Projets = () => {
       name: "MAMOOD",
       leftImage: "/lovable-uploads/450172737_1233005707693009_8303727533697657373_n.jpg",
       rightImage: "/lovable-uploads/4CD5F5BC-16B6-4B48-8063-7422452F39C1.jpeg",
-      description: "Collaboration sur l'enregistrement et mixage d'Adios et MPLPVP.",
+      description: "Collaboration sur l'enregistrement, le mixage et le mastering d'Adios et MPLPVP.",
       spotifyLink: "https://open.spotify.com/intl-fr/artist/2YkxhCLm6u50qBodau4R1z?si=VlQzbb3DQHmrPrhjui7_hg",
       collaborationDetails: "J'ai enregistré et mixé 'Adios' et 'MPLPVP' pour Mamood. Ces sessions ont été particulièrement enrichissantes, permettant d'explorer des sonorités urbaines contemporaines avec une approche technique précise pour capturer l'énergie de ses performances.",
       services: ["Enregistrement", "Mixage"]
@@ -150,7 +150,7 @@ const Projets = () => {
       name: "TIMOTHÉ CHATENOUD",
       leftImage: "/lovable-uploads/336901015_913434623316199_2830527649959552654_n.jpg",
       rightImage: "/lovable-uploads/Sans_titre13.png",
-      description: "Artiste autoproduit muni d'une identité musicale unique, nous apportons la touche finale aux créations de Timothé.",
+      description: "Artiste autoproduit muni d'une identité musicale unique, nous apportons la touche finale aux créations de Timothé avec un mastering hybride.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/1PWnN16t7B2Ee2GJd648og?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Timothé Chatenoud est un artiste autoproduit avec une identité musicale forte et unique. Nous intervenons pour apporter la touche finale professionnelle à ses créations, préservant son authenticité tout en optimisant la qualité sonore.",
       services: ["Mastering"]
@@ -160,7 +160,7 @@ const Projets = () => {
       name: "VENIN",
       leftImage: "/lovable-uploads/jean-marc-battini.jpg",
       rightImage: "/lovable-uploads/venin-album-cover.jpg",
-      description: "Groupe de rock légendaire, édition/mixage/mastering de l'album 'Le Premier Sang'.",
+      description: "Groupe de rock emblématique du Sud de la France, enregistrement, édition, mixage et mastering de l'album 'Le Premier Sang'.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/6RSIzijNFeHFmv4vLWhxgL?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Pour leur album 'Le Premier Sang', j'ai eu l'honneur d'accueillir Venin au Global Drip Studio. J'ai assuré l'édition, le mixage et le mastering des 9 titres inédits, ainsi que l'enregistrement des voix, des parties solo, et quelques arrangements claviers. Un projet entièrement pensé pour sonner eighties avec une approche authentique sans copier-coller ni trig.",
       services: ["Édition", "Mixage", "Mastering", "Enregistrement voix et guitares", "Arrangements"]

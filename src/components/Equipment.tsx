@@ -67,9 +67,10 @@ const Equipment = () => {
     instruments: [
       { name: "ESP E-II Horizon", type: "Guitare électrique", status: "premium" },
       { name: "ESP Vintage Plus", type: "Guitare électrique", status: "premium" },
+      { name: "LTD M7 Baritone Black Metal", type: "Guitare électrique", status: "premium" },
       { name: "Lag Roxane RR-1500", type: "Guitare électrique", status: "standard" },
       { name: "Fender Stratocaster Player Series", type: "Guitare électrique", status: "classic" },
-      { name: "Ibanez Tod10n", type: "Guitare électro-classique", status: "standard" },
+      { name: "Ibanez Tod10n", type: "Guitare électro-classique", status: "signature" },
       { name: "Washburn D15", type: "Guitare folk", status: "standard" },
       { name: "Guitare classique Pro Natura", type: "Guitare classique", status: "standard" },
       { name: "Guitare manouche Di Mauro", type: "Guitare manouche", status: "vintage" },
@@ -81,7 +82,6 @@ const Equipment = () => {
     backline: [
       { name: "EVH 5150 6l6 50w", type: "Tête d'amplificateur guitare", status: "premium" },
       { name: "Orange Rockerverb MkIII", type: "Tête d'amplificateur guitare", status: "premium" },
-      { name: "Victory VX The Kraken MK I 50w", type: "Tête d'amplificateur guitare", status: "premium" },
       { name: "ENGL 2x12 V30", type: "Baffle guitare", status: "premium" },
       { name: "EVH 2x12 G12-H", type: "Baffle guitare", status: "premium" },
       { name: "VOX V2x12C", type: "Baffle guitare", status: "classic" },
