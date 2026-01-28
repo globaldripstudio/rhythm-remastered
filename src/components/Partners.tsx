@@ -61,8 +61,8 @@ const Partners = () => {
                       src={partner.logo}
                       alt={`${partner.name} logo`}
                       className={`max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 ${
-                        partner.name === "Pulsor Agency" ? "scale-[3] translate-x-2 translate-y-1" : 
-                        partner.name === "Ultrack Agency" ? "scale-125 -translate-x-1" : 
+                        partner.name === "Pulsor Agency" ? "scale-[3] translate-x-2 translate-y-0.5" : 
+                        partner.name === "Ultrack Agency" ? "scale-110" : 
                         partner.name === "Ambit Components" ? "-translate-y-0.5" : ""
                       }`}
                       style={{ maxHeight: '40px' }}
