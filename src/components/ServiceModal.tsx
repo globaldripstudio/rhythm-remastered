@@ -51,9 +51,10 @@ const ServiceModalContent = ({ service, onClose }: { service: Service; onClose: 
           alt={service.title}
           className={`w-full h-full object-cover ${
             service.id === 'composition' ? 'object-center' :
-            service.id === 'captation-sonore' ? 'object-bottom' :  
+            service.id === 'captation-sonore' ? 'object-[center_25%]' :  
             service.id === 'direction-artistique' ? 'object-bottom' :
-            service.id === 'mixage-mastering' || service.id === 'mixage-mastering-express' ? 'object-top' :
+            service.id === 'mixage-mastering' ? 'object-top' :
+            service.id === 'mixage-mastering-express' ? 'object-center' :
             ''
           }`}
         />
