@@ -188,19 +188,20 @@ const Projets = () => {
 
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <a href="/" className="flex items-center space-x-3">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <a href="/" className="flex items-center space-x-2 sm:space-x-3">
                 <img 
                   src="/lovable-uploads/logo-blanc-sans-fond.png"
                   alt="Global Drip Studio"
-                  className="h-8 object-contain"
+                  className="h-6 sm:h-8 object-contain"
                 />
               </a>
               <a href="/">
-                <Button variant="outline" size="sm">
-                  ← Retour à l'accueil
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">← Retour à l'accueil</span>
+                  <span className="sm:hidden">← Accueil</span>
                 </Button>
               </a>
             </div>
@@ -209,20 +210,20 @@ const Projets = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-b from-background to-muted/20">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+      <section className="py-10 sm:py-16 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
             NOS <span className="hero-text">PROJETS</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
             Les artistes et projets avec lesquels nous sommes fiers d'avoir collaboré
           </p>
         </div>
       </section>
 
       {/* Projects */}
-      <section className={`py-8 transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <div className="container mx-auto px-6 space-y-8">
+      <section className={`py-6 sm:py-8 transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className="container mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
           {projects.map((project, projectIndex) => {
             // Calculate card position for parallax
             const cardRef = useRef<HTMLDivElement>(null);
@@ -247,18 +248,18 @@ const Projets = () => {
             const clampedHorizontal = Math.max(-20, Math.min(20, horizontalOffset)) * (projectIndex % 2 === 0 ? 1 : -1);
 
             return (
-            <div key={project.id} ref={cardRef} className="mb-12">
+            <div key={project.id} ref={cardRef} className="mb-6 sm:mb-12">
               {/* Project Card */}
               <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500">
-                <div className="grid grid-cols-1 lg:grid-cols-3 h-[400px]">
+                <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[280px] sm:min-h-[350px] lg:h-[400px]">
                   {/* Left Image - Artist Photo with Vertical Parallax */}
                   <div 
-                    className="lg:col-span-2 relative overflow-hidden group h-full"
+                    className="lg:col-span-2 relative overflow-hidden group min-h-[200px] sm:min-h-[280px] lg:h-full"
                     onMouseEnter={() => setHoveredProject(project.id)}
                     onMouseLeave={() => setHoveredProject(null)}
                   >
                     <div 
-                      className="absolute inset-[-20%] w-[140%] h-[140%] transition-all duration-500 ease-out"
+                      className="absolute inset-[-10%] sm:inset-[-20%] w-[120%] sm:w-[140%] h-[120%] sm:h-[140%] transition-all duration-500 ease-out"
                       style={{
                         backgroundImage: `url(${project.leftImage})`,
                         backgroundSize: 'cover',
@@ -274,15 +275,15 @@ const Projets = () => {
                     }`} />
                     
                     {/* Content */}
-                    <div className={`absolute inset-0 flex flex-col justify-end p-8 transition-all duration-500 ${
+                    <div className={`absolute inset-0 flex flex-col justify-end p-4 sm:p-6 lg:p-8 transition-all duration-500 ${
                       hoveredProject === project.id ? 'translate-y-[-8px]' : ''
                     }`}>
-                      <h2 className={`text-4xl md:text-5xl font-bold text-foreground mb-4 transition-all duration-300 ${
+                      <h2 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-4 transition-all duration-300 ${
                         hoveredProject === project.id ? 'scale-[1.02]' : ''
                       }`}>
                         {project.name}
                       </h2>
-                      <p className={`mb-6 max-w-xl transition-all duration-300 ${
+                      <p className={`mb-3 sm:mb-6 max-w-xl text-sm sm:text-base transition-all duration-300 ${
                         hoveredProject === project.id ? 'text-foreground' : 'text-muted-foreground'
                       }`}>
                         {project.description}
@@ -294,12 +295,13 @@ const Projets = () => {
                         <CollapsibleTrigger asChild>
                           <Button 
                             variant="outline" 
-                            className={`w-fit bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300 ${
+                            size="sm"
+                            className={`w-fit bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300 text-xs sm:text-sm ${
                               hoveredProject === project.id ? 'shadow-lg shadow-primary/25' : ''
                             }`}
                           >
                             En savoir plus
-                            <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-300 ${
+                            <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transition-transform duration-300 ${
                               expandedProject === project.id ? 'rotate-180' : ''
                             }`} />
                           </Button>
@@ -308,8 +310,8 @@ const Projets = () => {
                     </div>
                   </div>
 
-                  {/* Right Image - Project Cover with Horizontal Slide */}
-                  <div className="relative overflow-hidden group/right cursor-pointer h-full">
+                  {/* Right Image - Project Cover with Horizontal Slide - Hidden on mobile */}
+                  <div className="hidden lg:block relative overflow-hidden group/right cursor-pointer h-full">
                     <div 
                       className="absolute inset-0 w-full h-full transition-all duration-500 ease-out group-hover/right:scale-105"
                       style={{ 
@@ -332,22 +334,22 @@ const Projets = () => {
                   onOpenChange={() => toggleProject(project.id)}
                 >
                   <CollapsibleContent className="border-t border-border/50">
-                    <div className="p-8 bg-gradient-to-b from-muted/20 to-background">
+                    <div className="p-4 sm:p-6 lg:p-8 bg-gradient-to-b from-muted/20 to-background">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Details */}
                         <div>
-                          <h3 className="text-xl font-bold mb-4">Notre collaboration</h3>
-                          <p className="text-muted-foreground mb-6 leading-relaxed">
+                          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Notre collaboration</h3>
+                          <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
                             {project.collaborationDetails}
                           </p>
                           
-                          <div className="mb-6">
-                            <h4 className="font-semibold mb-3">Services fournis :</h4>
-                            <div className="flex flex-wrap gap-2">
+                          <div className="mb-4 sm:mb-6">
+                            <h4 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Services fournis :</h4>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
                               {project.services.map((service, index) => (
                                 <span 
                                   key={index}
-                                  className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium"
+                                  className="px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/20 text-primary rounded-full text-xs sm:text-sm font-medium"
                                 >
                                   {service}
                                 </span>
@@ -358,7 +360,7 @@ const Projets = () => {
 
                         {/* Spotify/YouTube Player */}
                         <div>
-                          <h3 className="text-xl font-bold mb-4">Écouter</h3>
+                          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Écouter</h3>
                           {project.spotifyEmbed ? (
                             <div className="bg-card rounded-lg p-4 border border-border/50">
                               <div dangerouslySetInnerHTML={{ __html: project.spotifyEmbed }} />
@@ -431,17 +433,17 @@ const Projets = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-b from-muted/20 to-background">
-        <div className="container mx-auto px-6 text-center">
+      <section className="py-10 sm:py-16 bg-gradient-to-b from-muted/20 to-background">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
               Prêt à rejoindre nos <span className="hero-text">collaborations</span> ?
             </h2>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
               Chaque projet est unique. Parlons de votre vision musicale et créons ensemble quelque chose d'extraordinaire.
             </p>
             <a href="/#contact">
-              <Button size="lg" className="studio-button">
+              <Button size="lg" className="studio-button text-sm sm:text-base">
                 Démarrer un projet
               </Button>
             </a>
