@@ -34,6 +34,7 @@ const Header = () => {
             <a href="/projets" className="hover:text-primary transition-colors text-muted-foreground">Projets</a>
             <span className="text-muted-foreground">|</span>
             <a href="/blog" className="hover:text-primary transition-colors text-muted-foreground">Blog</a>
+            <span className="text-muted-foreground">|</span>
             <a href="/ebook" className="hover:text-primary transition-colors text-muted-foreground">Boutique</a>
           </nav>
 
