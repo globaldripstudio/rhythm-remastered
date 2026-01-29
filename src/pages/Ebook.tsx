@@ -40,9 +40,9 @@ const Ebook = () => {
               <div className="relative">
                 <div className="aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-primary/20">
                   <img 
-                    src="/lovable-uploads/ebook-cover.png" 
+                    src="/lovable-uploads/ebook-cover.jpg" 
                     alt="Formation au Sound Design pour Vidéastes et Monteurs"
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
