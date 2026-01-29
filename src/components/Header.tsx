@@ -34,6 +34,7 @@ const Header = () => {
             <a href="/projets" className="hover:text-primary transition-colors text-muted-foreground">Projets</a>
             <span className="text-muted-foreground">|</span>
             <a href="/blog" className="hover:text-primary transition-colors text-muted-foreground">Blog</a>
+            <a href="/ebook" className="hover:text-primary transition-colors text-muted-foreground">Boutique</a>
           </nav>
 
           {/* Contact Info & CTA */}
@@ -66,8 +67,8 @@ const Header = () => {
               <a href="#contact" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Contact</a>
               <div className="border-t border-border my-2"></div>
               <a href="/projets" className="py-2 hover:text-primary transition-colors text-muted-foreground" onClick={toggleMenu}>Projets</a>
-              <div className="border-t border-border my-2"></div>
               <a href="/blog" className="py-2 hover:text-primary transition-colors text-muted-foreground" onClick={toggleMenu}>Blog</a>
+              <a href="/ebook" className="py-2 hover:text-primary transition-colors text-muted-foreground" onClick={toggleMenu}>Boutique</a>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />
