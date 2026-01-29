@@ -216,13 +216,13 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DrawerContent className="max-h-[90vh] animate-in slide-in-from-bottom duration-300">
+        <DrawerContent className="max-h-[90vh] animate-in slide-in-from-bottom duration-300 overflow-visible">
           <DrawerHeader className="sr-only">
             <DrawerTitle>{service.title}</DrawerTitle>
             <DrawerDescription>{service.description}</DrawerDescription>
           </DrawerHeader>
           {/* Orange bubble close button - out of the box style */}
-          <CloseButton onClick={onClose} className="-top-5 -right-2 sm:-top-6 sm:-right-3" />
+          <CloseButton onClick={onClose} className="absolute -top-5 right-4 sm:-top-6 sm:right-6 z-[60]" />
           <ServiceModalContent service={service} onClose={onClose} />
         </DrawerContent>
       </Drawer>
@@ -235,13 +235,13 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
       <DialogPortal>
         <DialogOverlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300" />
         <div className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]">
+          {/* Orange bubble close button - positioned outside and above modal */}
+          <CloseButton onClick={onClose} className="absolute -top-4 -right-4 sm:-top-5 sm:-right-5 md:-top-6 md:-right-6 z-[60]" />
           <div className="relative max-w-3xl w-[90vw] max-h-[90vh] border bg-background shadow-lg rounded-lg overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] duration-300">
             <DialogHeader className="sr-only">
               <DialogTitle>{service.title}</DialogTitle>
               <DialogDescription>{service.description}</DialogDescription>
             </DialogHeader>
-            {/* Orange bubble close button - out of the box style */}
-            <CloseButton onClick={onClose} className="-top-4 -right-4 sm:-top-5 sm:-right-5 md:-top-6 md:-right-6" />
             <ServiceModalContent service={service} onClose={onClose} />
           </div>
         </div>
