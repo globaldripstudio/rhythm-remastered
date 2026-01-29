@@ -15,6 +15,7 @@ import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
 import Ebook from "./pages/Ebook";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import Admin from "./pages/Admin";
 import LiveChat from "./components/LiveChat";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/cgv" element={<CGV />} />
           <Route path="/ebook" element={<Ebook />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
