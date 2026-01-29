@@ -80,59 +80,59 @@ const Hero = () => {
           </div>
 
           {/* Main Title */}
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 leading-tight">
             <span className="hero-text">GLOBAL DRIP</span>
             <br />
             <span className="text-foreground">STUDIO</span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
             Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel
           </p>
 
           {/* Stats */}
-          <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
+          <div className="flex flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">200+</div>
-              <div className="text-sm text-muted-foreground">Projets réalisés</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-secondary">10+</div>
-              <div className="text-sm text-muted-foreground">Années d'expérience</div>
+              <div className="text-2xl sm:text-3xl font-bold text-secondary">10+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Années d'expérience</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">50+</div>
-              <div className="text-sm text-muted-foreground">Artistes accompagnés</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Artistes accompagnés</div>
             </div>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="studio-button text-lg px-8 py-6" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
-              <Mic className="w-5 h-5 mr-2" />
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-10 md:mb-12 px-4">
+            <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
+              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Réserver une session
             </Button>
-            <a href="/projets">
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-muted">
-                <Play className="w-5 h-5 mr-2" />
+            <a href="/projets" className="w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-border hover:bg-muted w-full">
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Écouter nos réalisations
               </Button>
             </a>
           </div>
 
           {/* Trust Indicators */}
-          <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
+          <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground px-2">
             <div className="flex items-center">
-              <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-glow-pulse" />
-              Expertise reconnue depuis 2019
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2 animate-glow-pulse" />
+              Expertise depuis 2019
             </div>
             <div className="flex items-center">
-              <div className="w-2 h-2 bg-secondary rounded-full mr-2" />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-1.5 sm:mr-2" />
               Équipement haut de gamme
             </div>
             <div className="flex items-center">
-              <div className="w-2 h-2 bg-primary rounded-full mr-2" />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
               Ingénieur certifié
             </div>
           </div>
@@ -140,9 +140,9 @@ const Hero = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-muted-foreground rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-muted-foreground rounded-full mt-2 animate-pulse" />
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-muted-foreground rounded-full flex justify-center">
+          <div className="w-0.5 sm:w-1 h-2 sm:h-3 bg-muted-foreground rounded-full mt-1.5 sm:mt-2 animate-pulse" />
         </div>
       </div>
     </section>

@@ -16,20 +16,20 @@ import {
 
 const Contact = () => {
   return (
-    <section id="contact" className="py-24 bg-gradient-to-b from-background to-muted/20">
-      <div className="container mx-auto px-6">
+    <section id="contact" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-background to-muted/20">
+      <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+        <div className="text-center mb-10 sm:mb-12 md:mb-16 animate-fade-in">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
             Contactez <span className="hero-text">Global Drip</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
             Prêt à donner vie à votre projet musical ? Réservez votre session studio 
             ou demandez un devis personnalisé
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12">
           {/* Contact Form */}
           <Card className="service-card">
             <CardHeader>
