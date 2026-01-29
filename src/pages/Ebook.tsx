@@ -38,13 +38,12 @@ const Ebook = () => {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               {/* Image E-book */}
               <div className="relative">
-                <div className="aspect-[3/4] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20">
-                  <div className="text-center p-6 sm:p-8">
-                    <BookOpen className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4 sm:mb-6" />
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
-                      Formation au Sound Design pour Vidéastes et Monteurs
-                    </h3>
-                  </div>
+                <div className="aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-primary/20">
+                  <img 
+                    src="/lovable-uploads/ebook-cover.png" 
+                    alt="Formation au Sound Design pour Vidéastes et Monteurs"
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
               </div>
