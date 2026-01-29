@@ -1,6 +1,28 @@
-import { Instagram, Facebook, Youtube, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 
-const Footer = () => {
+// Service IDs mapping for footer links
+const footerServices = [
+  { label: "Mixage Studio", id: "mixage-mastering" },
+  { label: "Mastering Hybride", id: "mixage-mastering" },
+  { label: "Mixage + Mastering", id: "mixage-mastering" },
+  { label: "Projet sur mesure", id: "direction-artistique" },
+];
+
+interface FooterProps {
+  onOpenService?: (serviceId: string) => void;
+}
+
+const Footer = ({ onOpenService }: FooterProps) => {
+  const handleServiceClick = (e: React.MouseEvent, serviceId: string) => {
+    e.preventDefault();
+    if (onOpenService) {
+      onOpenService(serviceId);
+    } else {
+      // Fallback: scroll to services section
+      document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12">
@@ -48,10 +70,16 @@ const Footer = () => {
           <div>
             <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4">Services</h3>
             <ul className="space-y-1.5 sm:space-y-2 text-sm sm:text-base text-muted-foreground">
-              <li><a href="#services" className="hover:text-primary transition-colors">Mixage Studio</a></li>
-              <li><a href="#services" className="hover:text-primary transition-colors">Mastering Hybride</a></li>
-              <li><a href="#services" className="hover:text-primary transition-colors">Mixage + Mastering</a></li>
-              <li><a href="#services" className="hover:text-primary transition-colors">Projet sur mesure</a></li>
+              {footerServices.map((service) => (
+                <li key={service.label}>
+                  <button
+                    onClick={(e) => handleServiceClick(e, service.id)}
+                    className="hover:text-primary transition-colors text-left"
+                  >
+                    {service.label}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
