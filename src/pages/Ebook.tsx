@@ -39,11 +39,11 @@ const Ebook = () => {
               {/* Image E-book */}
               <div className="relative">
                 <div className="aspect-[3/4] rounded-lg overflow-hidden shadow-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20">
-                  <div className="text-center p-8">
-                    <BookOpen className="w-24 h-24 text-primary mx-auto mb-6" />
-                    <h3 className="text-2xl font-bold text-foreground mb-2">Formation</h3>
-                    <p className="text-lg text-muted-foreground">Sound Design</p>
-                    <p className="text-sm text-muted-foreground mt-2">pour Vidéastes et Monteurs</p>
+                  <div className="text-center p-6 sm:p-8">
+                    <BookOpen className="w-16 h-16 sm:w-24 sm:h-24 text-primary mx-auto mb-4 sm:mb-6" />
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
+                      Formation au Sound Design pour Vidéastes et Monteurs
+                    </h3>
                   </div>
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
@@ -67,11 +67,11 @@ const Ebook = () => {
                 <div className="space-y-4 mb-8">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <Zap className="w-5 h-5 text-primary" />
+                      <FileText className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground">Pas de jargon inutile</h4>
-                      <p className="text-sm text-muted-foreground">Juste ce qu'il faut savoir, au bon moment</p>
+                      <h4 className="font-semibold text-foreground">Manuel d'opérabilité</h4>
+                      <p className="text-sm text-muted-foreground">5 semaines de formation pour devenir 100% autonome sur la partie audio</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -79,17 +79,17 @@ const Ebook = () => {
                       <Play className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground">Compatible tous logiciels</h4>
-                      <p className="text-sm text-muted-foreground">Premiere Pro, Final Cut Pro, DaVinci Resolve, CapCut</p>
+                      <h4 className="font-semibold text-foreground">Adapté tous logiciels</h4>
+                      <p className="text-sm text-muted-foreground">Méthodes natives pour Premiere Pro, Final Cut Pro, DaVinci Resolve, CapCut</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-primary" />
+                      <Zap className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground">Réflexes terrain</h4>
-                      <p className="text-sm text-muted-foreground">Des workflows qui tiennent en conditions réelles</p>
+                      <h4 className="font-semibold text-foreground">Pas de jargon inutile</h4>
+                      <p className="text-sm text-muted-foreground">Juste ce qu'il faut savoir, au bon moment</p>
                     </div>
                   </div>
                 </div>
