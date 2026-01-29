@@ -154,54 +154,55 @@ const Equipment = () => {
   };
 
   return (
-    <section id="equipement" className="py-24 bg-muted/10">
-      <div className="container mx-auto px-6">
+    <section id="equipement" className="py-16 sm:py-20 md:py-24 bg-muted/10">
+      <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+        <div className="text-center mb-10 sm:mb-12 md:mb-16 animate-fade-in">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
             Notre <span className="hero-text">Équipement</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
             Un parc technique exceptionnel alliant le meilleur de l'analogique vintage 
             et les dernières innovations numériques
           </p>
         </div>
 
         {/* Category Navigation */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+        <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 sm:mb-10 md:mb-12">
           {categories.map((category) => (
             <Button
               key={category.key}
               variant={selectedCategory === category.key ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category.key)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
             >
-              <category.icon className="w-4 h-4" />
-              {category.title}
+              <category.icon className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">{category.title}</span>
+              <span className="xs:hidden sm:hidden">{category.title.split(' ')[0]}</span>
             </Button>
           ))}
         </div>
 
         {/* Equipment List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-16">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-10 sm:mb-12 md:mb-16">
           {equipmentData[selectedCategory as keyof typeof equipmentData].map((item, index) => (
             <Card 
               key={item.name}
               className="equipment-item hover:shadow-lg transition-all duration-300"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
                   <Badge 
-                    className={`${getStatusColor(item.status)} text-xs`}
+                    className={`${getStatusColor(item.status)} text-[10px] sm:text-xs`}
                     variant="secondary"
                   >
                     {getStatusLabel(item.status)}
                   </Badge>
                 </div>
-                <h4 className="font-semibold text-sm mb-1 text-foreground">{item.name}</h4>
-                <p className="text-xs text-muted-foreground">{item.type}</p>
+                <h4 className="font-semibold text-xs sm:text-sm mb-0.5 sm:mb-1 text-foreground">{item.name}</h4>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">{item.type}</p>
               </CardContent>
             </Card>
           ))}
