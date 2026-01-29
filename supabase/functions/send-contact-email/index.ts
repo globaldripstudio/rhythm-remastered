@@ -9,6 +9,29 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Simple in-memory rate limiting (per IP, resets on function restart)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+const RATE_LIMIT_MAX = 3; // Max 3 contact requests per hour
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  entry.count++;
+  return false;
+}
+
 interface ContactRequest {
   firstName: string;
   lastName: string;
@@ -30,6 +53,12 @@ const serviceLabels: Record<string, string> = {
   "formation": "Formation MAO/Mixage",
 };
 
+// Input length limits
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 255;
+const MAX_PHONE_LENGTH = 30;
+const MAX_MESSAGE_LENGTH = 2000;
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -37,20 +66,88 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Extract client IP for rate limiting
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                     req.headers.get("cf-connecting-ip") || 
+                     "unknown";
+    
+    // Check rate limit
+    if (isRateLimited(clientIp)) {
+      console.log(`Rate limit exceeded for contact form from IP: ${clientIp}`);
+      return new Response(
+        JSON.stringify({ success: false, error: "Trop de requêtes. Veuillez réessayer plus tard." }),
+        { 
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+          status: 429 
+        }
+      );
+    }
+
     const { firstName, lastName, email, phone, service, message }: ContactRequest = await req.json();
 
     // Validate required fields
     if (!firstName || !lastName || !email || !message) {
-      throw new Error("Champs requis manquants");
+      return new Response(
+        JSON.stringify({ success: false, error: "Champs requis manquants" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate input lengths
+    if (firstName.length > MAX_NAME_LENGTH || lastName.length > MAX_NAME_LENGTH) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Nom trop long" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (email.length > MAX_EMAIL_LENGTH) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Email trop long" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (phone && phone.length > MAX_PHONE_LENGTH) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Téléphone trop long" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Message trop long (max 2000 caractères)" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      throw new Error("Format d'email invalide");
+      return new Response(
+        JSON.stringify({ success: false, error: "Format d'email invalide" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
-    const serviceLabel = serviceLabels[service] || service || "Non spécifié";
+    // Sanitize inputs for HTML email (escape HTML entities)
+    const escapeHtml = (str: string): string => {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    };
+
+    const safeFirstName = escapeHtml(firstName.trim());
+    const safeLastName = escapeHtml(lastName.trim());
+    const safeEmail = escapeHtml(email.trim());
+    const safePhone = escapeHtml((phone || "").trim());
+    const safeMessage = escapeHtml(message.trim());
+
+    const serviceLabel = serviceLabels[service] || escapeHtml(service || "Non spécifié");
 
     // Send email to studio
     const emailResponse = await resend.emails.send({
@@ -82,15 +179,15 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="content">
               <div class="field">
                 <div class="label">👤 Nom complet</div>
-                <div class="value">${firstName} ${lastName}</div>
+                <div class="value">${safeFirstName} ${safeLastName}</div>
               </div>
               <div class="field">
                 <div class="label">📧 Email</div>
-                <div class="value"><a href="mailto:${email}">${email}</a></div>
+                <div class="value"><a href="mailto:${safeEmail}">${safeEmail}</a></div>
               </div>
               <div class="field">
                 <div class="label">📞 Téléphone</div>
-                <div class="value">${phone || "Non renseigné"}</div>
+                <div class="value">${safePhone || "Non renseigné"}</div>
               </div>
               <div class="field">
                 <div class="label">🎛️ Service souhaité</div>
@@ -98,7 +195,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               <div class="field">
                 <div class="label">💬 Message</div>
-                <div class="message-box">${message.replace(/\n/g, "<br>")}</div>
+                <div class="message-box">${safeMessage.replace(/\n/g, "<br>")}</div>
               </div>
             </div>
             <div class="footer">
@@ -110,7 +207,7 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Contact email sent successfully:", emailResponse);
+    console.log(`Contact email sent successfully from IP: ${clientIp}`);
 
     return new Response(JSON.stringify({ success: true, message: "Email envoyé avec succès" }), {
       status: 200,
@@ -122,7 +219,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-contact-email function:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: "Une erreur est survenue. Veuillez réessayer." }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
