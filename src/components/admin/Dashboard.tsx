@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, Calendar, Users, Home, BarChart3 } from 'lucide-react';
+import { LogOut, Calendar, Users, Home, BarChart3, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import AdminCalendar from './AdminCalendar';
+import WeeklyAgenda from './WeeklyAgenda';
 import ClientsList from './ClientsList';
 import CRMAnalytics from './CRMAnalytics';
+import StripeAnalytics from './StripeAnalytics';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -57,14 +58,18 @@ const Dashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Statistiques</span>
+              <span className="hidden sm:inline">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="stripe" className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              <span className="hidden sm:inline">Stripe</span>
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Calendrier</span>
+              <span className="hidden sm:inline">Agenda</span>
             </TabsTrigger>
             <TabsTrigger value="clients" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -76,8 +81,12 @@ const Dashboard = () => {
             <CRMAnalytics />
           </TabsContent>
 
+          <TabsContent value="stripe">
+            <StripeAnalytics />
+          </TabsContent>
+
           <TabsContent value="calendar">
-            <AdminCalendar />
+            <WeeklyAgenda />
           </TabsContent>
 
           <TabsContent value="clients">
