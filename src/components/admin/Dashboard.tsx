@@ -1,17 +1,21 @@
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { LogOut, Calendar, Users, Home } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LogOut, Calendar, Users, Home, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminCalendar from './AdminCalendar';
 import ClientsList from './ClientsList';
+import CRMAnalytics from './CRMAnalytics';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
+  const [activeTab, setActiveTab] = useState('analytics');
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-primary/20 bg-card">
+      <header className="border-b border-primary/20 bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/">
@@ -21,23 +25,23 @@ const Dashboard = () => {
                 className="h-8"
               />
             </Link>
-            <span className="text-muted-foreground">|</span>
-            <span className="font-semibold">Dashboard</span>
+            <span className="text-muted-foreground hidden sm:inline">|</span>
+            <span className="font-semibold hidden sm:inline">Dashboard</span>
           </div>
           
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground hidden sm:inline">
+            <span className="text-sm text-muted-foreground hidden md:inline">
               {user?.email}
             </span>
             <Link to="/">
               <Button variant="outline" size="sm">
-                <Home className="w-4 h-4 mr-2" />
-                Site
+                <Home className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Site</span>
               </Button>
             </Link>
             <Button variant="outline" size="sm" onClick={signOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Déconnexion
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Déconnexion</span>
             </Button>
           </div>
         </div>
@@ -48,21 +52,38 @@ const Dashboard = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Bienvenue 👋</h1>
           <p className="text-muted-foreground">
-            Gérez vos rendez-vous et clients depuis cet espace privé.
+            Gérez vos rendez-vous, clients et analysez votre activité.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Calendar */}
-          <div className="lg:col-span-2">
-            <AdminCalendar />
-          </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Statistiques</span>
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span className="hidden sm:inline">Calendrier</span>
+            </TabsTrigger>
+            <TabsTrigger value="clients" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">Clients</span>
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Clients */}
-          <div className="lg:col-span-2">
+          <TabsContent value="analytics">
+            <CRMAnalytics />
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            <AdminCalendar />
+          </TabsContent>
+
+          <TabsContent value="clients">
             <ClientsList />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
