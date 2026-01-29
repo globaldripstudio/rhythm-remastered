@@ -7,8 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Lock, Mail, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const AUTHORIZED_EMAIL = 'globaldripstudio@gmail.com';
-
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,17 +18,8 @@ const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Verify email before attempting login
-    if (email.toLowerCase() !== AUTHORIZED_EMAIL.toLowerCase()) {
-      toast({
-        title: "Accès refusé",
-        description: "Vous n'êtes pas autorisé à accéder à cette page.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
+    // Server-side role validation is handled by Admin.tsx after login
+    // No client-side email check here - authorization is verified from user_roles table
     const { error } = await signIn(email, password);
     
     if (error) {
@@ -42,7 +31,7 @@ const LoginForm = () => {
     } else {
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue dans votre espace admin !",
+        description: "Vérification des permissions...",
       });
     }
     
