@@ -31,15 +31,24 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
     
-    if (userError || !userData.user) {
+    if (claimsError || !claimsData?.claims) {
       throw new Error("User not authenticated");
     }
 
-    // Verify this is the admin user
-    if (userData.user.email !== "globaldripstudio@gmail.com") {
-      throw new Error("Unauthorized access");
+    const userId = claimsData.claims.sub;
+
+    // Verify user has admin role from user_roles table (server-side validation)
+    const { data: roleData, error: roleError } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (roleError || !roleData) {
+      throw new Error("Unauthorized access - Admin role required");
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
