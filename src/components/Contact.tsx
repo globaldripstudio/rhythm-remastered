@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,12 +10,88 @@ import {
   Mail, 
   Clock, 
   Send,
-  Calendar,
   MessageSquare,
-  Users
+  Loader2
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    service: "",
+    message: ""
+  });
+  const { toast } = useToast();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.message) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs obligatoires.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer une adresse email valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message envoyé !",
+        description: "Nous avons bien reçu votre demande et vous répondrons dans les plus brefs délais.",
+      });
+
+      // Reset form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        service: "",
+        message: ""
+      });
+    } catch (error: any) {
+      console.error("Error sending contact email:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi. Veuillez réessayer ou nous contacter directement.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4 sm:px-6">
@@ -39,41 +116,56 @@ const Contact = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">Prénom</Label>
+                    <Label htmlFor="firstName">Prénom *</Label>
                     <Input 
-                      id="firstName" 
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
                       placeholder="Votre prénom"
                       className="mt-2"
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="lastName">Nom</Label>
+                    <Label htmlFor="lastName">Nom *</Label>
                     <Input 
-                      id="lastName" 
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
                       placeholder="Votre nom"
                       className="mt-2"
+                      required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input 
-                    id="email" 
+                    id="email"
+                    name="email"
                     type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     placeholder="votre.email@exemple.com"
                     className="mt-2"
+                    required
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="phone">Téléphone</Label>
                   <Input 
-                    id="phone" 
+                    id="phone"
+                    name="phone"
                     type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
                     placeholder="+33 1 23 45 67 89"
                     className="mt-2"
                   />
@@ -84,6 +176,8 @@ const Contact = () => {
                   <select 
                     id="service"
                     name="service"
+                    value={formData.service}
+                    onChange={handleInputChange}
                     className="w-full mt-2 px-3 py-2 bg-input border border-border rounded-md text-foreground"
                   >
                     <option value="">Sélectionnez un service</option>
@@ -100,11 +194,15 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="message">Message</Label>
+                  <Label htmlFor="message">Message *</Label>
                   <Textarea 
                     id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
                     placeholder="Décrivez votre projet musical..."
                     className="mt-2 min-h-[120px]"
+                    required
                   />
                 </div>
 
@@ -112,23 +210,19 @@ const Contact = () => {
                   type="submit" 
                   size="lg" 
                   className="w-full studio-button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const form = (e.target as HTMLElement).closest('form') as HTMLFormElement;
-                    const formData = new FormData(form);
-                    const subject = encodeURIComponent('Demande de réservation - Global Drip Studio');
-                    const body = encodeURIComponent(`
-                      Nom: ${formData.get('firstName')} ${formData.get('lastName')}
-                      Email: ${formData.get('email')}
-                      Téléphone: ${formData.get('phone')}
-                      Service: ${formData.get('service')}
-                      Message: ${formData.get('message')}
-                    `);
-                    window.location.href = `mailto:globaldripstudio@gmail.com?subject=${subject}&body=${body}`;
-                  }}
+                  disabled={isSubmitting}
                 >
-                  <Send className="w-4 h-4 mr-2" />
-                  Envoyer la demande
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Envoi en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      Envoyer la demande
+                    </>
+                  )}
                 </Button>
               </form>
             </CardContent>
