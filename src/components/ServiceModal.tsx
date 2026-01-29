@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose } from "@/components/ui/drawer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogPortal, DialogOverlay } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,17 @@ interface ServiceModalProps {
   open: boolean;
   onClose: () => void;
 }
+
+// Styled close button component - orange bubble style
+const CloseButton = ({ onClick, className = "" }: { onClick: () => void; className?: string }) => (
+  <button
+    onClick={onClick}
+    className={`absolute z-50 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/close ${className}`}
+    aria-label="Fermer"
+  >
+    <X className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover/close:rotate-90" />
+  </button>
+);
 
 const ServiceModalContent = ({ service, onClose }: { service: Service; onClose: () => void }) => {
   return (
@@ -204,36 +215,36 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DrawerContent className="max-h-[90vh]">
+        <DrawerContent className="max-h-[90vh] animate-in slide-in-from-bottom duration-300">
           <DrawerHeader className="sr-only">
             <DrawerTitle>{service.title}</DrawerTitle>
             <DrawerDescription>{service.description}</DrawerDescription>
           </DrawerHeader>
-          <DrawerClose asChild>
-            <button 
-              className="absolute right-4 top-4 z-50 rounded-full bg-background/80 backdrop-blur-sm p-2 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Fermer</span>
-            </button>
-          </DrawerClose>
+          {/* Orange bubble close button - out of the box style */}
+          <CloseButton onClick={onClose} className="-top-5 -right-2 sm:-top-6 sm:-right-3" />
           <ServiceModalContent service={service} onClose={onClose} />
         </DrawerContent>
       </Drawer>
     );
   }
 
-  // Desktop: use Dialog (modal)
+  // Desktop: use Dialog (modal) with custom animations
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] p-0 overflow-hidden">
-        <DialogHeader className="sr-only">
-          <DialogTitle>{service.title}</DialogTitle>
-          <DialogDescription>{service.description}</DialogDescription>
-        </DialogHeader>
-        <ServiceModalContent service={service} onClose={onClose} />
-      </DialogContent>
+      <DialogPortal>
+        <DialogOverlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300" />
+        <div className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]">
+          <div className="relative max-w-3xl w-[90vw] max-h-[90vh] border bg-background shadow-lg rounded-lg overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] duration-300">
+            <DialogHeader className="sr-only">
+              <DialogTitle>{service.title}</DialogTitle>
+              <DialogDescription>{service.description}</DialogDescription>
+            </DialogHeader>
+            {/* Orange bubble close button - out of the box style */}
+            <CloseButton onClick={onClose} className="-top-4 -right-4 sm:-top-5 sm:-right-5 md:-top-6 md:-right-6" />
+            <ServiceModalContent service={service} onClose={onClose} />
+          </div>
+        </div>
+      </DialogPortal>
     </Dialog>
   );
 };
