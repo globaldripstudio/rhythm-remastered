@@ -1,11 +1,36 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Minimize2, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Minimize2, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatStream } from "@/hooks/useChatStream";
 import { useToast } from "@/hooks/use-toast";
+
+// Keywords that suggest booking/contact action
+const CONTACT_KEYWORDS = [
+  "formulaire de contact",
+  "nous contacter",
+  "contactez-nous",
+  "appeler",
+  "téléphone",
+  "réserver",
+  "envoyer un email",
+  "globaldripstudio@gmail.com",
+  "+33 6 59 79 73 42",
+];
+
+const hasContactSuggestion = (text: string): boolean => {
+  const lowerText = text.toLowerCase();
+  return CONTACT_KEYWORDS.some((keyword) => lowerText.includes(keyword.toLowerCase()));
+};
+
+const scrollToContact = () => {
+  const contactSection = document.getElementById("contact");
+  if (contactSection) {
+    contactSection.scrollIntoView({ behavior: "smooth" });
+  }
+};
 
 interface Message {
   id: string;
@@ -200,6 +225,20 @@ const LiveChat = () => {
                     ) : (
                       <>
                         <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                        {message.isBot && hasContactSuggestion(message.text) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 w-full text-xs bg-primary/10 hover:bg-primary/20 border-primary/30"
+                            onClick={() => {
+                              scrollToContact();
+                              setIsOpen(false);
+                            }}
+                          >
+                            <ArrowRight className="w-3 h-3 mr-1" />
+                            Accéder au formulaire de contact
+                          </Button>
+                        )}
                         <p
                           className={`text-xs mt-1 ${
                             message.isBot
