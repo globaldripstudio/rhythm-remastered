@@ -3,6 +3,7 @@ import { ChevronDown, Play, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import SpotifyEmbed from "@/components/SpotifyEmbed";
 
 const Projets = () => {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
@@ -363,7 +364,7 @@ const Projets = () => {
                           <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Écouter</h3>
                           {project.spotifyEmbed ? (
                             <div className="bg-card rounded-lg p-4 border border-border/50">
-                              <div dangerouslySetInnerHTML={{ __html: project.spotifyEmbed }} />
+                              <SpotifyEmbed embedHtml={project.spotifyEmbed} />
                             </div>
                           ) : project.id === "theo-bachelier" && project.youtubeUrl ? (
                             <div className="space-y-4">
