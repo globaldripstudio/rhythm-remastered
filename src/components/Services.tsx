@@ -255,9 +255,10 @@ const Services = () => {
                             src={service.image}
                             alt={service.title}
                             className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
-                              service.id === 'captation-sonore' ? 'object-bottom' :
+                              service.id === 'captation-sonore' ? 'object-[center_25%]' :
                               service.id === 'direction-artistique' ? 'object-bottom' :
-                              isMixageCard ? 'object-center' :
+                              service.id === 'mixage-mastering' ? 'object-top' :
+                              service.id === 'mixage-mastering-express' ? 'object-center' :
                               ''
                             }`}
                           />
