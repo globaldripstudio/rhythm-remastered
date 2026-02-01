@@ -88,10 +88,13 @@ serve(async (req) => {
       }
     );
   } catch (error) {
+    // Log detailed error server-side for debugging
     console.error("Error fetching Stripe data:", error);
+    
+    // Return generic error message to client to prevent information leakage
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: "Impossible de charger les données Stripe",
         customers: [],
         payments: [],
         products: [],
