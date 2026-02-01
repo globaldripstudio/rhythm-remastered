@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 const Partners = () => {
   const partners = [
     { 
-      name: "Porsche", 
-      logo: "/lovable-uploads/8d7d8e6d-4601-4ace-9397-7e40b97799f7.png",
-      url: "https://www.porsche.com"
+      name: "Type 7", 
+      logo: "/lovable-uploads/TYPE_7_white.png",
+      url: "https://type7.com/"
     },
     { 
       name: "Canyon Bicycles", 
