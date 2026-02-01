@@ -25,7 +25,10 @@ export const useAdminAuth = (): AdminAuthState => {
       }
 
       try {
-        // Query the user_roles table to check if user has admin role
+        // CLIENT-SIDE ROLE CHECK FOR UI ONLY
+        // This check controls dashboard visibility - NOT security.
+        // All admin endpoints (e.g., get-stripe-data) MUST verify admin role server-side.
+        // RLS policies also prevent unauthorized database access.
         const { data, error: queryError } = await supabase
           .from('user_roles')
           .select('role')
