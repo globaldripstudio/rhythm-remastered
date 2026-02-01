@@ -265,10 +265,13 @@ const Projets = () => {
             const parallaxOffset = isVisible ? (scrollY - cardTop + window.innerHeight / 2) * 0.1 : 0;
             const clampedParallax = Math.max(-40, Math.min(40, parallaxOffset));
             
-            // Subtle scale/depth effect for right images instead of horizontal slide
-            const depthProgress = isVisible ? Math.min(1, Math.max(0, (scrollY - cardTop + window.innerHeight) / window.innerHeight)) : 0.5;
-            const rightImageScale = 1 + (depthProgress - 0.5) * 0.08; // Subtle scale between 0.96 and 1.04
-            const rightImageBrightness = 0.85 + depthProgress * 0.15; // Brightness animation
+            // Horizontal slide for right images - alternating direction (one-way, no return)
+            const slideProgress = isVisible ? Math.min(1, Math.max(0, (scrollY - cardTop + window.innerHeight * 0.8) / (window.innerHeight * 0.6))) : 0;
+            const slideDirection = projectIndex % 2 === 0 ? 1 : -1; // Even: left-to-right, Odd: right-to-left
+            const horizontalOffset = slideProgress * 30 * slideDirection; // Max 30px movement
+            
+            // Compensate card width to prevent void - expand slightly in opposite direction
+            const cardWidthCompensation = Math.abs(horizontalOffset) * 0.5;
 
             return (
             <div key={project.id} ref={cardRef} className="mb-6 sm:mb-12">
@@ -333,21 +336,34 @@ const Projets = () => {
                     </div>
                   </div>
 
-                  {/* Right Image - Project Cover with Depth/Scale effect - Hidden on mobile */}
-                  <div className="hidden lg:block relative overflow-hidden group/right cursor-pointer h-full">
-                    {/* Extended background to prevent any gaps */}
+                  {/* Right Image - Project Cover with Horizontal Slide - Hidden on mobile */}
+                  <div 
+                    className="hidden lg:block relative overflow-hidden group/right cursor-pointer h-full"
+                    style={{
+                      // Expand container width to compensate for image movement
+                      marginLeft: slideDirection === 1 ? `-${cardWidthCompensation}px` : '0',
+                      marginRight: slideDirection === -1 ? `-${cardWidthCompensation}px` : '0',
+                      width: `calc(100% + ${cardWidthCompensation}px)`,
+                    }}
+                  >
+                    {/* Oversized background image that can slide without revealing edges */}
                     <div 
-                      className="absolute inset-[-20px] transition-all duration-700 ease-out"
+                      className="absolute transition-all duration-700 ease-out"
                       style={{ 
+                        // Make image 40% wider than container to allow movement
+                        left: slideDirection === 1 ? '-20%' : '0',
+                        right: slideDirection === -1 ? '-20%' : '0',
+                        top: '-10%',
+                        bottom: '-10%',
+                        width: '140%',
                         backgroundImage: `url(${project.rightImage})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        transform: `scale(${rightImageScale})`,
-                        filter: `brightness(${rightImageBrightness})`,
+                        transform: `translateX(${horizontalOffset}px)`,
                       }}
                     />
                     {/* Seamless gradient blend with left image */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-transparent to-transparent w-[60px] pointer-events-none" />
+                    <div className="absolute left-0 top-0 bottom-0 w-[80px] bg-gradient-to-r from-card via-card/50 to-transparent pointer-events-none z-10" />
                     {/* Subtle vignette overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-background/20 group-hover/right:from-background/30 transition-all duration-500" />
                     {/* Interactive glow on hover */}
