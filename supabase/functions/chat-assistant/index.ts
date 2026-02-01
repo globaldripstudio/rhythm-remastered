@@ -5,6 +5,98 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
+const MAX_REQUESTS_PER_WINDOW = 20; // Max 20 requests per hour per IP
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+// Clean up old rate limit entries periodically
+function cleanupRateLimits() {
+  const now = Date.now();
+  for (const [ip, data] of rateLimitMap.entries()) {
+    if (now > data.resetTime) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}
+
+// Check rate limit for an IP
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  cleanupRateLimits();
+  
+  const now = Date.now();
+  const existing = rateLimitMap.get(ip);
+  
+  if (!existing || now > existing.resetTime) {
+    // New window
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1, resetIn: RATE_LIMIT_WINDOW_MS };
+  }
+  
+  if (existing.count >= MAX_REQUESTS_PER_WINDOW) {
+    return { 
+      allowed: false, 
+      remaining: 0, 
+      resetIn: existing.resetTime - now 
+    };
+  }
+  
+  existing.count++;
+  return { 
+    allowed: true, 
+    remaining: MAX_REQUESTS_PER_WINDOW - existing.count, 
+    resetIn: existing.resetTime - now 
+  };
+}
+
+// Get client IP from request headers
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+         req.headers.get("x-real-ip") ||
+         req.headers.get("cf-connecting-ip") ||
+         "unknown";
+}
+
+// Input validation
+function validateMessages(messages: unknown): { valid: boolean; error?: string } {
+  if (!Array.isArray(messages)) {
+    return { valid: false, error: "Messages must be an array" };
+  }
+  
+  if (messages.length === 0) {
+    return { valid: false, error: "Messages cannot be empty" };
+  }
+  
+  if (messages.length > 50) {
+    return { valid: false, error: "Too many messages in conversation" };
+  }
+  
+  for (const msg of messages) {
+    if (typeof msg !== 'object' || msg === null) {
+      return { valid: false, error: "Invalid message format" };
+    }
+    
+    if (!('role' in msg) || !('content' in msg)) {
+      return { valid: false, error: "Message must have role and content" };
+    }
+    
+    if (typeof msg.role !== 'string' || !['user', 'assistant'].includes(msg.role)) {
+      return { valid: false, error: "Invalid message role" };
+    }
+    
+    if (typeof msg.content !== 'string') {
+      return { valid: false, error: "Message content must be a string" };
+    }
+    
+    // Limit message content length to prevent abuse
+    if (msg.content.length > 10000) {
+      return { valid: false, error: "Message content too long" };
+    }
+  }
+  
+  return { valid: true };
+}
+
 const SYSTEM_PROMPT = `Tu es l'assistant virtuel du Global Drip Studio, un studio d'enregistrement et de mixage professionnel fondé en 2019, situé à Martigues (8 Allée des Ajoncs, 13500 Martigues), à 25 minutes de Marseille.
 
 PERSONNALITÉ:
@@ -129,7 +221,50 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    // Rate limiting check
+    const clientIP = getClientIP(req);
+    const rateLimitResult = checkRateLimit(clientIP);
+    
+    if (!rateLimitResult.allowed) {
+      console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+      const resetMinutes = Math.ceil(rateLimitResult.resetIn / 60000);
+      return new Response(
+        JSON.stringify({ 
+          error: `Limite de requêtes atteinte. Réessayez dans ${resetMinutes} minutes.` 
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(Math.ceil(rateLimitResult.resetIn / 1000))
+          } 
+        }
+      );
+    }
+
+    // Parse and validate request body
+    let body: { messages?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Requête invalide" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { messages } = body;
+    
+    // Validate messages
+    const validation = validateMessages(messages);
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -150,7 +285,7 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
+          ...(messages as Array<{ role: string; content: string }>),
         ],
         stream: true,
       }),
@@ -178,12 +313,16 @@ serve(async (req) => {
     }
 
     return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: { 
+        ...corsHeaders, 
+        "Content-Type": "text/event-stream",
+        "X-RateLimit-Remaining": String(rateLimitResult.remaining)
+      },
     });
   } catch (error) {
     console.error("Chat assistant error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Erreur inconnue" }),
+      JSON.stringify({ error: "Une erreur est survenue. Veuillez réessayer." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
