@@ -139,7 +139,7 @@ const Projets = () => {
     {
       id: "theo-bachelier",
       name: "THÉO BACHELIER",
-      leftImage: "/lovable-uploads/WhatsApp_Image_2025-03-19_à_17.13.14_25767dda-2.jpg",
+      leftImage: "/lovable-uploads/theo-bachelier-2.jpg",
       rightImage: "/lovable-uploads/ULTRACK.jpg",
       description: "Collaboration privilégiée autour du sound design, post-production et mixage créatif.",
       youtubeUrl: "https://www.youtube.com/@theobachelier",
@@ -165,6 +165,26 @@ const Projets = () => {
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/6RSIzijNFeHFmv4vLWhxgL?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
       collaborationDetails: "Pour leur album 'Le Premier Sang', j'ai eu l'honneur d'accueillir Venin au Global Drip Studio. J'ai assuré l'édition, le mixage et le mastering des 9 titres inédits, ainsi que l'enregistrement des voix, des parties solo, et quelques arrangements claviers. Un projet entièrement pensé pour sonner eighties avec une approche authentique sans copier-coller ni trig.",
       services: ["Édition", "Mixage", "Mastering", "Enregistrement voix et guitares", "Arrangements"]
+    },
+    {
+      id: "ritualz",
+      name: "RITUALZ",
+      leftImage: "/lovable-uploads/ritualz-artist.jpeg",
+      rightImage: "/lovable-uploads/ritualz-dust-cover.jpeg",
+      description: "Retour en force en 2025 après dix ans d'expérience, mixage et mastering de ses nouvelles productions.",
+      spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/778PygOgKQkIo0Ib8bLHj0?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
+      collaborationDetails: "Ritualz est un mélange explosif de rythmes percutants, de basses puissantes et de sonorités diverses. Après plus de dix ans d'expérience dans la production, mais après avoir été éloigné de la scène, il revient en 2025 avec une énergie renouvelée, prêt à reconstruire son projet artistique à partir de zéro. Nous opérons à ses côtés sur la partie mixage et mastering.",
+      services: ["Mixage", "Mastering"]
+    },
+    {
+      id: "jibbs-arenas",
+      name: "JIBBS ARENAS",
+      leftImage: "/lovable-uploads/jibbs-arenas.jpg",
+      rightImage: "/lovable-uploads/jibbs-cadera.png",
+      description: "Artiste d'origine suisse et espagnol, collaboration étroite de l'enregistrement à la direction artistique.",
+      spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/2st5NLdvOw9BKhFs9RCaQu?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
+      collaborationDetails: "Jibbs Arenas est un artiste d'origine suisse et espagnol puisant son inspiration dans ses racines qu'il adapte à tout style. Nous opérons en étroite collaboration au Global Drip Studio, de l'enregistrement au mixage et mastering, en passant par la réalisation.",
+      services: ["Enregistrement", "Production", "Mixage", "Mastering", "Direction artistique"]
     }
   ];
 
