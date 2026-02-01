@@ -265,9 +265,10 @@ const Projets = () => {
             const parallaxOffset = isVisible ? (scrollY - cardTop + window.innerHeight / 2) * 0.1 : 0;
             const clampedParallax = Math.max(-40, Math.min(40, parallaxOffset));
             
-            // Horizontal slide for right images - alternating direction
-            const horizontalOffset = isVisible ? (scrollY - cardTop + window.innerHeight / 2) * 0.03 : 0;
-            const clampedHorizontal = Math.max(-20, Math.min(20, horizontalOffset)) * (projectIndex % 2 === 0 ? 1 : -1);
+            // Subtle scale/depth effect for right images instead of horizontal slide
+            const depthProgress = isVisible ? Math.min(1, Math.max(0, (scrollY - cardTop + window.innerHeight) / window.innerHeight)) : 0.5;
+            const rightImageScale = 1 + (depthProgress - 0.5) * 0.08; // Subtle scale between 0.96 and 1.04
+            const rightImageBrightness = 0.85 + depthProgress * 0.15; // Brightness animation
 
             return (
             <div key={project.id} ref={cardRef} className="mb-6 sm:mb-12">
@@ -332,21 +333,27 @@ const Projets = () => {
                     </div>
                   </div>
 
-                  {/* Right Image - Project Cover with Horizontal Slide - Hidden on mobile */}
+                  {/* Right Image - Project Cover with Depth/Scale effect - Hidden on mobile */}
                   <div className="hidden lg:block relative overflow-hidden group/right cursor-pointer h-full">
+                    {/* Extended background to prevent any gaps */}
                     <div 
-                      className="absolute inset-0 w-full h-full transition-all duration-500 ease-out group-hover/right:scale-105"
+                      className="absolute inset-[-20px] transition-all duration-700 ease-out"
                       style={{ 
                         backgroundImage: `url(${project.rightImage})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        transform: isVisible ? `translateX(${clampedHorizontal}px)` : 'translateX(0px)',
+                        transform: `scale(${rightImageScale})`,
+                        filter: `brightness(${rightImageBrightness})`,
                       }}
                     />
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/20 to-transparent group-hover/right:from-background/30 transition-all duration-500" />
-                    {/* Color tint on hover */}
-                    <div className="absolute inset-0 bg-primary/0 group-hover/right:bg-primary/15 transition-all duration-500" />
+                    {/* Seamless gradient blend with left image */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-transparent to-transparent w-[60px] pointer-events-none" />
+                    {/* Subtle vignette overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-background/20 group-hover/right:from-background/30 transition-all duration-500" />
+                    {/* Interactive glow on hover */}
+                    <div className="absolute inset-0 bg-primary/0 group-hover/right:bg-primary/10 transition-all duration-500" />
+                    {/* Inner shadow for depth */}
+                    <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.3)] group-hover/right:shadow-[inset_0_0_40px_rgba(0,0,0,0.2)] transition-all duration-500" />
                   </div>
                 </div>
 
