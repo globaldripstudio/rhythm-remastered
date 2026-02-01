@@ -50,11 +50,8 @@ const Partners = () => {
               href={partner.url}
               target="_blank"
               rel="noopener noreferrer"
+              referrerPolicy="no-referrer"
               className="block"
-              onClick={(e) => {
-                e.preventDefault();
-                window.open(partner.url, '_blank', 'noopener,noreferrer');
-              }}
             >
               <Card 
                 className="p-3 sm:p-4 md:p-6 flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-pointer animate-fade-in"
