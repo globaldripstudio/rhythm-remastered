@@ -160,6 +160,7 @@ const Projets = () => {
       id: "venin",
       name: "VENIN",
       leftImage: "/lovable-uploads/jean-marc-battini.jpg",
+      leftImagePosition: "center 60%",
       rightImage: "/lovable-uploads/venin-album-cover.jpg",
       description: "Groupe de rock emblématique du Sud de la France, enregistrement, édition, mixage et mastering de l'album 'Le Premier Sang'.",
       spotifyEmbed: `<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/6RSIzijNFeHFmv4vLWhxgL?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`,
@@ -284,7 +285,7 @@ const Projets = () => {
                       style={{
                         backgroundImage: `url(${project.leftImage})`,
                         backgroundSize: 'cover',
-                        backgroundPosition: 'center',
+                        backgroundPosition: project.leftImagePosition || 'center',
                         transform: isVisible ? `translateY(${clampedParallax}px)` : 'translateY(0px)',
                       }}
                     />
