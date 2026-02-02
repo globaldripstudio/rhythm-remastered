@@ -139,7 +139,7 @@ const Hero = () => {
           </div>
 
           {/* Orange Logo */}
-          <div className="mt-24 sm:mt-32 mb-2 flex justify-center">
+          <div className="mt-52 sm:mt-64 mb-2 flex justify-center">
             <img 
               src={logoOrange} 
               alt="Global Drip Studio Logo" 
