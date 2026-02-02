@@ -79,8 +79,8 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
       </div>
 
       {/* Scrollable Content */}
-      <ScrollArea className="flex-1 px-4 sm:px-6 pb-6">
-        <div className="space-y-4 sm:space-y-6 pt-4 pb-8">
+      <ScrollArea className="flex-1" type="always">
+        <div className="space-y-4 sm:space-y-6 pt-4 pb-8 px-4 sm:px-6">
           {/* Description */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-2">Description</h3>
