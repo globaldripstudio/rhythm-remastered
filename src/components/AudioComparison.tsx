@@ -237,13 +237,19 @@ const AudioComparison = () => {
             <button
               key={genre.key}
               onClick={() => setSelectedGenre(genre.key)}
-              className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+              className={`group relative px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 overflow-hidden ${
                 selectedGenre === genre.key
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
-                  : 'bg-card/60 text-muted-foreground hover:bg-card hover:text-foreground border border-border/50'
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105'
+                  : 'bg-card/60 text-muted-foreground border border-border/50 hover:border-primary/50 hover:text-foreground hover:scale-105 hover:shadow-md hover:shadow-primary/10'
               }`}
             >
-              {genre.title}
+              {/* Animated background gradient on hover */}
+              <span className={`absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                selectedGenre === genre.key ? 'opacity-0' : ''
+              }`} />
+              {/* Shine effect on hover */}
+              <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <span className="relative z-10">{genre.title}</span>
             </button>
           ))}
         </div>
