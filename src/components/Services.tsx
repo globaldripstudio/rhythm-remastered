@@ -149,7 +149,7 @@ const servicesData = [
     title: "Formation MAO / Mixage",
     description: "Formations personnalisées en production musicale et techniques de mixage",
     price: "39€/h",
-    icon: BookOpen,
+    icon: Music,
     image: "/lovable-uploads/6ed6bc90-04bb-4040-9e0b-26b3c13bba5d.png",
     featured: false,
     badgeText: "",
