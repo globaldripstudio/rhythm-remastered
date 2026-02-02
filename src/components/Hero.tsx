@@ -72,8 +72,8 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className={`relative z-10 container mx-auto px-6 text-center transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <div className="animate-fade-in">
+      <div className={`relative z-10 container mx-auto px-6 text-center transition-all duration-1000 flex flex-col justify-center min-h-screen ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className="animate-fade-in flex flex-col items-center justify-center flex-1 pb-32">
           {/* Welcome Badge */}
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-6">
             <Headphones className="w-4 h-4 mr-2 text-primary" />
@@ -81,7 +81,7 @@ const Hero = () => {
           </div>
 
           {/* BLOC 1: Title + Subtitle */}
-          <div className="mb-10 sm:mb-12 md:mb-14">
+          <div className="mb-8 sm:mb-10">
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-2 sm:mb-3 leading-tight">
               <span className="hero-text">GLOBAL DRIP</span>
               <br />
@@ -93,7 +93,7 @@ const Hero = () => {
           </div>
 
           {/* BLOC 2: Stats */}
-          <div className="flex flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-10 sm:mb-12 md:mb-14">
+          <div className="flex flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10">
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
@@ -145,26 +145,26 @@ const Hero = () => {
               </div>
             </div>
           </div>
-
-          {/* Orange Logo with Animated Gradient */}
-          <div className="mt-[15.5rem] sm:mt-[18.5rem] mb-2 w-full flex justify-center">
-            <div 
-              className="h-24 sm:h-32 md:h-40 w-24 sm:w-32 md:w-40 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
-              style={{
-                background: 'linear-gradient(135deg, hsl(18 100% 60%), hsl(180 35% 35%))',
-                backgroundSize: '200% 200%',
-                WebkitMaskImage: `url(${logoOrange})`,
-                maskImage: `url(${logoOrange})`,
-                WebkitMaskSize: 'contain',
-                maskSize: 'contain',
-                WebkitMaskRepeat: 'no-repeat',
-                maskRepeat: 'no-repeat',
-                WebkitMaskPosition: 'center',
-                maskPosition: 'center'
-              }}
-            />
-          </div>
         </div>
+      </div>
+
+      {/* Orange Logo with Animated Gradient - Fixed at bottom */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex justify-center">
+        <div 
+          className="h-24 sm:h-32 md:h-40 w-24 sm:w-32 md:w-40 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
+          style={{
+            background: 'linear-gradient(135deg, hsl(18 100% 60%), hsl(180 35% 35%))',
+            backgroundSize: '200% 200%',
+            WebkitMaskImage: `url(${logoOrange})`,
+            maskImage: `url(${logoOrange})`,
+            WebkitMaskSize: 'contain',
+            maskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            maskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskPosition: 'center'
+          }}
+        />
       </div>
 
       {/* Scroll Indicator */}
