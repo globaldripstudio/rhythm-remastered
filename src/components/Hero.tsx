@@ -80,20 +80,20 @@ const Hero = () => {
             <span className="text-sm text-muted-foreground">Bienvenue au Studio</span>
           </div>
 
-          {/* Main Title */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 leading-tight">
-            <span className="hero-text">GLOBAL DRIP</span>
-            <br />
-            <span className="text-foreground">STUDIO</span>
-          </h1>
+          {/* BLOC 1: Title + Subtitle */}
+          <div className="mb-10 sm:mb-12 md:mb-14">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-2 sm:mb-3 leading-tight">
+              <span className="hero-text">GLOBAL DRIP</span>
+              <br />
+              <span className="text-foreground">STUDIO</span>
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
+              Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel
+            </p>
+          </div>
 
-          {/* Subtitle */}
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
-            Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel
-          </p>
-
-          {/* Stats */}
-          <div className="flex flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
+          {/* BLOC 2: Stats */}
+          <div className="flex flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-10 sm:mb-12 md:mb-14">
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
@@ -108,41 +108,41 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-10 md:mb-12 px-4">
-            <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
-              const contactSection = document.getElementById('contact');
-              if (contactSection) {
-                const yOffset = 100; // Scroll 100px plus bas
-                const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-              }
-              setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
-            }}>
-              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Réserver une session
-            </Button>
-            <a href="/projets" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-border hover:bg-muted w-full">
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Écouter nos réalisations
+          {/* BLOC 3: CTA + Trust Indicators */}
+          <div className="space-y-4 sm:space-y-5">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+              <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
+                const contactSection = document.getElementById('contact');
+                if (contactSection) {
+                  const yOffset = 100;
+                  const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+                setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
+              }}>
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Réserver une session
               </Button>
-            </a>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground px-2">
-            <div className="flex items-center">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2 animate-glow-pulse" />
-              Expertise depuis 2019
+              <a href="/projets" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-border hover:bg-muted w-full">
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Écouter nos réalisations
+                </Button>
+              </a>
             </div>
-            <div className="flex items-center">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-1.5 sm:mr-2" />
-              Équipement haut de gamme
-            </div>
-            <div className="flex items-center">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
-              Ingénieur certifié
+            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground px-2">
+              <div className="flex items-center">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2 animate-glow-pulse" />
+                Expertise depuis 2019
+              </div>
+              <div className="flex items-center">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-1.5 sm:mr-2" />
+                Équipement haut de gamme
+              </div>
+              <div className="flex items-center">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
+                Ingénieur certifié
+              </div>
             </div>
           </div>
 
