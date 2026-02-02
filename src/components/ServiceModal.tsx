@@ -41,9 +41,9 @@ const CloseButton = ({ onClick, className = "" }: { onClick: () => void; classNa
   </button>
 );
 
-const ServiceModalContent = ({ service, onClose }: { service: Service; onClose: () => void }) => {
+const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: Service; onClose: () => void; isMobile?: boolean }) => {
   return (
-    <div className="flex flex-col h-full max-h-[85vh] md:max-h-[80vh]">
+    <div className={`flex flex-col h-full ${isMobile ? 'max-h-[calc(80vh-3rem)]' : 'max-h-[85vh] md:max-h-[80vh]'}`}>
       {/* Header Image */}
       <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden rounded-t-lg flex-shrink-0">
         <img 
@@ -79,8 +79,8 @@ const ServiceModalContent = ({ service, onClose }: { service: Service; onClose: 
       </div>
 
       {/* Scrollable Content */}
-      <ScrollArea className="flex-1 px-4 sm:px-6 pb-4">
-        <div className="space-y-4 sm:space-y-6 pt-4">
+      <ScrollArea className="flex-1 px-4 sm:px-6 pb-6">
+        <div className="space-y-4 sm:space-y-6 pt-4 pb-8">
           {/* Description */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-2">Description</h3>
@@ -215,15 +215,15 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
   // Mobile: use Drawer (bottom sheet)
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DrawerContent className="max-h-[90vh] animate-in slide-in-from-bottom duration-300 overflow-visible">
+      <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()} dismissible={true}>
+        <DrawerContent className="max-h-[80vh] animate-in slide-in-from-bottom duration-300 overflow-visible">
           <DrawerHeader className="sr-only">
             <DrawerTitle>{service.title}</DrawerTitle>
             <DrawerDescription>{service.description}</DrawerDescription>
           </DrawerHeader>
           {/* Orange bubble close button - out of the box style */}
           <CloseButton onClick={onClose} className="absolute -top-5 right-4 sm:-top-6 sm:right-6 z-[60]" />
-          <ServiceModalContent service={service} onClose={onClose} />
+          <ServiceModalContent service={service} onClose={onClose} isMobile={true} />
         </DrawerContent>
       </Drawer>
     );
