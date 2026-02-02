@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw, Music } from "lucide-react";
+import { ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw, Music, BookOpen } from "lucide-react";
 import ServiceModal from "@/components/ServiceModal";
 
 // Service data for both cards and modals
@@ -149,7 +149,7 @@ const servicesData = [
     title: "Formation MAO / Mixage",
     description: "Formations personnalisées en production musicale et techniques de mixage",
     price: "39€/h",
-    icon: Volume2,
+    icon: BookOpen,
     image: "/lovable-uploads/6ed6bc90-04bb-4040-9e0b-26b3c13bba5d.png",
     featured: false,
     badgeText: "",
