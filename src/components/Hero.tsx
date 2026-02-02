@@ -138,12 +138,13 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Orange Logo with Gradient */}
+          {/* Orange Logo with Animated Gradient */}
           <div className="mt-52 sm:mt-64 mb-2 flex justify-center">
             <div 
-              className="w-auto h-12 sm:h-16 md:h-20 opacity-40"
+              className="h-12 sm:h-16 md:h-20 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
               style={{
                 background: 'linear-gradient(135deg, hsl(18 100% 60%), hsl(180 35% 35%))',
+                backgroundSize: '200% 200%',
                 WebkitMaskImage: `url(${logoOrange})`,
                 maskImage: `url(${logoOrange})`,
                 WebkitMaskSize: 'contain',
