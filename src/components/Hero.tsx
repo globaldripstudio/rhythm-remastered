@@ -111,7 +111,12 @@ const Hero = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-10 md:mb-12 px-4">
             <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
-              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              const contactSection = document.getElementById('contact');
+              if (contactSection) {
+                const yOffset = 100; // Scroll 100px plus bas
+                const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+              }
               setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
             }}>
               <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
