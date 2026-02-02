@@ -3,7 +3,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } f
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Clock, Euro, Check, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -43,7 +43,7 @@ const CloseButton = ({ onClick, className = "" }: { onClick: () => void; classNa
 
 const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: Service; onClose: () => void; isMobile?: boolean }) => {
   return (
-    <div className={`flex flex-col h-full ${isMobile ? 'max-h-[calc(80vh-3rem)]' : 'max-h-[85vh] md:max-h-[80vh]'}`}>
+    <div className={`flex flex-col ${isMobile ? 'max-h-[calc(80vh-3rem)]' : 'max-h-[85vh] md:max-h-[80vh]'} overflow-hidden`}>
       {/* Header Image */}
       <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden rounded-t-lg flex-shrink-0">
         <img 
@@ -79,8 +79,8 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
       </div>
 
       {/* Scrollable Content */}
-      <ScrollArea className="flex-1" type="always">
-        <div className="space-y-4 sm:space-y-6 pt-4 pb-8 px-4 sm:px-6">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent hover:scrollbar-thumb-primary/70">
+        <div className="space-y-4 sm:space-y-6 pt-4 pb-8">
           {/* Description */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-2">Description</h3>
@@ -221,7 +221,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             </CardContent>
           </Card>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
