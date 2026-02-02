@@ -43,7 +43,7 @@ const CloseButton = ({ onClick, className = "" }: { onClick: () => void; classNa
 
 const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: Service; onClose: () => void; isMobile?: boolean }) => {
   return (
-    <div className={`flex flex-col ${isMobile ? 'max-h-[calc(80vh-3rem)]' : 'max-h-[85vh] md:max-h-[80vh]'} overflow-hidden`}>
+    <div className={`flex flex-col ${isMobile ? 'h-[calc(80vh-3rem)]' : 'h-[85vh] md:h-[80vh]'}`}>
       {/* Header Image */}
       <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden rounded-t-lg flex-shrink-0">
         <img 
