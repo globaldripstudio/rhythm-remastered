@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Play, Headphones, Mic } from "lucide-react";
+import { Play, Headphones, Mic, Star, Shield, Clock, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import studioHero from "@/assets/studio-hero.jpg";
 import logoOrange from "@/assets/logo-orange.png";
@@ -74,44 +74,88 @@ const Hero = () => {
       {/* Content */}
       <div className={`relative z-10 container mx-auto px-6 text-center transition-all duration-1000 flex flex-col justify-center min-h-screen ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="animate-fade-in flex flex-col items-center justify-center flex-1 pb-32">
-          {/* Welcome Badge */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-6">
-            <Headphones className="w-4 h-4 mr-2 text-primary" />
-            <span className="text-sm text-muted-foreground">Bienvenue au Studio</span>
+          
+          {/* PATTERN INTERRUPT - Urgency Badge */}
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/30 mb-4 animate-pulse">
+            <Clock className="w-4 h-4 mr-2 text-primary" />
+            <span className="text-sm text-primary font-medium">2 créneaux disponibles cette semaine</span>
           </div>
 
-          {/* BLOC 1: Title + Subtitle - Importance: Maximale */}
-          <div className="mb-10 sm:mb-12">
+          {/* BLOC 1: ATTENTION + INTEREST - Pain Point → Solution */}
+          <div className="mb-8 sm:mb-10">
+            {/* Pre-headline - Pattern interrupt */}
+            <p className="text-xs sm:text-sm uppercase tracking-widest text-muted-foreground mb-3">
+              Pour artistes exigeants uniquement
+            </p>
+            
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight">
               <span className="hero-text">GLOBAL DRIP</span>
               <br />
               <span className="text-foreground">STUDIO</span>
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
-              Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel
+            
+            {/* Value Proposition - Benefit-focused */}
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2 mb-4">
+              Transformez votre musique en <span className="text-primary font-semibold">hit professionnel</span> grâce à notre expertise en enregistrement, mixage et mastering
             </p>
+
+            {/* Micro-benefits list */}
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 text-xs sm:text-sm">
+              <div className="flex items-center text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 mr-1.5 text-primary" />
+                Son broadcast-ready
+              </div>
+              <div className="flex items-center text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 mr-1.5 text-primary" />
+                Livraison 48-72h
+              </div>
+              <div className="flex items-center text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 mr-1.5 text-primary" />
+                Révisions illimitées
+              </div>
+            </div>
           </div>
 
-          {/* BLOC 2: Stats - Importance: Moyenne (crédibilité) */}
-          <div className="flex flex-row justify-center items-center gap-6 sm:gap-8 md:gap-12 mb-10 sm:mb-12">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
+          {/* BLOC 2: SOCIAL PROOF - Authority + Trust */}
+          <div className="mb-8 sm:mb-10">
+            {/* Stats with emotional anchoring */}
+            <div className="flex flex-row justify-center items-center gap-6 sm:gap-8 md:gap-12 mb-4">
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Projets livrés</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-secondary">10 ans</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">D'expertise</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-primary">98%</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Clients satisfaits</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-secondary">10+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Années d'expérience</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Artistes accompagnés</div>
+
+            {/* Trust badges - Authority signals */}
+            <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-muted-foreground/70">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/50 border border-border/50">
+                <Shield className="w-3.5 h-3.5 text-secondary" />
+                Ingénieur certifié
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/50 border border-border/50">
+                <Star className="w-3.5 h-3.5 text-primary" />
+                5★ sur 50+ avis
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/50 border border-border/50">
+                <Headphones className="w-3.5 h-3.5 text-secondary" />
+                Équipement premium
+              </div>
             </div>
           </div>
 
-          {/* BLOC 3: CTA + Trust Indicators - Importance: Haute (conversion) */}
-          <div className="space-y-3">
+          {/* BLOC 3: DESIRE + ACTION - CTA with risk reversal */}
+          <div className="space-y-4">
+            {/* Primary CTA - High contrast, action-oriented */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-              <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
+              <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto group" onClick={() => {
                 const contactSection = document.getElementById('contact');
                 if (contactSection) {
                   const yOffset = 100;
@@ -120,29 +164,24 @@ const Hero = () => {
                 }
                 setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
               }}>
-                <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Réserver une session
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:animate-pulse" />
+                Réserver ma session gratuite
               </Button>
+              
+              {/* Secondary CTA - Lower commitment */}
               <a href="/projets" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-border hover:bg-muted w-full">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Écouter nos réalisations
+                  Écouter avant/après
                 </Button>
               </a>
             </div>
-            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground px-2">
-              <div className="flex items-center">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2 animate-glow-pulse" />
-                Expertise depuis 2019
-              </div>
-              <div className="flex items-center">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-1.5 sm:mr-2" />
-                Équipement haut de gamme
-              </div>
-              <div className="flex items-center">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
-                Ingénieur certifié
-              </div>
+
+            {/* Risk reversal + Micro-commitment */}
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-xs text-muted-foreground/70">
+                ✓ Appel découverte offert • ✓ Devis sous 24h • ✓ Sans engagement
+              </p>
             </div>
           </div>
         </div>
