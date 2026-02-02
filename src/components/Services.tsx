@@ -165,7 +165,7 @@ const servicesData = [
     process: "Évaluation niveau → Programme personnalisé → Formation pratique → Suivi progression",
     details: "Formation complète aux techniques de production musicale moderne. Apprenez les secrets du mixage et du mastering avec un professionnel expérimenté.",
     equipment: ["Stations de travail dédiées", "Logiciels professionnels", "Supports de cours", "Exercices pratiques"],
-    deliverables: ["Support de formation", "Projets d'exercice", "Certificat de formation"]
+    deliverables: ["Support de formation", "Projets d'exercice", "Fiches récapitulatives à chaque fin de séance"]
   }
 ];
 

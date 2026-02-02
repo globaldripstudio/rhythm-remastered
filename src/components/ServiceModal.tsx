@@ -181,6 +181,25 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             </div>
           )}
 
+          {/* Beatmaking/Composition Spotify Player */}
+          {service.id === "composition" && (
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">Nos productions</h3>
+              <div className="bg-card rounded-lg p-2 border border-border/50">
+                <iframe 
+                  style={{ borderRadius: '12px' }}
+                  src="https://open.spotify.com/embed/playlist/3zjaPFIW17OKA0XGhr2TQn?utm_source=generator" 
+                  width="100%" 
+                  height="352" 
+                  frameBorder="0" 
+                  allowFullScreen
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
+
           {/* CTA */}
           <Card className="bg-gradient-hero border-primary/20">
             <CardContent className="p-4 sm:pt-6">
