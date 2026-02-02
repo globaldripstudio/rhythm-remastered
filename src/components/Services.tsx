@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw, Music, BookOpen } from "lucide-react";
+import { ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw, Music, BookOpen, Speaker, Music2 } from "lucide-react";
 import ServiceModal from "@/components/ServiceModal";
 
 // Service data for both cards and modals
@@ -11,7 +11,7 @@ const servicesData = [
     title: "Mixage + Mastering",
     description: "Service complet pour donner vie à vos créations musicales",
     price: "290€",
-    icon: Music,
+    icon: Waves,
     image: "/lovable-uploads/5974c219-5112-499f-b5dd-3c09bc04df1a.png",
     featured: true,
     badgeText: "Spécialité",
@@ -34,7 +34,7 @@ const servicesData = [
     title: "Mixage + Mastering Express",
     description: "Solution professionnelle full numérique pour les artistes travaillant sur instrumentales en .wav",
     price: "120€",
-    icon: Music,
+    icon: Waves,
     image: "/lovable-uploads/Image-10.jpg",
     featured: true,
     badgeText: "Budget",
@@ -57,7 +57,7 @@ const servicesData = [
     title: "Sound Design",
     description: "Création sonore et design audio pour tous vos projets créatifs",
     price: "Sur devis",
-    icon: Settings,
+    icon: Speaker,
     image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
     featured: true,
     badgeText: "Spécialité",
@@ -103,7 +103,7 @@ const servicesData = [
     title: "Composition / Beatmaking",
     description: "Création musicale et production de beats personnalisés",
     price: "A partir de 300€",
-    icon: Volume2,
+    icon: Music2,
     image: "/lovable-uploads/64615fd6-368c-466a-a669-f5140677e476.png",
     featured: false,
     badgeText: "",
@@ -149,7 +149,7 @@ const servicesData = [
     title: "Formation MAO / Mixage",
     description: "Formations personnalisées en production musicale et techniques de mixage",
     price: "39€/h",
-    icon: Waves,
+    icon: BookOpen,
     image: "/lovable-uploads/6ed6bc90-04bb-4040-9e0b-26b3c13bba5d.png",
     featured: false,
     badgeText: "",
