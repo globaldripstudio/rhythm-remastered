@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Headphones, Mic } from "lucide-react";
 import { useState, useEffect } from "react";
 import studioHero from "@/assets/studio-hero.jpg";
+import logoOrange from "@/assets/logo-orange.png";
 
 const Hero = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -135,6 +136,15 @@ const Hero = () => {
               <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
               Ingénieur certifié
             </div>
+          </div>
+
+          {/* Orange Logo */}
+          <div className="mt-8 sm:mt-10 flex justify-center">
+            <img 
+              src={logoOrange} 
+              alt="Global Drip Studio Logo" 
+              className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 opacity-40"
+            />
           </div>
         </div>
       </div>
