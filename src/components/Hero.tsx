@@ -111,7 +111,7 @@ const Hero = () => {
           {/* BLOC 3: CTA + Trust Indicators - Importance: Haute (conversion) */}
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-              <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
+              <Button size="lg" className="studio-button text-base sm:text-lg px-7 sm:px-9 py-[1.35rem] sm:py-[1.6rem] w-full sm:w-auto" onClick={() => {
                 const contactSection = document.getElementById('contact');
                 if (contactSection) {
                   const yOffset = 100;
@@ -124,7 +124,7 @@ const Hero = () => {
                 Réserver une session
               </Button>
               <a href="/projets" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-border hover:bg-muted w-full">
+                <Button variant="outline" size="lg" className="text-base sm:text-lg px-7 sm:px-9 py-[1.35rem] sm:py-[1.6rem] border-border hover:bg-muted w-full">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Écouter nos réalisations
                 </Button>
