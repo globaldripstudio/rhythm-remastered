@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [highlightPhone, setHighlightPhone] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -27,6 +28,17 @@ const Contact = () => {
     message: ""
   });
   const { toast } = useToast();
+
+  // Listen for custom event to highlight phone
+  useEffect(() => {
+    const handleHighlight = () => {
+      setHighlightPhone(true);
+      setTimeout(() => setHighlightPhone(false), 1500);
+    };
+
+    window.addEventListener('highlight-phone', handleHighlight);
+    return () => window.removeEventListener('highlight-phone', handleHighlight);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -253,12 +265,12 @@ const Contact = () => {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-secondary" />
+                  <div className={`w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${highlightPhone ? 'highlight-phone bg-primary/30' : ''}`}>
+                    <Phone className={`w-5 h-5 transition-colors duration-300 ${highlightPhone ? 'text-primary' : 'text-secondary'}`} />
                   </div>
-                  <div>
+                  <div className={`transition-all duration-300 ${highlightPhone ? 'text-primary' : ''}`}>
                     <div className="font-medium">Téléphone</div>
-                    <div className="text-muted-foreground">+33 6 59 79 73 42</div>
+                    <div className={`transition-colors duration-300 ${highlightPhone ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>+33 6 59 79 73 42</div>
                   </div>
                 </div>
 
