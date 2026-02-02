@@ -139,9 +139,9 @@ const Hero = () => {
           </div>
 
           {/* Orange Logo with Animated Gradient */}
-          <div className="mt-[15.5rem] sm:mt-[18.5rem] mb-2 flex justify-center items-center w-full">
+          <div className="mt-[15.5rem] sm:mt-[18.5rem] mb-2 w-full flex justify-center">
             <div 
-              className="h-24 sm:h-32 md:h-40 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite] mx-auto"
+              className="h-24 sm:h-32 md:h-40 w-24 sm:w-32 md:w-40 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
               style={{
                 background: 'linear-gradient(135deg, hsl(18 100% 60%), hsl(180 35% 35%))',
                 backgroundSize: '200% 200%',
@@ -152,8 +152,7 @@ const Hero = () => {
                 WebkitMaskRepeat: 'no-repeat',
                 maskRepeat: 'no-repeat',
                 WebkitMaskPosition: 'center',
-                maskPosition: 'center',
-                aspectRatio: '1/1'
+                maskPosition: 'center'
               }}
             />
           </div>
@@ -161,7 +160,7 @@ const Hero = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 animate-bounce flex justify-center">
         <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-muted-foreground rounded-full flex justify-center">
           <div className="w-0.5 sm:w-1 h-2 sm:h-3 bg-muted-foreground rounded-full mt-1.5 sm:mt-2 animate-pulse" />
         </div>
