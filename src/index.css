@@ -149,10 +149,78 @@ All colors MUST be HSL for perfect theming.
   .studio-button {
     background: var(--gradient-accent);
     transition: var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .studio-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .studio-button:hover::before {
+    left: 100%;
   }
 
   .studio-button:hover {
     transform: scale(1.05);
     box-shadow: var(--shadow-glow);
+  }
+
+  /* Navigation link animation */
+  .nav-link {
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-accent);
+    transition: width 0.3s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  .nav-link:hover {
+    color: hsl(var(--primary));
+  }
+
+  /* Interactive button with shine effect */
+  .btn-shine {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .btn-shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .btn-shine:hover::before {
+    left: 100%;
+  }
+
+  .btn-shine:hover {
+    transform: scale(1.03);
   }
 }

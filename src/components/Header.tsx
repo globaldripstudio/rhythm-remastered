@@ -26,16 +26,16 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#accueil" className="hover:text-primary transition-colors">Accueil</a>
-            <a href="#services" className="hover:text-primary transition-colors">Services</a>
-            <a href="#equipement" className="hover:text-primary transition-colors">Équipement</a>
-            <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
-            <span className="text-muted-foreground">|</span>
-            <a href="/projets" className="hover:text-primary transition-colors text-muted-foreground">Projets</a>
-            <span className="text-muted-foreground">|</span>
-            <a href="/blog" className="hover:text-primary transition-colors text-muted-foreground">Blog</a>
-            <span className="text-muted-foreground">|</span>
-            <a href="/ebook" className="hover:text-primary transition-colors text-muted-foreground">Boutique</a>
+            <a href="#accueil" className="nav-link">Accueil</a>
+            <a href="#services" className="nav-link">Services</a>
+            <a href="#equipement" className="nav-link">Équipement</a>
+            <a href="#contact" className="nav-link">Contact</a>
+            <span className="text-muted-foreground/50">|</span>
+            <a href="/projets" className="nav-link text-muted-foreground">Projets</a>
+            <span className="text-muted-foreground/50">|</span>
+            <a href="/blog" className="nav-link text-muted-foreground">Blog</a>
+            <span className="text-muted-foreground/50">|</span>
+            <a href="/ebook" className="nav-link text-muted-foreground">Boutique</a>
           </nav>
 
           {/* Contact Info & CTA */}
@@ -62,14 +62,14 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 py-4 border-t border-border animate-fade-in">
             <nav className="flex flex-col space-y-4">
-              <a href="#accueil" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Accueil</a>
-              <a href="#services" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Services</a>
-              <a href="#equipement" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Équipement</a>
-              <a href="#contact" className="py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Contact</a>
+              <a href="#accueil" className="py-2 nav-link" onClick={toggleMenu}>Accueil</a>
+              <a href="#services" className="py-2 nav-link" onClick={toggleMenu}>Services</a>
+              <a href="#equipement" className="py-2 nav-link" onClick={toggleMenu}>Équipement</a>
+              <a href="#contact" className="py-2 nav-link" onClick={toggleMenu}>Contact</a>
               <div className="border-t border-border my-2"></div>
-              <a href="/projets" className="py-2 hover:text-primary transition-colors text-muted-foreground" onClick={toggleMenu}>Projets</a>
-              <a href="/blog" className="py-2 hover:text-primary transition-colors text-muted-foreground" onClick={toggleMenu}>Blog</a>
-              <a href="/ebook" className="py-2 hover:text-primary transition-colors text-muted-foreground" onClick={toggleMenu}>Boutique</a>
+              <a href="/projets" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Projets</a>
+              <a href="/blog" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Blog</a>
+              <a href="/ebook" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Boutique</a>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />
