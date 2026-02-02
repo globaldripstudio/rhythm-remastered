@@ -141,7 +141,7 @@ const Hero = () => {
           {/* Orange Logo with Animated Gradient */}
           <div className="mt-52 sm:mt-64 mb-2 flex justify-center">
             <div 
-              className="h-12 sm:h-16 md:h-20 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
+              className="h-24 sm:h-32 md:h-40 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
               style={{
                 background: 'linear-gradient(135deg, hsl(18 100% 60%), hsl(180 35% 35%))',
                 backgroundSize: '200% 200%',
