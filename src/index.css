@@ -176,26 +176,19 @@ All colors MUST be HSL for perfect theming.
   /* Navigation link animation */
   .nav-link {
     position: relative;
-    transition: color 0.3s ease;
-  }
-
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--gradient-accent);
-    transition: width 0.3s ease;
-  }
-
-  .nav-link:hover::after {
-    width: 100%;
+    transition: all 0.3s ease;
+    background-size: 200% 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
   }
 
   .nav-link:hover {
-    color: hsl(var(--primary));
+    background: var(--gradient-accent);
+    background-size: 200% 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 3s ease-in-out infinite;
   }
 
   /* Interactive button with shine effect */
