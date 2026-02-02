@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Play, Headphones, Mic } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import studioHero from "@/assets/studio-hero.jpg";
 import logoOrange from "@/assets/logo-orange.png";
 
 const Hero = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const img = new Image();
@@ -19,22 +17,8 @@ const Hero = () => {
     img.src = "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png";
   }, []);
 
-  // Parallax effect
-  useEffect(() => {
-    const handleScroll = () => {
-      if (heroRef.current) {
-        const rect = heroRef.current.getBoundingClientRect();
-        if (rect.bottom > 0) {
-          setScrollY(window.scrollY * 0.4);
-        }
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
-    <section ref={heroRef} id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Loading Screen */}
       {!imageLoaded && (
         <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
@@ -76,16 +60,12 @@ const Hero = () => {
         </div>
       )}
 
-      {/* Background Image with Parallax */}
+      {/* Background Image */}
       <div className={`absolute inset-0 z-0 transition-opacity duration-1000 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
         <img 
           src="/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png"
           alt="Global Drip Studio - Professional Recording Studio"
-          className="w-full h-[120%] object-cover object-center opacity-40 will-change-transform"
-          style={{ 
-            transform: `translateY(${scrollY}px)`,
-            transition: 'transform 0.1s ease-out'
-          }}
+          className="w-full h-full object-cover object-center opacity-40"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background/90" />
       </div>
