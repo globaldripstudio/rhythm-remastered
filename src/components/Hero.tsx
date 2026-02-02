@@ -92,61 +92,58 @@ const Hero = () => {
             </p>
           </div>
 
-          {/* BLOC 2: Stats + Social Proof - Importance: Moyenne (crédibilité) */}
-          <div className="flex flex-col items-center gap-4 sm:gap-5 mb-10 sm:mb-12">
-            {/* Stats */}
-            <div className="flex flex-row justify-center items-center gap-8 sm:gap-10 md:gap-14">
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-secondary">10+</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Années d'expérience</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Artistes accompagnés</div>
-              </div>
+          {/* BLOC 2: Stats - Importance: Moyenne (crédibilité) */}
+          <div className="flex flex-row justify-center items-center gap-6 sm:gap-8 md:gap-12 mb-10 sm:mb-12">
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
             </div>
-            
-            {/* Social Proof */}
-            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
-              <div className="flex items-center group">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-2 animate-pulse" />
-                <span className="group-hover:text-primary transition-colors">Expertise depuis 2019</span>
-              </div>
-              <div className="flex items-center group">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-2 animate-[pulse_2s_ease-in-out_infinite_0.5s]" />
-                <span className="group-hover:text-secondary transition-colors">Équipement haut de gamme</span>
-              </div>
-              <div className="flex items-center group">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-2 animate-[pulse_2s_ease-in-out_infinite_1s]" />
-                <span className="group-hover:text-primary transition-colors">Ingénieur certifié</span>
-              </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-secondary">10+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Années d'expérience</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Artistes accompagnés</div>
             </div>
           </div>
 
-          {/* BLOC 3: CTA - Importance: Haute (conversion) */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-            <Button size="lg" className="studio-button text-base sm:text-lg px-7 sm:px-9 py-5 sm:py-6 scale-[1.03] w-full sm:w-auto" onClick={() => {
-              const contactSection = document.getElementById('contact');
-              if (contactSection) {
-                const yOffset = 100;
-                const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-              }
-              setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
-            }}>
-              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Réserver une session
-            </Button>
-            <a href="/projets" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="text-base sm:text-lg px-7 sm:px-9 py-5 sm:py-6 scale-[1.03] border-border hover:bg-muted w-full">
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Écouter nos réalisations
+          {/* BLOC 3: CTA + Trust Indicators - Importance: Haute (conversion) */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+              <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
+                const contactSection = document.getElementById('contact');
+                if (contactSection) {
+                  const yOffset = 100;
+                  const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+                setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
+              }}>
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Réserver une session
               </Button>
-            </a>
+              <a href="/projets" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-border hover:bg-muted w-full">
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Écouter nos réalisations
+                </Button>
+              </a>
+            </div>
+            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground px-2">
+              <div className="flex items-center">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2 animate-glow-pulse" />
+                Expertise depuis 2019
+              </div>
+              <div className="flex items-center">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-1.5 sm:mr-2" />
+                Équipement haut de gamme
+              </div>
+              <div className="flex items-center">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
+                Ingénieur certifié
+              </div>
+            </div>
           </div>
         </div>
       </div>
