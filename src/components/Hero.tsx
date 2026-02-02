@@ -80,7 +80,7 @@ const Hero = () => {
           </div>
 
           {/* Block 1: Title + Subtitle */}
-          <div className="mb-12">
+          <div className="mb-16">
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight">
               <span className="hero-text">GLOBAL DRIP</span>
               <br />
@@ -92,7 +92,7 @@ const Hero = () => {
           </div>
 
           {/* Block 2: Stats */}
-          <div className="flex justify-center items-center gap-8 sm:gap-12 md:gap-16 mb-12">
+          <div className="flex justify-center items-center gap-8 sm:gap-12 md:gap-16 mb-16">
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-primary">200+</div>
               <div className="text-sm text-muted-foreground">Projets réalisés</div>
@@ -145,6 +145,19 @@ const Hero = () => {
           </div>
 
         </div>
+      </div>
+
+      {/* Animated Logo */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <img 
+          src="/lovable-uploads/logo-blanc-sans-fond.png"
+          alt="Global Drip Studio Logo"
+          className="h-24 sm:h-32 md:h-40 w-auto opacity-40 animate-pulse"
+          style={{
+            maskImage: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)))',
+            WebkitMaskImage: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)))',
+          }}
+        />
       </div>
 
       {/* Scroll Indicator */}
