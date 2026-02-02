@@ -79,20 +79,20 @@ const Hero = () => {
             <span className="text-sm text-muted-foreground">Bienvenue au Studio</span>
           </div>
 
-          {/* Main Title */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
-            <span className="hero-text">GLOBAL DRIP</span>
-            <br />
-            <span className="text-foreground">STUDIO</span>
-          </h1>
+          {/* Block 1: Title + Subtitle */}
+          <div className="mb-12">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight">
+              <span className="hero-text">GLOBAL DRIP</span>
+              <br />
+              <span className="text-foreground">STUDIO</span>
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              Magnifiez votre musique avec notre expertise en enregistrement, mixage et mastering professionnel
+            </p>
+          </div>
 
-          {/* Subtitle */}
-          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-            Magnifiez votre musique avec notre expertise en enregistrement, mixage et mastering professionnel
-          </p>
-
-          {/* Stats */}
-          <div className="flex justify-center items-center gap-8 sm:gap-12 md:gap-16 mb-10">
+          {/* Block 2: Stats */}
+          <div className="flex justify-center items-center gap-8 sm:gap-12 md:gap-16 mb-12">
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-primary">200+</div>
               <div className="text-sm text-muted-foreground">Projets réalisés</div>
@@ -107,8 +107,8 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          {/* Block 3: CTAs + Trust Indicators */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-4">
             <Button size="lg" className="studio-button text-lg px-8 py-6" onClick={() => {
               const contactSection = document.getElementById('contact');
               if (contactSection) {
@@ -129,7 +129,6 @@ const Hero = () => {
             </a>
           </div>
 
-          {/* Trust Indicators */}
           <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 text-sm text-muted-foreground">
             <div className="flex items-center">
               <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-pulse" />
