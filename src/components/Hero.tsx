@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Play, Headphones, Mic } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import studioHero from "@/assets/studio-hero.jpg";
 import logoOrange from "@/assets/logo-orange.png";
 
 const Hero = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const img = new Image();
@@ -17,8 +19,22 @@ const Hero = () => {
     img.src = "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png";
   }, []);
 
+  // Parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        if (rect.bottom > 0) {
+          setScrollY(window.scrollY * 0.4);
+        }
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section ref={heroRef} id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Loading Screen */}
       {!imageLoaded && (
         <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
@@ -60,13 +76,16 @@ const Hero = () => {
         </div>
       )}
 
-      {/* Background Image */}
+      {/* Background Image with Parallax */}
       <div className={`absolute inset-0 z-0 transition-opacity duration-1000 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
         <img 
           src="/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png"
           alt="Global Drip Studio - Professional Recording Studio"
-          className="w-full h-full object-cover object-center opacity-40"
-          style={{ aspectRatio: '16/9' }}
+          className="w-full h-[120%] object-cover object-center opacity-40 will-change-transform"
+          style={{ 
+            transform: `translateY(${scrollY}px)`,
+            transition: 'transform 0.1s ease-out'
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background/90" />
       </div>
@@ -74,10 +93,12 @@ const Hero = () => {
       {/* Content */}
       <div className={`relative z-10 container mx-auto px-6 text-center transition-all duration-1000 flex flex-col justify-center min-h-screen ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="animate-fade-in flex flex-col items-center justify-center flex-1 pb-32">
-          {/* Welcome Badge */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-6">
-            <Headphones className="w-4 h-4 mr-2 text-primary" />
-            <span className="text-sm text-muted-foreground">Bienvenue au Studio</span>
+          {/* Welcome Badge with Glassmorphism */}
+          <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-card/40 backdrop-blur-md border border-primary/20 mb-6 shadow-lg shadow-primary/5 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse opacity-50" />
+            <Headphones className="w-4 h-4 mr-2 text-primary relative z-10" />
+            <span className="text-sm text-muted-foreground relative z-10">Bienvenue au Studio</span>
           </div>
 
           {/* BLOC 1: Title + Subtitle - Importance: Maximale */}
