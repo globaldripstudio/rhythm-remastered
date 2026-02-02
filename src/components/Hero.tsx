@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Play, Headphones, Mic } from "lucide-react";
 import { useState, useEffect } from "react";
+import studioHero from "@/assets/studio-hero.jpg";
+import logoOrange from "@/assets/logo-orange.png";
 
 const Hero = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -71,93 +73,98 @@ const Hero = () => {
 
       {/* Content */}
       <div className={`relative z-10 container mx-auto px-6 text-center transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <div className="animate-fade-in flex flex-col items-center justify-center min-h-[80vh]">
-          
+        <div className="animate-fade-in">
           {/* Welcome Badge */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-8">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-6">
             <Headphones className="w-4 h-4 mr-2 text-primary" />
             <span className="text-sm text-muted-foreground">Bienvenue au Studio</span>
           </div>
 
-          {/* Block 1: Title + Subtitle */}
-          <div className="mb-16">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight">
-              <span className="hero-text">GLOBAL DRIP</span>
-              <br />
-              <span className="text-foreground">STUDIO</span>
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Magnifiez votre musique avec notre expertise en enregistrement, mixage et mastering professionnel
-            </p>
+          {/* Main Title */}
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 leading-tight">
+            <span className="hero-text">GLOBAL DRIP</span>
+            <br />
+            <span className="text-foreground">STUDIO</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
+            Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel
+          </p>
+
+          {/* Stats */}
+          <div className="flex flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-secondary">10+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Années d'expérience</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Artistes accompagnés</div>
+            </div>
           </div>
 
-          {/* Block 2: Stats */}
-          <div className="flex justify-center items-center gap-8 sm:gap-12 md:gap-16 mb-16">
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-primary">200+</div>
-              <div className="text-sm text-muted-foreground">Projets réalisés</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-secondary">10+</div>
-              <div className="text-sm text-muted-foreground">Années d'expérience</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-primary">50+</div>
-              <div className="text-sm text-muted-foreground">Artistes accompagnés</div>
-            </div>
-          </div>
-
-          {/* Block 3: CTAs + Trust Indicators */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-4">
-            <Button size="lg" className="studio-button text-lg px-8 py-6" onClick={() => {
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-10 md:mb-12 px-4">
+            <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
               const contactSection = document.getElementById('contact');
               if (contactSection) {
-                const yOffset = 100;
+                const yOffset = 100; // Scroll 100px plus bas
                 const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
                 window.scrollTo({ top: y, behavior: 'smooth' });
               }
               setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
             }}>
-              <Mic className="w-5 h-5 mr-2" />
+              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Réserver une session
             </Button>
-            <a href="/projets">
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-border hover:bg-muted">
-                <Play className="w-5 h-5 mr-2" />
+            <a href="/projets" className="w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-border hover:bg-muted w-full">
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Écouter nos réalisations
               </Button>
             </a>
           </div>
 
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 text-sm text-muted-foreground">
+          {/* Trust Indicators */}
+          <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground px-2">
             <div className="flex items-center">
-              <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-pulse" />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2 animate-glow-pulse" />
               Expertise depuis 2019
             </div>
             <div className="flex items-center">
-              <div className="w-2 h-2 bg-secondary rounded-full mr-2" />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-1.5 sm:mr-2" />
               Équipement haut de gamme
             </div>
             <div className="flex items-center">
-              <div className="w-2 h-2 bg-primary rounded-full mr-2" />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
               Ingénieur certifié
             </div>
           </div>
 
+          {/* Orange Logo with Animated Gradient */}
+          <div className="mt-[15.5rem] sm:mt-[18.5rem] mb-2 w-full flex justify-center">
+            <div 
+              className="h-24 sm:h-32 md:h-40 w-24 sm:w-32 md:w-40 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
+              style={{
+                background: 'linear-gradient(135deg, hsl(18 100% 60%), hsl(180 35% 35%))',
+                backgroundSize: '200% 200%',
+                WebkitMaskImage: `url(${logoOrange})`,
+                maskImage: `url(${logoOrange})`,
+                WebkitMaskSize: 'contain',
+                maskSize: 'contain',
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskPosition: 'center'
+              }}
+            />
+          </div>
         </div>
-      </div>
-
-      {/* Animated Logo */}
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center">
-        <img 
-          src="/lovable-uploads/logo-blanc-sans-fond.png"
-          alt="Global Drip Studio Logo"
-          className="h-24 sm:h-32 md:h-40 w-auto opacity-40 animate-pulse"
-          style={{
-            maskImage: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)))',
-            WebkitMaskImage: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)))',
-          }}
-        />
       </div>
 
       {/* Scroll Indicator */}
