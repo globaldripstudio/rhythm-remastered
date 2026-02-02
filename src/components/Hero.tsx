@@ -81,8 +81,8 @@ const Hero = () => {
           </div>
 
           {/* BLOC 1: Title + Subtitle */}
-          <div className="mb-8 sm:mb-10">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-2 sm:mb-3 leading-tight">
+          <div className="mb-12 sm:mb-16 md:mb-20">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-2 leading-tight">
               <span className="hero-text">GLOBAL DRIP</span>
               <br />
               <span className="text-foreground">STUDIO</span>
@@ -93,23 +93,23 @@ const Hero = () => {
           </div>
 
           {/* BLOC 2: Stats */}
-          <div className="flex flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10">
+          <div className="flex flex-row justify-center items-center gap-6 sm:gap-10 md:gap-14 mb-12 sm:mb-16 md:mb-20">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">200+</div>
+              <div className="text-sm sm:text-base text-muted-foreground">Projets réalisés</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-secondary">10+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Années d'expérience</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-secondary">10+</div>
+              <div className="text-sm sm:text-base text-muted-foreground">Années d'expérience</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Artistes accompagnés</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">50+</div>
+              <div className="text-sm sm:text-base text-muted-foreground">Artistes accompagnés</div>
             </div>
           </div>
 
           {/* BLOC 3: CTA + Trust Indicators */}
-          <div className="space-y-4 sm:space-y-5">
+          <div className="space-y-2">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               <Button size="lg" className="studio-button text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto" onClick={() => {
                 const contactSection = document.getElementById('contact');
