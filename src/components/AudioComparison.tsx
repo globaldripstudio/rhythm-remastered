@@ -222,56 +222,48 @@ const AudioComparison = () => {
     <section id="audio-comparison" className="py-16 sm:py-20 md:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center mb-10 sm:mb-12 md:mb-16 animate-fade-in">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
+        <div className="text-center mb-8 sm:mb-10 animate-fade-in">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
             Écoutez la <span className="hero-text">Différence</span>
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
-            Découvrez l'impact de notre travail de mixage et mastering sur différents styles musicaux
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Comparez l'avant/après de notre travail sur différents styles
           </p>
         </div>
 
-        {/* Genre Selection */}
-        <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 sm:mb-10 md:mb-12">
+        {/* Genre Selection - More compact pills */}
+        <div className="flex justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
           {genres.map((genre) => (
-            <Button
+            <button
               key={genre.key}
-              variant={selectedGenre === genre.key ? "default" : "outline"}
-              size="default"
               onClick={() => setSelectedGenre(genre.key)}
-              className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base px-3 sm:px-4"
+              className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+                selectedGenre === genre.key
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                  : 'bg-card/60 text-muted-foreground hover:bg-card hover:text-foreground border border-border/50'
+              }`}
             >
-              <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
               {genre.title}
-            </Button>
+            </button>
           ))}
         </div>
 
-        {/* Audio Players */}
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8 sm:mb-10 md:mb-12">
-            <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border mb-3 sm:mb-4">
-              <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-primary" />
-              <span className="text-xs sm:text-sm text-muted-foreground">Genre sélectionné</span>
+        {/* Main Audio Comparison Card */}
+        <div className="max-w-4xl mx-auto">
+          <Card className="overflow-hidden border-border/50 bg-card/40 backdrop-blur-sm">
+            {/* Genre Info Header */}
+            <div className="text-center py-4 sm:py-5 px-4 border-b border-border/30 bg-card/30">
+              <h3 className="text-lg sm:text-xl font-semibold mb-1">{currentGenre?.title}</h3>
+              <p className="text-sm text-muted-foreground">{currentGenre?.description}</p>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3">{currentGenre?.title}</h3>
-            <p className="text-base sm:text-lg text-muted-foreground mb-3 sm:mb-4">{currentGenre?.description}</p>
-            <div className="text-xs sm:text-sm text-muted-foreground italic bg-card/30 backdrop-blur-sm rounded-lg p-2 sm:p-3 max-w-2xl mx-auto">
-              {currentGenre?.credits}
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12">
-            {/* Before */}
-            <Card className="equipment-item p-4 sm:p-6 md:p-8">
-              <CardHeader className="text-center pb-4 sm:pb-6">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <Volume2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-muted-foreground" />
+            {/* Audio Players - Side by side on all screens */}
+            <div className="grid grid-cols-2 divide-x divide-border/30">
+              {/* Before */}
+              <div className="p-4 sm:p-6">
+                <div className="text-center mb-3 sm:mb-4">
+                  <span className="text-xs sm:text-sm uppercase tracking-wider text-muted-foreground font-medium">Avant</span>
                 </div>
-                <CardTitle className="text-xl sm:text-2xl text-muted-foreground">Avant</CardTitle>
-                <p className="text-sm sm:text-base text-muted-foreground">Version originale non traitée</p>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center space-y-4 sm:space-y-6">
                 <audio
                   ref={beforeRef}
                   src={currentGenre?.beforeSrc}
@@ -282,26 +274,21 @@ const AudioComparison = () => {
                 <SpectrumAnalyzer audioRef={beforeRef} isPlaying={playingBefore} />
                 <Button
                   onClick={handleBeforePlay}
-                  size="lg"
                   variant="outline"
-                  className="w-full h-12 sm:h-14 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg"
+                  className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 transition-all duration-300 ${
+                    playingBefore ? 'border-primary/50 bg-primary/10' : ''
+                  }`}
                 >
-                  {playingBefore ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" />}
-                  {playingBefore ? 'Pause' : 'Écouter l\'original'}
+                  {playingBefore ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  <span className="ml-2 text-sm sm:text-base">{playingBefore ? 'Pause' : 'Original'}</span>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* After */}
-            <Card className="equipment-item border-primary/30 bg-gradient-to-br from-card to-primary/5 p-4 sm:p-6 md:p-8">
-              <CardHeader className="text-center pb-4 sm:pb-6">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <Volume2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary" />
+              {/* After */}
+              <div className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-transparent">
+                <div className="text-center mb-3 sm:mb-4">
+                  <span className="text-xs sm:text-sm uppercase tracking-wider text-primary font-medium">Après</span>
                 </div>
-                <CardTitle className="text-xl sm:text-2xl hero-text">Après</CardTitle>
-                <p className="text-sm sm:text-base text-muted-foreground">Mixé & masterisé par Global Drip Studio</p>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center space-y-4 sm:space-y-6">
                 <audio
                   ref={afterRef}
                   src={currentGenre?.afterSrc}
@@ -312,35 +299,41 @@ const AudioComparison = () => {
                 <SpectrumAnalyzer audioRef={afterRef} isPlaying={playingAfter} />
                 <Button
                   onClick={handleAfterPlay}
-                  size="lg"
-                  className="w-full h-12 sm:h-14 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base md:text-lg studio-button"
+                  className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 studio-button transition-all duration-300 ${
+                    playingAfter ? 'shadow-lg shadow-primary/30' : ''
+                  }`}
                 >
-                  {playingAfter ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" />}
-                  {playingAfter ? 'Pause' : 'Écouter le résultat'}
+                  {playingAfter ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  <span className="ml-2 text-sm sm:text-base">{playingAfter ? 'Pause' : 'Mixé'}</span>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+
+            {/* Credits Footer */}
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border/30 bg-card/20">
+              <p className="text-xs sm:text-sm text-muted-foreground/70 text-center italic">
+                {currentGenre?.credits}
+              </p>
+            </div>
+          </Card>
+
+          {/* Listening Tip */}
+          <div className="flex items-center justify-center gap-2 mt-4 sm:mt-6 text-xs sm:text-sm text-muted-foreground/60">
+            <Headphones className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Casque recommandé</span>
           </div>
 
-        {/* Listening Recommendation */}
-        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-3 sm:p-4 mb-6 sm:mb-8 mt-6 sm:mt-8">
-          <div className="flex items-center justify-center text-xs sm:text-sm text-muted-foreground">
-            <Headphones className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-            Casque ou moniteurs recommandés pour une meilleure expérience
+          {/* CTA */}
+          <div className="text-center mt-8 sm:mt-10">
+            <Button 
+              size="lg" 
+              className="studio-button"
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              Réserver une session
+            </Button>
           </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center">
-          <Button 
-            size="lg" 
-            className="studio-button text-sm sm:text-base"
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
-            Réserver une session de mixage
-          </Button>
-        </div>
         </div>
       </div>
     </section>
