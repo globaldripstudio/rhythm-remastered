@@ -138,12 +138,22 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Orange Logo */}
+          {/* Orange Logo with Gradient */}
           <div className="mt-52 sm:mt-64 mb-2 flex justify-center">
-            <img 
-              src={logoOrange} 
-              alt="Global Drip Studio Logo" 
-              className="w-auto h-12 sm:h-16 md:h-20 opacity-40 object-contain"
+            <div 
+              className="w-auto h-12 sm:h-16 md:h-20 opacity-40"
+              style={{
+                background: 'linear-gradient(135deg, hsl(18 100% 60%), hsl(180 35% 35%))',
+                WebkitMaskImage: `url(${logoOrange})`,
+                maskImage: `url(${logoOrange})`,
+                WebkitMaskSize: 'contain',
+                maskSize: 'contain',
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskPosition: 'center',
+                aspectRatio: '1/1'
+              }}
             />
           </div>
         </div>
