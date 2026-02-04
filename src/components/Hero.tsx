@@ -18,7 +18,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden" aria-labelledby="hero-heading">
       {/* Loading Screen */}
       {!imageLoaded && (
         <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
@@ -77,13 +77,13 @@ const Hero = () => {
           <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-card/40 backdrop-blur-md border border-primary/20 mb-6 shadow-lg shadow-primary/5 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse opacity-50" />
-            <Headphones className="w-4 h-4 mr-2 text-primary relative z-10" />
+            <Headphones className="w-4 h-4 mr-2 text-primary relative z-10" aria-hidden="true" />
             <span className="text-sm text-muted-foreground relative z-10">Bienvenue au Studio</span>
           </div>
 
           {/* BLOC 1: Title + Subtitle - Importance: Maximale */}
           <div className="mb-10 sm:mb-12">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight">
+            <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight">
               <span className="hero-text">GLOBAL DRIP</span>
               <br />
               <span className="text-foreground">STUDIO</span>
@@ -169,7 +169,7 @@ const Hero = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center" aria-hidden="true">
         <div className="w-6 h-10 border-2 border-primary/50 rounded-full flex justify-center p-1 opacity-40">
           <div className="w-1.5 h-3 bg-gradient-to-b from-primary to-secondary rounded-full animate-bounce" />
         </div>
