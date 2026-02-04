@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 
 import { Clock, Euro, Check, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 interface Service {
   id: string;
   title: string;
@@ -42,6 +42,36 @@ const CloseButton = ({ onClick, className = "" }: { onClick: () => void; classNa
 );
 
 const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: Service; onClose: () => void; isMobile?: boolean }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    // Show indicator if there's more content to scroll (not at bottom)
+    const hasMoreContent = el.scrollHeight > el.clientHeight;
+    const notAtBottom = el.scrollTop + el.clientHeight < el.scrollHeight - 20;
+    setShowScrollIndicator(hasMoreContent && notAtBottom);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    // Check on mount
+    const timer = setTimeout(checkScroll, 100);
+    
+    el.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll]);
+
   return (
     <div className={`flex flex-col ${isMobile ? 'h-[calc(80vh-3rem)]' : 'h-[85vh] md:h-[80vh]'}`}>
       {/* Header Image */}
@@ -78,9 +108,13 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pb-6 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent hover:scrollbar-thumb-primary/70">
-        <div className="space-y-4 sm:space-y-6 pt-4 pb-8">
+      {/* Scrollable Content with scroll indicator */}
+      <div className="relative flex-1 min-h-0">
+        <div 
+          ref={scrollRef}
+          className="h-full overflow-y-auto px-4 sm:px-6 pb-6 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent hover:scrollbar-thumb-primary/70"
+        >
+          <div className="space-y-4 sm:space-y-6 pt-4 pb-8">
           {/* Description */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-2">Description</h3>
@@ -221,6 +255,23 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             </CardContent>
           </Card>
         </div>
+        </div>
+        
+        {/* Scroll indicator - fade at bottom when more content */}
+        {showScrollIndicator && (
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none bg-gradient-to-t from-background via-background/80 to-transparent flex items-end justify-center pb-2"
+            aria-hidden="true"
+          >
+            <div className="flex flex-col items-center animate-bounce">
+              <div className="w-6 h-6 border-2 border-primary/60 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

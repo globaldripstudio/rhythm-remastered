@@ -8,7 +8,7 @@ const Header = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border" role="banner">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -25,7 +25,7 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8" aria-label="Navigation principale">
             <a href="#accueil" className="nav-link">Accueil</a>
             <a href="#services" className="nav-link">Services</a>
             <a href="#equipement" className="nav-link">Équipement</a>
@@ -53,14 +53,17 @@ const Header = () => {
           <button
             onClick={toggleMenu}
             className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 py-4 border-t border-border animate-fade-in">
+          <div id="mobile-navigation" className="md:hidden mt-4 py-4 border-t border-border animate-fade-in" role="navigation" aria-label="Navigation mobile">
             <nav className="flex flex-col space-y-4">
               <a href="#accueil" className="py-2 nav-link" onClick={toggleMenu}>Accueil</a>
               <a href="#services" className="py-2 nav-link" onClick={toggleMenu}>Services</a>

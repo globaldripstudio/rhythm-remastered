@@ -197,11 +197,11 @@ const Services = () => {
   };
 
   return (
-    <section id="services" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-background to-muted/20">
+    <section id="services" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-background to-muted/20" aria-labelledby="services-heading">
       <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center mb-10 sm:mb-12 md:mb-16 animate-fade-in">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
+          <h2 id="services-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
             Nos <span className="hero-text">Services</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
@@ -229,9 +229,9 @@ const Services = () => {
                       setShowExpress(!showExpress);
                     }}
                     className="absolute -top-4 -left-4 sm:-top-6 sm:-left-6 md:-top-8 md:-left-8 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
-                    title={showExpress ? "Voir version Standard" : "Voir version Express"}
+                    aria-label={showExpress ? "Voir la version Standard du service Mixage + Mastering" : "Voir la version Express du service Mixage + Mastering"}
                   >
-                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-500 group-hover/switch:rotate-180" />
+                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-500 group-hover/switch:rotate-180" aria-hidden="true" />
                   </button>
                 )}
                 
