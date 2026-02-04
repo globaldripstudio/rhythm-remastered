@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogPortal, DialogOverlay } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,7 +79,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent hover:scrollbar-thumb-primary/70">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 pb-6 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent hover:scrollbar-thumb-primary/70">
         <div className="space-y-4 sm:space-y-6 pt-4 pb-8">
           {/* Description */}
           <div>
@@ -251,23 +251,19 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
   // Desktop: use Dialog (modal) with custom animations
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogPortal>
-        <DialogOverlay 
-          className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300 cursor-pointer" 
-          onClick={onClose}
-        />
-        <div className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] pointer-events-none">
+      <DialogContent
+        className="max-w-3xl w-[90vw] max-h-[90vh] p-0 overflow-hidden rounded-lg !flex !flex-col !gap-0 [&>button]:hidden"
+      >
+        <div className="relative">
           {/* Orange bubble close button - positioned outside and above modal */}
-          <CloseButton onClick={onClose} className="absolute -top-4 -right-4 sm:-top-5 sm:-right-5 md:-top-6 md:-right-6 z-[60] pointer-events-auto" />
-          <div className="relative max-w-3xl w-[90vw] max-h-[90vh] border bg-background shadow-lg rounded-lg overflow-hidden pointer-events-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] duration-300">
-            <DialogHeader className="sr-only">
-              <DialogTitle>{service.title}</DialogTitle>
-              <DialogDescription>{service.description}</DialogDescription>
-            </DialogHeader>
-            <ServiceModalContent service={service} onClose={onClose} />
-          </div>
+          <CloseButton onClick={onClose} className="absolute -top-4 -right-4 sm:-top-5 sm:-right-5 md:-top-6 md:-right-6 z-[60]" />
+          <DialogHeader className="sr-only">
+            <DialogTitle>{service.title}</DialogTitle>
+            <DialogDescription>{service.description}</DialogDescription>
+          </DialogHeader>
+          <ServiceModalContent service={service} onClose={onClose} />
         </div>
-      </DialogPortal>
+      </DialogContent>
     </Dialog>
   );
 };
