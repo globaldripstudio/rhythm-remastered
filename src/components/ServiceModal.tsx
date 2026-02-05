@@ -303,7 +303,7 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
-        className="max-w-3xl w-[90vw] max-h-[90vh] p-0 overflow-hidden rounded-lg !flex !flex-col !gap-0 [&>button]:hidden"
+        className="max-w-3xl w-[90vw] max-h-[90vh] p-0 overflow-visible rounded-lg !flex !flex-col !gap-0 [&>button]:hidden"
       >
         <div className="relative">
           {/* Orange bubble close button - positioned outside and above modal */}
