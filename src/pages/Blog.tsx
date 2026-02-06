@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User } from "lucide-react";
+import { Calendar, Clock, User, Eye, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+
 const Blog = () => {
   const posts = [
     {
@@ -14,21 +15,12 @@ const Blog = () => {
       readTime: "8 min",
       category: "Réalisations",
       image: "/lovable-uploads/venin-album-cover.jpg",
-      slug: "venin-le-premier-sang"
+      slug: "venin-le-premier-sang",
+      views: 342,
+      comingSoon: false
     },
     {
       id: 2,
-      title: "Bien mixer une voix : les 7 étapes essentielles",
-      excerpt: "Maîtrisez l'art du mixage vocal avec ces techniques professionnelles utilisées dans notre studio. De l'égalisation à la compression, découvrez nos secrets.",
-      author: "Global Drip Studio",
-      date: "2024-12-15",
-      readTime: "6 min",
-      category: "Mixage",
-      image: "/lovable-uploads/_edited.jpg.png",
-      slug: "bien-mixer-une-voix"
-    },
-    {
-      id: 3,
       title: "Comprendre la compression en 5 minutes",
       excerpt: "La compression démystifiée : ratio, attack, release, knee. Apprenez à utiliser cet outil indispensable pour contrôler la dynamique de vos enregistrements.",
       author: "Global Drip Studio", 
@@ -36,7 +28,22 @@ const Blog = () => {
       readTime: "5 min",
       category: "Techniques",
       image: "/lovable-uploads/Image-23.jpg",
-      slug: "comprendre-la-compression"
+      slug: "comprendre-la-compression",
+      views: 287,
+      comingSoon: false
+    },
+    {
+      id: 3,
+      title: "Bien mixer une voix : les 7 étapes essentielles",
+      excerpt: "Maîtrisez l'art du mixage vocal avec ces techniques professionnelles utilisées dans notre studio. De l'égalisation à la compression, découvrez nos secrets.",
+      author: "Global Drip Studio",
+      date: "2024-12-15",
+      readTime: "6 min",
+      category: "Mixage",
+      image: "/lovable-uploads/_edited.jpg.png",
+      slug: "bien-mixer-une-voix",
+      views: 198,
+      comingSoon: true
     },
     {
       id: 4,
@@ -47,7 +54,9 @@ const Blog = () => {
       readTime: "9 min",
       category: "Sound Design",
       image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
-      slug: "10-techniques-sound-design"
+      slug: "10-techniques-sound-design",
+      views: 156,
+      comingSoon: true
     }
   ];
 
@@ -92,10 +101,10 @@ const Blog = () => {
 
       {/* Blog Posts */}
       <section className="py-16">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
             {posts.map((post) => (
-              <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
+              <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col">
                 <div className="relative h-48 overflow-hidden">
                   <img 
                     src={post.image}
@@ -108,10 +117,15 @@ const Blog = () => {
                       {post.category}
                     </Badge>
                   </div>
+                  {/* View counter */}
+                  <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-muted-foreground">
+                    <Eye className="w-3 h-3" />
+                    <span>{post.views}</span>
+                  </div>
                 </div>
                 
-                <CardHeader>
-                  <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+                <CardHeader className="flex-grow">
+                  <CardTitle className="text-base sm:text-lg leading-snug group-hover:text-primary transition-colors">
                     {post.title}
                   </CardTitle>
                   <p className="text-muted-foreground text-sm line-clamp-3">
@@ -123,9 +137,10 @@ const Blog = () => {
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
                     <div className="flex items-center space-x-2">
                       <User className="w-3 h-3" />
-                      <span>{post.author}</span>
+                      <span className="hidden sm:inline">{post.author}</span>
+                      <span className="sm:hidden">GDS</span>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3 sm:space-x-4">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-3 h-3" />
                         <span>{post.date}</span>
@@ -136,11 +151,26 @@ const Blog = () => {
                       </div>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full">
-                    <Link to={post.slug ? `/blog/${post.slug}` : "#"}>
-                      Lire l'article
+                  {post.comingSoon ? (
+                    <div className="relative">
+                      <Button 
+                        variant="outline" 
+                        className="w-full opacity-60 cursor-not-allowed"
+                        disabled
+                      >
+                        Lire l'article
+                      </Button>
+                      <span className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-medium">
+                        bientôt
+                      </span>
+                    </div>
+                  ) : (
+                    <Link to={`/blog/${post.slug}`} className="block">
+                      <Button variant="outline" className="w-full">
+                        Lire l'article
+                      </Button>
                     </Link>
-                  </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}
