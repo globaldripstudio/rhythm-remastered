@@ -4,11 +4,19 @@ import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, Headphones, Mic } from "lucide-react";
 
 // Spectrum analyzer component
-const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<HTMLAudioElement>, isPlaying: boolean }) => {
+const SpectrumAnalyzer = ({ 
+  audioRef, 
+  isPlaying,
+  sharedAudioContextRef
+}: { 
+  audioRef: React.RefObject<HTMLAudioElement>, 
+  isPlaying: boolean,
+  sharedAudioContextRef: React.MutableRefObject<AudioContext | undefined>
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const analyserRef = useRef<AnalyserNode>();
-  const audioContextRef = useRef<AudioContext>();
+  const sourceConnectedRef = useRef(false);
 
   useEffect(() => {
     if (!audioRef.current || !canvasRef.current) return;
@@ -18,20 +26,26 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Initialize audio context and analyser
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      const source = audioContextRef.current.createMediaElementSource(audio);
-      source.connect(analyserRef.current);
-      analyserRef.current.connect(audioContextRef.current.destination);
-      analyserRef.current.fftSize = 256;
-      analyserRef.current.smoothingTimeConstant = 0.8;
+    // Initialize audio context and analyser only once
+    if (!sourceConnectedRef.current && isPlaying) {
+      try {
+        if (!sharedAudioContextRef.current) {
+          sharedAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        
+        if (!analyserRef.current) {
+          analyserRef.current = sharedAudioContextRef.current.createAnalyser();
+          const source = sharedAudioContextRef.current.createMediaElementSource(audio);
+          source.connect(analyserRef.current);
+          analyserRef.current.connect(sharedAudioContextRef.current.destination);
+          analyserRef.current.fftSize = 256;
+          analyserRef.current.smoothingTimeConstant = 0.8;
+          sourceConnectedRef.current = true;
+        }
+      } catch (error) {
+        console.warn('AudioContext initialization failed:', error);
+      }
     }
-
-    const analyser = analyserRef.current;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
 
     // Get computed colors from CSS variables
     const computedStyle = getComputedStyle(document.documentElement);
@@ -45,7 +59,11 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
     const primaryHsl40 = `hsla(${primaryColor} / 0.4)`;
 
     const draw = () => {
-      if (!isPlaying) return;
+      if (!isPlaying || !analyserRef.current) return;
+      
+      const analyser = analyserRef.current;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
       
       animationRef.current = requestAnimationFrame(draw);
       analyser.getByteFrequencyData(dataArray);
@@ -92,7 +110,7 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
       ctx.shadowBlur = 0;
     };
 
-    if (isPlaying) {
+    if (isPlaying && analyserRef.current) {
       draw();
     } else {
       // Draw static idle bars when not playing
@@ -121,7 +139,7 @@ const SpectrumAnalyzer = ({ audioRef, isPlaying }: { audioRef: React.RefObject<H
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, audioRef]);
+  }, [isPlaying, audioRef, sharedAudioContextRef]);
 
   return (
     <canvas
@@ -182,7 +200,7 @@ const AudioComparison = () => {
     setPlayingAfter(false);
   }, [selectedGenre]);
 
-  const handleBeforePlay = () => {
+  const handleBeforePlay = async () => {
     if (afterRef.current) {
       afterRef.current.pause();
       setPlayingAfter(false);
@@ -193,13 +211,21 @@ const AudioComparison = () => {
         beforeRef.current.pause();
         setPlayingBefore(false);
       } else {
-        beforeRef.current.play();
-        setPlayingBefore(true);
+        try {
+          // Resume AudioContext on mobile (required for iOS/Android)
+          if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+          }
+          await beforeRef.current.play();
+          setPlayingBefore(true);
+        } catch (error) {
+          console.error('Error playing audio:', error);
+        }
       }
     }
   };
 
-  const handleAfterPlay = () => {
+  const handleAfterPlay = async () => {
     if (beforeRef.current) {
       beforeRef.current.pause();
       setPlayingBefore(false);
@@ -210,11 +236,22 @@ const AudioComparison = () => {
         afterRef.current.pause();
         setPlayingAfter(false);
       } else {
-        afterRef.current.play();
-        setPlayingAfter(true);
+        try {
+          // Resume AudioContext on mobile (required for iOS/Android)
+          if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+          }
+          await afterRef.current.play();
+          setPlayingAfter(true);
+        } catch (error) {
+          console.error('Error playing audio:', error);
+        }
       }
     }
   };
+
+  // Reference to the shared AudioContext for mobile resume
+  const audioContextRef = useRef<AudioContext>();
 
   const currentGenre = genres.find(g => g.key === selectedGenre);
 
@@ -277,7 +314,7 @@ const AudioComparison = () => {
                   onLoadStart={() => setPlayingBefore(false)}
                   crossOrigin="anonymous"
                 />
-                <SpectrumAnalyzer audioRef={beforeRef} isPlaying={playingBefore} />
+                <SpectrumAnalyzer audioRef={beforeRef} isPlaying={playingBefore} sharedAudioContextRef={audioContextRef} />
                 <Button
                   onClick={handleBeforePlay}
                   variant="outline"
@@ -302,7 +339,7 @@ const AudioComparison = () => {
                   onLoadStart={() => setPlayingAfter(false)}
                   crossOrigin="anonymous"
                 />
-                <SpectrumAnalyzer audioRef={afterRef} isPlaying={playingAfter} />
+                <SpectrumAnalyzer audioRef={afterRef} isPlaying={playingAfter} sharedAudioContextRef={audioContextRef} />
                 <Button
                   onClick={handleAfterPlay}
                   className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 studio-button transition-all duration-300 ${

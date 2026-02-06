@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, User, Eye } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 const BlogArticle = () => {
@@ -14,6 +14,7 @@ const BlogArticle = () => {
         date: "2024-12-20",
         readTime: "8 min",
         category: "Réalisations",
+        views: 342,
         content: (
           <div className="prose prose-lg max-w-none">
             <div className="mb-8">
@@ -138,6 +139,7 @@ const BlogArticle = () => {
         date: "2024-12-15", 
         readTime: "6 min",
         category: "Mixage",
+        views: 198,
         content: <BienMixerUneVoix />
       };
     }
@@ -150,6 +152,7 @@ const BlogArticle = () => {
         date: "2024-12-10",
         readTime: "5 min", 
         category: "Techniques",
+        views: 287,
         content: <ComprendreCompression />
       };
     }
@@ -161,7 +164,8 @@ const BlogArticle = () => {
         author: "Global Drip Studio",
         date: "2024-12-05",
         readTime: "9 min",
-        category: "Sound Design", 
+        category: "Sound Design",
+        views: 156,
         content: <TechniquesSoundDesign />
       };
     }
@@ -187,21 +191,30 @@ const BlogArticle = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header - matching other pages */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3">
-              <img 
-                src="/lovable-uploads/logo-blanc-sans-fond.png"
-                alt="Global Drip Studio"
-                className="h-8 object-contain"
-              />
-            </Link>
+            <div className="flex items-center gap-3 sm:gap-6">
+              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+                <img 
+                  src="/lovable-uploads/logo-blanc-sans-fond.png"
+                  alt="Global Drip Studio"
+                  className="h-6 sm:h-8 object-contain"
+                />
+              </Link>
+              <Link to="/">
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">← Retour à l'accueil</span>
+                  <span className="sm:hidden">← Accueil</span>
+                </Button>
+              </Link>
+            </div>
             <Link to="/blog">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour au blog
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Retour au blog</span>
+                <span className="sm:hidden">Blog</span>
               </Button>
             </Link>
           </div>
@@ -209,21 +222,27 @@ const BlogArticle = () => {
       </header>
 
       {/* Article Content */}
-      <article className="py-16">
-        <div className="container mx-auto px-6 max-w-4xl">
+      <article className="py-10 sm:py-16">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
           {/* Article Header */}
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
+          <div className="mb-8 sm:mb-12">
+            <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
                 {article.category}
               </span>
+              {article.views && (
+                <span className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                  <Eye className="w-3 h-3" />
+                  {article.views} vues
+                </span>
+              )}
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
               {article.title}
             </h1>
             
-            <div className="flex flex-wrap items-center gap-6 text-muted-foreground text-sm">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-muted-foreground text-sm">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 <span>{article.author}</span>
