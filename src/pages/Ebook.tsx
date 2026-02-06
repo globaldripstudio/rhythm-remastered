@@ -4,8 +4,7 @@ import { BookOpen, Check, Download, Play, FileText, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Link } from "react-router-dom";
 
 const Ebook = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,9 +29,30 @@ const Ebook = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      {/* Header - matching Projets page style */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+                <img 
+                  src="/lovable-uploads/logo-blanc-sans-fond.png"
+                  alt="Global Drip Studio"
+                  className="h-6 sm:h-8 object-contain"
+                />
+              </Link>
+              <Link to="/">
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">← Retour à l'accueil</span>
+                  <span className="sm:hidden">← Accueil</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
       
-      <section className="pt-32 pb-24">
+      <section className="pt-10 sm:pt-16 pb-16 sm:pb-24">
         <div className="container mx-auto px-6">
           <Card className="max-w-5xl mx-auto p-8 md:p-12 bg-card/50 backdrop-blur border-border/50">
             <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -142,8 +162,6 @@ const Ebook = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };
