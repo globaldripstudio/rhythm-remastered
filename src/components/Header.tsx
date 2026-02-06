@@ -35,7 +35,12 @@ const Header = () => {
             <span className="text-muted-foreground/50">|</span>
             <a href="/blog" className="nav-link text-muted-foreground">Blog</a>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/ebook" className="nav-link text-muted-foreground">Boutique</a>
+            <span className="relative inline-flex items-center cursor-not-allowed">
+              <span className="text-muted-foreground/50">Boutique</span>
+              <span className="absolute -top-3 -right-4 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                bientôt
+              </span>
+            </span>
           </nav>
 
           {/* Contact Info & CTA */}
@@ -72,7 +77,12 @@ const Header = () => {
               <div className="border-t border-border my-2"></div>
               <a href="/projets" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Projets</a>
               <a href="/blog" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Blog</a>
-              <a href="/ebook" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Boutique</a>
+              <span className="py-2 relative inline-flex items-center cursor-not-allowed">
+                <span className="text-muted-foreground/50">Boutique</span>
+                <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                  bientôt
+                </span>
+              </span>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />

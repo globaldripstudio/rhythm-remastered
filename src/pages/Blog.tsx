@@ -1,9 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, User } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const Blog = () => {
   const posts = [
     {
@@ -54,35 +53,37 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header - matching Projets page style */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3">
-              <img 
-                src="/lovable-uploads/logo-blanc-sans-fond.png"
-                alt="Global Drip Studio"
-                className="h-8 object-contain"
-              />
-            </Link>
-            <Link to="/">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour à l'accueil
-              </Button>
-            </Link>
+            <div className="flex items-center gap-3 sm:gap-6">
+              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+                <img 
+                  src="/lovable-uploads/logo-blanc-sans-fond.png"
+                  alt="Global Drip Studio"
+                  className="h-6 sm:h-8 object-contain"
+                />
+              </Link>
+              <Link to="/">
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">← Retour à l'accueil</span>
+                  <span className="sm:hidden">← Accueil</span>
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-b from-background to-muted/20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+      <section className="py-10 sm:py-16 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
               Blog <span className="hero-text">Global Drip</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
               Conseils, techniques et actualités du monde de l'audio professionnel
             </p>
           </div>
