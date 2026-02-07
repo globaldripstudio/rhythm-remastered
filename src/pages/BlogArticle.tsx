@@ -1,9 +1,22 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock, User, Eye } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { trackBlogView } from "@/hooks/useBlogViews";
+import ComprendreCompression from "./BlogArticles/ComprendreCompression";
 
 const BlogArticle = () => {
   const { slug } = useParams();
+  const [viewCount, setViewCount] = useState<number | null>(null);
+  
+  // Track view on mount
+  useEffect(() => {
+    if (slug && !["bien-mixer-une-voix", "10-techniques-sound-design"].includes(slug)) {
+      trackBlogView(slug).then((count) => {
+        if (count) setViewCount(count);
+      });
+    }
+  }, [slug]);
   
   // Article content based on slug
   const getArticle = () => {
@@ -14,7 +27,6 @@ const BlogArticle = () => {
         date: "2024-12-20",
         readTime: "8 min",
         category: "Réalisations",
-        views: 342,
         content: (
           <div className="prose prose-lg max-w-none">
             <div className="mb-8">
@@ -131,42 +143,14 @@ const BlogArticle = () => {
       };
     }
 
-    if (slug === "bien-mixer-une-voix") {
-      const BienMixerUneVoix = require("./BlogArticles/BienMixerUneVoix").default;
-      return {
-        title: "Bien mixer une voix : les 7 étapes essentielles",
-        author: "Global Drip Studio",
-        date: "2024-12-15", 
-        readTime: "6 min",
-        category: "Mixage",
-        views: 198,
-        content: <BienMixerUneVoix />
-      };
-    }
-
     if (slug === "comprendre-la-compression") {
-      const ComprendreCompression = require("./BlogArticles/ComprendreCompression").default;
       return {
         title: "Comprendre la compression en 5 minutes",
         author: "Global Drip Studio",
         date: "2024-12-10",
         readTime: "5 min", 
         category: "Techniques",
-        views: 287,
         content: <ComprendreCompression />
-      };
-    }
-
-    if (slug === "10-techniques-sound-design") {
-      const TechniquesSoundDesign = require("./BlogArticles/TechniquesSoundDesign").default;
-      return {
-        title: "10 techniques de sound design pour créer des ambiances uniques",
-        author: "Global Drip Studio",
-        date: "2024-12-05",
-        readTime: "9 min",
-        category: "Sound Design",
-        views: 156,
-        content: <TechniquesSoundDesign />
       };
     }
     
@@ -230,10 +214,10 @@ const BlogArticle = () => {
               <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
                 {article.category}
               </span>
-              {article.views && (
+              {viewCount && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
                   <Eye className="w-3 h-3" />
-                  {article.views} vues
+                  {viewCount} vues
                 </span>
               )}
             </div>
