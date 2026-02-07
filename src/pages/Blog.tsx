@@ -1,10 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, Eye, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, User, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useBlogViews } from "@/hooks/useBlogViews";
 
 const Blog = () => {
+  const { views, isLoading } = useBlogViews();
+
   const posts = [
     {
       id: 1,
@@ -16,7 +19,6 @@ const Blog = () => {
       category: "Réalisations",
       image: "/lovable-uploads/venin-album-cover.jpg",
       slug: "venin-le-premier-sang",
-      views: 342,
       comingSoon: false
     },
     {
@@ -29,7 +31,6 @@ const Blog = () => {
       category: "Techniques",
       image: "/lovable-uploads/Image-23.jpg",
       slug: "comprendre-la-compression",
-      views: 287,
       comingSoon: false
     },
     {
@@ -42,7 +43,6 @@ const Blog = () => {
       category: "Mixage",
       image: "/lovable-uploads/_edited.jpg.png",
       slug: "bien-mixer-une-voix",
-      views: 198,
       comingSoon: true
     },
     {
@@ -55,7 +55,6 @@ const Blog = () => {
       category: "Sound Design",
       image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
       slug: "10-techniques-sound-design",
-      views: 156,
       comingSoon: true
     }
   ];
@@ -117,18 +116,20 @@ const Blog = () => {
                       {post.category}
                     </Badge>
                   </div>
-                  {/* View counter */}
-                  <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-muted-foreground">
-                    <Eye className="w-3 h-3" />
-                    <span>{post.views}</span>
-                  </div>
+                  {/* View counter - only for available articles */}
+                  {!post.comingSoon && (
+                    <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-muted-foreground">
+                      <Eye className="w-3 h-3" />
+                      <span>{isLoading ? "..." : (views[post.slug] || 100)}</span>
+                    </div>
+                  )}
                 </div>
                 
                 <CardHeader className="flex-grow">
                   <CardTitle className="text-base sm:text-lg leading-snug group-hover:text-primary transition-colors">
                     {post.title}
                   </CardTitle>
-                  <p className="text-muted-foreground text-sm line-clamp-3">
+                  <p className="text-muted-foreground text-sm">
                     {post.excerpt}
                   </p>
                 </CardHeader>

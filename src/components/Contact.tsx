@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,14 +11,35 @@ import {
   Clock, 
   Send,
   MessageSquare,
-  Loader2
+  Loader2,
+  Paperclip,
+  X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/mp3",
+  "audio/x-wav",
+  "audio/aac",
+  "audio/flac",
+  "audio/ogg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "application/zip",
+  "application/x-zip-compressed"
+];
+
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [highlightPhone, setHighlightPhone] = useState(false);
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -43,6 +64,38 @@ const Contact = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "Fichier trop volumineux",
+        description: "La taille maximale est de 10 Mo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({
+        title: "Type de fichier non supporté",
+        description: "Formats acceptés : PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAttachment(file);
+  };
+
+  const removeAttachment = () => {
+    setAttachment(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,8 +125,38 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      let attachmentUrl: string | null = null;
+      let attachmentName: string | null = null;
+
+      // Upload attachment if present
+      if (attachment) {
+        const fileExt = attachment.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('contact-attachments')
+          .upload(fileName, attachment);
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw new Error("Erreur lors de l'upload du fichier");
+        }
+
+        // Get signed URL for the attachment (valid for 7 days)
+        const { data: signedData } = await supabase.storage
+          .from('contact-attachments')
+          .createSignedUrl(fileName, 60 * 60 * 24 * 7);
+
+        attachmentUrl = signedData?.signedUrl || null;
+        attachmentName = attachment.name;
+      }
+
       const { data, error } = await supabase.functions.invoke('send-contact-email', {
-        body: formData
+        body: {
+          ...formData,
+          attachmentUrl,
+          attachmentName
+        }
       });
 
       if (error) throw error;
@@ -92,6 +175,10 @@ const Contact = () => {
         service: "",
         message: ""
       });
+      setAttachment(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error: any) {
       console.error("Error sending contact email:", error);
       toast({
@@ -216,6 +303,48 @@ const Contact = () => {
                     className="mt-2 min-h-[120px]"
                     required
                   />
+                </div>
+
+                {/* File Attachment */}
+                <div>
+                  <Label htmlFor="attachment">Pièce jointe (optionnel)</Label>
+                  <div className="mt-2">
+                    {attachment ? (
+                      <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                        <Paperclip className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm truncate flex-1">{attachment.name}</span>
+                        <span className="text-xs text-muted-foreground flex-shrink-0">
+                          ({(attachment.size / 1024 / 1024).toFixed(2)} Mo)
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 flex-shrink-0"
+                          onClick={removeAttachment}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          id="attachment"
+                          onChange={handleFileChange}
+                          accept=".pdf,.mp3,.wav,.flac,.aac,.ogg,.jpg,.jpeg,.png,.gif,.zip"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="flex items-center gap-2 p-3 border border-dashed border-border rounded-md hover:border-primary/50 transition-colors cursor-pointer">
+                          <Paperclip className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            PDF, audio, images, ZIP (max 10 Mo)
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <Button 

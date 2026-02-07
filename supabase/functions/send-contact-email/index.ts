@@ -39,6 +39,8 @@ interface ContactRequest {
   phone: string;
   service: string;
   message: string;
+  attachmentUrl?: string | null;
+  attachmentName?: string | null;
 }
 
 const serviceLabels: Record<string, string> = {
@@ -83,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { firstName, lastName, email, phone, service, message }: ContactRequest = await req.json();
+    const { firstName, lastName, email, phone, service, message, attachmentUrl, attachmentName }: ContactRequest = await req.json();
 
     // Validate required fields
     if (!firstName || !lastName || !email || !message) {
@@ -146,8 +148,17 @@ const handler = async (req: Request): Promise<Response> => {
     const safeEmail = escapeHtml(email.trim());
     const safePhone = escapeHtml((phone || "").trim());
     const safeMessage = escapeHtml(message.trim());
+    const safeAttachmentName = attachmentName ? escapeHtml(attachmentName) : null;
 
     const serviceLabel = serviceLabels[service] || escapeHtml(service || "Non spécifié");
+
+    // Build attachment section if present
+    const attachmentSection = attachmentUrl && safeAttachmentName ? `
+      <div class="field">
+        <div class="label">📎 Pièce jointe</div>
+        <div class="value"><a href="${attachmentUrl}" target="_blank" rel="noopener noreferrer">${safeAttachmentName}</a></div>
+      </div>
+    ` : '';
 
     // Send email to studio
     const emailResponse = await resend.emails.send({
@@ -197,6 +208,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <div class="label">💬 Message</div>
                 <div class="message-box">${safeMessage.replace(/\n/g, "<br>")}</div>
               </div>
+              ${attachmentSection}
             </div>
             <div class="footer">
               Envoyé depuis le formulaire de contact Global Drip Studio
