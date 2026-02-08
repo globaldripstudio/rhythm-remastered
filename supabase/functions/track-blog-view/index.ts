@@ -64,10 +64,10 @@ serve(async (req: Request): Promise<Response> => {
       }
       newCount = updatedView.view_count;
     } else {
-      // Create new entry starting at 101 (100 base + 1 view)
+      // Create new entry starting at 1 (honest metrics)
       const { data: newView, error: insertError } = await supabase
         .from("blog_views")
-        .insert({ slug: safeSlug, view_count: 101 })
+        .insert({ slug: safeSlug, view_count: 1 })
         .select("view_count")
         .single();
 
