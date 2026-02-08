@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -14,6 +15,23 @@ const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMIT_MAX = 3; // Max 3 contact requests per hour
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/mp3",
+  "audio/x-wav",
+  "audio/aac",
+  "audio/flac",
+  "audio/ogg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "application/zip",
+  "application/x-zip-compressed"
+];
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -39,8 +57,9 @@ interface ContactRequest {
   phone: string;
   service: string;
   message: string;
-  attachmentUrl?: string | null;
+  attachmentData?: string | null; // Base64 encoded file data
   attachmentName?: string | null;
+  attachmentType?: string | null;
 }
 
 const serviceLabels: Record<string, string> = {
@@ -73,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
                      req.headers.get("cf-connecting-ip") || 
                      "unknown";
     
-    // Check rate limit
+    // Check rate limit BEFORE processing any data (including file uploads)
     if (isRateLimited(clientIp)) {
       console.log(`Rate limit exceeded for contact form from IP: ${clientIp}`);
       return new Response(
@@ -85,7 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { firstName, lastName, email, phone, service, message, attachmentUrl, attachmentName }: ContactRequest = await req.json();
+    const { firstName, lastName, email, phone, service, message, attachmentData, attachmentName, attachmentType }: ContactRequest = await req.json();
 
     // Validate required fields
     if (!firstName || !lastName || !email || !message) {
@@ -133,6 +152,77 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Process attachment if present (server-side upload with rate limiting protection)
+    let attachmentUrl: string | null = null;
+    let safeAttachmentName: string | null = null;
+
+    if (attachmentData && attachmentName && attachmentType) {
+      // Validate file type
+      if (!ALLOWED_TYPES.includes(attachmentType)) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Type de fichier non supporté" }),
+          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // Decode base64 and validate size
+      const binaryData = Uint8Array.from(atob(attachmentData), c => c.charCodeAt(0));
+      
+      if (binaryData.length > MAX_FILE_SIZE) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Fichier trop volumineux (max 10 Mo)" }),
+          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // Create Supabase admin client for storage upload
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+      if (!supabaseUrl || !supabaseServiceKey) {
+        console.error("Missing Supabase configuration for storage");
+        return new Response(
+          JSON.stringify({ success: false, error: "Configuration serveur manquante" }),
+          { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+      // Generate unique filename
+      const fileExt = attachmentName.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      // Upload file server-side
+      const { error: uploadError } = await supabaseAdmin.storage
+        .from('contact-attachments')
+        .upload(fileName, binaryData, {
+          contentType: attachmentType,
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        return new Response(
+          JSON.stringify({ success: false, error: "Erreur lors de l'upload du fichier" }),
+          { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // Generate signed URL (valid for 7 days)
+      const { data: signedData, error: signedError } = await supabaseAdmin.storage
+        .from('contact-attachments')
+        .createSignedUrl(fileName, 60 * 60 * 24 * 7);
+
+      if (signedError) {
+        console.error("Signed URL error:", signedError);
+      } else {
+        attachmentUrl = signedData?.signedUrl || null;
+      }
+
+      safeAttachmentName = attachmentName;
+    }
+
     // Sanitize inputs for HTML email (escape HTML entities)
     const escapeHtml = (str: string): string => {
       return str
@@ -148,15 +238,15 @@ const handler = async (req: Request): Promise<Response> => {
     const safeEmail = escapeHtml(email.trim());
     const safePhone = escapeHtml((phone || "").trim());
     const safeMessage = escapeHtml(message.trim());
-    const safeAttachmentName = attachmentName ? escapeHtml(attachmentName) : null;
+    const escapedAttachmentName = safeAttachmentName ? escapeHtml(safeAttachmentName) : null;
 
     const serviceLabel = serviceLabels[service] || escapeHtml(service || "Non spécifié");
 
     // Build attachment section if present
-    const attachmentSection = attachmentUrl && safeAttachmentName ? `
+    const attachmentSection = attachmentUrl && escapedAttachmentName ? `
       <div class="field">
         <div class="label">📎 Pièce jointe</div>
-        <div class="value"><a href="${attachmentUrl}" target="_blank" rel="noopener noreferrer">${safeAttachmentName}</a></div>
+        <div class="value"><a href="${attachmentUrl}" target="_blank" rel="noopener noreferrer">${escapedAttachmentName}</a></div>
       </div>
     ` : '';
 
