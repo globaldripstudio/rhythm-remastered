@@ -4,20 +4,21 @@ import { ArrowLeft, Calendar, Clock, User, Eye } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { trackBlogView } from "@/hooks/useBlogViews";
 import ComprendreCompression from "./BlogArticles/ComprendreCompression";
-
 const BlogArticle = () => {
-  const { slug } = useParams();
+  const {
+    slug
+  } = useParams();
   const [viewCount, setViewCount] = useState<number | null>(null);
-  
+
   // Track view on mount
   useEffect(() => {
     if (slug && !["bien-mixer-une-voix", "10-techniques-sound-design"].includes(slug)) {
-      trackBlogView(slug).then((count) => {
+      trackBlogView(slug).then(count => {
         if (count) setViewCount(count);
       });
     }
   }, [slug]);
-  
+
   // Article content based on slug
   const getArticle = () => {
     if (slug === "venin-le-premier-sang") {
@@ -27,14 +28,9 @@ const BlogArticle = () => {
         date: "2024-12-20",
         readTime: "8 min",
         category: "Réalisations",
-        content: (
-          <div className="prose prose-lg max-w-none">
+        content: <div className="prose prose-lg max-w-none">
             <div className="mb-8">
-              <img 
-                src="/lovable-uploads/venin-album-cover.jpg"
-                alt="Album Le Premier Sang de Venin"
-                className="w-full max-w-none h-auto rounded-lg"
-              />
+              <img src="/lovable-uploads/venin-album-cover.jpg" alt="Album Le Premier Sang de Venin" className="w-full max-w-none h-auto rounded-lg" />
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
                 Le double vinyl de l'album "Le Premier Sang" est disponible sur Bandcamp.
               </p>
@@ -82,11 +78,7 @@ const BlogArticle = () => {
             </ul>
 
             <div className="mb-8">
-              <img 
-                src="/lovable-uploads/jean-marc-battini.jpg"
-                alt="Jean-Marc Battini en concert"
-                className="w-full max-w-none h-auto rounded-lg"
-              />
+              <img src="/lovable-uploads/jean-marc-battini.jpg" alt="Jean-Marc Battini en concert" className="w-full max-w-none h-auto rounded-lg" />
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
                 Jean-Marc Battini, fondateur de Venin
               </p>
@@ -118,74 +110,53 @@ const BlogArticle = () => {
             </p>
 
             <div className="mb-8">
-              <img 
-                src="/lovable-uploads/venin-logo.jpg"
-                alt="Logo du groupe Venin"
-                className="w-full max-w-none h-auto rounded-lg bg-black"
-              />
+              <img src="/lovable-uploads/venin-logo.jpg" alt="Logo du groupe Venin" className="w-full max-w-none h-auto rounded-lg bg-black" />
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
                 L'emblématique logo du groupe Venin
               </p>
             </div>
 
             <div className="mb-8">
-              <img 
-                src="/lovable-uploads/460172525_1040830691386194_6418285011960484228_n.jpg"
-                alt="Venin en studio"
-                className="w-full max-w-none h-auto rounded-lg"
-              />
+              
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
-                Le groupe Venin en session d'enregistrement
-              </p>
+            </p>
             </div>
           </div>
-        )
       };
     }
-
     if (slug === "comprendre-la-compression") {
       return {
         title: "Comprendre la compression en 5 minutes",
         author: "Global Drip Studio",
         date: "2024-12-10",
-        readTime: "5 min", 
+        readTime: "5 min",
         category: "Techniques",
         content: <ComprendreCompression />
       };
     }
-    
+
     // Default article not found
     return null;
   };
-
   const article = getArticle();
-
   if (!article) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Article non trouvé</h1>
           <Link to="/blog">
             <Button>Retourner au blog</Button>
           </Link>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header - matching other pages */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
               <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
-                <img 
-                  src="/lovable-uploads/logo-blanc-sans-fond.png"
-                  alt="Global Drip Studio"
-                  className="h-6 sm:h-8 object-contain"
-                />
+                <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
               </Link>
               <Link to="/">
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
@@ -214,12 +185,10 @@ const BlogArticle = () => {
               <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
                 {article.category}
               </span>
-              {viewCount && (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+              {viewCount && <span className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
                   <Eye className="w-3 h-3" />
                   {viewCount} vues
-                </span>
-              )}
+                </span>}
             </div>
             
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
@@ -248,8 +217,6 @@ const BlogArticle = () => {
           </div>
         </div>
       </article>
-    </div>
-  );
+    </div>;
 };
-
 export default BlogArticle;
