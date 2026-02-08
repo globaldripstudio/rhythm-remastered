@@ -4,15 +4,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Zap, Phone, Mail, MapPin, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 const ComprendreCompression = () => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
-
   useEffect(() => {
     document.title = "Comprendre la compression en 5 minutes | Global Drip Studio";
     const meta = document.querySelector('meta[name="description"]');
@@ -25,37 +19,10 @@ const ComprendreCompression = () => {
       meta.setAttribute('content', "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio professionnel.");
     }
   }, []);
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header - matching other blog articles */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 sm:gap-6">
-              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
-                <img 
-                  src="/lovable-uploads/logo-blanc-sans-fond.png"
-                  alt="Global Drip Studio"
-                  className="h-6 sm:h-8 object-contain"
-                />
-              </Link>
-              <Link to="/">
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                  <span className="hidden sm:inline">← Retour à l'accueil</span>
-                  <span className="sm:hidden">← Accueil</span>
-                </Button>
-              </Link>
-            </div>
-            <Link to="/blog">
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Retour au blog</span>
-                <span className="sm:hidden">Blog</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
+        
       </header>
 
       {/* Article */}
@@ -82,11 +49,7 @@ const ComprendreCompression = () => {
 
           {/* Featured Image */}
           <div className="mb-8 sm:mb-12 rounded-2xl overflow-hidden">
-            <img 
-              src="/lovable-uploads/Image-23.jpg"
-              alt="Compresseur audio professionnel"
-              className="w-full h-48 sm:h-64 md:h-96 object-cover"
-            />
+            <img src="/lovable-uploads/Image-23.jpg" alt="Compresseur audio professionnel" className="w-full h-48 sm:h-64 md:h-96 object-cover" />
           </div>
 
           {/* Content */}
@@ -198,10 +161,7 @@ const ComprendreCompression = () => {
               <p className="text-muted-foreground mb-6">
                 Si vous voulez aller plus vite et plus loin, le plus efficace reste de travailler sur de la matière réelle, dans un environnement de studio, avec une écoute fiable et des décisions assumées. Pour une session d'enregistrement, un mixage ou un mastering, vous pouvez réserver ou me contacter directement.
               </p>
-              <Button 
-                className="studio-button"
-                onClick={() => setContactModalOpen(true)}
-              >
+              <Button className="studio-button" onClick={() => setContactModalOpen(true)}>
                 Demande de réservation
               </Button>
             </div>
@@ -213,21 +173,13 @@ const ComprendreCompression = () => {
       <Dialog open={contactModalOpen} onOpenChange={setContactModalOpen}>
         <DialogContent className="max-w-lg p-0 overflow-visible bg-card border-border">
           <DialogTitle className="sr-only">Demande de réservation</DialogTitle>
-          <button
-            onClick={() => setContactModalOpen(false)}
-            className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-[60] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
-            aria-label="Fermer"
-          >
+          <button onClick={() => setContactModalOpen(false)} className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-[60] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors" aria-label="Fermer">
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           <div className="p-6 sm:p-8">
             <div className="text-center mb-6">
-              <img 
-                src="/lovable-uploads/logo-blanc-sans-fond.png"
-                alt="Global Drip Studio"
-                className="h-10 sm:h-12 mx-auto mb-4"
-              />
+              <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-10 sm:h-12 mx-auto mb-4" />
               <h3 className="text-xl sm:text-2xl font-bold mb-2">Global Drip Studio</h3>
               <p className="text-sm sm:text-base text-muted-foreground italic">
                 Passion audio & Innovation constante
@@ -237,20 +189,14 @@ const ComprendreCompression = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
                 <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                <a 
-                  href="tel:+33659797342" 
-                  className="text-sm sm:text-base hover:text-primary transition-colors"
-                >
+                <a href="tel:+33659797342" className="text-sm sm:text-base hover:text-primary transition-colors">
                   +33 6 59 79 73 42
                 </a>
               </div>
 
               <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
                 <Mail className="w-5 h-5 text-primary flex-shrink-0" />
-                <a 
-                  href="mailto:globaldripstudio@gmail.com" 
-                  className="text-sm sm:text-base hover:text-primary transition-colors break-all"
-                >
+                <a href="mailto:globaldripstudio@gmail.com" className="text-sm sm:text-base hover:text-primary transition-colors break-all">
                   globaldripstudio@gmail.com
                 </a>
               </div>
@@ -273,8 +219,6 @@ const ComprendreCompression = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default ComprendreCompression;
