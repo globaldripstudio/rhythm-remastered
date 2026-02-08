@@ -49,7 +49,17 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               <span>+33 6 59 79 73 42</span>
             </div>
-            <Button variant="default" className="studio-button" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
+            <Button variant="default" className="studio-button" onClick={() => {
+              const contactSection = document.getElementById('contact');
+              if (contactSection) {
+                const yOffset = -100;
+                const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+                setTimeout(() => {
+                  window.dispatchEvent(new CustomEvent('highlight-phone'));
+                }, 800);
+              }
+            }}>
               Réserver
             </Button>
           </div>
@@ -88,7 +98,18 @@ const Header = () => {
                   <Phone className="w-4 h-4" />
                   <span>+33 6 59 79 73 42</span>
                 </div>
-                <Button variant="default" className="studio-button w-full" onClick={() => { toggleMenu(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                <Button variant="default" className="studio-button w-full" onClick={() => { 
+                  toggleMenu(); 
+                  const contactSection = document.getElementById('contact');
+                  if (contactSection) {
+                    const yOffset = -100;
+                    const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                    setTimeout(() => {
+                      window.dispatchEvent(new CustomEvent('highlight-phone'));
+                    }, 800);
+                  }
+                }}>
                   Réserver
                 </Button>
               </div>

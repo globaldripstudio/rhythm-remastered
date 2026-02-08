@@ -135,7 +135,7 @@ const ClientsList = () => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl">Clients</CardTitle>
-          <Button onClick={() => handleOpenDialog()} className="studio-button">
+          <Button onClick={() => handleOpenDialog()} className="studio-button" data-add-client>
             <Plus className="w-4 h-4 mr-2" />
             Ajouter
           </Button>
