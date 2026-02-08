@@ -35,6 +35,21 @@ const ALLOWED_TYPES = [
   "application/x-zip-compressed"
 ];
 
+// Convert file to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = error => reject(error);
+  });
+};
+
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [highlightPhone, setHighlightPhone] = useState(false);
@@ -125,37 +140,24 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      let attachmentUrl: string | null = null;
+      // Prepare attachment data (send to server for secure upload)
+      let attachmentData: string | null = null;
       let attachmentName: string | null = null;
+      let attachmentType: string | null = null;
 
-      // Upload attachment if present
       if (attachment) {
-        const fileExt = attachment.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('contact-attachments')
-          .upload(fileName, attachment);
-
-        if (uploadError) {
-          console.error("Upload error:", uploadError);
-          throw new Error("Erreur lors de l'upload du fichier");
-        }
-
-        // Get signed URL for the attachment (valid for 7 days)
-        const { data: signedData } = await supabase.storage
-          .from('contact-attachments')
-          .createSignedUrl(fileName, 60 * 60 * 24 * 7);
-
-        attachmentUrl = signedData?.signedUrl || null;
+        attachmentData = await fileToBase64(attachment);
         attachmentName = attachment.name;
+        attachmentType = attachment.type;
       }
 
+      // Send everything to the edge function (file upload happens server-side with rate limiting)
       const { data, error } = await supabase.functions.invoke('send-contact-email', {
         body: {
           ...formData,
-          attachmentUrl,
-          attachmentName
+          attachmentData,
+          attachmentName,
+          attachmentType
         }
       });
 
