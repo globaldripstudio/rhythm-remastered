@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   LogOut, Calendar, Users, Home, BarChart3, CreditCard, 
-  LayoutDashboard, Settings, Bell, ChevronDown
+  LayoutDashboard, Bell, ChevronDown, Globe
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -23,16 +23,14 @@ import TodayOverview from './TodayOverview';
 import ActivityFeed from './ActivityFeed';
 import PerformanceMetrics from './PerformanceMetrics';
 import QuickActions from './QuickActions';
+import SiteAnalytics from './SiteAnalytics';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const clientsRef = useRef<{ openAddDialog?: () => void }>({});
-  const agendaRef = useRef<{ openAddDialog?: () => void }>({});
 
   const handleAddClient = () => {
     setActiveTab('clients');
-    // Small delay to ensure tab is rendered
     setTimeout(() => {
       const addButton = document.querySelector('[data-add-client]') as HTMLButtonElement;
       if (addButton) addButton.click();
@@ -50,11 +48,7 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img 
-                src="/lovable-uploads/logo-blanc-sans-fond.png" 
-                alt="Global Drip Studio" 
-                className="h-10"
-              />
+              <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-10" />
               <div className="hidden sm:block">
                 <span className="font-semibold text-lg">Dashboard</span>
                 <span className="text-xs text-muted-foreground block">Centre de pilotage</span>
@@ -63,11 +57,9 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            {/* Notification placeholder */}
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5" />
             </Button>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-2">
@@ -76,9 +68,7 @@ const Dashboard = () => {
                       {user?.email?.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="hidden md:inline text-sm max-w-[150px] truncate">
-                    {user?.email}
-                  </span>
+                  <span className="hidden md:inline text-sm max-w-[150px] truncate">{user?.email}</span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -105,16 +95,16 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-6 mb-6 h-auto p-1">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <LayoutDashboard className="w-4 h-4" />
               <span className="hidden sm:inline">Vue d'ensemble</span>
               <span className="sm:hidden">Accueil</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2 py-3">
-              <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Statistiques</span>
-              <span className="sm:hidden">Stats</span>
+            <TabsTrigger value="site-analytics" className="flex items-center gap-2 py-3">
+              <Globe className="w-4 h-4" />
+              <span className="hidden sm:inline">Site</span>
+              <span className="sm:hidden">Site</span>
             </TabsTrigger>
             <TabsTrigger value="stripe" className="flex items-center gap-2 py-3">
               <CreditCard className="w-4 h-4" />
@@ -131,48 +121,44 @@ const Dashboard = () => {
               <span className="hidden sm:inline">Clients</span>
               <span className="sm:hidden">CRM</span>
             </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2 py-3">
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Stats CRM</span>
+              <span className="sm:hidden">Stats</span>
+            </TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab - Command Center */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Today + Actions */}
               <div className="space-y-6">
                 <TodayOverview />
-                <QuickActions 
-                  onAddClient={handleAddClient}
-                  onAddEvent={handleAddEvent}
-                />
+                <QuickActions onAddClient={handleAddClient} onAddEvent={handleAddEvent} />
               </div>
-
-              {/* Middle Column - Activity */}
               <div className="space-y-6">
                 <ActivityFeed />
               </div>
-
-              {/* Right Column - Performance */}
               <div className="space-y-6">
                 <PerformanceMetrics />
               </div>
             </div>
           </TabsContent>
 
-          {/* Analytics Tab */}
+          <TabsContent value="site-analytics">
+            <SiteAnalytics />
+          </TabsContent>
+
           <TabsContent value="analytics">
             <CRMAnalytics />
           </TabsContent>
 
-          {/* Stripe Tab */}
           <TabsContent value="stripe">
             <StripeAnalytics />
           </TabsContent>
 
-          {/* Calendar Tab */}
           <TabsContent value="calendar">
             <WeeklyAgenda />
           </TabsContent>
 
-          {/* Clients Tab */}
           <TabsContent value="clients">
             <ClientsList />
           </TabsContent>

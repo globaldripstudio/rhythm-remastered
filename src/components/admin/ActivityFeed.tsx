@@ -8,7 +8,7 @@ import {
   Activity, Calendar, Users, Clock, 
   CheckCircle2, PlusCircle, Edit3
 } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface ActivityItem {
@@ -17,6 +17,7 @@ interface ActivityItem {
   action: 'created' | 'updated';
   name: string;
   timestamp: string;
+  eventDate?: string;
 }
 
 const ActivityFeed = () => {
@@ -43,7 +44,7 @@ const ActivityFeed = () => {
     // Fetch recent events
     const { data: events } = await supabase
       .from('events')
-      .select('id, title, created_at, updated_at')
+      .select('id, title, start_time, created_at, updated_at')
       .order('updated_at', { ascending: false })
       .limit(10);
 
@@ -67,7 +68,8 @@ const ActivityFeed = () => {
         type: 'event',
         action: isUpdated ? 'updated' : 'created',
         name: event.title,
-        timestamp: isUpdated ? event.updated_at : event.created_at
+        timestamp: isUpdated ? event.updated_at : event.created_at,
+        eventDate: event.start_time
       });
     });
 
@@ -151,7 +153,10 @@ const ActivityFeed = () => {
                       </span>
                       <span className="text-xs text-muted-foreground">•</span>
                       <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true, locale: fr })}
+                        {activity.eventDate 
+                          ? format(new Date(activity.eventDate), 'dd MMM yyyy à HH:mm', { locale: fr })
+                          : format(new Date(activity.timestamp), 'dd MMM yyyy', { locale: fr })
+                        }
                       </span>
                     </div>
                   </div>
