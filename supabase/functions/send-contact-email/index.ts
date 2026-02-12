@@ -18,19 +18,9 @@ const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const ALLOWED_TYPES = [
-  "application/pdf",
-  "audio/mpeg",
-  "audio/wav",
-  "audio/mp3",
-  "audio/x-wav",
-  "audio/aac",
-  "audio/flac",
-  "audio/ogg",
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "application/zip",
-  "application/x-zip-compressed"
+  "application/pdf", "audio/mpeg", "audio/wav", "audio/mp3", "audio/x-wav",
+  "audio/aac", "audio/flac", "audio/ogg", "image/jpeg", "image/png",
+  "image/gif", "application/zip", "application/x-zip-compressed"
 ];
 
 function isRateLimited(ip: string): boolean {
@@ -152,7 +142,31 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Process attachment if present (server-side upload with rate limiting protection)
+    // Create Supabase admin client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Missing Supabase configuration");
+      return new Response(
+        JSON.stringify({ success: false, error: "Configuration serveur manquante" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Save contact lead to database
+    await supabaseAdmin.from('contact_leads').insert({
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      email: email.trim(),
+      phone: phone?.trim() || null,
+      service: service || null,
+      message: message.trim(),
+    });
+
+    // Process attachment if present
     let attachmentUrl: string | null = null;
     let safeAttachmentName: string | null = null;
 
@@ -175,31 +189,12 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
-      // Create Supabase admin client for storage upload
-      const supabaseUrl = Deno.env.get("SUPABASE_URL");
-      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-      if (!supabaseUrl || !supabaseServiceKey) {
-        console.error("Missing Supabase configuration for storage");
-        return new Response(
-          JSON.stringify({ success: false, error: "Configuration serveur manquante" }),
-          { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
-      }
-
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-
-      // Generate unique filename
       const fileExt = attachmentName.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      // Upload file server-side
       const { error: uploadError } = await supabaseAdmin.storage
         .from('contact-attachments')
-        .upload(fileName, binaryData, {
-          contentType: attachmentType,
-          upsert: false
-        });
+        .upload(fileName, binaryData, { contentType: attachmentType, upsert: false });
 
       if (uploadError) {
         console.error("Upload error:", uploadError);
@@ -209,17 +204,11 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
-      // Generate signed URL (valid for 7 days)
       const { data: signedData, error: signedError } = await supabaseAdmin.storage
         .from('contact-attachments')
         .createSignedUrl(fileName, 60 * 60 * 24 * 7);
 
-      if (signedError) {
-        console.error("Signed URL error:", signedError);
-      } else {
-        attachmentUrl = signedData?.signedUrl || null;
-      }
-
+      if (!signedError) attachmentUrl = signedData?.signedUrl || null;
       safeAttachmentName = attachmentName;
     }
 
@@ -251,7 +240,7 @@ const handler = async (req: Request): Promise<Response> => {
     ` : '';
 
     // Send email to studio
-    const emailResponse = await resend.emails.send({
+    await resend.emails.send({
       from: "Global Drip Studio <onboarding@resend.dev>",
       to: ["globaldripstudio@gmail.com"],
       replyTo: email,

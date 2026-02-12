@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, Edit, User, Mail, Phone, Search } from 'lucide-react';
+import { Plus, Trash2, Edit, User, Mail, Phone, Search, Download } from 'lucide-react';
+import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
 interface Client {
@@ -135,10 +136,29 @@ const ClientsList = () => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl">Clients</CardTitle>
-          <Button onClick={() => handleOpenDialog()} className="studio-button" data-add-client>
-            <Plus className="w-4 h-4 mr-2" />
-            Ajouter
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => {
+              const headers = ['Nom', 'Email', 'Téléphone', 'Notes', 'Date ajout'];
+              const rows = clients.map(c => [
+                c.name, c.email || '', c.phone || '', (c.notes || '').replace(/\n/g, ' '),
+                format(new Date(c.created_at), 'dd/MM/yyyy')
+              ]);
+              const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(','))].join('\n');
+              const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `clients-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}>
+              <Download className="w-4 h-4 mr-1" /> CSV
+            </Button>
+            <Button onClick={() => handleOpenDialog()} className="studio-button" data-add-client>
+              <Plus className="w-4 h-4 mr-2" />
+              Ajouter
+            </Button>
+          </div>
         </div>
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
