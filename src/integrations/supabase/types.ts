@@ -71,6 +71,39 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_leads: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          message: string | null
+          phone: string | null
+          service: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          message?: string | null
+          phone?: string | null
+          service?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          message?: string | null
+          phone?: string | null
+          service?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           color: string | null

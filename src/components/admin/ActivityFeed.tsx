@@ -73,10 +73,21 @@ const ActivityFeed = () => {
       });
     });
 
-    // Sort by timestamp
-    allActivities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    // Sort chronologically: closest future event first (to-do list style)
+    const now = new Date().getTime();
+    allActivities.sort((a, b) => {
+      const dateA = new Date(a.eventDate || a.timestamp).getTime();
+      const dateB = new Date(b.eventDate || b.timestamp).getTime();
+      // Future events first (closest), then past events (most recent)
+      const aIsFuture = dateA >= now;
+      const bIsFuture = dateB >= now;
+      if (aIsFuture && bIsFuture) return dateA - dateB; // closest future first
+      if (aIsFuture && !bIsFuture) return -1; // future before past
+      if (!aIsFuture && bIsFuture) return 1;
+      return dateB - dateA; // most recent past first
+    });
 
-    setActivities(allActivities.slice(0, 8));
+    setActivities(allActivities.slice(0, 12));
     setIsLoading(false);
   };
 
