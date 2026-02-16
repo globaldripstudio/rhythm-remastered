@@ -28,20 +28,52 @@ const servicesData = [
     deliverables: ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps", "Version streaming optimisée"]
   },
   {
-    id: "direction-artistique",
-    title: "Direction Artistique / Arrangement",
-    description: "Accompagnement artistique et arrangements musicaux sur mesure",
+    id: "mixage-mastering-express",
+    title: "Mixage + Mastering Express",
+    description: "Solution professionnelle full numérique pour les artistes travaillant sur instrumentales en .wav",
+    price: "120€",
+    icon: () => null,
+    image: "/lovable-uploads/Image-10.jpg",
+    featured: true,
+    category: "Production",
+    duration: "4 heures",
+    included: ["Mixage professionnel instru + multipistes voix", "Mastering full numérique", "2 révisions incluses", "Livraison formats HD (WAV, MP3)"],
+    process: "Analyse → Mixage → Mastering → Révisions → Livraison finale",
+    details: "Notre service express s'adresse principalement aux artistes travaillant sur des instrumentales. Offrez vous le luxe d'un mixage et mastering professionnel tout numérique à coût réduit.",
+    equipment: ["Apollo Quad Converters", "Plugins professionnels", "Monitoring Adam A77x"],
+    deliverables: ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps"]
+  },
+  {
+    id: "sound-design",
+    title: "Sound Design",
+    description: "Création sonore et design audio pour tous vos projets créatifs",
     price: "Sur devis",
     icon: () => null,
-    image: "/lovable-uploads/35c8540d-ce59-433e-87fd-f1b8b1527941.png",
-    featured: false,
-    category: "Conseil",
+    image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
+    featured: true,
+    category: "Création",
     duration: "Variable",
-    included: ["Direction artistique complète", "Arrangements instrumentaux", "Conseils créatifs personnalisés", "Suivi de projet personnalisable"],
-    process: "Analyse artistique → Conseil stratégique → Arrangements → Suivi → Optimisation",
-    details: "Accompagnement complet de votre projet artistique, de la conception à la réalisation, avec une expertise technique et créative.",
-    equipment: ["Direction artistique stratégique", "Réseau de musiciens et ingénieurs", "Références & benchmarks professionnels", "Méthodologies de production"],
-    deliverables: ["Plan artistique détaillé", "Arrangements finalisés", "Rapport de suivi"]
+    included: ["Sound design pour films et jeux", "Création d'ambiances sonores", "Effets sonores sur mesure", "Post-production audio avancée"],
+    process: "Brief créatif → Recherche sonore → Création → Synchronisation → Finalisation",
+    details: "Spécialisé dans la création d'univers sonores uniques, nous donnons vie à vos projets audiovisuels avec des sons originaux et des ambiances immersives.",
+    equipment: ["Banques de sons premium", "Synthétiseurs modulaires", "Microphones de terrain", "Logiciels spécialisés"],
+    deliverables: ["Effets sonores isolés", "Stems multitracks", "Mix final synchronisé"]
+  },
+  {
+    id: "composition",
+    title: "Composition / Beatmaking",
+    description: "Création musicale et production de beats personnalisés",
+    price: "A partir de 300€",
+    icon: () => null,
+    image: "/lovable-uploads/64615fd6-368c-466a-a669-f5140677e476.png",
+    featured: false,
+    category: "Création",
+    duration: "1-3 semaines",
+    included: ["Composition originale", "Production complète", "Arrangements personnalisés", "Composition Exclusive"],
+    process: "Brief artistique → Création → Arrangements → Production → Finalisation",
+    details: "De l'idée à la réalisation complète, nous créons des compositions originales adaptées à votre style et vos besoins artistiques.",
+    equipment: ["FL Studio", "VSTs", "Banques de sons Splice", "Instruments réels"],
+    deliverables: ["Composition complète", "Version concert (PBO)", "Multistems négociable"]
   }
 ];
 
