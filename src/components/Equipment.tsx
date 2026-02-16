@@ -39,7 +39,7 @@ const Equipment = () => {
       { name: "Sennheiser E906", type: "Dynamique guitare", status: "standard" },
       { name: "Melodynamic 75A", type: "Dynamique vintage", status: "vintage" },
       { name: "Shure CR80R", type: "Dynamique", status: "vintage" },
-      { name: "Griffon Microphones Fuzzyphone", type: "Micro créatif", status: "premium" },
+      { name: "Griffon Microphones Fuzzyphone", type: "Micro créatif", status: "creative" },
       { name: "Griffon Microphones Saturne (x2)", type: "Condensateur", status: "premium" },
       { name: "LOM Geofon", type: "Géophone contact", status: "creative" }
     ],
