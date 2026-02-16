@@ -172,9 +172,11 @@ const ComprendreCompression = () => {
               <p className="text-muted-foreground mb-6">
                 Si vous voulez aller plus vite et plus loin, le plus efficace reste de travailler sur de la matière réelle, dans un environnement de studio, avec une écoute fiable et des décisions assumées. Pour une session d'enregistrement, un mixage ou un mastering, vous pouvez réserver ou me contacter directement.
               </p>
-              <Button className="studio-button" onClick={() => setContactModalOpen(true)}>
-                Demande de réservation
-              </Button>
+              <div className="flex justify-center">
+                <Button className="studio-button" onClick={() => setContactModalOpen(true)}>
+                  Demande de réservation
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -221,17 +223,28 @@ const ComprendreCompression = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-border">
-              <Link to="/#contact" onClick={() => {
+              <button className="w-full" onClick={() => {
                 setContactModalOpen(false);
                 setTimeout(() => {
-                  navigate('/#contact');
-                  setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+                  navigate('/');
+                  setTimeout(() => {
+                    const contactSection = document.getElementById('contact');
+                    if (contactSection) {
+                      const formCard = contactSection.querySelector('.service-card');
+                      if (formCard) {
+                        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      } else {
+                        contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }
+                    setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+                  }, 500);
                 }, 100);
               }}>
                 <Button className="w-full studio-button">
                   Accéder au formulaire de contact
                 </Button>
-              </Link>
+              </button>
             </div>
           </div>
         </DialogContent>
