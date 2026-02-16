@@ -396,7 +396,10 @@ const Services = () => {
               <Button 
                 size="lg" 
                 className="studio-button text-sm sm:text-base"
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => {
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                  setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+                }}
               >
                 Demander un devis gratuit
               </Button>

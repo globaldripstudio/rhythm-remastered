@@ -371,7 +371,10 @@ const AudioComparison = () => {
             <Button 
               size="lg" 
               className="studio-button"
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+              }}
             >
               <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Réserver une session

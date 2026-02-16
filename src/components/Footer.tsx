@@ -2,10 +2,10 @@ import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 
 // Service IDs mapping for footer links
 const footerServices = [
-  { label: "Mixage Studio", id: "mixage-mastering" },
-  { label: "Mastering Hybride", id: "mixage-mastering" },
   { label: "Mixage + Mastering", id: "mixage-mastering" },
-  { label: "Projet sur mesure", id: "direction-artistique" },
+  { label: "Mixage + Mastering Express", id: "mixage-mastering-express" },
+  { label: "Sound Design", id: "sound-design" },
+  { label: "Composition / Beatmaking", id: "composition" },
 ];
 
 interface FooterProps {

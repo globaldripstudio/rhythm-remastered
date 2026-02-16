@@ -2,10 +2,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Zap, Phone, Mail, MapPin, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { SeuilDiagram, RatioDiagram, AttackReleaseKneeDiagram } from "@/components/blog/CompressionDiagrams";
 const ComprendreCompression = () => {
+  const navigate = useNavigate();
   const [contactModalOpen, setContactModalOpen] = useState(false);
   useEffect(() => {
     document.title = "Comprendre la compression en 5 minutes | Global Drip Studio";
@@ -80,6 +82,9 @@ const ComprendreCompression = () => {
               </CardContent>
             </Card>
 
+            {/* Seuil Diagram */}
+            <SeuilDiagram />
+
             <Card className="mb-8 bg-gradient-to-r from-secondary/10 to-secondary/5 border-secondary/20">
               <CardContent className="p-6 sm:p-8">
                 <h2 className="text-xl sm:text-2xl font-bold mb-4">Le ratio, la quantité de contrôle</h2>
@@ -91,6 +96,9 @@ const ComprendreCompression = () => {
                 </p>
               </CardContent>
             </Card>
+
+            {/* Ratio Diagram */}
+            <RatioDiagram />
 
             <Card className="mb-8 bg-gradient-to-r from-primary/10 to-secondary/10 border-border">
               <CardContent className="p-6 sm:p-8">
@@ -121,6 +129,9 @@ const ComprendreCompression = () => {
                 </p>
               </CardContent>
             </Card>
+
+            {/* Attack, Release & Knee Diagram */}
+            <AttackReleaseKneeDiagram />
 
             <Card className="mb-8 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
               <CardContent className="p-6 sm:p-8">
@@ -210,7 +221,13 @@ const ComprendreCompression = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-border">
-              <Link to="/#contact" onClick={() => setContactModalOpen(false)}>
+              <Link to="/#contact" onClick={() => {
+                setContactModalOpen(false);
+                setTimeout(() => {
+                  navigate('/#contact');
+                  setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+                }, 100);
+              }}>
                 <Button className="w-full studio-button">
                   Accéder au formulaire de contact
                 </Button>
