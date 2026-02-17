@@ -1,25 +1,19 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const MentionsLegales = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-6 py-24">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="mb-8"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour à l'accueil
-        </Button>
+      {/* Floating back button */}
+      <Link 
+        to="/"
+        className="fixed top-4 left-4 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all hover:scale-110"
+        aria-label="Retour à l'accueil"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </Link>
 
+      <main className="container mx-auto px-6 py-16 sm:py-20">
         <h1 className="text-4xl md:text-5xl font-bold mb-8">
           Mentions <span className="hero-text">Légales</span>
         </h1>
@@ -101,7 +95,6 @@ const MentionsLegales = () => {
           </section>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

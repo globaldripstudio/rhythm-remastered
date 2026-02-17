@@ -234,6 +234,48 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             </div>
           )}
 
+          {/* Stem Mastering Spotify Player */}
+          {service.id === "stem-mastering" && (service as any).spotifyEmbed && (
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemple de réalisation</h3>
+              <div className="bg-card rounded-lg p-2 border border-border/50">
+                <iframe 
+                  style={{ borderRadius: '12px' }}
+                  src={(service as any).spotifyEmbed}
+                  width="100%" 
+                  height="152" 
+                  frameBorder="0" 
+                  allowFullScreen
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Pack Single Spotify examples */}
+          {service.id === "pack-single" && (service as any).spotifyEmbeds && (
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">Singles réalisés dans le cadre de cette offre</h3>
+              <div className="space-y-3">
+                {((service as any).spotifyEmbeds as string[]).map((embedUrl: string, i: number) => (
+                  <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
+                    <iframe 
+                      style={{ borderRadius: '12px' }}
+                      src={embedUrl}
+                      width="100%" 
+                      height="152" 
+                      frameBorder="0" 
+                      allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* CTA */}
           <Card className="bg-gradient-hero border-primary/20">
             <CardContent className="p-4 sm:pt-6">
