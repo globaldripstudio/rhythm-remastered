@@ -132,7 +132,7 @@ const Partners = () => {
               <div className="space-y-4 mb-6">
                 {selectedPartner.videos.map((video, i) =>
               <div key={i}>
-                    <p className="text-sm font-medium mb-2">{video.title}</p>
+                    
                     <div className="rounded-lg overflow-hidden">
                       <iframe
                     width="100%"
