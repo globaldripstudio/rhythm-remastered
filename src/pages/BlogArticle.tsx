@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock, User, Eye } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { trackBlogView } from "@/hooks/useBlogViews";
 import ComprendreCompression from "./BlogArticles/ComprendreCompression";
 const BlogArticle = () => {
   const {
     slug
   } = useParams();
+  const navigate = useNavigate();
   const [viewCount, setViewCount] = useState<number | null>(null);
 
   // Track view on mount
@@ -117,9 +118,48 @@ const BlogArticle = () => {
             </div>
 
             <div className="mb-8">
-              
-              <p className="text-sm italic text-muted-foreground mt-2 text-center">
-            </p>
+              <h3 className="text-2xl font-bold mb-4">Écoutez <span className="hero-text">Le Premier Sang</span> sur Spotify, produit au Global Drip Studio</h3>
+              <div className="rounded-xl overflow-hidden">
+                <iframe 
+                  style={{ borderRadius: '12px' }}
+                  src="https://open.spotify.com/embed/album/6RSIzijNFeHFmv4vLWhxgL?utm_source=generator" 
+                  width="100%" 
+                  height="352" 
+                  frameBorder="0" 
+                  allowFullScreen
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            <div className="bg-gradient-hero rounded-2xl p-6 sm:p-8">
+              <h3 className="text-xl sm:text-2xl font-bold mb-4">Vous aussi, donnez vie à votre projet au studio</h3>
+              <p className="text-muted-foreground mb-6">
+                Enregistrement, mixage, mastering — contactez-nous pour discuter de votre projet et obtenir un devis personnalisé.
+              </p>
+              <div className="flex justify-center">
+                <Button 
+                  className="studio-button"
+                  onClick={() => {
+                    navigate('/');
+                    setTimeout(() => {
+                      const contactSection = document.getElementById('contact');
+                      if (contactSection) {
+                        const formCard = contactSection.querySelector('.service-card');
+                        if (formCard) {
+                          formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                          contactSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                      }
+                      setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+                    }, 500);
+                  }}
+                >
+                  Demander un devis
+                </Button>
+              </div>
             </div>
           </div>
       };
