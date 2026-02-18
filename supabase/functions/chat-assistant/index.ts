@@ -132,10 +132,10 @@ INFORMATIONS DU STUDIO:
    - Non inclus (mais possible): exports multiples, stems, versions alternatives, gros editing, nettoyage extrême
    - Exports supplémentaires: 40€/h (min 30 min)
 
-2. MIXAGE + MASTERING EXPRESS - 140€/titre
+2. MIX + MASTER ESSENTIEL - 140€/titre
    - Délai: 4 heures (sous réserve de créneau)
    - Solution professionnelle full numérique
-   - Pour artistes travaillant sur instrumentaux .wav
+   - Pour artistes travaillant sur instrumentaux .wav (prod + voix)
    - 2 révisions incluses
    - Livraison WAV + MP3
    - Mêmes mentions inclus/non inclus que le premium
@@ -151,10 +151,10 @@ INFORMATIONS DU STUDIO:
    - Mixage seul, hybride analogique/numérique, sans mastering
    - 3 révisions incluses
 
-5. CAPTATION SONORE / ENREGISTREMENT - 40€/h (bloc minimum 3h, soit 120€)
-   - Enregistrement voix et instruments
+5. CAPTATION SONORE / ENREGISTREMENT - 40€/h (bloc minimum 3h, soit 120€) ou 350€/jour
+   - Enregistrement voix et instruments en studio
+   - Captation événementielle / tournage extérieur au tarif journalier
    - Micro principal: Griffon Microphone T12 (clone AKG C12 made in Bédarieux, haute qualité)
-   - Captation événementielle sur devis
 
 6. SOUND DESIGN - Sur devis
    - Post-production vidéo
@@ -164,17 +164,21 @@ INFORMATIONS DU STUDIO:
 7. COMPOSITION / BEATMAKING - À partir de 300€
    - Création musicale sur mesure
    - Production instrumentale
+   - Composition exclusive (cession de droits négociable)
 
 8. DIRECTION ARTISTIQUE / ARRANGEMENT - Sur devis
-   - Accompagnement artistique complet
+   - Direction artistique sur mesure
+   - Réalisation et recherche de signature sonore
    - Arrangements instrumentaux
+   - Management personnalisable
 
-9. FORMATION MAO / MIXAGE - 39€/h
+9. FORMATION MAO / MIXAGE - 45€/h
    - Cours personnalisés
    - Coaching technique
+   - De la composition au mastering
 
 10. PACK "SINGLE" COMPLET - 690€/titre
-    - Inclut: production/beatmaking, session d'enregistrement (bloc 3h), editing, mix + master hybride, livraison WAV + MP3
+    - Inclut: production/beatmaking, direction artistique/réalisation, session d'enregistrement (bloc 3h), editing, réalisation, mix + master hybride, livraison WAV + MP3 + version concert (PBO)
     - Le pack tout-en-un pour sortir un single professionnel
 
 📚 E-BOOK "MANUEL D'OPÉRABILITÉ" - 59€

@@ -20,6 +20,7 @@ import ClientsList from './ClientsList';
 import CRMAnalytics from './CRMAnalytics';
 import StripeAnalytics from './StripeAnalytics';
 import TodayOverview from './TodayOverview';
+import UpcomingEvents from './UpcomingEvents';
 import ActivityFeed from './ActivityFeed';
 import PerformanceMetrics from './PerformanceMetrics';
 import QuickActions from './QuickActions';
@@ -135,6 +136,7 @@ const Dashboard = () => {
                 <QuickActions onAddClient={handleAddClient} onAddEvent={handleAddEvent} />
               </div>
               <div className="space-y-6">
+                <UpcomingEvents />
                 <ActivityFeed />
               </div>
               <div className="space-y-6">

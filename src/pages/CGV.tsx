@@ -1,17 +1,27 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const CGV = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* Floating back button */}
-      <Link 
-        to="/"
-        className="fixed top-4 left-4 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all hover:scale-110"
-        aria-label="Retour à l'accueil"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </Link>
+      {/* Header - matching Blog/Projets pages */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+              <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
+            </Link>
+            <Link to="/">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Retour à l'accueil</span>
+                <span className="sm:hidden">Accueil</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
 
       <main className="container mx-auto px-6 py-16 sm:py-20">
         <h1 className="text-4xl md:text-5xl font-bold mb-8">
@@ -35,7 +45,7 @@ const CGV = () => {
             <p className="text-muted-foreground mb-4">Le Studio propose notamment :</p>
             <ul className="text-muted-foreground space-y-2 list-disc pl-6">
               <li><strong className="text-foreground">Mixage audio :</strong> équilibrage, corrections tonales, dynamique, spatialisation, cohérence entre scènes.</li>
-              <li><strong className="text-foreground">Mixage + Mastering (Standard et Express) :</strong> optimisation du rendu final et préparation à la diffusion.</li>
+              <li><strong className="text-foreground">Mixage + Mastering (Standard et Essentiel) :</strong> optimisation du rendu final et préparation à la diffusion.</li>
               <li><strong className="text-foreground">Mastering hybride analogique/numérique :</strong> chaîne analogique/numérique selon le projet, respect des normes de diffusion.</li>
               <li><strong className="text-foreground">Sound design :</strong> création/édition d'effets, foley, textures, impacts, transitions, signature sonore.</li>
               <li><strong className="text-foreground">Enregistrement studio et captation terrain :</strong> prise de son voix/instruments/ambiances, direction de prise.</li>
@@ -81,7 +91,7 @@ const CGV = () => {
             <p className="text-muted-foreground mb-4">Délais indicatifs (sauf mention contraire au devis) :</p>
             <ul className="text-muted-foreground space-y-2 list-disc pl-6">
               <li><strong className="text-foreground">Mixage + Mastering Standard :</strong> 3 à 5 jours ouvrés.</li>
-              <li><strong className="text-foreground">Mixage + Mastering Express :</strong> 4 heures (sous réserve de créneau et d'assets conformes).</li>
+              <li><strong className="text-foreground">Mix + Master Essentiel :</strong> 4 heures (sous réserve de créneau et d'assets conformes).</li>
               <li><strong className="text-foreground">Sound design :</strong> selon complexité du projet.</li>
               <li><strong className="text-foreground">Autres prestations :</strong> délai indiqué au devis.</li>
             </ul>
@@ -95,7 +105,7 @@ const CGV = () => {
             <h2 className="text-2xl font-bold text-foreground mb-4">6. Révisions</h2>
             <ul className="text-muted-foreground space-y-2 list-disc pl-6">
               <li><strong className="text-foreground">Mixage + Mastering Standard :</strong> 3 révisions incluses.</li>
-              <li><strong className="text-foreground">Mixage + Mastering Express :</strong> 2 révisions incluses.</li>
+              <li><strong className="text-foreground">Mix + Master Essentiel :</strong> 2 révisions incluses.</li>
             </ul>
             <p className="text-muted-foreground mt-4">
               <strong className="text-foreground">Définition :</strong> une révision = ajustements ciblés (niveaux, EQ, dynamiques, transitions, balances, micro‑édits).

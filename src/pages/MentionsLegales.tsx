@@ -1,17 +1,27 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const MentionsLegales = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* Floating back button */}
-      <Link 
-        to="/"
-        className="fixed top-4 left-4 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all hover:scale-110"
-        aria-label="Retour à l'accueil"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </Link>
+      {/* Header - matching Blog/Projets pages */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+              <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
+            </Link>
+            <Link to="/">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Retour à l'accueil</span>
+                <span className="sm:hidden">Accueil</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
 
       <main className="container mx-auto px-6 py-16 sm:py-20">
         <h1 className="text-4xl md:text-5xl font-bold mb-8">

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw, Music, BookOpen, Speaker, Music2, Info } from "lucide-react";
+import { ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw, Music, BookOpen, Speaker, Music2 } from "lucide-react";
 import ServiceModal from "@/components/ServiceModal";
 
 // Service data for both cards and modals
@@ -24,23 +24,22 @@ export const servicesData = [
   "Mastering hybride analogique/numérique",
   "3 révisions incluses",
   "Livraison WAV + MP3"],
-
   antiMalentendu: true,
   process: "Analyse → Mixage → Mastering → Révisions → Livraison finale",
   details: "Notre service phare combine mixage professionnel et mastering de haute qualité. Nous utilisons une approche hybride combinant le meilleur de l'analogique et du numérique pour sublimer vos productions.",
-  equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "IGS S-Type 500vu", "Moniteurs Adam A77x & RP6 Rokit G3"],
+  equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "IGS S-Type 500vu", "General Audio Research VAULTEC EQP-2A3SS", "DBX 160a", "Moniteurs Adam A77x & RP6 Rokit G3", "Plugins professionnels", "etc."],
   deliverables: ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps", "Version streaming optimisée"]
 },
 {
   id: "mixage-mastering-express",
-  title: "Mixage + Mastering Express",
+  title: "Mix + Master Essentiel",
   description: "Solution professionnelle full numérique pour les artistes travaillant sur instrumentales en .wav",
   price: "140€",
   priceLabel: "/ titre",
   icon: Waves,
   image: "/lovable-uploads/Image-10.jpg",
   featured: true,
-  badgeText: "Express",
+  badgeText: "Essentiel",
   badgeColor: "bg-emerald-500",
   category: "Production",
   duration: "4 heures",
@@ -49,11 +48,10 @@ export const servicesData = [
   "Mastering full numérique",
   "2 révisions incluses",
   "Livraison WAV + MP3"],
-
   antiMalentendu: true,
   process: "Analyse → Mixage → Mastering → Révisions → Livraison finale",
-  details: "Notre service express s'adresse principalement aux artistes travaillant sur des instrumentales. Offrez vous le luxe d'un mixage et mastering professionnel tout numérique à coût réduit.",
-  equipment: ["Apollo Quad Converters", "Plugins professionnels", "Monitoring Adam A77x"],
+  details: "Notre service essentiel s'adresse principalement aux artistes travaillant sur des instrumentales. Offrez vous le luxe d'un mixage et mastering professionnel tout numérique à coût réduit.",
+  equipment: ["Apollo Quad Converters", "Plugins professionnels", "Monitoring Adam A77x", "etc."],
   deliverables: ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps"]
 },
 {
@@ -74,11 +72,10 @@ export const servicesData = [
   "Pour : 1 stem prod + 1 stem voix (déjà mixées)",
   "2 révisions incluses",
   "Livraison Master WAV + MP3"],
-
-  antiMalentendu: false,
+  antiMalentendu: true,
   process: "Réception stems → Mastering hybride → Révisions → Livraison finale",
   details: "Service de stem mastering idéal si vous avez déjà mixé vos pistes. Envoyez-nous un stem production et un stem voix, et nous nous occupons du mastering avec notre chaîne hybride analogique/numérique.",
-  equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "IGS S-Type 500vu", "Moniteurs Adam A77x & RP6 Rokit G3"],
+  equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "IGS S-Type 500vu", "Moniteurs Adam A77x & RP6 Rokit G3", "etc."],
   deliverables: ["Master WAV 24bit/96kHz", "Version MP3 320kbps"],
   spotifyEmbed: "https://open.spotify.com/embed/track/2XMFGOAU4ZH0SVX81DTvj4?utm_source=generator"
 },
@@ -100,11 +97,10 @@ export const servicesData = [
   "Équilibre, dynamique, espace, automation",
   "Cohérence globale du mix",
   "3 révisions incluses"],
-
   antiMalentendu: true,
   process: "Analyse → Mixage hybride → Révisions → Livraison",
   details: "Service de mixage seul, sans mastering. Idéal si vous avez déjà un ingénieur de mastering ou si vous souhaitez un mixage hybride de qualité professionnelle.",
-  equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "IGS S-Type 500vu", "Moniteurs Adam A77x & RP6 Rokit G3"],
+  equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "IGS S-Type 500vu", "Moniteurs Adam A77x & RP6 Rokit G3", "etc."],
   deliverables: ["Mix stéréo WAV 24bit", "Stems sur demande"]
 },
 {
@@ -114,6 +110,7 @@ export const servicesData = [
   price: "40€/h",
   priceLabel: "",
   priceExtra: "3h minimum",
+  priceDay: "350€/jour",
   icon: Mic,
   image: "/lovable-uploads/92466e48-6f78-46d4-bb9b-2bc8c6a50017.png",
   featured: false,
@@ -126,11 +123,10 @@ export const servicesData = [
   "Captation événementielle mobile",
   "Équipement haute qualité",
   "Post-production incluse"],
-
   antiMalentendu: false,
   process: "Préparation → Installation → Captation → Monitoring → Post-production",
-  details: "Service complet d'enregistrement en studio ou en extérieur. Bloc minimum de 3 heures (soit 120€). Nous nous adaptons à tous vos besoins avec un équipement mobile de qualité professionnelle.",
-  equipment: ["ProTools Ultimate", "Microphones Griffon", "Préamplis Neve et Unison", "Monitoring professionnel"],
+  details: "Service complet d'enregistrement en studio ou en extérieur. Bloc minimum de 3 heures (soit 120€). Nous nous adaptons à tous vos besoins avec un équipement de qualité professionnelle.",
+  equipment: ["ProTools Ultimate", "Microphones Griffon", "Préamplis Neve et Unison", "Monitoring professionnel", "etc."],
   deliverables: ["Pistes brutes multitrack", "Écoutes de travail", "Fichiers synchronisés"]
 },
 {
@@ -147,16 +143,16 @@ export const servicesData = [
   category: "Conseil",
   duration: "Variable",
   included: [
-  "Direction artistique complète",
+  "Direction artistique sur mesure",
   "Arrangements instrumentaux",
   "Conseils créatifs personnalisés",
-  "Suivi de projet personnalisable"],
-
+  "Management personnalisable"],
   antiMalentendu: false,
   process: "Analyse artistique → Conseil stratégique → Arrangements → Suivi → Optimisation",
   details: "Accompagnement complet de votre projet artistique, de la conception à la réalisation, avec une expertise technique et créative.",
-  equipment: ["Direction artistique stratégique", "Réseau de musiciens et ingénieurs", "Références & benchmarks professionnels", "Méthodologies de production"],
-  deliverables: ["Plan artistique détaillé", "Arrangements finalisés", "Rapport de suivi"]
+  equipmentLabel: "Méthodes",
+  equipment: ["Réalisation", "Recherche de signature sonore", "Réseau de musiciens et ingénieurs", "Références & benchmarks professionnels"],
+  deliverables: ["Plan artistique détaillé", "Arrangements finalisés"]
 },
 {
   id: "composition",
@@ -166,6 +162,7 @@ export const servicesData = [
   priceLabel: "",
   icon: Music2,
   image: "/lovable-uploads/64615fd6-368c-466a-a669-f5140677e476.png",
+  imagePosition: "object-[center_60%]",
   featured: false,
   badgeText: "",
   badgeColor: "",
@@ -175,13 +172,12 @@ export const servicesData = [
   "Composition originale",
   "Production complète",
   "Arrangements personnalisés",
-  "Composition Exclusive"],
-
+  "Composition Exclusive (cession de droits négociable)"],
   antiMalentendu: false,
   process: "Brief artistique → Création → Arrangements → Production → Finalisation",
   details: "De l'idée à la réalisation complète, nous créons des compositions originales adaptées à votre style et vos besoins artistiques.",
-  equipment: ["FL Studio", "VSTs", "Banques de sons Splice", "Instruments réels"],
-  deliverables: ["Composition complète", "Version concert (PBO)", "Multistems négociable"]
+  equipment: ["FL Studio", "VSTs", "Banques de sons Splice", "Instruments réels", "etc."],
+  deliverables: ["Composition complète", "Multistems négociable"]
 },
 {
   id: "sound-design",
@@ -201,18 +197,17 @@ export const servicesData = [
   "Création d'ambiances sonores",
   "Effets sonores sur mesure",
   "Post-production audio avancée"],
-
   antiMalentendu: false,
-  process: "Brief créatif → Recherche sonore → Création → Synchronisation → Finalisation",
+  process: "Brief créatif → Recherche sonore → Création → Synchronisation → Mixage global → Finalisation",
   details: "Spécialisé dans la création d'univers sonores uniques, nous donnons vie à vos projets audiovisuels avec des sons originaux et des ambiances immersives.",
-  equipment: ["Banques de sons premium", "Synthétiseurs modulaires", "Microphones de terrain", "Logiciels spécialisés"],
-  deliverables: ["Effets sonores isolés", "Stems multitracks", "Mix final synchronisé"]
+  equipment: ["Protools Perpetual", "Griffon Microphones Saturne", "LOM Geofon", "Synthétiseurs modulaires", "Banques de sons premium", "etc."],
+  deliverables: ["Effets sonores isolés", "Stems multitracks", "Mix final synchronisé", "Master aux normes du support demandé"]
 },
 {
   id: "formation",
   title: "Formation MAO / Mixage",
   description: "Formations personnalisées en production musicale et techniques de mixage",
-  price: "39€/h",
+  price: "45€/h",
   priceLabel: "",
   icon: BookOpen,
   image: "/lovable-uploads/6ed6bc90-04bb-4040-9e0b-26b3c13bba5d.png",
@@ -226,10 +221,9 @@ export const servicesData = [
   "Formation sur logiciels MAO",
   "Techniques de mixage avancées",
   "Support pédagogique inclus"],
-
   antiMalentendu: false,
   process: "Évaluation niveau → Programme personnalisé → Formation pratique → Suivi progression",
-  details: "Formation complète aux techniques de production musicale moderne. Apprenez les secrets du mixage et du mastering avec un professionnel expérimenté.",
+  details: "Formation complète aux techniques de production musicale moderne. Apprenez les secrets de la composition et du mixage, jusqu'au mastering avec un professionnel expérimenté.",
   equipment: ["Stations de travail dédiées", "Logiciels professionnels", "Supports de cours", "Exercices pratiques"],
   deliverables: ["Support de formation", "Projets d'exercice", "Fiches récapitulatives à chaque fin de séance"]
 },
@@ -241,35 +235,31 @@ export const servicesData = [
   priceLabel: "/ titre",
   icon: Music,
   image: "/lovable-uploads/Image-33.jpg",
-  featured: false,
+  featured: true,
   badgeText: "Pack complet",
-  badgeColor: "bg-primary",
+  badgeColor: "bg-gradient-to-r from-red-800 to-rose-600",
   category: "Pack",
   duration: "2-3 semaines",
   included: [
   "Production / Beatmaking",
+  "Direction artistique/Réalisation",
   "Session d'enregistrement (bloc 3h)",
   "Editing complet",
+  "Réalisation",
   "Mix + Master hybride",
   "Livraison WAV + MP3"],
-
   antiMalentendu: true,
-  process: "Composition → Enregistrement → Editing → Mixage → Mastering → Livraison",
-  details: "Le pack Single complet : de la production à la livraison finale. Inclut la composition du beat, une session d'enregistrement de 3h, l'editing, le mixage hybride et le mastering. Tout ce qu'il faut pour sortir un single professionnel.",
-  equipment: ["FL Studio", "Dangerous Music 2Bus+", "Apollo Quad Converters", "Griffon Microphones"],
-  deliverables: ["Single master WAV 24bit/96kHz", "Version MP3 320kbps"],
+  process: "Composition → Enregistrement → Editing → Réalisation → Mixage → Mastering → Livraison",
+  details: "Le pack Single complet : de la production à la livraison finale. Inclut la composition du beat, une session d'enregistrement de 3h, l'editing, la réalisation, le mixage hybride et le mastering. Tout ce qu'il faut pour sortir un single professionnel.",
+  equipment: ["FL Studio", "Protools Perpetual", "Dangerous Music 2Bus+", "Apollo Quad Converters", "Griffon Microphones", "Préamplis Neve & Unison", "Instruments réels", "VSTs premium", "etc."],
+  deliverables: ["Single master WAV 24bit/96kHz", "Version MP3 320kbps", "Version concert (PBO)"],
   spotifyEmbeds: [
   "https://open.spotify.com/embed/track/5bKc0p54jMp55SKrbHmymH?utm_source=generator",
   "https://open.spotify.com/embed/track/1jgiMQkxjzMOVbax5McyCr?utm_source=generator"]
-
 }];
 
 
 // Layout: 3 rows
-// Row 1: mixage-mastering | mixage-mastering-express | stem-mastering/mixage-hybride (switch)
-// Row 2: captation-sonore | direction-artistique | composition
-// Row 3: sound-design | formation | pack-single
-
 const row1Ids = ["mixage-mastering", "mixage-mastering-express"];
 const row2Ids = ["captation-sonore", "direction-artistique", "composition"];
 const row3Ids = ["sound-design", "formation", "pack-single"];
@@ -298,7 +288,7 @@ const Services = () => {
       <Card
         className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 min-h-[440px] sm:min-h-[480px] md:min-h-[520px] flex flex-col ${
         isMixMaster || isSoundDesign ? 'ring-2 ring-white/20 hover:ring-white/40' : ''} ${
-        isPackSingle ? 'ring-2 ring-primary/40 hover:ring-primary hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)]' : ''}`}
+        isPackSingle ? 'ring-2 ring-red-800/40 hover:ring-red-700 hover:shadow-[0_0_30px_rgba(153,27,27,0.3)]' : ''}`}
         onClick={() => handleOpenModal(service)}>
 
         {/* Service Image */}
@@ -307,6 +297,7 @@ const Services = () => {
             src={service.image}
             alt={service.title}
             className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
+            (service as any).imagePosition ? (service as any).imagePosition :
             service.id === 'captation-sonore' ? 'object-[center_25%]' :
             service.id === 'direction-artistique' ? 'object-bottom' :
             service.id === 'mixage-mastering' ? 'object-top' :
@@ -322,7 +313,7 @@ const Services = () => {
           </div>
           {/* Badge */}
           {service.badgeText &&
-          <div className={`absolute top-3 left-3 sm:top-4 sm:left-4 ${service.badgeColor || 'bg-primary'} text-primary-foreground px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-bold shadow-lg`}>
+          <div className={`absolute top-3 left-3 sm:top-4 sm:left-4 ${service.badgeColor || 'bg-primary'} text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-bold shadow-lg`}>
               {service.badgeText}
             </div>
           }
@@ -334,6 +325,7 @@ const Services = () => {
             <div className="text-right flex-shrink-0 ml-2">
               <div className="text-xl sm:text-2xl font-bold text-primary">{service.price}</div>
               {(service as any).priceLabel && <div className="text-xs text-muted-foreground">{(service as any).priceLabel}</div>}
+              {(service as any).priceDay && <div className="text-xs text-muted-foreground mt-0.5">{(service as any).priceDay}</div>}
               {(service as any).priceExtra &&
               <div className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full mt-1 font-medium">
                   {(service as any).priceExtra}
@@ -371,7 +363,10 @@ const Services = () => {
         </CardContent>
 
         {/* Glow Effect on Hover */}
-        <div className={`absolute inset-0 ${isPackSingle ? 'bg-primary' : 'bg-gradient-accent'} opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none`} />
+        <div className={`absolute inset-0 ${
+          isPackSingle ? 'bg-gradient-to-br from-red-800/20 to-rose-600/10' : 
+          'bg-gradient-accent'
+        } opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none`} />
       </Card>);
 
   };
@@ -431,20 +426,6 @@ const Services = () => {
             const service = servicesData.find((s) => s.id === id)!;
             return <div key={id} className="animate-fade-in" style={{ animationDelay: `${(index + 6) * 0.15}s` }}>{renderCard(service, index + 6)}</div>;
           })}
-        </div>
-
-        {/* Anti-malentendus note */}
-        <div className="max-w-3xl mx-auto mb-10 sm:mb-12 md:mb-16">
-          <div className="bg-card/50 border border-border rounded-xl p-4 sm:p-6">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-muted-foreground space-y-2">
-                <p><strong className="text-foreground">Inclus dans nos prestations de mixage/mastering :</strong>Inclus dans nos prestations de mixage/mastering : équilibre, dynamique, espace, cohérence globale, master final.</p>
-                <p><strong className="text-foreground">Non inclus (mais possible) :</strong>Non inclus (mais négociable sur demande) : Versionnage, multistems, editing poussé, rattrapage/nettoyage piste.</p>
-                <p className="text-primary font-medium">→ Exports supplémentaires : 40 EUR/h (min 30 min)</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Bottom CTA */}
