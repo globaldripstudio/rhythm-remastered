@@ -4,6 +4,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } f
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Info } from "lucide-react";
 
 import { Clock, Euro, Check, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -41,6 +42,19 @@ const CloseButton = ({ onClick, className = "" }: { onClick: () => void; classNa
   </button>
 );
 
+const AntiMalentenduBlock = () => (
+  <div className="bg-muted/30 border border-border rounded-lg p-3 sm:p-4">
+    <div className="flex items-start gap-2">
+      <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+      <div className="text-xs text-muted-foreground space-y-1.5">
+        <p><strong className="text-foreground">Inclus dans nos prestations de mixage/mastering :</strong> équilibre, dynamique, espace, cohérence globale, master final.</p>
+        <p><strong className="text-foreground">Non inclus (mais négociable sur demande) :</strong> Versionnage, multistems, editing poussé, rattrapage/nettoyage piste.</p>
+        <p className="text-primary font-medium">→ Exports supplémentaires : 40 EUR/h (min 30 min)</p>
+      </div>
+    </div>
+  </div>
+);
+
 const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: Service; onClose: () => void; isMobile?: boolean }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -49,7 +63,6 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
     const el = scrollRef.current;
     if (!el) return;
     
-    // Show indicator if there's more content to scroll (not at bottom)
     const hasMoreContent = el.scrollHeight > el.clientHeight;
     const notAtBottom = el.scrollTop + el.clientHeight < el.scrollHeight - 20;
     setShowScrollIndicator(hasMoreContent && notAtBottom);
@@ -59,7 +72,6 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
     const el = scrollRef.current;
     if (!el) return;
 
-    // Check on mount
     const timer = setTimeout(checkScroll, 100);
     
     el.addEventListener('scroll', checkScroll);
@@ -72,6 +84,9 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
     };
   }, [checkScroll]);
 
+  const hasAntiMalentendu = (service as any).antiMalentendu === true;
+  const equipmentLabel = (service as any).equipmentLabel || "Équipement";
+
   return (
     <div className={`flex flex-col ${isMobile ? 'h-[calc(80vh-3rem)]' : 'h-[85vh] md:h-[80vh]'}`}>
       {/* Header Image */}
@@ -80,7 +95,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           src={service.image}
           alt={service.title}
           className={`w-full h-full object-cover ${
-            service.id === 'composition' ? 'object-center' :
+            (service as any).imagePosition ? (service as any).imagePosition :
             service.id === 'captation-sonore' ? 'object-[center_25%]' :  
             service.id === 'direction-artistique' ? 'object-bottom' :
             service.id === 'mixage-mastering' ? 'object-top' :
@@ -103,6 +118,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             <div className="flex items-center gap-1">
               <Euro className="w-3 h-3 sm:w-4 sm:h-4" />
               {service.price}
+              {(service as any).priceDay && <span className="ml-1">| {(service as any).priceDay}</span>}
             </div>
           </div>
         </div>
@@ -172,10 +188,10 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
 
           {/* Equipment */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-2">Équipement</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-2">{equipmentLabel}</h3>
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {service.equipment.map((item, index) => (
-                <Badge key={index} variant="outline" className="text-xs sm:text-sm">
+                <Badge key={index} variant={item === "etc." ? "secondary" : "outline"} className={`text-xs sm:text-sm ${item === "etc." ? "italic text-muted-foreground" : ""}`}>
                   {item}
                 </Badge>
               ))}
@@ -189,10 +205,10 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <div className="space-y-4">
                 {[
                   { title: "THE HOLY LAND - Tomas Lemoine", desc: "Collaboration with Commencal - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/u44cDLJWeFc" },
+                  { title: "The Silver Coast - Type 7 Film", desc: "Collaboration with Type7 - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/W-GAqmI96ro" },
                   { title: "To the next chapter - Tomas Lemoine", desc: "Collaboration with Canyon Bicycles - Chef opérateur son et post-prod", url: "https://www.youtube.com/embed/A7s0pP0D3Po" },
                   { title: "Théo Bachelier", desc: "Post production/sound design/global mixing", url: "https://www.youtube.com/embed/M-eW6rpRklU" },
                   { title: "Théo Pulsor", desc: "Young and successful entrepreneur (220k+ views) - Post production/sound design", url: "https://www.youtube.com/embed/kFEacVd-iMs" },
-                  { title: "The Silver Coast - Type 7 Film", desc: "Collaboration with Type7 - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/W-GAqmI96ro" }
                 ].map((video, index) => (
                   <div key={index}>
                     <h4 className="font-semibold text-sm mb-1">{video.title}</h4>
@@ -276,6 +292,9 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             </div>
           )}
 
+          {/* Anti-malentendus block - only in relevant modals */}
+          {hasAntiMalentendu && <AntiMalentenduBlock />}
+
           {/* CTA */}
           <Card className="bg-gradient-hero border-primary/20">
             <CardContent className="p-4 sm:pt-6">
@@ -288,7 +307,18 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                   className="w-full studio-button"
                   onClick={() => {
                     onClose();
-                    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                    setTimeout(() => {
+                      const contactSection = document.getElementById('contact');
+                      if (contactSection) {
+                        const formCard = contactSection.querySelector('.service-card');
+                        if (formCard) {
+                          formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                          contactSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                      }
+                      setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+                    }, 300);
                   }}
                 >
                   Demander un devis
@@ -299,7 +329,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
         </div>
         </div>
         
-        {/* Scroll indicator - fade at bottom when more content */}
+        {/* Scroll indicator */}
         {showScrollIndicator && (
           <div 
             className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none bg-gradient-to-t from-background via-background/80 to-transparent flex items-end justify-center pb-2"
@@ -324,7 +354,6 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
 
   if (!service) return null;
 
-  // Mobile: use Drawer (bottom sheet)
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()} dismissible={true}>
@@ -333,7 +362,6 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
             <DrawerTitle>{service.title}</DrawerTitle>
             <DrawerDescription>{service.description}</DrawerDescription>
           </DrawerHeader>
-          {/* Orange bubble close button - out of the box style */}
           <CloseButton onClick={onClose} className="absolute -top-5 right-4 sm:-top-6 sm:right-6 z-[60]" />
           <ServiceModalContent service={service} onClose={onClose} isMobile={true} />
         </DrawerContent>
@@ -341,14 +369,12 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
     );
   }
 
-  // Desktop: use Dialog (modal) with custom animations
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
         className="max-w-3xl w-[90vw] max-h-[90vh] p-0 overflow-visible rounded-lg !flex !flex-col !gap-0 [&>button]:hidden"
       >
         <div className="relative">
-          {/* Orange bubble close button - positioned outside and above modal */}
           <CloseButton onClick={onClose} className="absolute -top-4 -right-4 sm:-top-5 sm:-right-5 md:-top-6 md:-right-6 z-[60]" />
           <DialogHeader className="sr-only">
             <DialogTitle>{service.title}</DialogTitle>

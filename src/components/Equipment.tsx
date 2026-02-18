@@ -107,6 +107,8 @@ const Equipment = () => {
       { name: "Neural DSP Archetype Tim Henson X", type: "Amplificateur guitare", status: "signature" },
       { name: "Native Instruments Guitar Rig 7", type: "Amplificateur guitare", status: "standard" },
       { name: "NI Kontakt", type: "Sampler", status: "industry" },
+      { name: "Xfer Serum 2", type: "Synthétiseur wavetable", status: "premium" },
+      { name: "ICEAUDIO ICE Filter", type: "Filtre créatif", status: "creative" },
       { name: "Klanghelm MJUC Compressor", type: "Compresseur vintage", status: "vintage" },
       { name: "Nicky Romero Kickstart", type: "Sidechain", status: "standard" },
       { name: "Drip Plugin", type: "Effet signature", status: "creative" },

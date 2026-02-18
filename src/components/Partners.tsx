@@ -10,40 +10,69 @@ const partners = [
   logo: "/lovable-uploads/TYPE_7_white.png",
   url: "https://type7.com/",
   videos: [
-  { title: "The Silver Coast", url: "https://www.youtube.com/embed/W-GAqmI96ro?si=3gD45YYFn39W3e82" }]
-
+  { title: "The Silver Coast", url: "https://www.youtube.com/embed/W-GAqmI96ro?si=3gD45YYFn39W3e82" }],
+  credits: [
+    { role: "Director", name: "Antoine Paï" },
+    { role: "Production Company", name: "Intervalle Studio" },
+    { role: "Chief Editor", name: "François Guiot" },
+    { role: "Editor", name: "Théo Bachelier" },
+    { role: "Sound Design/Mixing", name: "Guillaume Surget", highlight: true },
+    { role: "Color", name: "Douglas Dutton" },
+    { role: "Underwater Cinematography", name: "Laurent Pujol" },
+  ]
 },
 {
   name: "Canyon Bicycles",
   logo: "/lovable-uploads/canyon-new.png",
   url: "https://www.canyon.com/fr-fr/",
   videos: [
-  { title: "To the next chapter - Tomas Lemoine", url: "https://www.youtube.com/embed/A7s0pP0D3Po?si=w9XhJHH8aejyIDYM" }]
-
+  { title: "To the next chapter - Tomas Lemoine", url: "https://www.youtube.com/embed/A7s0pP0D3Po?si=w9XhJHH8aejyIDYM" }],
+  credits: [
+    { role: "Directed, filmed & edited", name: "Jeremy Gonzales (@jeremygonzalesvideo)" },
+    { role: "2nd camera", name: "Hugo Pes (@hugopes_video)" },
+    { role: "Drone Shots", name: "Jorris Pierrat (@joris_tarreip.fpv)" },
+    { role: "Composer – Sound recordist / engineer", name: "Guillaume Surget (@ekzo_xo)", highlight: true },
+  ]
 },
 {
   name: "Commencal",
   logo: "/lovable-uploads/fd1b44e8-bc02-4bd0-b187-ab685c182ccc.png",
   url: "https://www.commencal.com/",
   videos: [
-  { title: "THE HOLY LAND - Tomas Lemoine", url: "https://www.youtube.com/embed/u44cDLJWeFc?si=_NWFed-j_1xE8oJ0" }]
-
+  { title: "THE HOLY LAND - Tomas Lemoine", url: "https://www.youtube.com/embed/u44cDLJWeFc?si=_NWFed-j_1xE8oJ0" }],
+  credits: [
+    { role: "Rider", name: "Tomas Lemoine" },
+    { role: "Film & Edit", name: "@gonzyfilms" },
+    { role: "Additional filming", name: "Alex Brard" },
+    { role: "Sound design", name: "Guillaume Surget", highlight: true },
+    { role: "Photos", name: "Julien Carrere" },
+    { role: "Special thanks", name: "@reedboggs @shredshed" },
+  ]
 },
 {
   name: "Ambit Components",
   logo: "/lovable-uploads/ambit-inverted.png",
   url: "https://ambit-components.com/en/",
   videos: [
-  { title: "Ambit Components", url: "https://www.youtube.com/embed/Kb9_SjMzdVc?si=8d6k4InZMOY3xgAZ" }]
-
+  { title: "Ambit Components", url: "https://www.youtube.com/embed/Kb9_SjMzdVc?si=8d6k4InZMOY3xgAZ" }],
+  credits: [
+    { role: "Filmed & edited", name: "@gonzyfilms" },
+    { role: "Drone shots", name: "@jorisPierrat" },
+    { role: "VFX artist", name: "@gotti_le_chat_noir" },
+    { role: "Sound engineer / designer", name: "Guillaume Surget (@ekzo_xo)", highlight: true },
+    { role: "Music", name: "@bobba.ash" },
+  ]
 },
 {
   name: "Pulsor Agency",
   logo: "/lovable-uploads/pulsor-inverted.png",
   url: "https://www.pulsor.agency/",
   videos: [
-  { title: "Théo Pulsor", url: "https://www.youtube.com/embed/kFEacVd-iMs?si=EQFXCN8usgWLzyxH" }]
-
+  { title: "Théo Pulsor", url: "https://www.youtube.com/embed/kFEacVd-iMs?si=EQFXCN8usgWLzyxH" }],
+  credits: [
+    { role: "Video/réal", name: "Théo Bachelier" },
+    { role: "Post-production, sound design, mixage", name: "Guillaume Surget", highlight: true },
+  ]
 },
 {
   name: "Ultrack Agency",
@@ -51,8 +80,11 @@ const partners = [
   url: "https://ultrack.webflow.io/",
   videos: [
   { title: "Théo Bachelier", url: "https://www.youtube.com/embed/M-eW6rpRklU?si=XtzNzrdN3U58QyAB" },
-  { title: "Ultrack", url: "https://www.youtube.com/embed/WDM-H839CYM?si=fUeQY879818PvYaY" }]
-
+  { title: "Ultrack", url: "https://www.youtube.com/embed/WDM-H839CYM?si=fUeQY879818PvYaY" }],
+  credits: [
+    { role: "Video/réal", name: "Théo Bachelier" },
+    { role: "Post-production, sound design, mixage", name: "Guillaume Surget (pour les deux vidéos)", highlight: true },
+  ]
 }];
 
 
@@ -129,7 +161,7 @@ const Partners = () => {
                 
               </div>
 
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4 mb-4">
                 {selectedPartner.videos.map((video, i) =>
               <div key={i}>
                     
@@ -148,6 +180,18 @@ const Partners = () => {
                     </div>
                   </div>
               )}
+              </div>
+
+              {/* Credits */}
+              <div className="mb-6 space-y-1">
+                {selectedPartner.credits.map((credit, i) => (
+                  <p key={i} className="text-xs text-muted-foreground">
+                    <span className="text-foreground/70">{credit.role} :</span>{" "}
+                    <span className={credit.highlight ? "text-primary font-semibold" : ""}>
+                      {credit.name}
+                    </span>
+                  </p>
+                ))}
               </div>
 
               <a
