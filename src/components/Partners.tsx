@@ -83,7 +83,7 @@ const partners = [
   { title: "Ultrack", url: "https://www.youtube.com/embed/WDM-H839CYM?si=fUeQY879818PvYaY" }],
   credits: [
     { role: "Video/réal", name: "Théo Bachelier" },
-    { role: "Post-production, sound design, mixage", name: "Guillaume Surget (pour les deux vidéos)", highlight: true },
+    { role: "Post-production, sound design, mixage", name: "Guillaume Surget", highlight: true },
   ]
 }];
 
