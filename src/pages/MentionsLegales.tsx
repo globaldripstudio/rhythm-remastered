@@ -8,7 +8,7 @@ const MentionsLegales = () => {
       {/* Header - matching Blog/Projets pages */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
               <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
             </Link>

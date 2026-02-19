@@ -187,7 +187,7 @@ const Partners = () => {
                 {selectedPartner.credits.map((credit, i) => (
                   <p key={i} className="text-xs text-muted-foreground">
                     <span className="text-foreground/70">{credit.role} :</span>{" "}
-                    <span className={credit.highlight ? "text-primary font-semibold" : ""}>
+                    <span className={credit.highlight ? "hero-text font-semibold" : ""}>
                       {credit.name}
                     </span>
                   </p>
