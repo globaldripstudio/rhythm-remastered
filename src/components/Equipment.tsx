@@ -108,7 +108,7 @@ const Equipment = () => {
       { name: "Native Instruments Guitar Rig 7", type: "Amplificateur guitare", status: "standard" },
       { name: "NI Kontakt", type: "Sampler", status: "industry" },
       { name: "Xfer Serum 2", type: "Synthétiseur wavetable", status: "premium" },
-      { name: "ICEAUDIO ICE Filter", type: "Filtre créatif", status: "creative" },
+      { name: "ICEAUDIO ICE Filter", type: "Filtre créatif", status: "standard" },
       { name: "Klanghelm MJUC Compressor", type: "Compresseur vintage", status: "vintage" },
       { name: "Nicky Romero Kickstart", type: "Sidechain", status: "standard" },
       { name: "Drip Plugin", type: "Effet signature", status: "creative" },
@@ -136,7 +136,7 @@ const Equipment = () => {
       case "premium": return "bg-orange-premium text-white";
       case "vintage": return "bg-secondary text-secondary-foreground"; 
       case "classic": return "bg-orange-classic text-white";
-      case "industry": return "bg-gradient-to-r from-orange-premium to-secondary text-white";
+      case "industry": return "bg-muted text-muted-foreground";
       case "creative": return "bg-gradient-to-r from-orange-classic to-orange-premium text-white";
       case "signature": return "bg-gradient-to-r from-secondary to-orange-premium text-white";
       default: return "bg-muted text-muted-foreground";

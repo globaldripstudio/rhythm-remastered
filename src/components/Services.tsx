@@ -83,8 +83,8 @@ export const servicesData = [
   id: "mixage-hybride",
   title: "Mixage hybride",
   description: "Mixage professionnel hybride analogique/numérique sans mastering",
-  price: "Sur devis",
-  priceLabel: "",
+  price: "190€",
+  priceLabel: "/ titre",
   icon: Waves,
   image: "/lovable-uploads/Image-19.jpg",
   featured: false,
@@ -283,12 +283,14 @@ const Services = () => {
     const isPackSingle = service.id === "pack-single";
     const isSoundDesign = service.id === "sound-design";
     const isMixMaster = service.id === "mixage-mastering";
+    const isFeaturedWhite = isMixMaster || isSoundDesign;
+    const isFeaturedCard = isFeaturedWhite || isPackSingle;
 
     return (
       <Card
         className={`service-card group cursor-pointer relative overflow-hidden transition-all duration-500 min-h-[440px] sm:min-h-[480px] md:min-h-[520px] flex flex-col ${
-        isMixMaster || isSoundDesign ? 'ring-2 ring-white/20 hover:ring-white/40' : ''} ${
-        isPackSingle ? 'ring-2 ring-red-800/40 hover:ring-red-700 hover:shadow-[0_0_30px_rgba(153,27,27,0.3)]' : ''}`}
+        isFeaturedWhite ? 'ring-2 ring-white/20 hover:ring-white/40' : ''} ${
+        isPackSingle ? 'ring-0 hover:ring-0 hover:shadow-[0_0_40px_rgba(127,29,29,0.35),0_0_80px_rgba(153,27,27,0.15)]' : ''}`}
         onClick={() => handleOpenModal(service)}>
 
         {/* Service Image */}
@@ -363,10 +365,12 @@ const Services = () => {
         </CardContent>
 
         {/* Glow Effect on Hover */}
-        <div className={`absolute inset-0 ${
-          isPackSingle ? 'bg-gradient-to-br from-red-800/20 to-rose-600/10' : 
-          'bg-gradient-accent'
-        } opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none`} />
+        {isFeaturedCard && (
+          <div className={`absolute inset-0 ${
+            isPackSingle ? 'bg-gradient-to-br from-red-900/30 via-rose-800/15 to-transparent' : 
+            'bg-gradient-accent'
+          } opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none`} />
+        )}
       </Card>);
 
   };
@@ -403,7 +407,7 @@ const Services = () => {
                 e.stopPropagation();
                 setShowMixageHybride(!showMixageHybride);
               }}
-              className="absolute -top-4 -left-4 sm:-top-6 sm:-left-6 md:-top-8 md:-left-8 z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
+              className="absolute -top-4 -left-4 sm:-top-6 sm:-left-6 md:-top-8 md:-right-8 md:left-auto z-40 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-primary border-4 border-background rounded-full flex items-center justify-center hover:bg-primary/80 text-primary-foreground transition-all duration-300 shadow-xl hover:shadow-primary/50 hover:scale-110 group/switch"
               aria-label={showMixageHybride ? "Voir Stem Mastering" : "Voir Mixage hybride"}>
 
               <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-500 group-hover/switch:rotate-180" />

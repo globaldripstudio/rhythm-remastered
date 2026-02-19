@@ -96,8 +96,12 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           alt={service.title}
           className={`w-full h-full object-cover ${
             (service as any).imagePosition ? (service as any).imagePosition :
-            service.id === 'captation-sonore' ? 'object-[center_25%]' :  
-            service.id === 'direction-artistique' ? 'object-bottom' :
+            service.id === 'captation-sonore' ? 'object-[center_30%]' :  
+            service.id === 'direction-artistique' ? 'object-[center_35%]' :
+            service.id === 'sound-design' ? 'object-[center_60%]' :
+            service.id === 'composition' ? 'object-[center_70%]' :
+            service.id === 'pack-single' ? 'object-[center_60%]' :
+            service.id === 'formation' ? 'object-[center_35%]' :
             service.id === 'mixage-mastering' ? 'object-top' :
             service.id === 'mixage-mastering-express' ? 'object-center' :
             ''
@@ -191,7 +195,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             <h3 className="text-base sm:text-lg font-semibold mb-2">{equipmentLabel}</h3>
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {service.equipment.map((item, index) => (
-                <Badge key={index} variant={item === "etc." ? "secondary" : "outline"} className={`text-xs sm:text-sm ${item === "etc." ? "italic text-muted-foreground" : ""}`}>
+                <Badge key={index} variant="outline" className="text-xs sm:text-sm">
                   {item}
                 </Badge>
               ))}

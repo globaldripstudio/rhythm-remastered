@@ -147,7 +147,7 @@ INFORMATIONS DU STUDIO:
    - Livraison incluse: Master WAV + MP3
    - 2 révisions incluses
 
-4. MIXAGE HYBRIDE - Sur devis
+4. MIXAGE HYBRIDE - 190€/titre
    - Mixage seul, hybride analogique/numérique, sans mastering
    - 3 révisions incluses
 

@@ -213,15 +213,16 @@ const Contact = () => {
                   <Label htmlFor="service">Service souhaité</Label>
                   <select id="service" name="service" value={formData.service} onChange={handleInputChange} className="w-full mt-2 px-3 py-2 bg-input border border-border rounded-md text-foreground">
                     <option value="">Sélectionnez un service</option>
-                    <option value="mixage">Mixage</option>
-                    <option value="mixage-mastering">Mixage + Mastering</option>
-                    <option value="mixage-mastering-express">Mixage + Mastering Express</option>
+                    <option value="mixage-mastering">Mixage + Mastering (Premium)</option>
+                    <option value="mixage-mastering-essentiel">Mix + Master Essentiel</option>
+                    <option value="stem-mastering">Stem Mastering</option>
+                    <option value="mixage-hybride">Mixage hybride</option>
+                    <option value="captation-sonore">Captation Sonore</option>
                     <option value="sound-design">Sound Design</option>
-                    <option value="enregistrement-studio">Enregistrement Studio</option>
-                    <option value="enregistrement-terrain">Enregistrement Terrain</option>
-                    <option value="composition-beatmaking">Composition/Beatmaking</option>
-                    <option value="direction-artistique">Direction Artistique/Arrangement</option>
-                    <option value="formation">Formation MAO/Mixage</option>
+                    <option value="composition-beatmaking">Composition / Beatmaking</option>
+                    <option value="direction-artistique">Direction Artistique / Arrangement</option>
+                    <option value="formation">Formation MAO / Mixage</option>
+                    <option value="pack-single">Pack "Single"</option>
                   </select>
                 </div>
 
