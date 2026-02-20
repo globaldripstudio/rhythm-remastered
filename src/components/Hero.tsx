@@ -18,7 +18,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden" aria-labelledby="hero-heading">
+    <section id="accueil" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-0" aria-labelledby="hero-heading">
       {/* Loading Screen */}
       {!imageLoaded && (
         <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
