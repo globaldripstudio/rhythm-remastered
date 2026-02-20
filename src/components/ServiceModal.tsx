@@ -88,7 +88,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
   const equipmentLabel = (service as any).equipmentLabel || "Équipement";
 
   return (
-    <div className={`flex flex-col ${isMobile ? 'h-[calc(80vh-3rem)]' : 'h-[85vh] md:h-[80vh]'}`}>
+    <div className={`flex flex-col ${isMobile ? 'h-[calc(75vh-3rem)]' : 'h-[85vh] md:h-[80vh]'}`}>
       {/* Header Image */}
       <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden rounded-t-lg flex-shrink-0">
         <img 
@@ -460,12 +460,12 @@ const ServiceModal = ({ service, open, onClose }: ServiceModalProps) => {
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()} dismissible={true}>
-        <DrawerContent className="max-h-[80vh] animate-in slide-in-from-bottom duration-300 overflow-visible">
+        <DrawerContent className="max-h-[75vh] animate-in slide-in-from-bottom duration-300 overflow-visible">
           <DrawerHeader className="sr-only">
             <DrawerTitle>{service.title}</DrawerTitle>
             <DrawerDescription>{service.description}</DrawerDescription>
           </DrawerHeader>
-          <CloseButton onClick={onClose} className="absolute -top-5 right-4 sm:-top-6 sm:right-6 z-[60]" />
+          <CloseButton onClick={onClose} className="absolute -top-5 right-4 z-[60]" />
           <ServiceModalContent service={service} onClose={onClose} isMobile={true} />
         </DrawerContent>
       </Drawer>
