@@ -32,7 +32,7 @@ export const servicesData = [
 },
 {
   id: "mixage-mastering-express",
-  title: "Mix + Master Essentiel",
+  title: "Mixage + Mastering | Essentiel",
   description: "Solution professionnelle full numérique pour les artistes travaillant sur instrumentales en .wav",
   price: "140€",
   priceLabel: "/ titre",

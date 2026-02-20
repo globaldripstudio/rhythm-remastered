@@ -202,6 +202,106 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             </div>
           </div>
 
+          {/* Anti-malentendus block - before examples */}
+          {hasAntiMalentendu && <AntiMalentenduBlock />}
+
+          {/* Mixage + Mastering Spotify examples */}
+          {service.id === "mixage-mastering" && (
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <div className="space-y-3">
+                {[
+                  "https://open.spotify.com/embed/track/4VaLoumJTvU1Gu8xCOYffV?utm_source=generator",
+                  "https://open.spotify.com/embed/track/3XQRb93rYsKQ2jD5WPz6tZ?utm_source=generator&theme=0",
+                  "https://open.spotify.com/embed/track/0hYDAVu5iX2ytEhiVfxw8L?utm_source=generator",
+                  "https://open.spotify.com/embed/track/7CjbRpXeFddbHqjoE0SgiB?utm_source=generator",
+                ].map((url, i) => (
+                  <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
+                    <iframe
+                      style={{ borderRadius: '12px' }}
+                      src={url}
+                      width="100%"
+                      height="152"
+                      frameBorder="0"
+                      allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Mixage + Mastering Essentiel Spotify examples */}
+          {service.id === "mixage-mastering-express" && (
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <div className="space-y-3">
+                {[
+                  "https://open.spotify.com/embed/track/7n88fpW829UNQSHAeiJlH7?utm_source=generator",
+                  "https://open.spotify.com/embed/track/1O6r6usgwGKMsizB23L6dl?utm_source=generator&theme=0",
+                ].map((url, i) => (
+                  <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
+                    <iframe
+                      style={{ borderRadius: '12px' }}
+                      src={url}
+                      width="100%"
+                      height="152"
+                      frameBorder="0"
+                      allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Captation Sonore examples */}
+          {service.id === "captation-sonore" && (
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <div className="space-y-3">
+                {[
+                  "https://open.spotify.com/embed/track/6Ppunn0oij7cXSsQRefvrx?utm_source=generator",
+                  "https://open.spotify.com/embed/track/6JcKCkSDO6VK2foG8Rf0f1?utm_source=generator",
+                  "https://open.spotify.com/embed/track/7G5mpCMVKEGDwreiXvf4bv?utm_source=generator&theme=0",
+                ].map((url, i) => (
+                  <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
+                    <iframe
+                      style={{ borderRadius: '12px' }}
+                      src={url}
+                      width="100%"
+                      height="152"
+                      frameBorder="0"
+                      allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">To the next chapter - Tomas Lemoine</h4>
+                  <p className="text-xs text-muted-foreground mb-2">Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod</p>
+                  <div className="bg-card rounded-lg p-2 border border-border/50">
+                    <iframe
+                      width="100%"
+                      height="150"
+                      src="https://www.youtube.com/embed/A7s0pP0D3Po?si=GiCaRFrbObt0H-OI"
+                      title="To the next chapter - Tomas Lemoine"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Sound Design Videos */}
           {service.id === "sound-design" && (
             <div>
@@ -296,8 +396,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             </div>
           )}
 
-          {/* Anti-malentendus block - only in relevant modals */}
-          {hasAntiMalentendu && <AntiMalentenduBlock />}
+          
 
           {/* CTA */}
           <Card className="bg-gradient-hero border-primary/20">
