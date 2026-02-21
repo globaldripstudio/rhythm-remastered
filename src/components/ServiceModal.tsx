@@ -98,10 +98,10 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             (service as any).imagePosition ? (service as any).imagePosition :
             service.id === 'captation-sonore' ? 'object-[center_30%]' :  
             service.id === 'direction-artistique' ? 'object-[center_35%]' :
-            service.id === 'sound-design' ? 'object-[center_60%]' :
-            service.id === 'composition' ? 'object-[center_70%]' :
+            service.id === 'sound-design' ? 'object-[center_40%]' :
+            service.id === 'composition' ? 'object-[center_80%]' :
             service.id === 'pack-single' ? 'object-[center_60%]' :
-            service.id === 'formation' ? 'object-[center_35%]' :
+            service.id === 'formation' ? 'object-[center_45%]' :
             service.id === 'mixage-mastering' ? 'object-top' :
             service.id === 'mixage-mastering-express' ? 'object-center' :
             ''
@@ -268,6 +268,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                   "https://open.spotify.com/embed/track/6Ppunn0oij7cXSsQRefvrx?utm_source=generator",
                   "https://open.spotify.com/embed/track/6JcKCkSDO6VK2foG8Rf0f1?utm_source=generator",
                   "https://open.spotify.com/embed/track/7G5mpCMVKEGDwreiXvf4bv?utm_source=generator&theme=0",
+                  "https://open.spotify.com/embed/track/5Z4M0Q41SuxBHtbZZT7uTy?utm_source=generator",
                 ].map((url, i) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
                     <iframe
