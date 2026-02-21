@@ -99,7 +99,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             service.id === 'captation-sonore' ? 'object-[center_30%]' :  
             service.id === 'direction-artistique' ? 'object-[center_35%]' :
             service.id === 'sound-design' ? 'object-[center_40%]' :
-            service.id === 'composition' ? 'object-[center_80%]' :
+            service.id === 'composition' ? 'object-[center_95%]' :
             service.id === 'pack-single' ? 'object-[center_60%]' :
             service.id === 'formation' ? 'object-[center_45%]' :
             service.id === 'mixage-mastering' ? 'object-top' :
