@@ -272,7 +272,7 @@ const Projets = () => {
             const horizontalOffset = slideProgress * maxSlide * slideDirection;
 
             return (
-            <div key={project.id} ref={cardRef} className="mb-6 sm:mb-12">
+            <div key={project.id} ref={cardRef}>
               {/* Project Card */}
               <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500">
                 <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[280px] sm:min-h-[350px] lg:h-[400px]">
