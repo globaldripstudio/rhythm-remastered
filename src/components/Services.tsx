@@ -77,7 +77,10 @@ export const servicesData = [
   details: "Service de stem mastering idéal si vous avez déjà mixé vos pistes. Envoyez-nous un stem production et un stem voix, et nous nous occupons du mastering avec notre chaîne hybride analogique/numérique.",
   equipment: ["Dangerous Music 2Bus+", "Apollo Quad Converters", "IGS S-Type 500vu", "Moniteurs Adam A77x & RP6 Rokit G3", "etc."],
   deliverables: ["Master WAV 24bit/96kHz", "Version MP3 320kbps"],
-  spotifyEmbed: "https://open.spotify.com/embed/track/2XMFGOAU4ZH0SVX81DTvj4?utm_source=generator"
+  spotifyEmbeds: [
+  "https://open.spotify.com/embed/track/1vfFR4nBeRrkZW9dFVPCWQ?utm_source=generator",
+  "https://open.spotify.com/embed/track/2XMFGOAU4ZH0SVX81DTvj4?utm_source=generator"
+  ]
 },
 {
   id: "mixage-hybride",
@@ -255,7 +258,8 @@ export const servicesData = [
   deliverables: ["Single master WAV 24bit/96kHz", "Version MP3 320kbps", "Version concert (PBO)"],
   spotifyEmbeds: [
   "https://open.spotify.com/embed/track/5bKc0p54jMp55SKrbHmymH?utm_source=generator",
-  "https://open.spotify.com/embed/track/1jgiMQkxjzMOVbax5McyCr?utm_source=generator"]
+  "https://open.spotify.com/embed/track/1jgiMQkxjzMOVbax5McyCr?utm_source=generator",
+  "https://open.spotify.com/embed/track/1oRpEqMoiZqZHY13jKZ9gD?utm_source=generator"]
 }];
 
 

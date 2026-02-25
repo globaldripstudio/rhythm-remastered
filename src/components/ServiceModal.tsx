@@ -212,6 +212,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <div className="space-y-3">
                 {[
                   "https://open.spotify.com/embed/track/4VaLoumJTvU1Gu8xCOYffV?utm_source=generator",
+                  "https://open.spotify.com/embed/track/7cDXHSg4URkQPeOl7WDV9V?utm_source=generator",
                   "https://open.spotify.com/embed/track/3XQRb93rYsKQ2jD5WPz6tZ?utm_source=generator&theme=0",
                   "https://open.spotify.com/embed/track/0hYDAVu5iX2ytEhiVfxw8L?utm_source=generator",
                   "https://open.spotify.com/embed/track/7CjbRpXeFddbHqjoE0SgiB?utm_source=generator",
@@ -299,6 +300,22 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                     />
                   </div>
                 </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Tomas Lemoine 2.0 Signature Shoe</h4>
+                  <p className="text-xs text-muted-foreground mb-2">Contribution au spot publicitaire de Leatt - captation sonore voix</p>
+                  <div className="bg-card rounded-lg p-2 border border-border/50">
+                    <iframe
+                      width="100%"
+                      height="150"
+                      src="https://www.youtube.com/embed/Zu-rXeTm01g?si=1A_rkW46J6cwsdhl"
+                      title="Tomas Lemoine 2.0 Signature Shoe"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -356,20 +373,24 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           )}
 
           {/* Stem Mastering Spotify Player */}
-          {service.id === "stem-mastering" && (service as any).spotifyEmbed && (
+          {service.id === "stem-mastering" && (service as any).spotifyEmbeds && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemple de réalisation</h3>
-              <div className="bg-card rounded-lg p-2 border border-border/50">
-                <iframe 
-                  style={{ borderRadius: '12px' }}
-                  src={(service as any).spotifyEmbed}
-                  width="100%" 
-                  height="152" 
-                  frameBorder="0" 
-                  allowFullScreen
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                  loading="lazy"
-                />
+              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <div className="space-y-3">
+                {((service as any).spotifyEmbeds as string[]).map((embedUrl: string, i: number) => (
+                  <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
+                    <iframe 
+                      style={{ borderRadius: '12px' }}
+                      src={embedUrl}
+                      width="100%" 
+                      height="152" 
+                      frameBorder="0" 
+                      allowFullScreen
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}
