@@ -1,7 +1,8 @@
 /**
  * Safe Spotify embed component that extracts and validates embed URLs
- * instead of using dangerouslySetInnerHTML with raw HTML
+ * Uses the SpotifyEmbedPlayer for single-playback management
  */
+import SpotifyEmbedPlayer from "@/components/SpotifyEmbedPlayer";
 
 interface SpotifyEmbedProps {
   embedHtml: string;
@@ -13,7 +14,6 @@ interface SpotifyEmbedProps {
  * Only allows URLs from open.spotify.com domain
  */
 const extractSpotifySrc = (embedHtml: string): string | null => {
-  // Match src attribute from iframe tag
   const srcMatch = embedHtml.match(/src="(https:\/\/open\.spotify\.com\/embed\/[^"]+)"/);
   
   if (!srcMatch || !srcMatch[1]) {
@@ -22,21 +22,12 @@ const extractSpotifySrc = (embedHtml: string): string | null => {
   
   const url = srcMatch[1];
   
-  // Validate URL is from Spotify domain only
   try {
     const parsedUrl = new URL(url);
-    if (parsedUrl.hostname !== 'open.spotify.com') {
-      console.warn('Invalid Spotify embed URL - not from open.spotify.com');
-      return null;
-    }
-    // Validate path starts with /embed/
-    if (!parsedUrl.pathname.startsWith('/embed/')) {
-      console.warn('Invalid Spotify embed URL - not an embed path');
-      return null;
-    }
+    if (parsedUrl.hostname !== 'open.spotify.com') return null;
+    if (!parsedUrl.pathname.startsWith('/embed/')) return null;
     return url;
   } catch {
-    console.warn('Invalid Spotify embed URL');
     return null;
   }
 };
@@ -53,16 +44,10 @@ const SpotifyEmbed = ({ embedHtml, className }: SpotifyEmbedProps) => {
   }
   
   return (
-    <iframe
-      src={spotifySrc}
-      width="100%"
-      height="352"
-      frameBorder="0"
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      loading="lazy"
+    <SpotifyEmbedPlayer
+      embedUrl={spotifySrc}
+      height={352}
       className={className}
-      style={{ borderRadius: '12px' }}
-      title="Spotify Player"
     />
   );
 };

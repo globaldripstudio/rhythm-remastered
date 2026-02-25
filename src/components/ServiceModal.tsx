@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Info } from "lucide-react";
+import SpotifyEmbedPlayer from "@/components/SpotifyEmbedPlayer";
 
 import { Clock, Euro, Check, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -218,16 +219,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                   "https://open.spotify.com/embed/track/7CjbRpXeFddbHqjoE0SgiB?utm_source=generator",
                 ].map((url, i) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
-                    <iframe
-                      style={{ borderRadius: '12px' }}
-                      src={url}
-                      width="100%"
-                      height="152"
-                      frameBorder="0"
-                      allowFullScreen
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                      loading="lazy"
-                    />
+                    <SpotifyEmbedPlayer embedUrl={url} height={152} />
                   </div>
                 ))}
               </div>
@@ -244,16 +236,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                   "https://open.spotify.com/embed/track/1O6r6usgwGKMsizB23L6dl?utm_source=generator&theme=0",
                 ].map((url, i) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
-                    <iframe
-                      style={{ borderRadius: '12px' }}
-                      src={url}
-                      width="100%"
-                      height="152"
-                      frameBorder="0"
-                      allowFullScreen
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                      loading="lazy"
-                    />
+                    <SpotifyEmbedPlayer embedUrl={url} height={152} />
                   </div>
                 ))}
               </div>
@@ -272,16 +255,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                   "https://open.spotify.com/embed/track/5Z4M0Q41SuxBHtbZZT7uTy?utm_source=generator",
                 ].map((url, i) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
-                    <iframe
-                      style={{ borderRadius: '12px' }}
-                      src={url}
-                      width="100%"
-                      height="152"
-                      frameBorder="0"
-                      allowFullScreen
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                      loading="lazy"
-                    />
+                    <SpotifyEmbedPlayer embedUrl={url} height={152} />
                   </div>
                 ))}
                 <div>
@@ -358,16 +332,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             <div>
               <h3 className="text-base sm:text-lg font-semibold mb-3">Nos productions</h3>
               <div className="bg-card rounded-lg p-2 border border-border/50">
-                <iframe 
-                  style={{ borderRadius: '12px' }}
-                  src="https://open.spotify.com/embed/playlist/3zjaPFIW17OKA0XGhr2TQn?utm_source=generator" 
-                  width="100%" 
-                  height="352" 
-                  frameBorder="0" 
-                  allowFullScreen
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                  loading="lazy"
-                />
+                <SpotifyEmbedPlayer embedUrl="https://open.spotify.com/embed/playlist/3zjaPFIW17OKA0XGhr2TQn?utm_source=generator" height={352} />
               </div>
             </div>
           )}
@@ -379,16 +344,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <div className="space-y-3">
                 {((service as any).spotifyEmbeds as string[]).map((embedUrl: string, i: number) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
-                    <iframe 
-                      style={{ borderRadius: '12px' }}
-                      src={embedUrl}
-                      width="100%" 
-                      height="152" 
-                      frameBorder="0" 
-                      allowFullScreen
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                      loading="lazy"
-                    />
+                    <SpotifyEmbedPlayer embedUrl={embedUrl} height={152} />
                   </div>
                 ))}
               </div>
@@ -402,16 +358,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <div className="space-y-3">
                 {((service as any).spotifyEmbeds as string[]).map((embedUrl: string, i: number) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
-                    <iframe 
-                      style={{ borderRadius: '12px' }}
-                      src={embedUrl}
-                      width="100%" 
-                      height="152" 
-                      frameBorder="0" 
-                      allowFullScreen
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                      loading="lazy"
-                    />
+                    <SpotifyEmbedPlayer embedUrl={embedUrl} height={152} />
                   </div>
                 ))}
               </div>
