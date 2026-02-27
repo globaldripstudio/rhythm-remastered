@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Waves, Settings, Volume2, Mic, RefreshCw, Music, BookOpen, Speaker, Music2 } from "lucide-react";
 import ServiceModal from "@/components/ServiceModal";
+import { useTranslation } from "react-i18next";
 
 // Service data for both cards and modals
 export const servicesData = [
@@ -269,6 +270,7 @@ const row2Ids = ["captation-sonore", "direction-artistique", "composition"];
 const row3Ids = ["sound-design", "formation", "pack-single"];
 
 const Services = () => {
+  const { t } = useTranslation();
   const [showMixageHybride, setShowMixageHybride] = useState(false);
   const [selectedService, setSelectedService] = useState<typeof servicesData[0] | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -327,7 +329,7 @@ const Services = () => {
 
         <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
           <div className="flex justify-between items-start mb-1 sm:mb-2">
-            <CardTitle className="text-lg sm:text-xl font-bold">{service.title}</CardTitle>
+            <CardTitle className="text-lg sm:text-xl font-bold">{t(`services.data.${service.id}.title`, service.title)}</CardTitle>
             <div className="text-right flex-shrink-0 ml-2">
               <div className="text-xl sm:text-2xl font-bold text-primary">{service.price}</div>
               {(service as any).priceLabel && <div className="text-xs text-muted-foreground">{(service as any).priceLabel}</div>}
@@ -340,7 +342,7 @@ const Services = () => {
             </div>
           </div>
           <CardDescription className="text-muted-foreground text-sm sm:text-base line-clamp-2">
-            {service.description}
+            {t(`services.data.${service.id}.description`, service.description)}
           </CardDescription>
         </CardHeader>
 
@@ -363,7 +365,7 @@ const Services = () => {
               handleOpenModal(service);
             }}>
 
-            Plus d'infos
+            {t('services.moreInfo')}
             <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2 transition-transform group-hover:translate-x-1" />
           </Button>
         </CardContent>
@@ -389,11 +391,10 @@ const Services = () => {
         {/* Section Header */}
         <div className="text-center mb-10 sm:mb-12 md:mb-16 animate-fade-in">
           <h2 id="services-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-            Nos <span className="hero-text">Services</span>
+            {t('services.sectionTitle')} <span className="hero-text">{t('services.sectionTitleHighlight')}</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
-            Des prestations professionnelles adaptées à tous vos besoins musicaux, 
-            du mixage/mastering haute fidélité à la composition, en passant par la formation
+            {t('services.sectionDesc')}
           </p>
         </div>
 
@@ -440,8 +441,8 @@ const Services = () => {
         <div className="text-center">
           <div className="inline-flex items-center justify-center p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl bg-gradient-hero border border-border">
             <div className="text-center">
-              <h3 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">Projet sur mesure ?</h3>
-              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">Contactez-nous pour un devis personnalisé</p>
+              <h3 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">{t('services.cta.ready')}</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">{t('services.cta.desc')}</p>
               <Button
                 size="lg"
                 className="studio-button text-sm sm:text-base"
@@ -450,7 +451,7 @@ const Services = () => {
                   setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
                 }}>
 
-                Demander un devis gratuit
+                {t('services.cta.bookNow')}
               </Button>
             </div>
           </div>

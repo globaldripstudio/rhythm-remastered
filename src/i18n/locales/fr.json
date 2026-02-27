@@ -1,0 +1,335 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "services": "Services",
+    "equipment": "Équipement",
+    "contact": "Contact",
+    "projects": "Projets",
+    "blog": "Blog",
+    "shop": "Boutique",
+    "shopSoon": "bientôt",
+    "book": "Réserver",
+    "backHome": "Retour à l'accueil",
+    "backHomeShort": "Accueil"
+  },
+  "hero": {
+    "welcome": "Bienvenue au Studio",
+    "title1": "GLOBAL DRIP",
+    "title2": "STUDIO",
+    "subtitle": "Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel",
+    "projectsDone": "Projets réalisés",
+    "yearsExp": "Années d'expérience",
+    "artistsHelped": "Artistes accompagnés",
+    "bookSession": "Réserver une session",
+    "listenWork": "Écouter nos réalisations",
+    "expertise": "Expertise depuis 2019",
+    "premiumGear": "Équipement haut de gamme",
+    "certifiedEng": "Ingénieur certifié",
+    "loading": "Initialisation du studio..."
+  },
+  "partners": {
+    "title": "Nous avons les",
+    "titleHighlight": "meilleurs partenaires",
+    "visitSite": "Visiter le site du partenaire",
+    "close": "Fermer"
+  },
+  "services": {
+    "sectionTitle": "Nos",
+    "sectionTitleHighlight": "Services",
+    "sectionDesc": "Solutions audio professionnelles adaptées à chaque projet, de l'enregistrement au mastering final",
+    "moreInfo": "Plus d'infos",
+    "showAlternative": "Voir aussi : Mixage hybride (sans mastering)",
+    "hideAlternative": "Masquer",
+    "showStemMastering": "Voir aussi : Stem Mastering",
+    "hideStemMastering": "Masquer",
+    "description": "Description",
+    "process": "Processus",
+    "included": "Inclus",
+    "deliverables": "Livrables",
+    "examples": "Exemples de réalisation",
+    "singlesProduced": "Singles réalisés dans le cadre de cette offre",
+    "ourProductions": "Nos productions",
+    "ourWork": "Nos réalisations",
+    "antiMalentendu": {
+      "includedTitle": "Inclus dans nos prestations de mixage/mastering :",
+      "includedDesc": "équilibre, dynamique, espace, cohérence globale, master final.",
+      "notIncludedTitle": "Non inclus (mais négociable sur demande) :",
+      "notIncludedDesc": "Versionnage, multistems, editing poussé, rattrapage/nettoyage piste.",
+      "extra": "→ Exports supplémentaires : 40 EUR/h (min 30 min)"
+    },
+    "cta": {
+      "ready": "Prêt à commencer ?",
+      "desc": "Contactez-nous pour discuter de votre projet et obtenir un devis personnalisé.",
+      "bookNow": "Réserver maintenant"
+    },
+    "data": {
+      "mixage-mastering": {
+        "title": "Mixage + Mastering",
+        "description": "Service premium hybride analogique/numérique pour un rendu professionnel haut de gamme",
+        "details": "Notre service phare combine mixage professionnel et mastering de haute qualité. Nous utilisons une approche hybride combinant le meilleur de l'analogique et du numérique pour sublimer vos productions.",
+        "badgeText": "Premium",
+        "category": "Production",
+        "duration": "3-5 jours",
+        "process": "Analyse → Mixage → Mastering → Révisions → Livraison finale",
+        "included": ["Mixage professionnel multi-pistes", "Mastering hybride analogique/numérique", "3 révisions incluses", "Livraison WAV + MP3"],
+        "deliverables": ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps", "Version streaming optimisée"]
+      },
+      "mixage-mastering-express": {
+        "title": "Mixage + Mastering | Essentiel",
+        "description": "Solution professionnelle full numérique pour les artistes travaillant sur instrumentales en .wav",
+        "details": "Notre service essentiel s'adresse principalement aux artistes travaillant sur des instrumentales. Offrez vous le luxe d'un mixage et mastering professionnel tout numérique à coût réduit.",
+        "badgeText": "Essentiel",
+        "category": "Production",
+        "duration": "4 heures",
+        "process": "Analyse → Mixage → Mastering → Révisions → Livraison finale",
+        "included": ["Mixage professionnel instru + multipistes voix", "Mastering full numérique", "2 révisions incluses", "Livraison WAV + MP3"],
+        "deliverables": ["Fichier master WAV 24bit/96kHz", "Version MP3 320kbps"]
+      },
+      "stem-mastering": {
+        "title": "Stem Mastering",
+        "description": "Mastering hybride analogique/numérique à partir de vos stems (1 stem prod + 1 stem voix déjà mixées)",
+        "details": "Service de stem mastering idéal si vous avez déjà mixé vos pistes. Envoyez-nous un stem production et un stem voix, et nous nous occupons du mastering avec notre chaîne hybride analogique/numérique.",
+        "category": "Production",
+        "duration": "24-48h",
+        "process": "Réception stems → Mastering hybride → Révisions → Livraison finale",
+        "included": ["Stem mastering hybride analogique/numérique", "Pour : 1 stem prod + 1 stem voix (déjà mixées)", "2 révisions incluses", "Livraison Master WAV + MP3"],
+        "deliverables": ["Master WAV 24bit/96kHz", "Version MP3 320kbps"]
+      },
+      "mixage-hybride": {
+        "title": "Mixage hybride",
+        "description": "Mixage professionnel hybride analogique/numérique sans mastering",
+        "details": "Service de mixage seul, sans mastering. Idéal si vous avez déjà un ingénieur de mastering ou si vous souhaitez un mixage hybride de qualité professionnelle.",
+        "category": "Production",
+        "duration": "3-5 jours",
+        "process": "Analyse → Mixage hybride → Révisions → Livraison",
+        "included": ["Mixage hybride analogique/numérique", "Équilibre, dynamique, espace, automation", "Cohérence globale du mix", "3 révisions incluses"],
+        "deliverables": ["Mix stéréo WAV 24bit", "Stems sur demande"]
+      },
+      "captation-sonore": {
+        "title": "Captation Sonore",
+        "description": "Captation audio professionnelle en studio, ou pour évènements et tournages",
+        "details": "Service complet d'enregistrement en studio ou en extérieur. Bloc minimum de 3 heures (soit 120€). Nous nous adaptons à tous vos besoins avec un équipement de qualité professionnelle.",
+        "category": "Enregistrement",
+        "duration": "À la demande",
+        "process": "Préparation → Installation → Captation → Monitoring → Post-production",
+        "included": ["Enregistrement studio professionnel", "Captation événementielle mobile", "Équipement haute qualité", "Post-production incluse"],
+        "deliverables": ["Pistes brutes multitrack", "Écoutes de travail", "Fichiers synchronisés"]
+      },
+      "direction-artistique": {
+        "title": "Direction Artistique / Arrangement",
+        "description": "Accompagnement artistique et arrangements musicaux sur mesure",
+        "details": "Accompagnement complet de votre projet artistique, de la conception à la réalisation, avec une expertise technique et créative.",
+        "category": "Conseil",
+        "duration": "Variable",
+        "process": "Analyse artistique → Conseil stratégique → Arrangements → Suivi → Optimisation",
+        "included": ["Direction artistique sur mesure", "Arrangements instrumentaux", "Conseils créatifs personnalisés", "Management personnalisable"],
+        "deliverables": ["Plan artistique détaillé", "Arrangements finalisés"],
+        "equipmentLabel": "Méthodes"
+      },
+      "composition": {
+        "title": "Composition / Beatmaking",
+        "description": "Création musicale et production de beats personnalisés",
+        "details": "De l'idée à la réalisation complète, nous créons des compositions originales adaptées à votre style et vos besoins artistiques.",
+        "category": "Création",
+        "duration": "1-3 semaines",
+        "process": "Brief artistique → Création → Arrangements → Production → Finalisation",
+        "included": ["Composition originale", "Production complète", "Arrangements personnalisés", "Composition Exclusive (cession de droits négociable)"],
+        "deliverables": ["Composition complète", "Multistems négociable"]
+      },
+      "sound-design": {
+        "title": "Sound Design",
+        "description": "Création sonore et design audio pour tous vos projets créatifs",
+        "details": "Spécialisé dans la création d'univers sonores uniques, nous donnons vie à vos projets audiovisuels avec des sons originaux et des ambiances immersives.",
+        "badgeText": "Spécialité",
+        "category": "Création",
+        "duration": "Variable",
+        "process": "Brief créatif → Recherche sonore → Création → Synchronisation → Mixage global → Finalisation",
+        "included": ["Sound design pour films et jeux", "Création d'ambiances sonores", "Effets sonores sur mesure", "Post-production audio avancée"],
+        "deliverables": ["Effets sonores isolés", "Stems multitracks", "Mix final synchronisé", "Master aux normes du support demandé"]
+      },
+      "formation": {
+        "title": "Formation MAO / Mixage",
+        "description": "Formations personnalisées en production musicale et techniques de mixage",
+        "details": "Formation complète aux techniques de production musicale moderne. Apprenez les secrets de la composition et du mixage, jusqu'au mastering avec un professionnel expérimenté.",
+        "category": "Formation",
+        "duration": "Flexible",
+        "process": "Évaluation niveau → Programme personnalisé → Formation pratique → Suivi progression",
+        "included": ["Cours particuliers ou en groupe", "Formation sur logiciels MAO", "Techniques de mixage avancées", "Support pédagogique inclus"],
+        "deliverables": ["Support de formation", "Projets d'exercice", "Fiches récapitulatives à chaque fin de séance"]
+      },
+      "pack-single": {
+        "title": "Pack \"Single\"",
+        "description": "Le pack complet : beat + enregistrement + mixage hybride + mastering",
+        "badgeText": "Pack complet",
+        "category": "Pack",
+        "duration": "2-3 semaines",
+        "process": "Composition → Enregistrement → Editing → Réalisation → Mixage → Mastering → Livraison",
+        "details": "Le pack Single complet : de la production à la livraison finale. Inclut la composition du beat, une session d'enregistrement de 3h, l'editing, la réalisation, le mixage hybride et le mastering. Tout ce qu'il faut pour sortir un single professionnel.",
+        "included": ["Production / Beatmaking", "Direction artistique/Réalisation", "Session d'enregistrement (bloc 3h)", "Editing complet", "Réalisation", "Mix + Master hybride", "Livraison WAV + MP3"],
+        "deliverables": ["Single master WAV 24bit/96kHz", "Version MP3 320kbps", "Version concert (PBO)"]
+      }
+    }
+  },
+  "audio": {
+    "title": "Écoutez la",
+    "titleHighlight": "Différence",
+    "subtitle": "Comparez l'avant/après de notre travail sur différents styles",
+    "before": "Avant",
+    "after": "Après",
+    "original": "Original",
+    "mixed": "Mixé",
+    "pause": "Pause",
+    "headphones": "Casque recommandé",
+    "bookSession": "Réserver une session",
+    "hiphop": {
+      "title": "Hip-Hop",
+      "description": "Punch et clarté pour le rap moderne"
+    },
+    "rock": {
+      "title": "Rock",
+      "description": "Puissance et dynamique pour le rock"
+    },
+    "edm": {
+      "title": "EDM",
+      "description": "Impact et largeur pour l'électronique"
+    }
+  },
+  "equipment": {
+    "title": "Notre",
+    "titleHighlight": "Équipement",
+    "subtitle": "Un parc technique exceptionnel alliant le meilleur de l'analogique vintage et les dernières innovations numériques",
+    "categories": {
+      "sommation": "Sommation & Conversion",
+      "daw": "Logiciels",
+      "ecoutes": "Écoutes",
+      "microphones": "Microphones",
+      "preamps": "Préamplificateurs",
+      "equalizers": "Égaliseurs",
+      "compressors": "Compresseurs & Effets",
+      "instruments": "Instruments",
+      "backline": "Backline",
+      "plugins": "Plugins"
+    },
+    "status": {
+      "premium": "Premium",
+      "vintage": "Vintage",
+      "classic": "Classique",
+      "industry": "Industry Standard",
+      "creative": "Créatif",
+      "signature": "Signature",
+      "standard": "Standard"
+    }
+  },
+  "contact": {
+    "title": "Contactez",
+    "titleHighlight": "Global Drip",
+    "subtitle": "Prêt à donner vie à votre projet musical ? Réservez votre session studio ou demandez un devis personnalisé",
+    "form": {
+      "title": "Demande de réservation",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "service": "Service souhaité",
+      "selectService": "Sélectionnez un service",
+      "message": "Message",
+      "messagePlaceholder": "Décrivez votre projet musical...",
+      "attachment": "Pièce jointe (optionnel)",
+      "attachmentFormats": "PDF, audio, images, ZIP (max 10 Mo)",
+      "send": "Envoyer la demande",
+      "sending": "Envoi en cours...",
+      "success": "Message envoyé !",
+      "successDesc": "Nous avons bien reçu votre demande et vous répondrons dans les plus brefs délais.",
+      "error": "Erreur",
+      "errorFields": "Veuillez remplir tous les champs obligatoires.",
+      "errorEmail": "Veuillez entrer une adresse email valide.",
+      "errorSend": "Une erreur est survenue lors de l'envoi. Veuillez réessayer ou nous contacter directement.",
+      "fileTooLarge": "Fichier trop volumineux",
+      "fileTooLargeDesc": "La taille maximale est de 10 Mo.",
+      "fileTypeError": "Type de fichier non supporté",
+      "fileTypeErrorDesc": "Formats acceptés : PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP."
+    },
+    "info": {
+      "title": "Informations de contact",
+      "address": "Adresse du studio",
+      "phone": "Téléphone",
+      "email": "Email",
+      "hours": "Heures d'ouverture",
+      "hoursValue": "Lun - Ven : 10h00 - 19h00",
+      "hoursClosed": "Sam - Dim : Fermé"
+    },
+    "tagline": "Passion audio & Innovation constante"
+  },
+  "footer": {
+    "description": "Studio d'enregistrement professionnel spécialisé dans le mixage, mastering audio et sound design. Plus de 10 années d'expérience au service de votre créativité.",
+    "servicesTitle": "Services",
+    "contactTitle": "Contact",
+    "copyright": "© 2024 Global Drip Worldwide. Tous droits réservés.",
+    "legal": "Mentions légales",
+    "privacy": "Confidentialité",
+    "terms": "CGV"
+  },
+  "blog": {
+    "title": "Blog",
+    "titleHighlight": "Global Drip",
+    "subtitle": "Conseils, techniques et actualités du monde de l'audio professionnel",
+    "readArticle": "Lire l'article",
+    "comingSoon": "bientôt",
+    "moreArticles": "Plus d'articles bientôt",
+    "moreArticlesDesc": "Nous préparons du contenu exclusif sur les techniques d'enregistrement, le sound design et les secrets du studio professionnel."
+  },
+  "projects": {
+    "title": "NOS",
+    "titleHighlight": "PROJETS",
+    "subtitle": "Les artistes et projets avec lesquels nous sommes fiers d'avoir collaboré",
+    "loading": "Chargement des collaborations artistiques...",
+    "servicesProvided": "Services :",
+    "listenOn": "Écouter sur",
+    "visitChannel": "Voir la chaîne"
+  },
+  "ebook": {
+    "badge": "Formation Premium",
+    "title": "Formation au Sound Design pour Vidéastes et Monteurs",
+    "subtitle": "Ce livre a une ambition simple : vous donner des méthodes concrètes, des checklists minimalistes et des workflows pour hausser votre niveau dès cette semaine.",
+    "manual": "Manuel d'opérabilité",
+    "manualDesc": "5 semaines de formation pour devenir 100% autonome sur la partie audio",
+    "allSoftware": "Adapté tous logiciels",
+    "allSoftwareDesc": "Méthodes natives pour Premiere Pro, Final Cut Pro, DaVinci Resolve, CapCut",
+    "noJargon": "Pas de jargon inutile",
+    "noJargonDesc": "Juste ce qu'il faut savoir, au bon moment",
+    "immediateAccess": "Accès immédiat",
+    "downloadablePDF": "PDF téléchargeable",
+    "freeUpdates": "Mises à jour gratuites",
+    "buyNow": "Acheter maintenant — 59€",
+    "loading": "Chargement...",
+    "securePay": "Paiement sécurisé par Stripe • Livraison immédiate par email",
+    "objectiveTitle": "L'objectif",
+    "objectiveDesc": "Monter vos vidéos plus vite, démystifier l'aspect sonore, devenir autonome et précis à ce sujet, et faire enfin sonner vos images."
+  },
+  "chat": {
+    "greeting": "Bonjour ! Je suis l'assistant IA du Global Drip Studio. Comment puis-je vous aider aujourd'hui ?",
+    "assistant": "Assistant IA • En ligne",
+    "placeholder": "Posez votre question...",
+    "responding": "En train de répondre...",
+    "goToContact": "Accéder au formulaire de contact",
+    "fallback": "Désolé, je n'ai pas pu générer une réponse. N'hésitez pas à nous contacter au +33 6 59 79 73 42.",
+    "suggestions": {
+      "rates": "Quels sont vos tarifs ?",
+      "delivery": "Délai de livraison ?",
+      "location": "Où êtes-vous situés ?",
+      "genres": "Quels styles musicaux ?"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Oops ! Page introuvable",
+    "back": "Retour à l'accueil"
+  },
+  "paymentSuccess": {
+    "title": "Merci pour votre achat !",
+    "subtitle": "Votre paiement a été traité avec succès. Vous allez recevoir un email avec le lien de téléchargement de votre formation.",
+    "checkInbox": "Vérifiez votre boîte de réception (et les spams)",
+    "noEmail": "Vous n'avez pas reçu l'email ? Contactez-nous à",
+    "backHome": "Retour à l'accueil"
+  }
+}

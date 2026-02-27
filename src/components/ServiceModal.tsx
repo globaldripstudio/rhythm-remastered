@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Info } from "lucide-react";
 import SpotifyEmbedPlayer from "@/components/SpotifyEmbedPlayer";
+import { useTranslation } from "react-i18next";
 
 import { Clock, Euro, Check, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -43,20 +44,24 @@ const CloseButton = ({ onClick, className = "" }: { onClick: () => void; classNa
   </button>
 );
 
-const AntiMalentenduBlock = () => (
-  <div className="bg-muted/30 border border-border rounded-lg p-3 sm:p-4">
-    <div className="flex items-start gap-2">
-      <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-      <div className="text-xs text-muted-foreground space-y-1.5">
-        <p><strong className="text-foreground">Inclus dans nos prestations de mixage/mastering :</strong> équilibre, dynamique, espace, cohérence globale, master final.</p>
-        <p><strong className="text-foreground">Non inclus (mais négociable sur demande) :</strong> Versionnage, multistems, editing poussé, rattrapage/nettoyage piste.</p>
-        <p className="text-primary font-medium">→ Exports supplémentaires : 40 EUR/h (min 30 min)</p>
+const AntiMalentenduBlock = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="bg-muted/30 border border-border rounded-lg p-3 sm:p-4">
+      <div className="flex items-start gap-2">
+        <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+        <div className="text-xs text-muted-foreground space-y-1.5">
+          <p><strong className="text-foreground">{t('services.antiMalentendu.includedTitle')}</strong> {t('services.antiMalentendu.includedDesc')}</p>
+          <p><strong className="text-foreground">{t('services.antiMalentendu.notIncludedTitle')}</strong> {t('services.antiMalentendu.notIncludedDesc')}</p>
+          <p className="text-primary font-medium">{t('services.antiMalentendu.extra')}</p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: Service; onClose: () => void; isMobile?: boolean }) => {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
 
@@ -114,7 +119,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             <Badge variant="secondary" className="text-xs">{service.category}</Badge>
             {service.featured && <Badge className="bg-primary text-xs">Spécialité</Badge>}
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{service.title}</h2>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{t(`services.data.${service.id}.title`, service.title)}</h2>
           <div className="flex items-center gap-3 sm:gap-4 text-white/80 text-xs sm:text-sm mt-1">
             <div className="flex items-center gap-1">
               <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -136,16 +141,15 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           className="h-full overflow-y-auto px-4 sm:px-6 pb-6 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent hover:scrollbar-thumb-primary/70"
         >
           <div className="space-y-4 sm:space-y-6 pt-4 pb-8">
-          {/* Description */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-2">Description</h3>
-            <p className="text-sm sm:text-base text-muted-foreground mb-2">{service.description}</p>
-            <p className="text-sm sm:text-base">{service.details}</p>
+            <h3 className="text-base sm:text-lg font-semibold mb-2">{t('services.description')}</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-2">{t(`services.data.${service.id}.description`, service.description)}</p>
+            <p className="text-sm sm:text-base">{t(`services.data.${service.id}.details`, service.details)}</p>
           </div>
 
           {/* Process */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-2">Processus</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-2">{t('services.process')}</h3>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
               {service.process.split(' → ').map((step, index, array) => (
                 <div key={index} className="flex items-center gap-1.5 sm:gap-2">
@@ -160,7 +164,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Card className="bg-card/50">
               <CardHeader className="pb-2 p-3 sm:p-4">
-                <CardTitle className="text-sm sm:text-base">Inclus</CardTitle>
+                <CardTitle className="text-sm sm:text-base">{t('services.included')}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">
                 <ul className="space-y-1.5 sm:space-y-2">
@@ -176,7 +180,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
 
             <Card className="bg-card/50">
               <CardHeader className="pb-2 p-3 sm:p-4">
-                <CardTitle className="text-sm sm:text-base">Livrables</CardTitle>
+                <CardTitle className="text-sm sm:text-base">{t('services.deliverables')}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">
                 <ul className="space-y-1.5 sm:space-y-2">
@@ -209,7 +213,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           {/* Mixage + Mastering Spotify examples */}
           {service.id === "mixage-mastering" && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.examples')}</h3>
               <div className="space-y-3">
                 {[
                   "https://open.spotify.com/embed/track/4VaLoumJTvU1Gu8xCOYffV?utm_source=generator",
@@ -229,7 +233,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           {/* Mixage + Mastering Essentiel Spotify examples */}
           {service.id === "mixage-mastering-express" && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.examples')}</h3>
               <div className="space-y-3">
                 {[
                   "https://open.spotify.com/embed/track/7n88fpW829UNQSHAeiJlH7?utm_source=generator",
@@ -246,7 +250,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           {/* Captation Sonore examples */}
           {service.id === "captation-sonore" && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.examples')}</h3>
               <div className="space-y-3">
                 {[
                   "https://open.spotify.com/embed/track/6Ppunn0oij7cXSsQRefvrx?utm_source=generator",
@@ -297,7 +301,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           {/* Sound Design Videos */}
           {service.id === "sound-design" && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Nos réalisations</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.ourWork')}</h3>
               <div className="space-y-4">
                 {[
                   { title: "THE HOLY LAND - Tomas Lemoine", desc: "Collaboration with Commencal - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/u44cDLJWeFc" },
@@ -330,7 +334,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           {/* Beatmaking/Composition Spotify Player */}
           {service.id === "composition" && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Nos productions</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.ourProductions')}</h3>
               <div className="bg-card rounded-lg p-2 border border-border/50">
                 <SpotifyEmbedPlayer embedUrl="https://open.spotify.com/embed/playlist/3zjaPFIW17OKA0XGhr2TQn?utm_source=generator" height={352} />
               </div>
@@ -340,7 +344,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           {/* Stem Mastering Spotify Player */}
           {service.id === "stem-mastering" && (service as any).spotifyEmbeds && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Exemples de réalisation</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.examples')}</h3>
               <div className="space-y-3">
                 {((service as any).spotifyEmbeds as string[]).map((embedUrl: string, i: number) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
@@ -354,7 +358,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           {/* Pack Single Spotify examples */}
           {service.id === "pack-single" && (service as any).spotifyEmbeds && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3">Singles réalisés dans le cadre de cette offre</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.singlesProduced')}</h3>
               <div className="space-y-3">
                 {((service as any).spotifyEmbeds as string[]).map((embedUrl: string, i: number) => (
                   <div key={i} className="bg-card rounded-lg p-2 border border-border/50">
@@ -393,7 +397,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                     }, 300);
                   }}
                 >
-                  Demander un devis
+                  {t('services.cta.bookNow')}
                 </Button>
               </div>
             </CardContent>
