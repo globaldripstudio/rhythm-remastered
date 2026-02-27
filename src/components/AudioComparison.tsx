@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, Headphones, Mic } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Spectrum analyzer component
 const SpectrumAnalyzer = ({ 
@@ -26,7 +27,6 @@ const SpectrumAnalyzer = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Initialize audio context and analyser only once
     if (!sourceConnectedRef.current && isPlaying) {
       try {
         if (!sharedAudioContextRef.current) {
@@ -47,13 +47,11 @@ const SpectrumAnalyzer = ({
       }
     }
 
-    // Get computed colors from CSS variables
     const computedStyle = getComputedStyle(document.documentElement);
     const primaryColor = computedStyle.getPropertyValue('--primary').trim();
-    const bgColor = "#0a0a0b"; // Dark background fallback
+    const bgColor = "#0a0a0b";
     const mutedColor = "rgba(255, 255, 255, 0.3)";
     
-    // Parse primary HSL and convert to usable format
     const primaryHsl = `hsl(${primaryColor})`;
     const primaryHsl70 = `hsla(${primaryColor} / 0.7)`;
     const primaryHsl40 = `hsla(${primaryColor} / 0.4)`;
@@ -68,7 +66,6 @@ const SpectrumAnalyzer = ({
       animationRef.current = requestAnimationFrame(draw);
       analyser.getByteFrequencyData(dataArray);
 
-      // Clear canvas with background
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -85,7 +82,6 @@ const SpectrumAnalyzer = ({
         const x = i * (barWidth + gap);
         const y = canvas.height - barHeight;
 
-        // Create gradient for each bar with actual color values
         const gradient = ctx.createLinearGradient(x, canvas.height, x, y);
         gradient.addColorStop(0, primaryHsl);
         gradient.addColorStop(0.5, primaryHsl70);
@@ -93,27 +89,23 @@ const SpectrumAnalyzer = ({
         
         ctx.fillStyle = gradient;
         
-        // Draw rounded bars
         const radius = barWidth / 2;
         ctx.beginPath();
         ctx.roundRect(x, y, barWidth, barHeight, [radius, radius, 0, 0]);
         ctx.fill();
 
-        // Add glow effect
         ctx.shadowColor = primaryHsl;
         ctx.shadowBlur = 10;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
       }
       
-      // Reset shadow
       ctx.shadowBlur = 0;
     };
 
     if (isPlaying && analyserRef.current) {
       draw();
     } else {
-      // Draw static idle bars when not playing
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
@@ -152,6 +144,7 @@ const SpectrumAnalyzer = ({
 };
 
 const AudioComparison = () => {
+  const { t } = useTranslation();
   const [selectedGenre, setSelectedGenre] = useState('hiphop');
   const [playingBefore, setPlayingBefore] = useState(false);
   const [playingAfter, setPlayingAfter] = useState(false);
@@ -162,113 +155,73 @@ const AudioComparison = () => {
   const genres = [
     { 
       key: 'hiphop', 
-      title: 'Hip-Hop',
-      description: 'Punch et clarté pour le rap moderne',
       beforeSrc: '/audio/hef-no-mix.wav',
       afterSrc: '/audio/hef-mixed.wav',
       credits: '"HEFNER" by Tany, produit au Global Drip Studio et paru le 1er décembre 2023'
     },
     { 
       key: 'rock', 
-      title: 'Rock',
-      description: 'Puissance et dynamique pour le rock',
       beforeSrc: '/audio/excalibur-no-mix.wav',
       afterSrc: '/audio/excalibur-mixed.wav',
       credits: '"Excalibur" by Venin, édité/enregistré (voix)/mixé/masterisé au Global Drip Studio et paru le 15 mai 2025'
     },
     { 
       key: 'edm', 
-      title: 'EDM',
-      description: 'Impact et largeur pour l\'électronique',
       beforeSrc: '/audio/bigbass-no-mix.wav',
       afterSrc: '/audio/bigbass-mixed.wav',
       credits: '"BIG BASS" by Eddy de Mart, mixé et masterisé au Global Drip Studio, unreleased'
     }
   ];
 
-  // Stop all audio when switching genres
   useEffect(() => {
-    if (beforeRef.current) {
-      beforeRef.current.pause();
-      beforeRef.current.currentTime = 0;
-    }
-    if (afterRef.current) {
-      afterRef.current.pause();
-      afterRef.current.currentTime = 0;
-    }
+    if (beforeRef.current) { beforeRef.current.pause(); beforeRef.current.currentTime = 0; }
+    if (afterRef.current) { afterRef.current.pause(); afterRef.current.currentTime = 0; }
     setPlayingBefore(false);
     setPlayingAfter(false);
   }, [selectedGenre]);
 
+  const audioContextRef = useRef<AudioContext>();
+
   const handleBeforePlay = async () => {
-    if (afterRef.current) {
-      afterRef.current.pause();
-      setPlayingAfter(false);
-    }
-    
+    if (afterRef.current) { afterRef.current.pause(); setPlayingAfter(false); }
     if (beforeRef.current) {
-      if (playingBefore) {
-        beforeRef.current.pause();
-        setPlayingBefore(false);
-      } else {
+      if (playingBefore) { beforeRef.current.pause(); setPlayingBefore(false); }
+      else {
         try {
-          // Resume AudioContext on mobile (required for iOS/Android)
-          if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-            await audioContextRef.current.resume();
-          }
-          await beforeRef.current.play();
-          setPlayingBefore(true);
-        } catch (error) {
-          console.error('Error playing audio:', error);
-        }
+          if (audioContextRef.current && audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
+          await beforeRef.current.play(); setPlayingBefore(true);
+        } catch (error) { console.error('Error playing audio:', error); }
       }
     }
   };
 
   const handleAfterPlay = async () => {
-    if (beforeRef.current) {
-      beforeRef.current.pause();
-      setPlayingBefore(false);
-    }
-    
+    if (beforeRef.current) { beforeRef.current.pause(); setPlayingBefore(false); }
     if (afterRef.current) {
-      if (playingAfter) {
-        afterRef.current.pause();
-        setPlayingAfter(false);
-      } else {
+      if (playingAfter) { afterRef.current.pause(); setPlayingAfter(false); }
+      else {
         try {
-          // Resume AudioContext on mobile (required for iOS/Android)
-          if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-            await audioContextRef.current.resume();
-          }
-          await afterRef.current.play();
-          setPlayingAfter(true);
-        } catch (error) {
-          console.error('Error playing audio:', error);
-        }
+          if (audioContextRef.current && audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
+          await afterRef.current.play(); setPlayingAfter(true);
+        } catch (error) { console.error('Error playing audio:', error); }
       }
     }
   };
-
-  // Reference to the shared AudioContext for mobile resume
-  const audioContextRef = useRef<AudioContext>();
 
   const currentGenre = genres.find(g => g.key === selectedGenre);
 
   return (
     <section id="audio-comparison" className="py-16 sm:py-20 md:py-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6">
-        {/* Section Header */}
         <div className="text-center mb-8 sm:mb-10 animate-fade-in">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
-            Écoutez la <span className="hero-text">Différence</span>
+            {t('audio.title')} <span className="hero-text">{t('audio.titleHighlight')}</span>
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Comparez l'avant/après de notre travail sur différents styles
+            {t('audio.subtitle')}
           </p>
         </div>
 
-        {/* Genre Selection - More compact pills */}
         <div className="flex justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
           {genres.map((genre) => (
             <button
@@ -280,104 +233,63 @@ const AudioComparison = () => {
                   : 'bg-card/60 text-muted-foreground border border-border/50 hover:border-primary/50 hover:text-foreground hover:scale-105 hover:shadow-md hover:shadow-primary/10'
               }`}
             >
-              {/* Animated background gradient on hover */}
-              <span className={`absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                selectedGenre === genre.key ? 'opacity-0' : ''
-              }`} />
-              {/* Shine effect on hover */}
+              <span className={`absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${selectedGenre === genre.key ? 'opacity-0' : ''}`} />
               <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              <span className="relative z-10">{genre.title}</span>
+              <span className="relative z-10">{t(`audio.${genre.key}.title`)}</span>
             </button>
           ))}
         </div>
 
-        {/* Main Audio Comparison Card */}
         <div className="max-w-4xl mx-auto">
           <Card className="overflow-hidden border-border/50 bg-card/40 backdrop-blur-sm">
-            {/* Genre Info Header */}
             <div className="text-center py-4 sm:py-5 px-4 border-b border-border/30 bg-card/30">
-              <h3 className="text-lg sm:text-xl font-semibold mb-1">{currentGenre?.title}</h3>
-              <p className="text-sm text-muted-foreground">{currentGenre?.description}</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-1">{t(`audio.${selectedGenre}.title`)}</h3>
+              <p className="text-sm text-muted-foreground">{t(`audio.${selectedGenre}.description`)}</p>
             </div>
 
-            {/* Audio Players - Side by side on all screens */}
             <div className="grid grid-cols-2 divide-x divide-border/30">
-              {/* Before */}
               <div className="p-4 sm:p-6">
                 <div className="text-center mb-3 sm:mb-4">
-                  <span className="text-xs sm:text-sm uppercase tracking-wider text-muted-foreground font-medium">Avant</span>
+                  <span className="text-xs sm:text-sm uppercase tracking-wider text-muted-foreground font-medium">{t('audio.before')}</span>
                 </div>
-                <audio
-                  ref={beforeRef}
-                  src={currentGenre?.beforeSrc}
-                  onEnded={() => setPlayingBefore(false)}
-                  onLoadStart={() => setPlayingBefore(false)}
-                  crossOrigin="anonymous"
-                />
+                <audio ref={beforeRef} src={currentGenre?.beforeSrc} onEnded={() => setPlayingBefore(false)} onLoadStart={() => setPlayingBefore(false)} crossOrigin="anonymous" />
                 <SpectrumAnalyzer audioRef={beforeRef} isPlaying={playingBefore} sharedAudioContextRef={audioContextRef} />
-                <Button
-                  onClick={handleBeforePlay}
-                  variant="outline"
-                  className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 transition-all duration-300 ${
-                    playingBefore ? 'border-primary/50 bg-primary/10' : ''
-                  }`}
-                >
+                <Button onClick={handleBeforePlay} variant="outline" className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 transition-all duration-300 ${playingBefore ? 'border-primary/50 bg-primary/10' : ''}`}>
                   {playingBefore ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5" />}
-                  <span className="ml-2 text-sm sm:text-base">{playingBefore ? 'Pause' : 'Original'}</span>
+                  <span className="ml-2 text-sm sm:text-base">{playingBefore ? t('audio.pause') : t('audio.original')}</span>
                 </Button>
               </div>
 
-              {/* After */}
               <div className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-transparent">
                 <div className="text-center mb-3 sm:mb-4">
-                  <span className="text-xs sm:text-sm uppercase tracking-wider text-primary font-medium">Après</span>
+                  <span className="text-xs sm:text-sm uppercase tracking-wider text-primary font-medium">{t('audio.after')}</span>
                 </div>
-                <audio
-                  ref={afterRef}
-                  src={currentGenre?.afterSrc}
-                  onEnded={() => setPlayingAfter(false)}
-                  onLoadStart={() => setPlayingAfter(false)}
-                  crossOrigin="anonymous"
-                />
+                <audio ref={afterRef} src={currentGenre?.afterSrc} onEnded={() => setPlayingAfter(false)} onLoadStart={() => setPlayingAfter(false)} crossOrigin="anonymous" />
                 <SpectrumAnalyzer audioRef={afterRef} isPlaying={playingAfter} sharedAudioContextRef={audioContextRef} />
-                <Button
-                  onClick={handleAfterPlay}
-                  className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 studio-button transition-all duration-300 ${
-                    playingAfter ? 'shadow-lg shadow-primary/30' : ''
-                  }`}
-                >
+                <Button onClick={handleAfterPlay} className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 studio-button transition-all duration-300 ${playingAfter ? 'shadow-lg shadow-primary/30' : ''}`}>
                   {playingAfter ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5" />}
-                  <span className="ml-2 text-sm sm:text-base">{playingAfter ? 'Pause' : 'Mixé'}</span>
+                  <span className="ml-2 text-sm sm:text-base">{playingAfter ? t('audio.pause') : t('audio.mixed')}</span>
                 </Button>
               </div>
             </div>
 
-            {/* Credits Footer */}
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border/30 bg-card/20">
-              <p className="text-xs sm:text-sm text-muted-foreground/70 text-center italic">
-                {currentGenre?.credits}
-              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground/70 text-center italic">{currentGenre?.credits}</p>
             </div>
           </Card>
 
-          {/* Listening Tip */}
           <div className="flex items-center justify-center gap-2 mt-4 sm:mt-6 text-xs sm:text-sm text-muted-foreground/60">
             <Headphones className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>Casque recommandé</span>
+            <span>{t('audio.headphones')}</span>
           </div>
 
-          {/* CTA */}
           <div className="text-center mt-8 sm:mt-10">
-            <Button 
-              size="lg" 
-              className="studio-button"
-              onClick={() => {
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
-              }}
-            >
+            <Button size="lg" className="studio-button" onClick={() => {
+              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              setTimeout(() => window.dispatchEvent(new Event('highlight-phone')), 800);
+            }}>
               <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Réserver une session
+              {t('audio.bookSession')}
             </Button>
           </div>
         </div>

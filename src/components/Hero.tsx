@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Play, Headphones, Mic } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import studioHero from "@/assets/studio-hero.jpg";
 import logoOrange from "@/assets/logo-orange.png";
 
 const Hero = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const img = new Image();
@@ -24,21 +26,15 @@ const Hero = () => {
         <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
           <div className="text-center">
             <div className="relative mb-8">
-              {/* Complex loading animation */}
               <div className="relative w-32 h-32">
-                {/* Outer ring */}
                 <div className="absolute inset-0 border-4 border-primary/10 rounded-full"></div>
-                {/* Rotating elements */}
                 <div className="absolute inset-0 border-4 border-primary border-t-transparent border-r-transparent rounded-full animate-spin"></div>
                 <div className="absolute inset-2 border-4 border-secondary border-b-transparent border-l-transparent rounded-full animate-spin animate-reverse" style={{ animationDuration: '1.5s' }}></div>
                 <div className="absolute inset-4 border-4 border-primary/60 border-r-transparent border-t-transparent rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
-                {/* Center pulsing circle */}
                 <div className="absolute inset-8 bg-gradient-to-r from-primary to-secondary rounded-full animate-pulse"></div>
-                {/* Sound waves */}
                 <div className="absolute inset-6 border-2 border-primary/30 rounded-full animate-ping"></div>
                 <div className="absolute inset-4 border-2 border-secondary/20 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
               </div>
-              {/* Floating elements */}
               <div className="absolute -top-2 -right-2 w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               <div className="absolute -bottom-2 -left-2 w-2 h-2 bg-secondary rounded-full animate-bounce" style={{ animationDelay: '0.8s' }}></div>
             </div>
@@ -47,7 +43,7 @@ const Hero = () => {
               <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent animate-pulse">
                 GLOBAL DRIP STUDIO
               </h3>
-              <p className="text-muted-foreground animate-pulse">Initialisation du studio...</p>
+              <p className="text-muted-foreground animate-pulse">{t('hero.loading')}</p>
               <div className="flex justify-center">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
@@ -73,43 +69,43 @@ const Hero = () => {
       {/* Content */}
       <div className={`relative z-10 container mx-auto px-6 text-center transition-all duration-1000 flex flex-col justify-center min-h-screen ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="animate-fade-in flex flex-col items-center justify-center flex-1 pb-32">
-          {/* Welcome Badge with Glassmorphism */}
+          {/* Welcome Badge */}
           <div className="inline-flex items-center px-5 py-2.5 rounded-full bg-card/40 backdrop-blur-md border border-primary/20 mb-6 shadow-lg shadow-primary/5 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse opacity-50" />
             <Headphones className="w-4 h-4 mr-2 text-primary relative z-10" aria-hidden="true" />
-            <span className="text-sm text-muted-foreground relative z-10">Bienvenue au Studio</span>
+            <span className="text-sm text-muted-foreground relative z-10">{t('hero.welcome')}</span>
           </div>
 
-          {/* BLOC 1: Title + Subtitle - Importance: Maximale */}
+          {/* Title + Subtitle */}
           <div className="mb-10 sm:mb-12">
             <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight">
-              <span className="hero-text">GLOBAL DRIP</span>
+              <span className="hero-text">{t('hero.title1')}</span>
               <br />
-              <span className="text-foreground">STUDIO</span>
+              <span className="text-foreground">{t('hero.title2')}</span>
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
-              Magnifiez votre musique à nos côtés. Enregistrement, mixage, mastering et sound design professionnel
+              {t('hero.subtitle')}
             </p>
           </div>
 
-          {/* BLOC 2: Stats - Importance: Moyenne (crédibilité) */}
+          {/* Stats */}
           <div className="flex flex-row justify-center items-center gap-6 sm:gap-8 md:gap-12 mb-10 sm:mb-12">
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-primary">200+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Projets réalisés</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">{t('hero.projectsDone')}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-secondary">10+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Années d'expérience</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">{t('hero.yearsExp')}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Artistes accompagnés</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">{t('hero.artistsHelped')}</div>
             </div>
           </div>
 
-          {/* BLOC 3: CTA + Trust Indicators - Importance: Haute (conversion) */}
+          {/* CTA */}
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               <Button size="lg" className="studio-button text-base sm:text-lg px-7 sm:px-9 py-[1.35rem] sm:py-[1.6rem] w-full sm:w-auto" onClick={() => {
@@ -122,34 +118,34 @@ const Hero = () => {
                 setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-phone')), 800);
               }}>
                 <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Réserver une session
+                {t('hero.bookSession')}
               </Button>
               <a href="/projets" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="text-base sm:text-lg px-7 sm:px-9 py-[1.35rem] sm:py-[1.6rem] border-border hover:bg-muted w-full">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Écouter nos réalisations
+                  {t('hero.listenWork')}
                 </Button>
               </a>
             </div>
             <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground px-2">
               <div className="flex items-center">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2 animate-glow-pulse" />
-                Expertise depuis 2019
+                {t('hero.expertise')}
               </div>
               <div className="flex items-center">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full mr-1.5 sm:mr-2" />
-                Équipement haut de gamme
+                {t('hero.premiumGear')}
               </div>
               <div className="flex items-center">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mr-1.5 sm:mr-2" />
-                Ingénieur certifié
+                {t('hero.certifiedEng')}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Orange Logo with Animated Gradient - Fixed at bottom */}
+      {/* Orange Logo */}
       <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex justify-center">
         <div 
           className="h-24 sm:h-32 md:h-40 w-24 sm:w-32 md:w-40 opacity-40 animate-[gradient-shift_3s_ease-in-out_infinite]"
@@ -174,7 +170,6 @@ const Hero = () => {
           <div className="w-1.5 h-3 bg-gradient-to-b from-primary to-secondary rounded-full animate-bounce" />
         </div>
       </div>
-
     </section>
   );
 };

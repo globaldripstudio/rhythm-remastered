@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { 
   Headphones, 
   Mic, 
@@ -14,6 +15,8 @@ import {
 } from "lucide-react";
 
 const Equipment = () => {
+  const { t } = useTranslation();
+
   const equipmentData = {
     sommation: [
       { name: "Dangerous Music 2Bus+", type: "Sommation analogique", status: "premium" },
@@ -119,16 +122,16 @@ const Equipment = () => {
   const [selectedCategory, setSelectedCategory] = useState('sommation');
 
   const categories = [
-    { key: 'sommation', title: 'Sommation & Conversion', icon: HardDrive },
-    { key: 'daw', title: 'Logiciels', icon: Cpu },
-    { key: 'ecoutes', title: 'Écoutes', icon: Headphones },
-    { key: 'microphones', title: 'Microphones', icon: Mic },
-    { key: 'preamps', title: 'Préamplificateurs', icon: Settings },
-    { key: 'equalizers', title: 'Égaliseurs', icon: Monitor },
-    { key: 'compressors', title: 'Compresseurs & Effets', icon: Zap },
-    { key: 'instruments', title: 'Instruments', icon: Volume2 },
-    { key: 'backline', title: 'Backline', icon: Volume2 },
-    { key: 'plugins', title: 'Plugins', icon: Cpu }
+    { key: 'sommation', icon: HardDrive },
+    { key: 'daw', icon: Cpu },
+    { key: 'ecoutes', icon: Headphones },
+    { key: 'microphones', icon: Mic },
+    { key: 'preamps', icon: Settings },
+    { key: 'equalizers', icon: Monitor },
+    { key: 'compressors', icon: Zap },
+    { key: 'instruments', icon: Volume2 },
+    { key: 'backline', icon: Volume2 },
+    { key: 'plugins', icon: Cpu }
   ];
 
   const getStatusColor = (status: string) => {
@@ -143,33 +146,18 @@ const Equipment = () => {
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "premium": return "Premium";
-      case "vintage": return "Vintage";
-      case "classic": return "Classique";
-      case "industry": return "Industry Standard";
-      case "creative": return "Créatif";
-      case "signature": return "Signature";
-      default: return "Standard";
-    }
-  };
-
   return (
     <section id="equipement" className="py-16 sm:py-20 md:py-24 bg-muted/10">
       <div className="container mx-auto px-4 sm:px-6">
-        {/* Section Header */}
         <div className="text-center mb-10 sm:mb-12 md:mb-16 animate-fade-in">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-            Notre <span className="hero-text">Équipement</span>
+            {t('equipment.title')} <span className="hero-text">{t('equipment.titleHighlight')}</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2">
-            Un parc technique exceptionnel alliant le meilleur de l'analogique vintage 
-            et les dernières innovations numériques
+            {t('equipment.subtitle')}
           </p>
         </div>
 
-        {/* Category Navigation */}
         <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 sm:mb-10 md:mb-12">
           {categories.map((category) => (
             <Button
@@ -180,13 +168,12 @@ const Equipment = () => {
               className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
             >
               <category.icon className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline sm:inline">{category.title}</span>
-              <span className="xs:hidden sm:hidden">{category.title.split(' ')[0]}</span>
+              <span className="hidden xs:inline sm:inline">{t(`equipment.categories.${category.key}`)}</span>
+              <span className="xs:hidden sm:hidden">{(t(`equipment.categories.${category.key}`) as string).split(' ')[0]}</span>
             </Button>
           ))}
         </div>
 
-        {/* Equipment List */}
         <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-10 sm:mb-12 md:mb-16">
           {equipmentData[selectedCategory as keyof typeof equipmentData].map((item, index) => (
             <Card 
@@ -196,11 +183,8 @@ const Equipment = () => {
             >
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                  <Badge 
-                    className={`${getStatusColor(item.status)} text-[10px] sm:text-xs`}
-                    variant="secondary"
-                  >
-                    {getStatusLabel(item.status)}
+                  <Badge className={`${getStatusColor(item.status)} text-[10px] sm:text-xs`} variant="secondary">
+                    {t(`equipment.status.${item.status}`)}
                   </Badge>
                 </div>
                 <h4 className="font-semibold text-xs sm:text-sm mb-0.5 sm:mb-1 text-foreground">{item.name}</h4>
@@ -209,7 +193,6 @@ const Equipment = () => {
             </Card>
           ))}
         </div>
-
       </div>
     </section>
   );

@@ -1,11 +1,29 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t, i18n } = useTranslation();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+  };
+
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      const yOffset = -100;
+      const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('highlight-phone'));
+      }, 800);
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border" role="banner">
@@ -26,71 +44,83 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8" aria-label="Navigation principale">
-            <a href="#accueil" className="nav-link">Accueil</a>
-            <a href="#services" className="nav-link">Services</a>
-            <a href="#equipement" className="nav-link">Équipement</a>
-            <a href="#contact" className="nav-link">Contact</a>
+            <a href="#accueil" className="nav-link">{t('nav.home')}</a>
+            <a href="#services" className="nav-link">{t('nav.services')}</a>
+            <a href="#equipement" className="nav-link">{t('nav.equipment')}</a>
+            <a href="#contact" className="nav-link">{t('nav.contact')}</a>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/projets" className="nav-link text-muted-foreground">Projets</a>
+            <a href="/projets" className="nav-link text-muted-foreground">{t('nav.projects')}</a>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/blog" className="nav-link text-muted-foreground">Blog</a>
+            <a href="/blog" className="nav-link text-muted-foreground">{t('nav.blog')}</a>
             <span className="text-muted-foreground/50">|</span>
             <span className="relative inline-flex items-center cursor-not-allowed">
-              <span className="text-muted-foreground/50">Boutique</span>
+              <span className="text-muted-foreground/50">{t('nav.shop')}</span>
               <span className="absolute -top-3 -right-4 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                bientôt
+                {t('nav.shopSoon')}
               </span>
             </span>
           </nav>
 
-          {/* Contact Info & CTA */}
+          {/* Contact Info & CTA & Language Switch */}
           <div className="hidden lg:flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <Phone className="w-4 h-4" />
               <span>+33 6 59 79 73 42</span>
             </div>
-            <Button variant="default" className="studio-button" onClick={() => {
-              const contactSection = document.getElementById('contact');
-              if (contactSection) {
-                const yOffset = -100;
-                const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-                setTimeout(() => {
-                  window.dispatchEvent(new CustomEvent('highlight-phone'));
-                }, 800);
-              }
-            }}>
-              Réserver
+            <Button variant="default" className="studio-button" onClick={scrollToContact}>
+              {t('nav.book')}
             </Button>
+            {/* Language Switch */}
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
+              aria-label="Switch language"
+            >
+              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className="text-muted-foreground/40">|</span>
+              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={toggleMenu}
-            className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
-            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-navigation"
-          >
-            {isMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            {/* Mobile Language Switch */}
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50"
+              aria-label="Switch language"
+            >
+              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className="text-muted-foreground/40">|</span>
+              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+            </button>
+            <button
+              onClick={toggleMenu}
+              className="p-2 text-foreground hover:text-primary transition-colors"
+              aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
+            >
+              {isMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div id="mobile-navigation" className="md:hidden mt-4 py-4 border-t border-border animate-fade-in" role="navigation" aria-label="Navigation mobile">
             <nav className="flex flex-col space-y-4">
-              <a href="#accueil" className="py-2 nav-link" onClick={toggleMenu}>Accueil</a>
-              <a href="#services" className="py-2 nav-link" onClick={toggleMenu}>Services</a>
-              <a href="#equipement" className="py-2 nav-link" onClick={toggleMenu}>Équipement</a>
-              <a href="#contact" className="py-2 nav-link" onClick={toggleMenu}>Contact</a>
+              <a href="#accueil" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.home')}</a>
+              <a href="#services" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.services')}</a>
+              <a href="#equipement" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.equipment')}</a>
+              <a href="#contact" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.contact')}</a>
               <div className="border-t border-border my-2"></div>
-              <a href="/projets" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Projets</a>
-              <a href="/blog" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>Blog</a>
+              <a href="/projets" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>{t('nav.projects')}</a>
+              <a href="/blog" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>{t('nav.blog')}</a>
               <span className="py-2 relative inline-flex items-center cursor-not-allowed">
-                <span className="text-muted-foreground/50">Boutique</span>
+                <span className="text-muted-foreground/50">{t('nav.shop')}</span>
                 <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                  bientôt
+                  {t('nav.shopSoon')}
                 </span>
               </span>
               <div className="pt-4 border-t border-border">
@@ -100,17 +130,9 @@ const Header = () => {
                 </div>
                 <Button variant="default" className="studio-button w-full" onClick={() => { 
                   toggleMenu(); 
-                  const contactSection = document.getElementById('contact');
-                  if (contactSection) {
-                    const yOffset = -100;
-                    const y = contactSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                    window.scrollTo({ top: y, behavior: 'smooth' });
-                    setTimeout(() => {
-                      window.dispatchEvent(new CustomEvent('highlight-phone'));
-                    }, 800);
-                  }
+                  scrollToContact();
                 }}>
-                  Réserver
+                  {t('nav.book')}
                 </Button>
               </div>
             </nav>
