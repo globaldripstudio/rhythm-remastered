@@ -70,6 +70,11 @@ const BlogArticle = () => {
             <p className="mb-6">{t('blog.articles.venin.technicalDrums')}</p>
             <p className="mb-6">{t('blog.articles.venin.outro')}</p>
 
+            <div className="mb-8">
+              <img src="/lovable-uploads/venin-logo-2.jpg" alt="Logo Venin" className="w-full max-w-none h-auto rounded-lg" />
+              <p className="text-sm italic text-muted-foreground mt-2 text-center">{t('blog.articles.venin.logoCaption')}</p>
+            </div>
+
             <p className="mb-6">
               {t('blog.articles.venin.availableOn')} <a href="https://venin1.bandcamp.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://venin1.bandcamp.com/</a>
             </p>
