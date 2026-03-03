@@ -43,11 +43,12 @@ const BlogArticle = () => {
 
             <h3 className="text-2xl font-bold mb-4">{t('blog.articles.venin.eightiesTitle')}</h3>
 
-            <ul className="list-disc pl-6 mb-6 space-y-2">
+            <ul className="list-disc pl-6 mb-6 space-y-3">
               <li>{t('blog.articles.venin.eighties1')}</li>
               <li>{t('blog.articles.venin.eighties2')}</li>
               <li>{t('blog.articles.venin.eighties3')}</li>
               <li>{t('blog.articles.venin.eighties4')}</li>
+              <li>{t('blog.articles.venin.eighties5')}</li>
             </ul>
 
             <div className="mb-8">
@@ -55,22 +56,19 @@ const BlogArticle = () => {
               <p className="text-sm italic text-muted-foreground mt-2 text-center">{t('blog.articles.venin.battiniCaption')}</p>
             </div>
 
-            <h3 className="text-2xl font-bold mb-4">{t('blog.articles.venin.recordingTitle')}</h3>
-            <p className="mb-6">{t('blog.articles.venin.recordingP1')}</p>
+            <h3 className="text-2xl font-bold mb-4">{t('blog.articles.venin.technicalTitle')}</h3>
 
-            <div className="mb-8">
-              <img src="/lovable-uploads/image00001.jpeg.png" alt={t('blog.articles.venin.sessionCaption1')} className="w-full max-w-none h-auto rounded-lg" />
-              <p className="text-sm italic text-muted-foreground mt-2 text-center">{t('blog.articles.venin.sessionCaption1')}</p>
+            <p className="mb-6">{t('blog.articles.venin.technicalP1')}</p>
+            <p className="mb-6">{t('blog.articles.venin.technicalP2')}</p>
+
+            <div className="bg-muted/30 rounded-lg p-4 mb-6 space-y-2 font-mono text-sm">
+              <p>{t('blog.articles.venin.technicalChain1')}</p>
+              <p>{t('blog.articles.venin.technicalChain2')}</p>
             </div>
 
-            <p className="mb-6">{t('blog.articles.venin.recordingP2')}</p>
-
-            <div className="mb-8">
-              <img src="/lovable-uploads/image00002.jpeg.png" alt={t('blog.articles.venin.sessionCaption2')} className="w-full max-w-none h-auto rounded-lg" />
-              <p className="text-sm italic text-muted-foreground mt-2 text-center">{t('blog.articles.venin.sessionCaption2')}</p>
-            </div>
-
-            <p className="mb-6">{t('blog.articles.venin.recordingP3')}</p>
+            <p className="mb-6">{t('blog.articles.venin.technicalVocals')}</p>
+            <p className="mb-6">{t('blog.articles.venin.technicalDrums')}</p>
+            <p className="mb-6">{t('blog.articles.venin.outro')}</p>
 
             <p className="mb-6">
               {t('blog.articles.venin.availableOn')} <a href="https://venin1.bandcamp.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://venin1.bandcamp.com/</a>
