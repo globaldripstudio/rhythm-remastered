@@ -33,38 +33,47 @@ const BlogArticle = () => {
             <div className="mb-8">
               <img src="/lovable-uploads/venin-album-cover.jpg" alt="Album Le Premier Sang de Venin" className="w-full max-w-none h-auto rounded-lg" />
               <p className="text-sm italic text-muted-foreground mt-2 text-center">
-                Le double vinyl de l'album "Le Premier Sang" est disponible sur Bandcamp.
+                {t('blog.articles.venin.coverCaption')}
               </p>
             </div>
 
-            <p className="mb-6">
-              Venin est un groupe de rock français incontournable, né à Marseille en 1983. Alliant l'énergie brute du hard rock à des influences heavy en passant par le blues, Venin inscrit son nom sur la carte de la scène nationale grâce à ses textes chantés en français et son identité musicale singulière.
-            </p>
+            <p className="mb-6">{t('blog.articles.venin.intro1')}</p>
+            <p className="mb-6">{t('blog.articles.venin.intro2')}</p>
+            <p className="mb-6">{t('blog.articles.venin.intro3')}</p>
 
-            <p className="mb-6">
-              Malgré une pause à la fin de la décennie, Venin renaît dans les années 2010, retrouvant son public fidèle et une dynamique de création renouvelée.
-            </p>
-
-            <p className="mb-6">
-              Pour leur dernier album, "Le Premier Sang", j'ai eu le plaisir d'accueillir Venin au Global Drip Studio, où j'ai assuré l'édition, le mixage et le mastering des 9 titres inédits, ainsi que l'enregistrement des voix, des parties solo, et quelques arrangements claviers.
-            </p>
-
-            <h3 className="text-2xl font-bold mb-4">L'album a été entièrement pensé pour sonner eighties :</h3>
+            <h3 className="text-2xl font-bold mb-4">{t('blog.articles.venin.eightiesTitle')}</h3>
 
             <ul className="list-disc pl-6 mb-6 space-y-2">
-              <li>Des compositions typiques des grandes années du hard/heavy metal.</li>
-              <li>Tous les musiciens ont été enregistrés en même temps, en réseau.</li>
-              <li>Aucune partie n'a été copiée/collée.</li>
-              <li>Pas d'utilisation de trig.</li>
+              <li>{t('blog.articles.venin.eighties1')}</li>
+              <li>{t('blog.articles.venin.eighties2')}</li>
+              <li>{t('blog.articles.venin.eighties3')}</li>
+              <li>{t('blog.articles.venin.eighties4')}</li>
             </ul>
 
             <div className="mb-8">
               <img src="/lovable-uploads/jean-marc-battini.jpg" alt="Jean-Marc Battini" className="w-full max-w-none h-auto rounded-lg" />
-              <p className="text-sm italic text-muted-foreground mt-2 text-center">Jean-Marc Battini, fondateur de Venin</p>
+              <p className="text-sm italic text-muted-foreground mt-2 text-center">{t('blog.articles.venin.battiniCaption')}</p>
             </div>
 
+            <h3 className="text-2xl font-bold mb-4">{t('blog.articles.venin.recordingTitle')}</h3>
+            <p className="mb-6">{t('blog.articles.venin.recordingP1')}</p>
+
+            <div className="mb-8">
+              <img src="/lovable-uploads/image00001.jpeg.png" alt={t('blog.articles.venin.sessionCaption1')} className="w-full max-w-none h-auto rounded-lg" />
+              <p className="text-sm italic text-muted-foreground mt-2 text-center">{t('blog.articles.venin.sessionCaption1')}</p>
+            </div>
+
+            <p className="mb-6">{t('blog.articles.venin.recordingP2')}</p>
+
+            <div className="mb-8">
+              <img src="/lovable-uploads/image00002.jpeg.png" alt={t('blog.articles.venin.sessionCaption2')} className="w-full max-w-none h-auto rounded-lg" />
+              <p className="text-sm italic text-muted-foreground mt-2 text-center">{t('blog.articles.venin.sessionCaption2')}</p>
+            </div>
+
+            <p className="mb-6">{t('blog.articles.venin.recordingP3')}</p>
+
             <p className="mb-6">
-              L'album "Le Premier Sang" est disponible sur toutes les plateformes : <a href="https://venin1.bandcamp.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://venin1.bandcamp.com/</a>
+              {t('blog.articles.venin.availableOn')} <a href="https://venin1.bandcamp.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://venin1.bandcamp.com/</a>
             </p>
 
             <div className="mb-8">
