@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -32,9 +31,8 @@ const BlogArticleHeader = () => {
             </Link>
             <Link to="/blog">
               <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">{t('nav.backBlog')}</span>
-                <span className="sm:hidden">{t('nav.backBlogShort')}</span>
+                <span className="hidden sm:inline">← {t('nav.backBlog')}</span>
+                <span className="sm:hidden">← {t('nav.backBlogShort')}</span>
               </Button>
             </Link>
           </div>
