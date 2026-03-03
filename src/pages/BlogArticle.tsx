@@ -97,18 +97,13 @@ const BlogArticle = () => {
           </div>
       };
     }
-    if (slug === "comprendre-la-compression") {
-      return {
-        title: t('blog.cards.compression.title'),
-        author: "Global Drip Studio",
-        date: "2024-12-10",
-        readTime: "5 min",
-        category: t('blog.cards.compression.category'),
-        content: <ComprendreCompression />
-      };
-    }
     return null;
   };
+
+  // Full-page article components that handle their own layout
+  if (slug === "comprendre-la-compression") {
+    return <ComprendreCompression />;
+  }
 
   const article = getArticle();
   if (!article) {
