@@ -4,9 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Clock, User, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useBlogViews } from "@/hooks/useBlogViews";
+import { useTranslation } from "react-i18next";
 
 const Blog = () => {
   const { views, isLoading } = useBlogViews();
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    document.body.classList.add('lang-switching');
+    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    setTimeout(() => document.body.classList.remove('lang-switching'), 500);
+  };
 
   const posts = [
     {
@@ -75,11 +83,20 @@ const Blog = () => {
               </Link>
               <Link to="/">
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                  <span className="hidden sm:inline">← Retour à l'accueil</span>
-                  <span className="sm:hidden">← Accueil</span>
+                  <span className="hidden sm:inline">← {t('nav.backHome')}</span>
+                  <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
                 </Button>
               </Link>
             </div>
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
+              aria-label="Switch language"
+            >
+              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className="text-muted-foreground/40">|</span>
+              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+            </button>
           </div>
         </div>
       </header>
@@ -89,10 +106,10 @@ const Blog = () => {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-              Blog <span className="hero-text">Global Drip</span>
+              {t('blog.title')} <span className="hero-text">{t('blog.titleHighlight')}</span>
             </h1>
             <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Conseils, techniques et actualités du monde de l'audio professionnel
+              {t('blog.subtitle')}
             </p>
           </div>
         </div>
@@ -159,16 +176,16 @@ const Blog = () => {
                         className="w-full opacity-60 cursor-not-allowed"
                         disabled
                       >
-                        Lire l'article
+                        {t('blog.readArticle')}
                       </Button>
                       <span className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-medium">
-                        bientôt
+                        {t('blog.comingSoon')}
                       </span>
                     </div>
                   ) : (
                     <Link to={`/blog/${post.slug}`} className="block">
                       <Button variant="outline" className="w-full">
-                        Lire l'article
+                        {t('blog.readArticle')}
                       </Button>
                     </Link>
                   )}
@@ -179,10 +196,9 @@ const Blog = () => {
 
           {/* Coming Soon */}
           <div className="text-center mt-16 p-8 rounded-2xl bg-gradient-hero border border-border">
-            <h3 className="text-2xl font-bold mb-4">Plus d'articles bientôt</h3>
+            <h3 className="text-2xl font-bold mb-4">{t('blog.moreArticles')}</h3>
             <p className="text-muted-foreground">
-              Nous préparons du contenu exclusif sur les techniques d'enregistrement, 
-              le sound design et les secrets du studio professionnel.
+              {t('blog.moreArticlesDesc')}
             </p>
           </div>
         </div>

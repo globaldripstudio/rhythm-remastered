@@ -283,9 +283,16 @@
     "titleHighlight": "PROJECTS",
     "subtitle": "The artists and projects we are proud to have collaborated with",
     "loading": "Loading artistic collaborations...",
-    "servicesProvided": "Services:",
+    "learnMore": "Learn more",
+    "ourCollaboration": "Our collaboration",
+    "listen": "Listen",
+    "servicesProvided": "Services provided:",
     "listenOn": "Listen on",
-    "visitChannel": "Visit channel"
+    "visitChannel": "Visit channel",
+    "readyToJoin": "Ready to join our",
+    "collaborationsWord": "collaborations",
+    "readyDesc": "Every project is unique. Let's talk about your musical vision and create something extraordinary together.",
+    "startProject": "Start a project"
   },
   "ebook": {
     "badge": "Premium Training",

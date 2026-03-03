@@ -10,7 +10,9 @@ const Header = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const toggleLanguage = () => {
+    document.body.classList.add('lang-switching');
     i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    setTimeout(() => document.body.classList.remove('lang-switching'), 500);
   };
 
   const scrollToContact = () => {
