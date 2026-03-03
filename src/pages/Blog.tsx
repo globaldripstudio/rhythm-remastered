@@ -19,48 +19,48 @@ const Blog = () => {
   const posts = [
     {
       id: 1,
-      title: '"Le Premier Sang", le nouvel album du groupe Venin, est enfin disponible',
-      excerpt: "Découvrez l'album \"Le Premier Sang\" de Venin, entièrement enregistré, mixé et masterisé au Global Drip Studio.",
+      titleKey: "blog.cards.venin.title",
+      excerptKey: "blog.cards.venin.excerpt",
+      categoryKey: "blog.cards.venin.category",
       author: "Global Drip Studio",
       date: "2024-12-20",
       readTime: "8 min",
-      category: "Réalisations",
       image: "/lovable-uploads/venin-album-cover.jpg",
       slug: "venin-le-premier-sang",
       comingSoon: false
     },
     {
       id: 2,
-      title: "Comprendre la compression en 5 minutes",
-      excerpt: "La compression démystifiée : ratio, attack, release, knee. Apprenez à utiliser cet outil indispensable pour contrôler la dynamique de vos enregistrements.",
-      author: "Global Drip Studio", 
+      titleKey: "blog.cards.compression.title",
+      excerptKey: "blog.cards.compression.excerpt",
+      categoryKey: "blog.cards.compression.category",
+      author: "Global Drip Studio",
       date: "2024-12-10",
       readTime: "5 min",
-      category: "Techniques",
       image: "/lovable-uploads/Image-23.jpg",
       slug: "comprendre-la-compression",
       comingSoon: false
     },
     {
       id: 3,
-      title: "Bien mixer une voix : les 7 étapes essentielles",
-      excerpt: "Maîtrisez l'art du mixage vocal avec ces techniques professionnelles utilisées dans notre studio. De l'égalisation à la compression, découvrez nos secrets.",
+      titleKey: "blog.cards.voix.title",
+      excerptKey: "blog.cards.voix.excerpt",
+      categoryKey: "blog.cards.voix.category",
       author: "Global Drip Studio",
       date: "2024-12-15",
       readTime: "6 min",
-      category: "Mixage",
       image: "/lovable-uploads/_edited.jpg.png",
       slug: "bien-mixer-une-voix",
       comingSoon: true
     },
     {
       id: 4,
-      title: "10 techniques de sound design pour créer des ambiances uniques",
-      excerpt: "Explorez les techniques avancées de création sonore : field recording, granular synthesis, convolution reverb et manipulation spectrale pour des univers sonores immersifs.",
+      titleKey: "blog.cards.sounddesign.title",
+      excerptKey: "blog.cards.sounddesign.excerpt",
+      categoryKey: "blog.cards.sounddesign.category",
       author: "Global Drip Studio",
-      date: "2024-12-05", 
+      date: "2024-12-05",
       readTime: "9 min",
-      category: "Sound Design",
       image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
       slug: "10-techniques-sound-design",
       comingSoon: true
@@ -69,17 +69,12 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - matching Projets page style */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
               <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
-                <img 
-                  src="/lovable-uploads/logo-blanc-sans-fond.png"
-                  alt="Global Drip Studio"
-                  className="h-6 sm:h-8 object-contain"
-                />
+                <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
               </Link>
               <Link to="/">
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
@@ -101,39 +96,28 @@ const Blog = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="py-10 sm:py-16 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
               {t('blog.title')} <span className="hero-text">{t('blog.titleHighlight')}</span>
             </h1>
-            <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-              {t('blog.subtitle')}
-            </p>
+            <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">{t('blog.subtitle')}</p>
           </div>
         </div>
       </section>
 
-      {/* Blog Posts */}
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8">
             {posts.map((post) => (
               <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col">
                 <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                  <img src={post.image} alt={t(post.titleKey)} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
                   <div className="absolute top-4 left-4">
-                    <Badge variant="secondary" className="bg-primary text-primary-foreground">
-                      {post.category}
-                    </Badge>
+                    <Badge variant="secondary" className="bg-primary text-primary-foreground">{t(post.categoryKey)}</Badge>
                   </div>
-                  {/* View counter - only for available articles */}
                   {!post.comingSoon && (
                     <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-muted-foreground">
                       <Eye className="w-3 h-3" />
@@ -141,16 +125,10 @@ const Blog = () => {
                     </div>
                   )}
                 </div>
-                
                 <CardHeader className="flex-grow">
-                  <CardTitle className="text-base sm:text-lg leading-snug group-hover:text-primary transition-colors">
-                    {post.title}
-                  </CardTitle>
-                  <p className="text-muted-foreground text-sm">
-                    {post.excerpt}
-                  </p>
+                  <CardTitle className="text-base sm:text-lg leading-snug group-hover:text-primary transition-colors">{t(post.titleKey)}</CardTitle>
+                  <p className="text-muted-foreground text-sm">{t(post.excerptKey)}</p>
                 </CardHeader>
-
                 <CardContent>
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
                     <div className="flex items-center space-x-2">
@@ -171,22 +149,12 @@ const Blog = () => {
                   </div>
                   {post.comingSoon ? (
                     <div className="relative">
-                      <Button 
-                        variant="outline" 
-                        className="w-full opacity-60 cursor-not-allowed"
-                        disabled
-                      >
-                        {t('blog.readArticle')}
-                      </Button>
-                      <span className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-medium">
-                        {t('blog.comingSoon')}
-                      </span>
+                      <Button variant="outline" className="w-full opacity-60 cursor-not-allowed" disabled>{t('blog.readArticle')}</Button>
+                      <span className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-medium">{t('blog.comingSoon')}</span>
                     </div>
                   ) : (
                     <Link to={`/blog/${post.slug}`} className="block">
-                      <Button variant="outline" className="w-full">
-                        {t('blog.readArticle')}
-                      </Button>
+                      <Button variant="outline" className="w-full">{t('blog.readArticle')}</Button>
                     </Link>
                   )}
                 </CardContent>
@@ -194,12 +162,9 @@ const Blog = () => {
             ))}
           </div>
 
-          {/* Coming Soon */}
           <div className="text-center mt-16 p-8 rounded-2xl bg-gradient-hero border border-border">
             <h3 className="text-2xl font-bold mb-4">{t('blog.moreArticles')}</h3>
-            <p className="text-muted-foreground">
-              {t('blog.moreArticlesDesc')}
-            </p>
+            <p className="text-muted-foreground">{t('blog.moreArticlesDesc')}</p>
           </div>
         </div>
       </section>
