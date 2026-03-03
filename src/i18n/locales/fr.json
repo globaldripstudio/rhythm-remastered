@@ -283,9 +283,16 @@
     "titleHighlight": "PROJETS",
     "subtitle": "Les artistes et projets avec lesquels nous sommes fiers d'avoir collaboré",
     "loading": "Chargement des collaborations artistiques...",
-    "servicesProvided": "Services :",
+    "learnMore": "En savoir plus",
+    "ourCollaboration": "Notre collaboration",
+    "listen": "Écouter",
+    "servicesProvided": "Services fournis :",
     "listenOn": "Écouter sur",
-    "visitChannel": "Voir la chaîne"
+    "visitChannel": "Voir la chaîne",
+    "readyToJoin": "Prêt à rejoindre nos",
+    "collaborationsWord": "collaborations",
+    "readyDesc": "Chaque projet est unique. Parlons de votre vision musicale et créons ensemble quelque chose d'extraordinaire.",
+    "startProject": "Démarrer un projet"
   },
   "ebook": {
     "badge": "Formation Premium",

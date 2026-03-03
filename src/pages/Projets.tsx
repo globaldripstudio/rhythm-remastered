@@ -4,9 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import SpotifyEmbed from "@/components/SpotifyEmbed";
+import { useTranslation } from "react-i18next";
 
 const Projets = () => {
-  const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const { t, i18n } = useTranslation();
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -42,7 +44,21 @@ const Projets = () => {
   }, []);
 
   const toggleProject = (projectId: string) => {
-    setExpandedProject(expandedProject === projectId ? null : projectId);
+    setExpandedProjects(prev => {
+      const next = new Set(prev);
+      if (next.has(projectId)) {
+        next.delete(projectId);
+      } else {
+        next.add(projectId);
+      }
+      return next;
+    });
+  };
+
+  const toggleLanguage = () => {
+    document.body.classList.add('lang-switching');
+    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    setTimeout(() => document.body.classList.remove('lang-switching'), 500);
   };
 
   const projects = [
@@ -202,8 +218,8 @@ const Projets = () => {
                 <div className="absolute inset-4 bg-primary/20 rounded-full animate-pulse"></div>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-primary mb-2">NOS PROJETS</h3>
-            <p className="text-muted-foreground animate-pulse">Chargement des collaborations artistiques...</p>
+            <h3 className="text-xl font-bold text-primary mb-2">{t('projects.title')} {t('projects.titleHighlight')}</h3>
+            <p className="text-muted-foreground animate-pulse">{t('projects.loading')}</p>
           </div>
         </div>
       )}
@@ -222,11 +238,20 @@ const Projets = () => {
               </a>
               <a href="/">
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                  <span className="hidden sm:inline">← Retour à l'accueil</span>
-                  <span className="sm:hidden">← Accueil</span>
+                  <span className="hidden sm:inline">← {t('nav.backHome')}</span>
+                  <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
                 </Button>
               </a>
             </div>
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
+              aria-label="Switch language"
+            >
+              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className="text-muted-foreground/40">|</span>
+              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+            </button>
           </div>
         </div>
       </header>
@@ -235,10 +260,10 @@ const Projets = () => {
       <section className="py-10 sm:py-16 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4 sm:px-6 text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-            NOS <span className="hero-text">PROJETS</span>
+            {t('projects.title')} <span className="hero-text">{t('projects.titleHighlight')}</span>
           </h1>
           <p className="text-base sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Les artistes et projets avec lesquels nous sommes fiers d'avoir collaboré
+            {t('projects.subtitle')}
           </p>
         </div>
       </section>
@@ -313,7 +338,7 @@ const Projets = () => {
                         {project.description}
                       </p>
                       <Collapsible 
-                        open={expandedProject === project.id}
+                        open={expandedProjects.has(project.id)}
                         onOpenChange={() => toggleProject(project.id)}
                       >
                         <CollapsibleTrigger asChild>
@@ -324,9 +349,9 @@ const Projets = () => {
                               hoveredProject === project.id ? 'shadow-lg shadow-primary/25' : ''
                             }`}
                           >
-                            En savoir plus
+                            {t('projects.learnMore', 'En savoir plus')}
                             <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transition-transform duration-300 ${
-                              expandedProject === project.id ? 'rotate-180' : ''
+                              expandedProjects.has(project.id) ? 'rotate-180' : ''
                             }`} />
                           </Button>
                         </CollapsibleTrigger>
@@ -365,7 +390,7 @@ const Projets = () => {
 
                 {/* Expandable Content */}
                 <Collapsible 
-                  open={expandedProject === project.id}
+                  open={expandedProjects.has(project.id)}
                   onOpenChange={() => toggleProject(project.id)}
                 >
                   <CollapsibleContent className="border-t border-border/50">
@@ -373,13 +398,13 @@ const Projets = () => {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Details */}
                         <div>
-                          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Notre collaboration</h3>
+                          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">{t('projects.ourCollaboration', 'Notre collaboration')}</h3>
                           <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
                             {project.collaborationDetails}
                           </p>
                           
                           <div className="mb-4 sm:mb-6">
-                            <h4 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">Services fournis :</h4>
+                            <h4 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">{t('projects.servicesProvided')}</h4>
                             <div className="flex flex-wrap gap-1.5 sm:gap-2">
                               {project.services.map((service, index) => (
                                 <span 
@@ -395,7 +420,7 @@ const Projets = () => {
 
                         {/* Spotify/YouTube Player */}
                         <div>
-                          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Écouter</h3>
+                          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">{t('projects.listen', 'Écouter')}</h3>
                           {project.spotifyEmbed ? (
                             <div className="bg-card rounded-lg p-4 border border-border/50">
                               <SpotifyEmbed embedHtml={project.spotifyEmbed} />
@@ -450,7 +475,7 @@ const Projets = () => {
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center text-primary hover:underline text-lg"
                               >
-                                Écouter sur Spotify
+                                {t('projects.listenOn', 'Écouter sur')} Spotify
                                 <ExternalLink className="w-4 h-4 ml-2" />
                               </a>
                             </div>
@@ -472,14 +497,14 @@ const Projets = () => {
         <div className="container mx-auto px-4 sm:px-6 text-center">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
-              Prêt à rejoindre nos <span className="hero-text">collaborations</span> ?
+              {t('projects.readyToJoin', 'Prêt à rejoindre nos')} <span className="hero-text">{t('projects.collaborationsWord', 'collaborations')}</span> ?
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
-              Chaque projet est unique. Parlons de votre vision musicale et créons ensemble quelque chose d'extraordinaire.
+              {t('projects.readyDesc', 'Chaque projet est unique. Parlons de votre vision musicale et créons ensemble quelque chose d\'extraordinaire.')}
             </p>
             <a href="/#contact">
               <Button size="lg" className="studio-button text-sm sm:text-base">
-                Démarrer un projet
+                {t('projects.startProject', 'Démarrer un projet')}
               </Button>
             </a>
           </div>

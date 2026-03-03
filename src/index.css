@@ -259,4 +259,21 @@ All colors MUST be HSL for perfect theming.
   .btn-shine:hover {
     transform: scale(1.03);
   }
+
+  /* Language switch blur transition */
+  @keyframes lang-blur {
+    0% { filter: blur(4px); opacity: 0.6; }
+    100% { filter: blur(0); opacity: 1; }
+  }
+
+  body.lang-switching h1,
+  body.lang-switching h2,
+  body.lang-switching h3,
+  body.lang-switching p,
+  body.lang-switching span,
+  body.lang-switching a,
+  body.lang-switching li,
+  body.lang-switching button {
+    animation: lang-blur 0.45s ease-out both;
+  }
 }
