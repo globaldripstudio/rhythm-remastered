@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import SEO from "@/components/SEO";
 const Blog = () => {
   const { views, isLoading } = useBlogViews();
   const { t, i18n } = useTranslation();
+  const [contentLoaded, setContentLoaded] = useState(false);
 
   const toggleLanguage = () => {
     document.body.classList.add('lang-switching');
@@ -19,57 +21,69 @@ const Blog = () => {
 
   const posts = [
     {
-      id: 1,
-      titleKey: "blog.cards.venin.title",
-      excerptKey: "blog.cards.venin.excerpt",
-      categoryKey: "blog.cards.venin.category",
-      author: "Global Drip Studio",
-      date: "2024-12-20",
-      readTime: "8 min",
-      image: "/lovable-uploads/venin-album-cover.jpg",
-      slug: "venin-le-premier-sang",
-      comingSoon: false
+      id: 1, titleKey: "blog.cards.venin.title", excerptKey: "blog.cards.venin.excerpt",
+      categoryKey: "blog.cards.venin.category", author: "Global Drip Studio", date: "2024-12-20",
+      readTime: "8 min", image: "/lovable-uploads/venin-album-cover.jpg", slug: "venin-le-premier-sang", comingSoon: false
     },
     {
-      id: 2,
-      titleKey: "blog.cards.compression.title",
-      excerptKey: "blog.cards.compression.excerpt",
-      categoryKey: "blog.cards.compression.category",
-      author: "Global Drip Studio",
-      date: "2024-12-10",
-      readTime: "5 min",
-      image: "/lovable-uploads/Image-23.jpg",
-      slug: "comprendre-la-compression",
-      comingSoon: false
+      id: 2, titleKey: "blog.cards.compression.title", excerptKey: "blog.cards.compression.excerpt",
+      categoryKey: "blog.cards.compression.category", author: "Global Drip Studio", date: "2024-12-10",
+      readTime: "5 min", image: "/lovable-uploads/Image-23.jpg", slug: "comprendre-la-compression", comingSoon: false
     },
     {
-      id: 3,
-      titleKey: "blog.cards.voix.title",
-      excerptKey: "blog.cards.voix.excerpt",
-      categoryKey: "blog.cards.voix.category",
-      author: "Global Drip Studio",
-      date: "2024-12-15",
-      readTime: "6 min",
-      image: "/lovable-uploads/_edited.jpg.png",
-      slug: "bien-mixer-une-voix",
-      comingSoon: true
+      id: 3, titleKey: "blog.cards.voix.title", excerptKey: "blog.cards.voix.excerpt",
+      categoryKey: "blog.cards.voix.category", author: "Global Drip Studio", date: "2024-12-15",
+      readTime: "6 min", image: "/lovable-uploads/_edited.jpg.png", slug: "bien-mixer-une-voix", comingSoon: true
     },
     {
-      id: 4,
-      titleKey: "blog.cards.sounddesign.title",
-      excerptKey: "blog.cards.sounddesign.excerpt",
-      categoryKey: "blog.cards.sounddesign.category",
-      author: "Global Drip Studio",
-      date: "2024-12-05",
-      readTime: "9 min",
-      image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png",
-      slug: "10-techniques-sound-design",
-      comingSoon: true
+      id: 4, titleKey: "blog.cards.sounddesign.title", excerptKey: "blog.cards.sounddesign.excerpt",
+      categoryKey: "blog.cards.sounddesign.category", author: "Global Drip Studio", date: "2024-12-05",
+      readTime: "9 min", image: "/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png", slug: "10-techniques-sound-design", comingSoon: true
     }
   ];
 
+  useEffect(() => {
+    const images = posts.map(p => p.image);
+    let loaded = 0;
+    images.forEach(src => {
+      const img = new Image();
+      img.onload = img.onerror = () => {
+        loaded++;
+        if (loaded >= images.length) setContentLoaded(true);
+      };
+      img.src = src;
+    });
+    const timeout = setTimeout(() => setContentLoaded(true), 3000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Loading Screen */}
+      {!contentLoaded && (
+        <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+          <div className="text-center">
+            <div className="relative mb-8">
+              <div className="relative w-24 h-24 mx-auto">
+                <div className="absolute inset-0 border-4 border-primary/20 rounded-full animate-spin"></div>
+                <div className="absolute inset-2 border-4 border-secondary border-t-transparent rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                <div className="absolute inset-4 bg-primary/20 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-primary mb-2">{t('blog.title')} {t('blog.titleHighlight')}</h3>
+            <p className="text-muted-foreground animate-pulse">{t('blog.loading')}</p>
+            <div className="flex justify-center mt-3">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       <SEO title={t('seo.blog.title')} description={t('seo.blog.description')} path="/blog" />
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
