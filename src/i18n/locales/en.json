@@ -529,5 +529,47 @@
     "checkInbox": "Check your inbox (and spam folder)",
     "noEmail": "Didn't receive the email? Contact us at",
     "backHome": "Back to Home"
+  },
+  "seo": {
+    "home": {
+      "title": "Global Drip Studio - Recording Studio Martigues | Mixing, Mastering & Sound Design",
+      "description": "Professional recording studio in Martigues, France. Mixing, mastering, music production and sound design. 200+ projects, 50+ artists. Book your session."
+    },
+    "blog": {
+      "title": "Audio & Music Production Blog | Global Drip Studio",
+      "description": "Articles, tutorials and tips on mixing, mastering, audio compression and sound design. Free resources by Global Drip Studio."
+    },
+    "projets": {
+      "title": "Projects & Portfolio | Global Drip Studio",
+      "description": "Discover projects mixed and mastered at Global Drip Studio: rock, hip-hop, EDM and more. Listen to our work."
+    },
+    "services": {
+      "title": "Services & Pricing | Global Drip Studio - Mixing, Mastering, Sound Design",
+      "description": "Our mixing, hybrid mastering, music production and sound design services. Transparent pricing and custom quotes."
+    },
+    "ebook": {
+      "title": "Audio Mixing Course | Global Drip Studio",
+      "description": "Learn professional mixing techniques with our comprehensive course. Practical guide by Global Drip Studio."
+    },
+    "mentionsLegales": {
+      "title": "Legal Notice | Global Drip Studio",
+      "description": "Legal notice for Global Drip Studio, recording studio in Martigues, France."
+    },
+    "politiqueConfidentialite": {
+      "title": "Privacy Policy | Global Drip Studio",
+      "description": "Privacy policy and personal data management for Global Drip Studio."
+    },
+    "cgv": {
+      "title": "Terms & Conditions | Global Drip Studio",
+      "description": "Terms and conditions for Global Drip Studio services."
+    },
+    "venin": {
+      "title": "\"Le Premier Sang\" by Venin - Mixing & Mastering | Global Drip Studio",
+      "description": "Discover the behind-the-scenes of mixing and mastering the album \"Le Premier Sang\" by Venin, produced at Global Drip Studio."
+    },
+    "compression": {
+      "title": "Understanding Audio Compression in 5 Minutes | Global Drip Studio",
+      "description": "Compression demystified: ratio, attack, release, knee. Complete guide to mastering this essential mixing tool."
+    }
   }
 }

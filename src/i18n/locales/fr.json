@@ -529,5 +529,47 @@
     "checkInbox": "Vérifiez votre boîte de réception (et les spams)",
     "noEmail": "Vous n'avez pas reçu l'email ? Contactez-nous à",
     "backHome": "Retour à l'accueil"
+  },
+  "seo": {
+    "home": {
+      "title": "Global Drip Studio - Studio d'enregistrement Martigues | Mixage, Mastering & Sound Design",
+      "description": "Studio d'enregistrement à Martigues (13500). Mixage, mastering, production musicale et sound design. 200+ projets, 50+ artistes. Réservez votre session."
+    },
+    "blog": {
+      "title": "Blog Audio & Production Musicale | Global Drip Studio",
+      "description": "Articles, tutoriels et conseils sur le mixage, mastering, compression audio et sound design. Ressources gratuites par Global Drip Studio."
+    },
+    "projets": {
+      "title": "Projets & Réalisations | Global Drip Studio",
+      "description": "Découvrez les projets mixés et masterisés au Global Drip Studio : rock, hip-hop, EDM et plus. Écoutez nos réalisations."
+    },
+    "services": {
+      "title": "Services & Tarifs | Global Drip Studio - Mixage, Mastering, Sound Design",
+      "description": "Nos services de mixage, mastering hybride, production musicale et sound design. Tarifs transparents et devis personnalisés."
+    },
+    "ebook": {
+      "title": "Formation Mixage Audio | Global Drip Studio",
+      "description": "Apprenez les techniques de mixage professionnel avec notre formation complète. Guide pratique par Global Drip Studio."
+    },
+    "mentionsLegales": {
+      "title": "Mentions Légales | Global Drip Studio",
+      "description": "Mentions légales de Global Drip Studio, studio d'enregistrement à Martigues."
+    },
+    "politiqueConfidentialite": {
+      "title": "Politique de Confidentialité | Global Drip Studio",
+      "description": "Politique de confidentialité et gestion des données personnelles de Global Drip Studio."
+    },
+    "cgv": {
+      "title": "Conditions Générales de Vente | Global Drip Studio",
+      "description": "Conditions générales de vente des services et prestations de Global Drip Studio."
+    },
+    "venin": {
+      "title": "\"Le Premier Sang\" de Venin - Mixage & Mastering | Global Drip Studio",
+      "description": "Découvrez les coulisses du mixage et mastering de l'album \"Le Premier Sang\" du groupe Venin, produit au Global Drip Studio."
+    },
+    "compression": {
+      "title": "Comprendre la Compression Audio en 5 Minutes | Global Drip Studio",
+      "description": "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio."
+    }
   }
 }

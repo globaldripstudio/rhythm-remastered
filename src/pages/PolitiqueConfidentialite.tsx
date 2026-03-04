@@ -1,10 +1,14 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+import SEO from "@/components/SEO";
 
 const PolitiqueConfidentialite = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-background">
+      <SEO title={t('seo.politiqueConfidentialite.title')} description={t('seo.politiqueConfidentialite.description')} path="/politique-confidentialite" />
       {/* Header - matching Blog/Projets pages */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import SpotifyEmbed from "@/components/SpotifyEmbed";
 import { useTranslation } from "react-i18next";
+import SEO from "@/components/SEO";
 
 const Projets = () => {
   const { t, i18n } = useTranslation();
@@ -207,6 +208,7 @@ const Projets = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title={t('seo.projets.title')} description={t('seo.projets.description')} path="/projets" />
       {/* Loading Screen */}
       {!imageLoaded && (
         <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">

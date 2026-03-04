@@ -2,51 +2,61 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://globaldripstudio.fr/</loc>
+    <lastmod>2025-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/projets</loc>
+    <lastmod>2025-02-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/blog</loc>
+    <lastmod>2025-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://globaldripstudio.fr/boutique</loc>
+    <loc>https://globaldripstudio.fr/services</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/ebook</loc>
+    <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://globaldripstudio.fr/blog/comprendre-la-compression-audio</loc>
+    <loc>https://globaldripstudio.fr/blog/venin-le-premier-sang</loc>
+    <lastmod>2024-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://globaldripstudio.fr/blog/bien-mixer-une-voix</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://globaldripstudio.fr/blog/techniques-sound-design</loc>
+    <loc>https://globaldripstudio.fr/blog/comprendre-la-compression</loc>
+    <lastmod>2024-12-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/mentions-legales</loc>
+    <lastmod>2024-06-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/politique-confidentialite</loc>
+    <lastmod>2024-06-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/cgv</loc>
+    <lastmod>2024-06-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Partners from "@/components/Partners";
@@ -8,9 +9,11 @@ import Equipment from "@/components/Equipment";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import ServiceModal from "@/components/ServiceModal";
+import SEO from "@/components/SEO";
 import { servicesData } from "@/components/Services";
 
 const Index = () => {
+  const { t } = useTranslation();
   const [footerModalService, setFooterModalService] = useState<typeof servicesData[0] | null>(null);
   const [footerModalOpen, setFooterModalOpen] = useState(false);
 
@@ -29,6 +32,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO title={t('seo.home.title')} description={t('seo.home.description')} path="/" />
       <Header />
       <main>
         <Hero />

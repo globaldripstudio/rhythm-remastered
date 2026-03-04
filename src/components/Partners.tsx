@@ -121,7 +121,8 @@ const Partners = () => {
                   partner.name === "Ultrack Agency" ? "scale-110" :
                   partner.name === "Ambit Components" ? "-translate-y-0.5" : ""}`
                   }
-                  style={{ maxHeight: '32px' }} />
+                  style={{ maxHeight: '32px' }}
+                  loading="lazy" />
 
                 </div>
               </Card>

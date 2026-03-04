@@ -6,6 +6,7 @@ import { trackBlogView } from "@/hooks/useBlogViews";
 import { useTranslation } from "react-i18next";
 import ComprendreCompression from "./BlogArticles/ComprendreCompression";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
+import SEO from "@/components/SEO";
 
 const BlogArticle = () => {
   const { slug } = useParams();
@@ -129,8 +130,25 @@ const BlogArticle = () => {
     );
   }
 
+  const seoKey = slug === "venin-le-premier-sang" ? "venin" : "compression";
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={t(`seo.${seoKey}.title`)}
+        description={t(`seo.${seoKey}.description`)}
+        path={`/blog/${slug}`}
+        type="article"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": article.title,
+          "author": { "@type": "Organization", "name": "Global Drip Studio" },
+          "datePublished": article.date,
+          "image": slug === "venin-le-premier-sang" ? "https://globaldripstudio.fr/lovable-uploads/venin-album-cover.jpg" : "https://globaldripstudio.fr/lovable-uploads/Image-23.jpg",
+          "publisher": { "@type": "Organization", "name": "Global Drip Studio", "logo": { "@type": "ImageObject", "url": "https://globaldripstudio.fr/lovable-uploads/logo-blanc-sans-fond.png" } }
+        }}
+      />
       <BlogArticleHeader />
 
       <article className="py-10 sm:py-16">
