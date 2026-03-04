@@ -5,8 +5,11 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Clock, Euro, Check, Star, Music, Settings, Volume2, Mic } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import SEO from "@/components/SEO";
 
 const Services = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
@@ -175,6 +178,7 @@ const Services = () => {
   if (selectedService && service) {
     return (
       <div className="min-h-screen bg-background">
+        <SEO title={t('seo.services.title')} description={t('seo.services.description')} path="/services" />
         <div className="container mx-auto px-6 py-12">
           <Button 
             variant="ghost" 
@@ -408,6 +412,7 @@ const Services = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title={t('seo.services.title')} description={t('seo.services.description')} path="/services" />
       <div className="container mx-auto px-6 py-12">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">

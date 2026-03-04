@@ -5,8 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import SEO from "@/components/SEO";
 
 const Ebook = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePurchase = async () => {
@@ -29,6 +32,7 @@ const Ebook = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title={t('seo.ebook.title')} description={t('seo.ebook.description')} path="/ebook" />
       {/* Header - matching Projets page style */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">

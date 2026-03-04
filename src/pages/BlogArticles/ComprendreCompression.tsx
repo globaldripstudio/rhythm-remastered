@@ -3,32 +3,35 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Zap, Phone, Mail, MapPin, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SeuilDiagram, RatioDiagram, AttackReleaseKneeDiagram } from "@/components/blog/CompressionDiagrams";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import { useTranslation } from "react-i18next";
+import SEO from "@/components/SEO";
 
 const ComprendreCompression = () => {
   const navigate = useNavigate();
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    document.title = "Comprendre la compression en 5 minutes | Global Drip Studio";
-    const meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      const m = document.createElement('meta');
-      m.name = 'description';
-      m.content = "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio professionnel.";
-      document.head.appendChild(m);
-    } else {
-      meta.setAttribute('content', "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio professionnel.");
-    }
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={t('seo.compression.title')}
+        description={t('seo.compression.description')}
+        path="/blog/comprendre-la-compression"
+        type="article"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": t('blog.articles.compression.title'),
+          "author": { "@type": "Organization", "name": "Global Drip Studio" },
+          "datePublished": "2024-12-10",
+          "image": "https://globaldripstudio.fr/lovable-uploads/Image-23.jpg",
+          "publisher": { "@type": "Organization", "name": "Global Drip Studio", "logo": { "@type": "ImageObject", "url": "https://globaldripstudio.fr/lovable-uploads/logo-blanc-sans-fond.png" } }
+        }}
+      />
       <BlogArticleHeader />
 
       <article className="py-10 sm:py-16">
