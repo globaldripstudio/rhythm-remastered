@@ -295,7 +295,7 @@ const Projets = () => {
                       <p className={`mb-3 sm:mb-6 max-w-xl text-sm sm:text-base transition-all duration-300 ${
                         hoveredProject === project.id ? 'text-foreground' : 'text-muted-foreground'
                       }`}>
-                        {project.description}
+                        {t(`projects.cards.${project.id}.description`)}
                       </p>
                       <Collapsible 
                         open={expandedProjects.has(project.id)}
