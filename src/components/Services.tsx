@@ -322,7 +322,7 @@ const Services = () => {
           {/* Badge */}
           {service.badgeText &&
           <div className={`absolute top-3 left-3 sm:top-4 sm:left-4 ${service.badgeColor || 'bg-primary'} text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-bold shadow-lg`}>
-              {service.badgeText}
+              {t(`services.data.${service.id}.badgeText`, service.badgeText)}
             </div>
           }
         </div>
