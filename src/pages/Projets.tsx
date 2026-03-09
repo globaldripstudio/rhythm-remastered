@@ -366,7 +366,7 @@ const Projets = () => {
                           <div className="mb-4 sm:mb-6">
                             <h4 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">{t('projects.servicesProvided')}</h4>
                             <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                              {project.services.map((service, index) => (
+                              {(t(`projects.cards.${project.id}.services`, { returnObjects: true }) as string[]).map((service: string, index: number) => (
                                 <span 
                                   key={index}
                                   className="px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/20 text-primary rounded-full text-xs sm:text-sm font-medium"
