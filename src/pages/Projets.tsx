@@ -399,7 +399,7 @@ const Projets = () => {
                                   className="rounded-lg"
                                 />
                                 <p className="text-sm text-muted-foreground mt-2">
-                                  Projet créatif avec sound design et mixage complet
+                                  {t('projects.theoBachelier.videoDesc1')}
                                 </p>
                               </div>
                               <div className="bg-card rounded-lg p-4 border border-border/50">
