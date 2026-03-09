@@ -18,6 +18,10 @@ const ShareButtons = ({ title, url }: ShareButtonsProps) => {
     toast.success(t('blog.share.copied'));
   };
 
+  const openShare = (href: string) => {
+    window.open(href, '_blank', 'noopener,noreferrer,width=600,height=400');
+  };
+
   const buttons = [
     {
       label: "Twitter",
@@ -40,16 +44,14 @@ const ShareButtons = ({ title, url }: ShareButtonsProps) => {
     <div className="flex items-center gap-2 flex-wrap">
       <span className="text-sm text-muted-foreground mr-1">{t('blog.share.label')}</span>
       {buttons.map((btn) => (
-        <a
+        <button
           key={btn.label}
-          href={btn.href}
-          target="_blank"
-          rel="noopener noreferrer"
+          onClick={() => openShare(btn.href)}
           aria-label={`${t('blog.share.label')} ${btn.label}`}
           className="w-9 h-9 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <btn.icon className="w-4 h-4" />
-        </a>
+        </button>
       ))}
       <button
         onClick={copyLink}
