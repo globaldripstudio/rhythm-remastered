@@ -168,7 +168,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">
                 <ul className="space-y-1.5 sm:space-y-2">
-                  {service.included.map((item, index) => (
+                  {(t(`services.data.${service.id}.included`, { returnObjects: true, defaultValue: service.included }) as string[]).map((item, index) => (
                     <li key={index} className="flex items-start gap-2 text-xs sm:text-sm">
                       <Check className="w-3 h-3 sm:w-4 sm:h-4 text-primary mt-0.5 flex-shrink-0" />
                       <span>{item}</span>
