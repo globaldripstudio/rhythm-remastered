@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SeuilDiagram, RatioDiagram, AttackReleaseKneeDiagram } from "@/components/blog/CompressionDiagrams";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
+import ShareButtons from "@/components/blog/ShareButtons";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 
