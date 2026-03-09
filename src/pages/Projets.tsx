@@ -360,7 +360,7 @@ const Projets = () => {
                         <div>
                           <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">{t('projects.ourCollaboration', 'Notre collaboration')}</h3>
                           <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
-                            {project.collaborationDetails}
+                            {t(`projects.cards.${project.id}.collaborationDetails`)}
                           </p>
                           
                           <div className="mb-4 sm:mb-6">
