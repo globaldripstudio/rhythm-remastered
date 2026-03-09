@@ -322,7 +322,7 @@ const Services = () => {
           {/* Badge */}
           {service.badgeText &&
           <div className={`absolute top-3 left-3 sm:top-4 sm:left-4 ${service.badgeColor || 'bg-primary'} text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-bold shadow-lg`}>
-              {service.badgeText}
+              {t(`services.data.${service.id}.badgeText`, service.badgeText)}
             </div>
           }
         </div>
@@ -349,7 +349,7 @@ const Services = () => {
         <CardContent className="flex-1 flex flex-col px-4 sm:px-6 pb-4 sm:pb-6">
           {/* Features List */}
           <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6 flex-1">
-            {service.included.slice(0, 3).map((feature, featureIndex) =>
+            {(t(`services.data.${service.id}.included`, { returnObjects: true, defaultValue: service.included }) as string[]).slice(0, 3).map((feature, featureIndex) =>
             <li key={featureIndex} className="flex items-center text-xs sm:text-sm">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2 sm:mr-3 flex-shrink-0" />
                 {feature}

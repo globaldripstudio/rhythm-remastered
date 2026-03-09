@@ -48,10 +48,22 @@
     "process": "Processus",
     "included": "Inclus",
     "deliverables": "Livrables",
+    "equipmentLabel": "Équipement",
     "examples": "Exemples de réalisation",
     "singlesProduced": "Singles réalisés dans le cadre de cette offre",
     "ourProductions": "Nos productions",
     "ourWork": "Nos réalisations",
+    "priceOnRequest": "Prix sur demande",
+    "priceAllIncluded": "Prix tout inclus",
+    "videoDescs": {
+      "canyonCaptation": "Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod",
+      "leattCaptation": "Contribution au spot publicitaire de Leatt - captation sonore voix",
+      "sd_commencal": "Collaboration avec Commencal - Post-production/sound design/mixage global",
+      "sd_type7": "Collaboration avec Type7 - Post-production/sound design/mixage global",
+      "sd_canyon": "Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod",
+      "sd_bachelier": "Post-production/sound design/mixage global",
+      "sd_pulsor": "Jeune entrepreneur à succès (220k+ vues) - Post-production/sound design"
+    },
     "antiMalentendu": {
       "includedTitle": "Inclus dans nos prestations de mixage/mastering :",
       "includedDesc": "équilibre, dynamique, espace, cohérence globale, master final.",
@@ -185,15 +197,18 @@
     "bookSession": "Réserver une session",
     "hiphop": {
       "title": "Hip-Hop",
-      "description": "Punch et clarté pour le rap moderne"
+      "description": "Punch et clarté pour le rap moderne",
+      "credits": "\"HEFNER\" by Tany, produit au Global Drip Studio et paru le 1er décembre 2023"
     },
     "rock": {
       "title": "Rock",
-      "description": "Puissance et dynamique pour le rock"
+      "description": "Puissance et dynamique pour le rock",
+      "credits": "\"Excalibur\" by Venin, édité/enregistré (voix)/mixé/masterisé au Global Drip Studio et paru le 15 mai 2025"
     },
     "edm": {
       "title": "EDM",
-      "description": "Impact et largeur pour l'électronique"
+      "description": "Impact et largeur pour l'électronique",
+      "credits": "\"BIG BASS\" by Eddy de Mart, mixé et masterisé au Global Drip Studio, unreleased"
     }
   },
   "equipment": {

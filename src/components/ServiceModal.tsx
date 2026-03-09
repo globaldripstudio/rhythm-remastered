@@ -91,7 +91,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
   }, [checkScroll]);
 
   const hasAntiMalentendu = (service as any).antiMalentendu === true;
-  const equipmentLabel = (service as any).equipmentLabel || "Équipement";
+  const equipmentLabel = t(`services.data.${service.id}.equipmentLabel`, t('services.equipmentLabel'));
 
   return (
     <div className={`flex flex-col ${isMobile ? 'h-[calc(65vh-3rem)]' : 'h-[85vh] md:h-[80vh]'}`}>
@@ -116,14 +116,14 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
         <div className="absolute bottom-3 left-4 right-4 md:bottom-4">
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="secondary" className="text-xs">{service.category}</Badge>
-            {service.featured && <Badge className="bg-primary text-xs">Spécialité</Badge>}
+            <Badge variant="secondary" className="text-xs">{t(`services.data.${service.id}.category`, service.category)}</Badge>
+            {service.featured && <Badge className="bg-primary text-xs">{t(`services.data.${service.id}.badgeText`, service.featured ? 'Spécialité' : '')}</Badge>}
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{t(`services.data.${service.id}.title`, service.title)}</h2>
-          <div className="flex items-center gap-3 sm:gap-4 text-white/80 text-xs sm:text-sm mt-1">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-              {service.duration}
+            <div className="flex items-center gap-3 sm:gap-4 text-white/80 text-xs sm:text-sm mt-1">
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                {t(`services.data.${service.id}.duration`, service.duration)}
             </div>
             <div className="flex items-center gap-1">
               <Euro className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -151,7 +151,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-2">{t('services.process')}</h3>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
-              {service.process.split(' → ').map((step, index, array) => (
+              {(t(`services.data.${service.id}.process`, service.process) as string).split(' → ').map((step, index, array) => (
                 <div key={index} className="flex items-center gap-1.5 sm:gap-2">
                   <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-primary/10 rounded-full whitespace-nowrap">{step}</span>
                   {index < array.length - 1 && <span>→</span>}
@@ -168,7 +168,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">
                 <ul className="space-y-1.5 sm:space-y-2">
-                  {service.included.map((item, index) => (
+                  {(t(`services.data.${service.id}.included`, { returnObjects: true, defaultValue: service.included }) as string[]).map((item, index) => (
                     <li key={index} className="flex items-start gap-2 text-xs sm:text-sm">
                       <Check className="w-3 h-3 sm:w-4 sm:h-4 text-primary mt-0.5 flex-shrink-0" />
                       <span>{item}</span>
@@ -184,7 +184,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">
                 <ul className="space-y-1.5 sm:space-y-2">
-                  {service.deliverables.map((item, index) => (
+                  {(t(`services.data.${service.id}.deliverables`, { returnObjects: true, defaultValue: service.deliverables }) as string[]).map((item, index) => (
                     <li key={index} className="flex items-center gap-2 text-xs sm:text-sm">
                       <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0" />
                       {item}
@@ -264,7 +264,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                 ))}
                 <div>
                   <h4 className="font-semibold text-sm mb-1">To the next chapter - Tomas Lemoine</h4>
-                  <p className="text-xs text-muted-foreground mb-2">Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t('services.videoDescs.canyonCaptation')}</p>
                   <div className="bg-card rounded-lg p-2 border border-border/50">
                     <iframe
                       width="100%"
@@ -280,7 +280,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm mb-1">Tomas Lemoine 2.0 Signature Shoe</h4>
-                  <p className="text-xs text-muted-foreground mb-2">Contribution au spot publicitaire de Leatt - captation sonore voix</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t('services.videoDescs.leattCaptation')}</p>
                   <div className="bg-card rounded-lg p-2 border border-border/50">
                     <iframe
                       width="100%"
@@ -304,15 +304,15 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.ourWork')}</h3>
               <div className="space-y-4">
                 {[
-                  { title: "THE HOLY LAND - Tomas Lemoine", desc: "Collaboration with Commencal - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/u44cDLJWeFc" },
-                  { title: "The Silver Coast - Type 7 Film", desc: "Collaboration with Type7 - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/W-GAqmI96ro" },
-                  { title: "To the next chapter - Tomas Lemoine", desc: "Collaboration with Canyon Bicycles - Chef opérateur son et post-prod", url: "https://www.youtube.com/embed/A7s0pP0D3Po" },
-                  { title: "Théo Bachelier", desc: "Post production/sound design/global mixing", url: "https://www.youtube.com/embed/M-eW6rpRklU" },
-                  { title: "Théo Pulsor", desc: "Young and successful entrepreneur (220k+ views) - Post production/sound design", url: "https://www.youtube.com/embed/kFEacVd-iMs" },
+                  { title: "THE HOLY LAND - Tomas Lemoine", descKey: "commencal", descFallback: "Collaboration with Commencal - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/u44cDLJWeFc" },
+                  { title: "The Silver Coast - Type 7 Film", descKey: "type7", descFallback: "Collaboration with Type7 - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/W-GAqmI96ro" },
+                  { title: "To the next chapter - Tomas Lemoine", descKey: "canyon", descFallback: "Collaboration with Canyon Bicycles - Sound operator and post-production", url: "https://www.youtube.com/embed/A7s0pP0D3Po" },
+                  { title: "Théo Bachelier", descKey: "bachelier", descFallback: "Post production/sound design/global mixing", url: "https://www.youtube.com/embed/M-eW6rpRklU" },
+                  { title: "Théo Pulsor", descKey: "pulsor", descFallback: "Young and successful entrepreneur (220k+ views) - Post production/sound design", url: "https://www.youtube.com/embed/kFEacVd-iMs" },
                 ].map((video, index) => (
                   <div key={index}>
                     <h4 className="font-semibold text-sm mb-1">{video.title}</h4>
-                    <p className="text-xs text-muted-foreground mb-2">{video.desc}</p>
+                    <p className="text-xs text-muted-foreground mb-2">{t(`services.videoDescs.sd_${video.descKey}`, video.descFallback)}</p>
                     <div className="bg-card rounded-lg p-2 border border-border/50">
                       <iframe 
                         width="100%" 
@@ -377,7 +377,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2">{service.price}</div>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                  Prix {service.price.includes('devis') ? 'sur demande' : 'tout inclus'}
+                  {service.price.includes('devis') || service.price.includes('request') ? t('services.priceOnRequest') : t('services.priceAllIncluded')}
                 </p>
                 <Button 
                   className="w-full studio-button"

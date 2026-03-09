@@ -157,19 +157,16 @@ const AudioComparison = () => {
       key: 'hiphop', 
       beforeSrc: '/audio/hef-no-mix.wav',
       afterSrc: '/audio/hef-mixed.wav',
-      credits: '"HEFNER" by Tany, produit au Global Drip Studio et paru le 1er décembre 2023'
     },
     { 
       key: 'rock', 
       beforeSrc: '/audio/excalibur-no-mix.wav',
       afterSrc: '/audio/excalibur-mixed.wav',
-      credits: '"Excalibur" by Venin, édité/enregistré (voix)/mixé/masterisé au Global Drip Studio et paru le 15 mai 2025'
     },
     { 
       key: 'edm', 
       beforeSrc: '/audio/bigbass-no-mix.wav',
       afterSrc: '/audio/bigbass-mixed.wav',
-      credits: '"BIG BASS" by Eddy de Mart, mixé et masterisé au Global Drip Studio, unreleased'
     }
   ];
 
@@ -274,7 +271,7 @@ const AudioComparison = () => {
             </div>
 
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border/30 bg-card/20">
-              <p className="text-xs sm:text-sm text-muted-foreground/70 text-center italic">{currentGenre?.credits}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground/70 text-center italic">{t(`audio.${selectedGenre}.credits`)}</p>
             </div>
           </Card>
 

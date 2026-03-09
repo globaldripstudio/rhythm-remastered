@@ -48,10 +48,22 @@
     "process": "Process",
     "included": "Included",
     "deliverables": "Deliverables",
+    "equipmentLabel": "Equipment",
     "examples": "Work examples",
     "singlesProduced": "Singles produced with this package",
     "ourProductions": "Our productions",
     "ourWork": "Our work",
+    "priceOnRequest": "Price on request",
+    "priceAllIncluded": "All-inclusive price",
+    "videoDescs": {
+      "canyonCaptation": "Collaboration with Canyon Bicycles - Sound operator and post-production",
+      "leattCaptation": "Contribution to Leatt commercial - voice sound recording",
+      "sd_commencal": "Collaboration with Commencal - Post-production/sound design/global mixing",
+      "sd_type7": "Collaboration with Type7 - Post-production/sound design/global mixing",
+      "sd_canyon": "Collaboration with Canyon Bicycles - Sound operator and post-production",
+      "sd_bachelier": "Post-production/sound design/global mixing",
+      "sd_pulsor": "Young and successful entrepreneur (220k+ views) - Post-production/sound design"
+    },
     "antiMalentendu": {
       "includedTitle": "Included in our mixing/mastering services:",
       "includedDesc": "balance, dynamics, space, overall coherence, final master.",
@@ -185,15 +197,18 @@
     "bookSession": "Book a session",
     "hiphop": {
       "title": "Hip-Hop",
-      "description": "Punch and clarity for modern rap"
+      "description": "Punch and clarity for modern rap",
+      "credits": "\"HEFNER\" by Tany, produced at Global Drip Studio, released December 1, 2023"
     },
     "rock": {
       "title": "Rock",
-      "description": "Power and dynamics for rock"
+      "description": "Power and dynamics for rock",
+      "credits": "\"Excalibur\" by Venin, edited/recorded (vocals)/mixed/mastered at Global Drip Studio, released May 15, 2025"
     },
     "edm": {
       "title": "EDM",
-      "description": "Impact and width for electronic music"
+      "description": "Impact and width for electronic music",
+      "credits": "\"BIG BASS\" by Eddy de Mart, mixed and mastered at Global Drip Studio, unreleased"
     }
   },
   "equipment": {
