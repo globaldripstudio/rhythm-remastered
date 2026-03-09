@@ -452,7 +452,7 @@ const Services = () => {
                 <div className="flex justify-between items-start mb-2">
                   <CardTitle className="text-xl font-bold">{service.title}</CardTitle>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">{service.price}</div>
+                    <div className="text-2xl font-bold text-primary">{service.price === "Sur devis" ? t('services.onQuote', 'Sur devis') : service.price}</div>
                   </div>
                 </div>
                 <CardDescription className="text-muted-foreground">
