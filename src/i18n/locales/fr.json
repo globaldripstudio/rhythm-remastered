@@ -484,7 +484,84 @@
     "readyToJoin": "Prêt à rejoindre nos",
     "collaborationsWord": "collaborations",
     "readyDesc": "Chaque projet est unique. Parlons de votre vision musicale et créons ensemble quelque chose d'extraordinaire.",
-    "startProject": "Démarrer un projet"
+    "startProject": "Démarrer un projet",
+    "seeMoreYouTube": "Voir plus sur YouTube",
+    "theoBachelier": {
+      "videoDesc1": "Projet créatif avec sound design et mixage complet",
+      "videoDesc2": "Post-production et sound design avancé"
+    },
+    "cards": {
+      "zeu": {
+        "description": "Collaborations créatives avec un artiste reconnu du rap underground aux flows authentiques.",
+        "collaborationDetails": "J'ai composé et enregistré 'JDAY', ainsi qu'enregistré 'J'DEVRAIS' et 'RARE' avec ZEU. Une collaboration créative intense qui a donné naissance à des tracks authentiques mêlant flows accrocheurs et productions soignées.",
+        "services": ["Composition", "Enregistrement"]
+      },
+      "tany": {
+        "description": "Partenariat privilégié et relation artistique forte avec une direction sur mesure.",
+        "collaborationDetails": "Partenariat privilégié avec Tany, nous avons développé une relation artistique forte et durable. Ensemble, nous construisons une direction artistique unique qui définit son identité musicale.",
+        "services": ["Production complète", "Enregistrement", "Mixage", "Mastering", "Direction artistique"]
+      },
+      "lil-moine": {
+        "description": "Collaboration rapprochée depuis 2020, production quasi-exclusive de ses tracks et projets audiovisuels.",
+        "collaborationDetails": "Collaboration privilégiée depuis 2020 avec Lil Moine. Je produis presque chaque track et projet pour lui, créant un son cohérent et évolutif. Cette relation artistique durable nous permet d'explorer constamment de nouvelles sonorités tout en gardant son identité musicale forte.",
+        "services": ["Production", "Composition", "Enregistrement", "Mixage", "Mastering", "Direction artistique", "Ingénieur son live", "Sound Design"]
+      },
+      "eddy-de-mart": {
+        "description": "Mixage et mastering depuis 2022, apportant dimension technique à ses créations.",
+        "collaborationDetails": "Depuis 2022, je m'occupe du mixage et mastering des projets d'Eddy de Mart. Notre collaboration se concentre sur l'obtention d'un son professionnel et impactant, mettant en valeur ses compositions avec une approche technique rigoureuse.",
+        "services": ["Mixage", "Mastering", "Post-production", "Arrangement"]
+      },
+      "black-beanie-dub": {
+        "description": "Projet co-fondé avec Mathieu Battini en 2017, notre réalisation la plus reconnue.",
+        "collaborationDetails": "Black Beanie Dub est un projet que j'ai fondé avec Mathieu Battini en 2017. C'est devenu notre projet le plus réussi, explorant les territoires du dub et du roots reggae, de l'électronique et de l'expérimentation sonore, toujours en respectant les fondements traditionnels du genre. Une aventure artistique qui continue d'évoluer.",
+        "services": ["Co-fondateur", "Production", "Composition", "Sound Design"]
+      },
+      "lofai": {
+        "description": "Projet collaboratif explorant l'intersection entre intelligence artificielle et musique lofi.",
+        "collaborationDetails": "LOFAI est un projet collaboratif fascinant qui explore l'intersection entre l'intelligence artificielle et la musique lofi. Nous travaillons avec des musiciens talentueux et des jazzmen exceptionnels - LOFAI n'existerait pas sans eux. Nous expérimentons avec des outils d'IA pour créer des textures sonores uniques tout en gardant l'authenticité et la chaleur du lofi traditionnel.",
+        "services": ["Expérimentation IA", "Production", "Sound Design", "Mixage", "Mastering", "Direction artistique", "Management"]
+      },
+      "ekzo": {
+        "description": "Mon alias de beatmaker/producteur depuis 2022 pour mes projets personnels créatifs.",
+        "collaborationDetails": "Ekzo est mon nom de beatmaker/producteur depuis 2022. Sous cet alias, je sors tous mes projets personnels, explorant différents styles et approches de production. C'est mon laboratoire créatif où j'exprime ma vision artistique personnelle.",
+        "services": ["Beatmaking", "Production personnelle", "Expérimentation"]
+      },
+      "lave": {
+        "description": "Jeune talent prometteur, mixage et mastering du titre 'Bête noir'.",
+        "collaborationDetails": "J'ai eu le plaisir de mixer et masteriser 'Bête noir' pour Lavé, un jeune artiste très talentueux. Le projet nécessitait une approche délicate pour préserver l'authenticité de sa voix tout en apportant la profondeur et l'impact nécessaires.",
+        "services": ["Mixage", "Mastering"]
+      },
+      "mamood": {
+        "description": "Collaboration sur l'enregistrement, le mixage et le mastering d'Adios et MPLPVP.",
+        "collaborationDetails": "J'ai enregistré et mixé 'Adios' et 'MPLPVP' pour Mamood. Ces sessions ont été particulièrement enrichissantes, permettant d'explorer des sonorités urbaines contemporaines avec une approche technique précise pour capturer l'énergie de ses performances.",
+        "services": ["Enregistrement", "Mixage"]
+      },
+      "theo-bachelier": {
+        "description": "Collaboration privilégiée autour du sound design, post-production et mixage créatif.",
+        "collaborationDetails": "Collaboration privilégiée avec Théo Bachelier autour du sound design. Je travaille sur la post-production, le sound design et le mixage de ses projets créatifs. Une synergie artistique qui nous permet d'explorer les limites de la création sonore contemporaine.",
+        "services": ["Sound Design", "Post-production", "Mixage", "Collaboration créative"]
+      },
+      "timothe-chatenoud": {
+        "description": "Artiste autoproduit muni d'une identité musicale unique, nous apportons la touche finale aux créations de Timothé avec un mastering hybride.",
+        "collaborationDetails": "Timothé Chatenoud est un artiste autoproduit avec une identité musicale forte et unique. Nous intervenons pour apporter la touche finale professionnelle à ses créations, préservant son authenticité tout en optimisant la qualité sonore.",
+        "services": ["Mastering"]
+      },
+      "venin": {
+        "description": "Groupe de rock emblématique du Sud de la France, enregistrement, édition, mixage et mastering de l'album 'Le Premier Sang'.",
+        "collaborationDetails": "Pour leur album 'Le Premier Sang', j'ai eu l'honneur d'accueillir Venin au Global Drip Studio. J'ai assuré l'édition, le mixage et le mastering des 9 titres inédits, ainsi que l'enregistrement des voix, des parties solo, et quelques arrangements claviers. Un projet entièrement pensé pour sonner eighties avec une approche authentique sans copier-coller ni trig.",
+        "services": ["Édition", "Mixage", "Mastering", "Enregistrement voix et guitares", "Arrangements"]
+      },
+      "ritualz": {
+        "description": "Retour en force en 2025 après dix ans d'expérience, mixage et mastering de ses nouvelles productions.",
+        "collaborationDetails": "Ritualz est un mélange explosif de rythmes percutants, de basses puissantes et de sonorités diverses. Après plus de dix ans d'expérience dans la production, mais après avoir été éloigné de la scène, il revient en 2025 avec une énergie renouvelée, prêt à reconstruire son projet artistique à partir de zéro. Nous opérons à ses côtés sur la partie mixage et mastering.",
+        "services": ["Mixage", "Mastering"]
+      },
+      "jibbs-arenas": {
+        "description": "Artiste d'origine suisse et espagnol, collaboration étroite de l'enregistrement à la direction artistique.",
+        "collaborationDetails": "Jibbs Arenas est un artiste d'origine suisse et espagnol puisant son inspiration dans ses racines qu'il adapte à tout style. Nous opérons en étroite collaboration au Global Drip Studio, de l'enregistrement au mixage et mastering, en passant par la réalisation.",
+        "services": ["Enregistrement", "Production", "Mixage", "Mastering", "Direction artistique"]
+      }
+    }
   },
   "ebook": {
     "badge": "Formation Premium",
