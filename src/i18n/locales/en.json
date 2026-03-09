@@ -185,15 +185,18 @@
     "bookSession": "Book a session",
     "hiphop": {
       "title": "Hip-Hop",
-      "description": "Punch and clarity for modern rap"
+      "description": "Punch and clarity for modern rap",
+      "credits": "\"HEFNER\" by Tany, produced at Global Drip Studio, released December 1, 2023"
     },
     "rock": {
       "title": "Rock",
-      "description": "Power and dynamics for rock"
+      "description": "Power and dynamics for rock",
+      "credits": "\"Excalibur\" by Venin, edited/recorded (vocals)/mixed/mastered at Global Drip Studio, released May 15, 2025"
     },
     "edm": {
       "title": "EDM",
-      "description": "Impact and width for electronic music"
+      "description": "Impact and width for electronic music",
+      "credits": "\"BIG BASS\" by Eddy de Mart, mixed and mastered at Global Drip Studio, unreleased"
     }
   },
   "equipment": {
