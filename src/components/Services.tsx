@@ -331,7 +331,7 @@ const Services = () => {
           <div className="flex justify-between items-start mb-1 sm:mb-2">
             <CardTitle className="text-lg sm:text-xl font-bold">{t(`services.data.${service.id}.title`, service.title)}</CardTitle>
             <div className="text-right flex-shrink-0 ml-2">
-              <div className="text-xl sm:text-2xl font-bold text-primary">{service.price}</div>
+              <div className="text-xl sm:text-2xl font-bold text-primary">{service.price === "Sur devis" ? t('services.onQuote', 'Sur devis') : service.price}</div>
               {(service as any).priceLabel && <div className="text-xs text-muted-foreground">{(service as any).priceLabel}</div>}
               {(service as any).priceDay && <div className="text-xs text-muted-foreground mt-0.5">{(service as any).priceDay}</div>}
               {(service as any).priceExtra &&

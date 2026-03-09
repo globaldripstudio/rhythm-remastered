@@ -217,7 +217,7 @@ const Services = () => {
                   </div>
                   <div className="flex items-center gap-1">
                     <Euro className="w-4 h-4" />
-                    {service.price}
+                    {service.price === "Sur devis" ? t('services.onQuote', 'Sur devis') : service.price}
                   </div>
                 </div>
               </div>
@@ -394,7 +394,7 @@ const Services = () => {
                 <Card className="bg-gradient-hero border-primary/20">
                   <CardContent className="pt-6">
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-primary mb-2">{service.price}</div>
+                      <div className="text-3xl font-bold text-primary mb-2">{service.price === "Sur devis" ? t('services.onQuote', 'Sur devis') : service.price}</div>
                       <p className="text-sm text-muted-foreground mb-4">Prix {service.price.includes('devis') ? 'sur demande' : 'tout inclus'}</p>
                       <Button className="w-full studio-button">
                         Demander un devis
@@ -452,7 +452,7 @@ const Services = () => {
                 <div className="flex justify-between items-start mb-2">
                   <CardTitle className="text-xl font-bold">{service.title}</CardTitle>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">{service.price}</div>
+                    <div className="text-2xl font-bold text-primary">{service.price === "Sur devis" ? t('services.onQuote', 'Sur devis') : service.price}</div>
                   </div>
                 </div>
                 <CardDescription className="text-muted-foreground">
