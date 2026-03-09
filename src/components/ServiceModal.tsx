@@ -151,7 +151,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-2">{t('services.process')}</h3>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
-              {service.process.split(' → ').map((step, index, array) => (
+              {(t(`services.data.${service.id}.process`, service.process) as string).split(' → ').map((step, index, array) => (
                 <div key={index} className="flex items-center gap-1.5 sm:gap-2">
                   <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-primary/10 rounded-full whitespace-nowrap">{step}</span>
                   {index < array.length - 1 && <span>→</span>}
