@@ -276,6 +276,11 @@
     "titleHighlight": "Global Drip",
     "subtitle": "Conseils, techniques et actualités du monde de l'audio professionnel",
     "loading": "Chargement des articles...",
+    "share": {
+      "label": "Partager",
+      "copied": "Lien copié !",
+      "copyLink": "Copier le lien"
+    },
     "readArticle": "Lire l'article",
     "comingSoon": "bientôt",
     "moreArticles": "Plus d'articles bientôt",

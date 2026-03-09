@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SeuilDiagram, RatioDiagram, AttackReleaseKneeDiagram } from "@/components/blog/CompressionDiagrams";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
+import ShareButtons from "@/components/blog/ShareButtons";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 
@@ -51,9 +52,10 @@ const ComprendreCompression = () => {
             <p className="text-lg sm:text-xl text-muted-foreground mb-4 sm:mb-6">
               {t('blog.articles.compression.subtitle')}
             </p>
-            <div className="flex items-center text-sm text-muted-foreground">
+            <div className="flex items-center text-sm text-muted-foreground mb-6">
               <span>{t('blog.articles.compression.meta')}</span>
             </div>
+            <ShareButtons title={t('blog.articles.compression.title')} url="https://globaldripstudio.fr/blog/comprendre-la-compression" />
           </header>
 
           <div className="mb-8 sm:mb-12 rounded-2xl overflow-hidden">
@@ -140,6 +142,9 @@ const ComprendreCompression = () => {
                 </Button>
               </div>
             </div>
+          </div>
+          <div className="mt-10 pt-6 border-t border-border">
+            <ShareButtons title={t('blog.articles.compression.title')} url="https://globaldripstudio.fr/blog/comprendre-la-compression" />
           </div>
         </div>
       </article>
