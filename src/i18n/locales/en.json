@@ -48,10 +48,17 @@
     "process": "Process",
     "included": "Included",
     "deliverables": "Deliverables",
+    "equipmentLabel": "Equipment",
     "examples": "Work examples",
     "singlesProduced": "Singles produced with this package",
     "ourProductions": "Our productions",
     "ourWork": "Our work",
+    "priceOnRequest": "Price on request",
+    "priceAllIncluded": "All-inclusive price",
+    "videoDescs": {
+      "canyonCaptation": "Collaboration with Canyon Bicycles - Sound operator and post-production",
+      "leattCaptation": "Contribution to Leatt commercial - voice sound recording"
+    },
     "antiMalentendu": {
       "includedTitle": "Included in our mixing/mastering services:",
       "includedDesc": "balance, dynamics, space, overall coherence, final master.",

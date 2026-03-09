@@ -48,10 +48,17 @@
     "process": "Processus",
     "included": "Inclus",
     "deliverables": "Livrables",
+    "equipmentLabel": "Équipement",
     "examples": "Exemples de réalisation",
     "singlesProduced": "Singles réalisés dans le cadre de cette offre",
     "ourProductions": "Nos productions",
     "ourWork": "Nos réalisations",
+    "priceOnRequest": "Prix sur demande",
+    "priceAllIncluded": "Prix tout inclus",
+    "videoDescs": {
+      "canyonCaptation": "Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod",
+      "leattCaptation": "Contribution au spot publicitaire de Leatt - captation sonore voix"
+    },
     "antiMalentendu": {
       "includedTitle": "Inclus dans nos prestations de mixage/mastering :",
       "includedDesc": "équilibre, dynamique, espace, cohérence globale, master final.",
