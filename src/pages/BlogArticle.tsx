@@ -174,7 +174,7 @@ const BlogArticle = () => {
           </div>
           <div className="text-foreground leading-relaxed">{article.content}</div>
           <div className="mt-10 pt-6 border-t border-border">
-            <ShareButtons title={article.title} url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
           </div>
         </div>
       </article>
