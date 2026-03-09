@@ -271,7 +271,7 @@ const AudioComparison = () => {
             </div>
 
             <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border/30 bg-card/20">
-              <p className="text-xs sm:text-sm text-muted-foreground/70 text-center italic">{currentGenre?.credits}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground/70 text-center italic">{t(`audio.${selectedGenre}.credits`)}</p>
             </div>
           </Card>
 

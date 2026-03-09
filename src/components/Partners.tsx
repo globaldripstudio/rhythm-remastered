@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X, ExternalLink } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const partners = [
 {
@@ -70,8 +71,8 @@ const partners = [
   videos: [
   { title: "Théo Pulsor", url: "https://www.youtube.com/embed/kFEacVd-iMs?si=EQFXCN8usgWLzyxH" }],
   credits: [
-    { role: "Video/réal", name: "Théo Bachelier" },
-    { role: "Post-production, sound design, mixage", name: "Guillaume Surget", highlight: true },
+    { role: "Video/Direction", name: "Théo Bachelier" },
+    { role: "Post-production, sound design, mixing", name: "Guillaume Surget", highlight: true },
   ]
 },
 {
@@ -82,13 +83,14 @@ const partners = [
   { title: "Théo Bachelier", url: "https://www.youtube.com/embed/M-eW6rpRklU?si=XtzNzrdN3U58QyAB" },
   { title: "Ultrack", url: "https://www.youtube.com/embed/WDM-H839CYM?si=fUeQY879818PvYaY" }],
   credits: [
-    { role: "Video/réal", name: "Théo Bachelier" },
-    { role: "Post-production, sound design, mixage", name: "Guillaume Surget", highlight: true },
+    { role: "Video/Direction", name: "Théo Bachelier" },
+    { role: "Post-production, sound design, mixing", name: "Guillaume Surget", highlight: true },
   ]
 }];
 
 
 const Partners = () => {
+  const { t } = useTranslation();
   const [selectedPartner, setSelectedPartner] = useState<typeof partners[0] | null>(null);
 
   return (
@@ -96,7 +98,7 @@ const Partners = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">
-            Nous avons les <span className="hero-text">meilleurs partenaires</span>
+            {t('partners.title')} <span className="hero-text">{t('partners.titleHighlight')}</span>
           </h2>
         </div>
 
@@ -138,7 +140,7 @@ const Partners = () => {
           <button
             onClick={() => setSelectedPartner(null)}
             className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-[60] w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors hover:scale-110"
-            aria-label="Fermer">
+            aria-label={t('partners.close')}>
 
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
@@ -203,7 +205,7 @@ const Partners = () => {
 
                 <Button className="w-full studio-button">
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  Visiter le site du partenaire
+                  {t('partners.visitSite')}
                 </Button>
               </a>
             </div>
