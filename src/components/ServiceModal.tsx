@@ -91,7 +91,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
   }, [checkScroll]);
 
   const hasAntiMalentendu = (service as any).antiMalentendu === true;
-  const equipmentLabel = (service as any).equipmentLabel || "Équipement";
+  const equipmentLabel = t(`services.data.${service.id}.equipmentLabel`, t('services.equipmentLabel'));
 
   return (
     <div className={`flex flex-col ${isMobile ? 'h-[calc(65vh-3rem)]' : 'h-[85vh] md:h-[80vh]'}`}>
