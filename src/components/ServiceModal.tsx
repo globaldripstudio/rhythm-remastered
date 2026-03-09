@@ -280,7 +280,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm mb-1">Tomas Lemoine 2.0 Signature Shoe</h4>
-                  <p className="text-xs text-muted-foreground mb-2">Contribution au spot publicitaire de Leatt - captation sonore voix</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t('services.videoDescs.leattCaptation')}</p>
                   <div className="bg-card rounded-lg p-2 border border-border/50">
                     <iframe
                       width="100%"
