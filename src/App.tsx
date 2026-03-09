@@ -48,6 +48,14 @@ const App = () => (
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
             
+            {/* Redirections anciennes URLs */}
+            <Route path="/a-propos" element={<Navigate to="/" replace />} />
+            <Route path="/about" element={<Navigate to="/" replace />} />
+            <Route path="/programmes" element={<Navigate to="/services" replace />} />
+            <Route path="/programs" element={<Navigate to="/services" replace />} />
+            <Route path="/our-projects" element={<Navigate to="/projets" replace />} />
+            <Route path="/projects" element={<Navigate to="/projets" replace />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
