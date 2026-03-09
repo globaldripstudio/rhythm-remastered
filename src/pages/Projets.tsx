@@ -414,7 +414,7 @@ const Projets = () => {
                                   className="rounded-lg"
                                 />
                                 <p className="text-sm text-muted-foreground mt-2">
-                                  Post-production et sound design avancé
+                                  {t('projects.theoBachelier.videoDesc2')}
                                 </p>
                               </div>
                               <a 
