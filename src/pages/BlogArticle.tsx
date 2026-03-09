@@ -170,7 +170,7 @@ const BlogArticle = () => {
               <span>{article.date}</span>
               <span>{article.readTime}</span>
             </div>
-            <ShareButtons title={article.title} url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
           </div>
           <div className="text-foreground leading-relaxed">{article.content}</div>
           <div className="mt-10 pt-6 border-t border-border">
