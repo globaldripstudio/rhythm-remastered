@@ -57,7 +57,12 @@
     "priceAllIncluded": "Prix tout inclus",
     "videoDescs": {
       "canyonCaptation": "Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod",
-      "leattCaptation": "Contribution au spot publicitaire de Leatt - captation sonore voix"
+      "leattCaptation": "Contribution au spot publicitaire de Leatt - captation sonore voix",
+      "sd_commencal": "Collaboration avec Commencal - Post-production/sound design/mixage global",
+      "sd_type7": "Collaboration avec Type7 - Post-production/sound design/mixage global",
+      "sd_canyon": "Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod",
+      "sd_bachelier": "Post-production/sound design/mixage global",
+      "sd_pulsor": "Jeune entrepreneur à succès (220k+ vues) - Post-production/sound design"
     },
     "antiMalentendu": {
       "includedTitle": "Inclus dans nos prestations de mixage/mastering :",

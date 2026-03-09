@@ -57,7 +57,12 @@
     "priceAllIncluded": "All-inclusive price",
     "videoDescs": {
       "canyonCaptation": "Collaboration with Canyon Bicycles - Sound operator and post-production",
-      "leattCaptation": "Contribution to Leatt commercial - voice sound recording"
+      "leattCaptation": "Contribution to Leatt commercial - voice sound recording",
+      "sd_commencal": "Collaboration with Commencal - Post-production/sound design/global mixing",
+      "sd_type7": "Collaboration with Type7 - Post-production/sound design/global mixing",
+      "sd_canyon": "Collaboration with Canyon Bicycles - Sound operator and post-production",
+      "sd_bachelier": "Post-production/sound design/global mixing",
+      "sd_pulsor": "Young and successful entrepreneur (220k+ views) - Post-production/sound design"
     },
     "antiMalentendu": {
       "includedTitle": "Included in our mixing/mastering services:",
