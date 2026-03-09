@@ -184,7 +184,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">
                 <ul className="space-y-1.5 sm:space-y-2">
-                  {service.deliverables.map((item, index) => (
+                  {(t(`services.data.${service.id}.deliverables`, { returnObjects: true, defaultValue: service.deliverables }) as string[]).map((item, index) => (
                     <li key={index} className="flex items-center gap-2 text-xs sm:text-sm">
                       <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0" />
                       {item}
