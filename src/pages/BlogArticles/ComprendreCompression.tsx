@@ -55,7 +55,7 @@ const ComprendreCompression = () => {
             <div className="flex items-center text-sm text-muted-foreground mb-6">
               <span>{t('blog.articles.compression.meta')}</span>
             </div>
-            <ShareButtons title={t('blog.articles.compression.title')} url="https://globaldripstudio.fr/blog/comprendre-la-compression" />
+            <ShareButtons url="https://globaldripstudio.fr/blog/comprendre-la-compression" />
           </header>
 
           <div className="mb-8 sm:mb-12 rounded-2xl overflow-hidden">
