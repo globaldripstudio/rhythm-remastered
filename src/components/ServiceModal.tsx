@@ -304,11 +304,11 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <h3 className="text-base sm:text-lg font-semibold mb-3">{t('services.ourWork')}</h3>
               <div className="space-y-4">
                 {[
-                  { title: "THE HOLY LAND - Tomas Lemoine", desc: "Collaboration with Commencal - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/u44cDLJWeFc" },
-                  { title: "The Silver Coast - Type 7 Film", desc: "Collaboration with Type7 - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/W-GAqmI96ro" },
-                  { title: "To the next chapter - Tomas Lemoine", desc: "Collaboration with Canyon Bicycles - Chef opérateur son et post-prod", url: "https://www.youtube.com/embed/A7s0pP0D3Po" },
-                  { title: "Théo Bachelier", desc: "Post production/sound design/global mixing", url: "https://www.youtube.com/embed/M-eW6rpRklU" },
-                  { title: "Théo Pulsor", desc: "Young and successful entrepreneur (220k+ views) - Post production/sound design", url: "https://www.youtube.com/embed/kFEacVd-iMs" },
+                  { title: "THE HOLY LAND - Tomas Lemoine", descKey: "commencal", descFallback: "Collaboration with Commencal - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/u44cDLJWeFc" },
+                  { title: "The Silver Coast - Type 7 Film", descKey: "type7", descFallback: "Collaboration with Type7 - Post-production/sound design/global mixing", url: "https://www.youtube.com/embed/W-GAqmI96ro" },
+                  { title: "To the next chapter - Tomas Lemoine", descKey: "canyon", descFallback: "Collaboration with Canyon Bicycles - Sound operator and post-production", url: "https://www.youtube.com/embed/A7s0pP0D3Po" },
+                  { title: "Théo Bachelier", descKey: "bachelier", descFallback: "Post production/sound design/global mixing", url: "https://www.youtube.com/embed/M-eW6rpRklU" },
+                  { title: "Théo Pulsor", descKey: "pulsor", descFallback: "Young and successful entrepreneur (220k+ views) - Post production/sound design", url: "https://www.youtube.com/embed/kFEacVd-iMs" },
                 ].map((video, index) => (
                   <div key={index}>
                     <h4 className="font-semibold text-sm mb-1">{video.title}</h4>
