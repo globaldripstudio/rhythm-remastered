@@ -423,7 +423,7 @@ const Projets = () => {
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center text-primary hover:underline"
                               >
-                                Voir plus sur YouTube
+                                {t('projects.seeMoreYouTube')}
                                 <ExternalLink className="w-4 h-4 ml-1" />
                               </a>
                             </div>
