@@ -143,6 +143,9 @@ const ComprendreCompression = () => {
               </div>
             </div>
           </div>
+          <div className="mt-10 pt-6 border-t border-border">
+            <ShareButtons title={t('blog.articles.compression.title')} url="https://globaldripstudio.fr/blog/comprendre-la-compression" />
+          </div>
         </div>
       </article>
 
