@@ -165,13 +165,17 @@ const BlogArticle = () => {
               )}
             </div>
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 leading-tight">{article.title}</h1>
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-muted-foreground text-sm">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-muted-foreground text-sm mb-6">
               <span>{article.author}</span>
               <span>{article.date}</span>
               <span>{article.readTime}</span>
             </div>
+            <ShareButtons title={article.title} url={`https://globaldripstudio.fr/blog/${slug}`} />
           </div>
           <div className="text-foreground leading-relaxed">{article.content}</div>
+          <div className="mt-10 pt-6 border-t border-border">
+            <ShareButtons title={article.title} url={`https://globaldripstudio.fr/blog/${slug}`} />
+          </div>
         </div>
       </article>
     </div>
