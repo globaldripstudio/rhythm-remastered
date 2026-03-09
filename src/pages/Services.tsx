@@ -217,7 +217,7 @@ const Services = () => {
                   </div>
                   <div className="flex items-center gap-1">
                     <Euro className="w-4 h-4" />
-                    {service.price}
+                    {service.price === "Sur devis" ? t('services.onQuote', 'Sur devis') : service.price}
                   </div>
                 </div>
               </div>
