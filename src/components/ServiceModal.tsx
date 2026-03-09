@@ -264,7 +264,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                 ))}
                 <div>
                   <h4 className="font-semibold text-sm mb-1">To the next chapter - Tomas Lemoine</h4>
-                  <p className="text-xs text-muted-foreground mb-2">Collaboration avec Canyon Bicycles - Chef opérateur son et post-prod</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t('services.videoDescs.canyonCaptation')}</p>
                   <div className="bg-card rounded-lg p-2 border border-border/50">
                     <iframe
                       width="100%"
