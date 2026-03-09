@@ -312,7 +312,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                 ].map((video, index) => (
                   <div key={index}>
                     <h4 className="font-semibold text-sm mb-1">{video.title}</h4>
-                    <p className="text-xs text-muted-foreground mb-2">{video.desc}</p>
+                    <p className="text-xs text-muted-foreground mb-2">{t(`services.videoDescs.sd_${video.descKey}`, video.descFallback)}</p>
                     <div className="bg-card rounded-lg p-2 border border-border/50">
                       <iframe 
                         width="100%" 
