@@ -116,8 +116,8 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
         <div className="absolute bottom-3 left-4 right-4 md:bottom-4">
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="secondary" className="text-xs">{service.category}</Badge>
-            {service.featured && <Badge className="bg-primary text-xs">Spécialité</Badge>}
+            <Badge variant="secondary" className="text-xs">{t(`services.data.${service.id}.category`, service.category)}</Badge>
+            {service.featured && <Badge className="bg-primary text-xs">{t(`services.data.${service.id}.badgeText`, service.featured ? 'Spécialité' : '')}</Badge>}
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{t(`services.data.${service.id}.title`, service.title)}</h2>
           <div className="flex items-center gap-3 sm:gap-4 text-white/80 text-xs sm:text-sm mt-1">
