@@ -120,10 +120,10 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
             {service.featured && <Badge className="bg-primary text-xs">{t(`services.data.${service.id}.badgeText`, service.featured ? 'Spécialité' : '')}</Badge>}
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{t(`services.data.${service.id}.title`, service.title)}</h2>
-          <div className="flex items-center gap-3 sm:gap-4 text-white/80 text-xs sm:text-sm mt-1">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-              {service.duration}
+            <div className="flex items-center gap-3 sm:gap-4 text-white/80 text-xs sm:text-sm mt-1">
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                {t(`services.data.${service.id}.duration`, service.duration)}
             </div>
             <div className="flex items-center gap-1">
               <Euro className="w-3 h-3 sm:w-4 sm:h-4" />
