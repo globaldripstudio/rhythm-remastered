@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { SpotifyPlayerProvider } from "@/contexts/SpotifyPlayerContext";
 import Index from "./pages/Index";
@@ -47,6 +47,14 @@ const App = () => (
             <Route path="/ebook" element={<Ebook />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
+            
+            {/* Redirections anciennes URLs */}
+            <Route path="/a-propos" element={<Navigate to="/" replace />} />
+            <Route path="/about" element={<Navigate to="/" replace />} />
+            <Route path="/programmes" element={<Navigate to="/services" replace />} />
+            <Route path="/programs" element={<Navigate to="/services" replace />} />
+            <Route path="/our-projects" element={<Navigate to="/projets" replace />} />
+            <Route path="/projects" element={<Navigate to="/projets" replace />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
