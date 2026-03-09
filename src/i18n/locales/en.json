@@ -484,7 +484,84 @@
     "readyToJoin": "Ready to join our",
     "collaborationsWord": "collaborations",
     "readyDesc": "Every project is unique. Let's talk about your musical vision and create something extraordinary together.",
-    "startProject": "Start a project"
+    "startProject": "Start a project",
+    "seeMoreYouTube": "See more on YouTube",
+    "theoBachelier": {
+      "videoDesc1": "Creative project with full sound design and mixing",
+      "videoDesc2": "Advanced post-production and sound design"
+    },
+    "cards": {
+      "zeu": {
+        "description": "Creative collaborations with a renowned underground rap artist with authentic flows.",
+        "collaborationDetails": "I composed and recorded 'JDAY', as well as recorded 'J'DEVRAIS' and 'RARE' with ZEU. An intense creative collaboration that gave birth to authentic tracks blending catchy flows and polished productions.",
+        "services": ["Composition", "Recording"]
+      },
+      "tany": {
+        "description": "Privileged partnership and strong artistic relationship with custom direction.",
+        "collaborationDetails": "Privileged partnership with Tany, we've developed a strong and lasting artistic relationship. Together, we build a unique artistic direction that defines his musical identity.",
+        "services": ["Full production", "Recording", "Mixing", "Mastering", "Artistic direction"]
+      },
+      "lil-moine": {
+        "description": "Close collaboration since 2020, near-exclusive production of his tracks and audiovisual projects.",
+        "collaborationDetails": "Privileged collaboration since 2020 with Lil Moine. I produce almost every track and project for him, creating a coherent and evolving sound. This lasting artistic relationship allows us to constantly explore new sonic territories while maintaining his strong musical identity.",
+        "services": ["Production", "Composition", "Recording", "Mixing", "Mastering", "Artistic direction", "Live sound engineer", "Sound Design"]
+      },
+      "eddy-de-mart": {
+        "description": "Mixing and mastering since 2022, bringing technical dimension to his creations.",
+        "collaborationDetails": "Since 2022, I handle the mixing and mastering of Eddy de Mart's projects. Our collaboration focuses on achieving a professional and impactful sound, showcasing his compositions with a rigorous technical approach.",
+        "services": ["Mixing", "Mastering", "Post-production", "Arrangement"]
+      },
+      "black-beanie-dub": {
+        "description": "Project co-founded with Mathieu Battini in 2017, our most recognized achievement.",
+        "collaborationDetails": "Black Beanie Dub is a project I founded with Mathieu Battini in 2017. It became our most successful project, exploring the territories of dub and roots reggae, electronic music and sonic experimentation, always respecting the traditional foundations of the genre. An artistic adventure that continues to evolve.",
+        "services": ["Co-founder", "Production", "Composition", "Sound Design"]
+      },
+      "lofai": {
+        "description": "Collaborative project exploring the intersection between artificial intelligence and lofi music.",
+        "collaborationDetails": "LOFAI is a fascinating collaborative project exploring the intersection between artificial intelligence and lofi music. We work with talented musicians and exceptional jazz players — LOFAI wouldn't exist without them. We experiment with AI tools to create unique sonic textures while preserving the authenticity and warmth of traditional lofi.",
+        "services": ["AI Experimentation", "Production", "Sound Design", "Mixing", "Mastering", "Artistic direction", "Management"]
+      },
+      "ekzo": {
+        "description": "My beatmaker/producer alias since 2022 for my personal creative projects.",
+        "collaborationDetails": "Ekzo is my beatmaker/producer name since 2022. Under this alias, I release all my personal projects, exploring different styles and production approaches. It's my creative laboratory where I express my personal artistic vision.",
+        "services": ["Beatmaking", "Personal production", "Experimentation"]
+      },
+      "lave": {
+        "description": "Promising young talent, mixing and mastering of the track 'Bête noir'.",
+        "collaborationDetails": "I had the pleasure of mixing and mastering 'Bête noir' for Lavé, a very talented young artist. The project required a delicate approach to preserve the authenticity of his voice while delivering the depth and impact needed.",
+        "services": ["Mixing", "Mastering"]
+      },
+      "mamood": {
+        "description": "Collaboration on the recording, mixing and mastering of Adios and MPLPVP.",
+        "collaborationDetails": "I recorded and mixed 'Adios' and 'MPLPVP' for Mamood. These sessions were particularly enriching, exploring contemporary urban sounds with a precise technical approach to capture the energy of his performances.",
+        "services": ["Recording", "Mixing"]
+      },
+      "theo-bachelier": {
+        "description": "Privileged collaboration around sound design, post-production and creative mixing.",
+        "collaborationDetails": "Privileged collaboration with Théo Bachelier around sound design. I work on the post-production, sound design and mixing of his creative projects. An artistic synergy that allows us to push the boundaries of contemporary sound creation.",
+        "services": ["Sound Design", "Post-production", "Mixing", "Creative collaboration"]
+      },
+      "timothe-chatenoud": {
+        "description": "Self-produced artist with a unique musical identity, we bring the finishing touch to Timothé's creations with hybrid mastering.",
+        "collaborationDetails": "Timothé Chatenoud is a self-produced artist with a strong and unique musical identity. We step in to bring the professional finishing touch to his creations, preserving his authenticity while optimizing sound quality.",
+        "services": ["Mastering"]
+      },
+      "venin": {
+        "description": "Iconic rock band from Southern France, recording, editing, mixing and mastering of the album 'Le Premier Sang'.",
+        "collaborationDetails": "For their album 'Le Premier Sang', I had the honor of welcoming Venin to Global Drip Studio. I handled the editing, mixing and mastering of the 9 new tracks, as well as the recording of vocals, solo parts, and some keyboard arrangements. A project entirely designed to sound eighties with an authentic approach — no copy-paste, no triggers.",
+        "services": ["Editing", "Mixing", "Mastering", "Vocal & guitar recording", "Arrangements"]
+      },
+      "ritualz": {
+        "description": "A powerful comeback in 2025 after ten years of experience, mixing and mastering his new productions.",
+        "collaborationDetails": "Ritualz is an explosive blend of hard-hitting rhythms, powerful bass and diverse sounds. After more than ten years of production experience but being away from the scene, he returns in 2025 with renewed energy, ready to rebuild his artistic project from scratch. We work alongside him on mixing and mastering.",
+        "services": ["Mixing", "Mastering"]
+      },
+      "jibbs-arenas": {
+        "description": "Swiss and Spanish artist, close collaboration from recording to artistic direction.",
+        "collaborationDetails": "Jibbs Arenas is a Swiss and Spanish artist who draws inspiration from his roots and adapts them to any style. We work in close collaboration at Global Drip Studio, from recording to mixing and mastering, including production.",
+        "services": ["Recording", "Production", "Mixing", "Mastering", "Artistic direction"]
+      }
+    }
   },
   "ebook": {
     "badge": "Premium Training",
