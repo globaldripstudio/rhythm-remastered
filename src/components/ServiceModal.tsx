@@ -377,7 +377,7 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2">{service.price}</div>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                  Prix {service.price.includes('devis') ? 'sur demande' : 'tout inclus'}
+                  {service.price.includes('devis') || service.price.includes('request') ? t('services.priceOnRequest') : t('services.priceAllIncluded')}
                 </p>
                 <Button 
                   className="w-full studio-button"
