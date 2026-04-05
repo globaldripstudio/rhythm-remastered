@@ -17,6 +17,8 @@ import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
 import Ebook from "./pages/Ebook";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import EbookLogin from "./pages/EbookLogin";
+import EbookReader from "./pages/EbookReader";
 import Admin from "./pages/Admin";
 
 import LiveChat from "./components/LiveChat";
