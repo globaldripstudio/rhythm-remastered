@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   LogOut, Calendar, Users, Home, BarChart3, CreditCard, 
-  LayoutDashboard, Bell, ChevronDown, Globe
+  LayoutDashboard, Bell, ChevronDown, Globe, BookOpen
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -25,6 +25,7 @@ import ActivityFeed from './ActivityFeed';
 import PerformanceMetrics from './PerformanceMetrics';
 import QuickActions from './QuickActions';
 import SiteAnalytics from './SiteAnalytics';
+import EbookManager from './EbookManager';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -96,7 +97,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-6 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-7 mb-6 h-auto p-1">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <LayoutDashboard className="w-4 h-4" />
               <span className="hidden sm:inline">Vue d'ensemble</span>
@@ -111,6 +112,11 @@ const Dashboard = () => {
               <CreditCard className="w-4 h-4" />
               <span className="hidden sm:inline">Paiements</span>
               <span className="sm:hidden">€</span>
+            </TabsTrigger>
+            <TabsTrigger value="ebook" className="flex items-center gap-2 py-3">
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">E-book</span>
+              <span className="sm:hidden">📖</span>
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2 py-3">
               <Calendar className="w-4 h-4" />
@@ -155,6 +161,10 @@ const Dashboard = () => {
 
           <TabsContent value="stripe">
             <StripeAnalytics />
+          </TabsContent>
+
+          <TabsContent value="ebook">
+            <EbookManager />
           </TabsContent>
 
           <TabsContent value="calendar">

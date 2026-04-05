@@ -33,6 +33,12 @@ const PaymentSuccess = () => {
             </div>
 
             <div className="space-y-4">
+              <Link to="/ebook/login">
+                <Button className="studio-button w-full" size="lg">
+                  Créer mon compte et accéder à la formation
+                </Button>
+              </Link>
+
               <p className="text-sm text-muted-foreground">
                 Vous n'avez pas reçu l'email ? Contactez-nous à{" "}
                 <a href="mailto:globaldripstudio@gmail.com" className="text-primary hover:underline">
@@ -41,7 +47,7 @@ const PaymentSuccess = () => {
               </p>
               
               <Link to="/">
-                <Button className="studio-button">
+                <Button variant="outline">
                   <Home className="w-4 h-4 mr-2" />
                   Retour à l'accueil
                 </Button>

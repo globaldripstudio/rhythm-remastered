@@ -17,6 +17,8 @@ import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
 import Ebook from "./pages/Ebook";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import EbookLogin from "./pages/EbookLogin";
+import EbookReader from "./pages/EbookReader";
 import Admin from "./pages/Admin";
 
 import LiveChat from "./components/LiveChat";
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
             <Route path="/ebook" element={<Ebook />} />
+            <Route path="/ebook/login" element={<EbookLogin />} />
+            <Route path="/ebook/reader" element={<EbookReader />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
             
