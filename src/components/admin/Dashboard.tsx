@@ -97,7 +97,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-6 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-7 mb-6 h-auto p-1">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <LayoutDashboard className="w-4 h-4" />
               <span className="hidden sm:inline">Vue d'ensemble</span>
@@ -112,6 +112,11 @@ const Dashboard = () => {
               <CreditCard className="w-4 h-4" />
               <span className="hidden sm:inline">Paiements</span>
               <span className="sm:hidden">€</span>
+            </TabsTrigger>
+            <TabsTrigger value="ebook" className="flex items-center gap-2 py-3">
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">E-book</span>
+              <span className="sm:hidden">📖</span>
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2 py-3">
               <Calendar className="w-4 h-4" />
