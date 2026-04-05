@@ -163,6 +163,10 @@ const Dashboard = () => {
             <StripeAnalytics />
           </TabsContent>
 
+          <TabsContent value="ebook">
+            <EbookManager />
+          </TabsContent>
+
           <TabsContent value="calendar">
             <WeeklyAgenda />
           </TabsContent>
