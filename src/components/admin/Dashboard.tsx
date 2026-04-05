@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   LogOut, Calendar, Users, Home, BarChart3, CreditCard, 
-  LayoutDashboard, Bell, ChevronDown, Globe
+  LayoutDashboard, Bell, ChevronDown, Globe, BookOpen
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
