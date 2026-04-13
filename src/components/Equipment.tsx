@@ -71,8 +71,8 @@ const Equipment = () => {
       { name: "ESP E-II Horizon", type: "Guitare électrique", status: "premium" },
       { name: "ESP Vintage Plus", type: "Guitare électrique", status: "premium" },
       { name: "LTD M7 Baritone Black Metal", type: "Guitare électrique", status: "premium" },
-      { name: "Charvel PM PLUS SRS", type: "Guitare électrique", status: "standard" },
-      { name: "Fender Stratocaster Player Series", type: "Guitare électrique", status: "classic" },
+      { name: "Charvel PM PLUS SRS", type: "Guitare électrique", status: "premium" },
+      
       { name: "Ibanez Tod10n", type: "Guitare électro-classique", status: "signature" },
       { name: "Washburn D15", type: "Guitare folk", status: "standard" },
       { name: "Guitare classique Pro Natura", type: "Guitare classique", status: "standard" },
