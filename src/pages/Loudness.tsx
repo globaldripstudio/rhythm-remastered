@@ -663,26 +663,26 @@ const Loudness = () => {
           </div>
 
           {result && (
-            <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label={t("loudness.resultsAria")}>
+            <section className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4" aria-label={t("loudness.resultsAria")}>
               <Card className="equipment-card sm:col-span-2 lg:col-span-4">
-                <CardContent className="p-6">
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-muted-foreground">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="mb-4 flex flex-col gap-3 text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex min-w-0 items-center gap-3">
                       <Music2 className="h-5 w-5 shrink-0 text-primary" />
                       <span className="truncate text-sm">{result.fileName}</span>
                     </div>
-                    <span className="rounded-full border border-border px-3 py-1 text-xs">
+                    <span className="w-fit rounded-full border border-border px-3 py-1 text-xs">
                       {t(analysisModes.find((mode) => mode.value === result.mode)?.labelKey ?? "loudness.modes.stereo")}
                     </span>
                   </div>
-                  <div className="mb-5 flex flex-wrap items-center gap-2">
+                  <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                     {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">{t("loudness.inferredProfile")}: {t(contextLabelKeys[inferredContext])}</span>}
-                    <Button type="button" onClick={exportPdfReport} variant="outline" size="sm">
+                    <Button type="button" onClick={exportPdfReport} variant="outline" size="sm" className="w-full sm:w-auto">
                       <Download className="h-4 w-4" />
                       {t("loudness.pdfButton")}
                     </Button>
                   </div>
-                  <div className="mb-6 flex flex-wrap gap-2" aria-label={t("loudness.modeAria")}>
+                  <div className="mb-6 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap" aria-label={t("loudness.modeAria")}>
                     {analysisModes.map((mode) => (
                       <Button
                         key={mode.value}
@@ -690,7 +690,7 @@ const Loudness = () => {
                         variant={selectedMode === mode.value ? "default" : "outline"}
                         onClick={() => handleModeChange(mode.value)}
                         disabled={isAnalyzing}
-                        className="min-w-32"
+                        className="w-full sm:w-auto sm:min-w-32"
                       >
                         {t(mode.labelKey)}
                       </Button>
@@ -698,15 +698,15 @@ const Loudness = () => {
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
-                      <p className="text-5xl font-bold text-primary">{result.lufs.toFixed(1)}</p>
+                      <p className="text-4xl font-bold text-primary sm:text-5xl">{result.lufs.toFixed(1)}</p>
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
                     </div>
                     <div>
-                      <p className="text-4xl font-bold">{result.momentaryLufs.toFixed(1)}</p>
+                      <p className="text-3xl font-bold sm:text-4xl">{result.momentaryLufs.toFixed(1)}</p>
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.momentaryCurrent")}</p>
                     </div>
                     <div>
-                      <p className="text-4xl font-bold">{result.shortTermLufs.toFixed(1)}</p>
+                      <p className="text-3xl font-bold sm:text-4xl">{result.shortTermLufs.toFixed(1)}</p>
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.shortTermCurrent")}</p>
                     </div>
                   </div>
