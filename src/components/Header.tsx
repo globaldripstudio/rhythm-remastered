@@ -45,7 +45,7 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8" aria-label="Navigation principale">
+          <nav className="hidden md:flex items-center space-x-5 xl:space-x-7" aria-label="Navigation principale">
             <a href="#accueil" className="nav-link">{t('nav.home')}</a>
             <a href="#services" className="nav-link">{t('nav.services')}</a>
             <a href="#equipement" className="nav-link">{t('nav.equipment')}</a>
@@ -55,22 +55,22 @@ const Header = () => {
             <span className="text-muted-foreground/50">|</span>
             <a href="/blog" className="nav-link text-muted-foreground">{t('nav.blog')}</a>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/loudness" className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/20 px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground">
-              <Gauge className="h-4 w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
-              {t('nav.loudness')}
-            </a>
-            <span className="text-muted-foreground/50">|</span>
             <span className="relative inline-flex items-center cursor-not-allowed">
               <span className="text-muted-foreground/50">{t('nav.shop')}</span>
               <span className="absolute -top-3 -right-4 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
                 {t('nav.shopSoon')}
               </span>
             </span>
+            <span className="text-muted-foreground/50">|</span>
+            <a href="/loudness" className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/20 px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground">
+              <Gauge className="h-4 w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
+              {t('nav.loudness')}
+            </a>
           </nav>
 
           {/* Contact Info & CTA & Language Switch */}
           <div className="hidden lg:flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <div className="hidden 2xl:flex items-center space-x-2 text-sm text-muted-foreground">
               <Phone className="w-4 h-4" />
               <span>+33 6 59 79 73 42</span>
             </div>
