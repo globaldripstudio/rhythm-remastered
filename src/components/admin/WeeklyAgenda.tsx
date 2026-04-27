@@ -262,6 +262,48 @@ const WeeklyAgenda = () => {
         </div>
       </CardHeader>
       <CardContent className="p-0">
+        <div className="border-y border-border bg-muted/10 p-3 sm:hidden">
+          <div className="space-y-3">
+            {days.map(day => {
+              const dayEvents = getEventsForDay(day);
+              return (
+                <div key={day.toISOString()} className={cn("rounded-lg border border-border bg-card/70 p-3", today(day) && "border-primary/60 bg-primary/5", isWeekend(day) && "opacity-70")}>
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold capitalize">{format(day, 'EEEE d MMM', { locale: fr })}</div>
+                      <div className="text-xs text-muted-foreground">{isWeekend(day) ? 'Fermé' : '10h-19h'}</div>
+                    </div>
+                    <Button type="button" size="sm" onClick={() => openDialogForDay(day)} disabled={isWeekend(day)} className="h-8 px-3">
+                      <Plus className="h-4 w-4" />
+                      RDV
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {dayEvents.length === 0 ? (
+                      <p className="rounded-md border border-dashed border-border p-3 text-center text-xs text-muted-foreground">Aucun rendez-vous</p>
+                    ) : dayEvents.map(event => (
+                      <button
+                        key={event.id}
+                        type="button"
+                        onClick={(e) => handleEventClick(event, e)}
+                        className="w-full rounded-md border border-border bg-background/60 p-3 text-left transition-colors hover:bg-muted/40"
+                        style={{ borderLeft: `4px solid ${event.color}` }}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-medium leading-tight">{event.title}</span>
+                          <span className="shrink-0 text-xs text-muted-foreground">{format(new Date(event.start_time), 'HH:mm')} {event.end_time ? `- ${format(new Date(event.end_time), 'HH:mm')}` : ''}</span>
+                        </div>
+                        {event.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{event.description}</p>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="hidden sm:block overflow-x-auto">
         {/* Header - Days */}
         <div className="grid grid-cols-[40px_repeat(7,1fr)] border-b border-border">
           <div className="p-1" />
@@ -366,6 +408,7 @@ const WeeklyAgenda = () => {
               );
             })}
           </div>
+        </div>
         </div>
 
         {/* Dialog */}
