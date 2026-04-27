@@ -61,6 +61,63 @@ const formatDuration = (seconds: number) => {
 
 const safeFileName = (name: string) => name.replace(/[^a-z0-9-_]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "rapport-lufs";
 
+const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, y: number, width: number, height: number) => {
+  const data = result.curve.length ? result.curve : [{ time: 0, momentary: -70, shortTerm: -70 }];
+  const values = [...data.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
+  const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
+  const maxValue = Math.ceil(Math.max(...values, -8) / 5) * 5;
+  const valueRange = Math.max(maxValue - minValue, 1);
+  const timeMax = Math.max(data[data.length - 1].time, 0.1);
+  const plot = { left: x + 12, top: y + 13, right: x + width - 30, bottom: y + height - 14 };
+  const toPoint = (point: { time: number }, value: number) => ({
+    x: plot.left + (point.time / timeMax) * (plot.right - plot.left),
+    y: plot.top + ((maxValue - value) / valueRange) * (plot.bottom - plot.top),
+  });
+
+  report.setFillColor(17, 20, 24);
+  report.roundedRect(x, y, width, height, 3, 3, "F");
+  report.setDrawColor(45, 52, 60);
+  report.line(plot.left, plot.bottom, plot.right, plot.bottom);
+  report.line(plot.left, plot.top, plot.left, plot.bottom);
+  loudnessMarkers.forEach((marker) => {
+    const markerY = toPoint({ time: 0 }, marker.value).y;
+    if (markerY >= plot.top && markerY <= plot.bottom) {
+      report.setDrawColor(48, 56, 64);
+      report.setLineDashPattern([1.5, 2], 0);
+      report.line(plot.left, markerY, plot.right, markerY);
+      report.setLineDashPattern([], 0);
+      report.setTextColor(150, 158, 170);
+      report.setFontSize(6.5);
+      report.text(marker.label, plot.right + 3, markerY + 1.5);
+    }
+  });
+
+  const drawSeries = (key: "momentary" | "shortTerm", color: [number, number, number]) => {
+    report.setDrawColor(...color);
+    report.setLineWidth(0.45);
+    data.forEach((point, index) => {
+      if (index === 0) return;
+      const previous = toPoint(data[index - 1], data[index - 1][key]);
+      const current = toPoint(point, point[key]);
+      report.line(previous.x, previous.y, current.x, current.y);
+    });
+  };
+  drawSeries("momentary", [20, 184, 166]);
+  drawSeries("shortTerm", [255, 112, 54]);
+  report.setTextColor(226, 232, 240);
+  report.setFont("helvetica", "bold");
+  report.setFontSize(9);
+  report.text("Courbe LUFS", x + 6, y + 8);
+  report.setFont("helvetica", "normal");
+  report.setFontSize(7);
+  report.setTextColor(20, 184, 166);
+  report.text("Momentary", x + width - 58, y + 8);
+  report.setTextColor(255, 112, 54);
+  report.text("Short-term", x + width - 30, y + 8);
+  report.setTextColor(150, 158, 170);
+  report.text(`${formatDuration(0)}                     ${formatDuration(timeMax / 2)}                     ${formatDuration(timeMax)}`, plot.left, y + height - 4);
+};
+
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
 
 const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
@@ -277,17 +334,17 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
             </g>
           ) : null;
         })}
-        <polyline points={momentaryPath} fill="none" className="stroke-primary [filter:drop-shadow(0_0_5px_hsl(var(--primary)/0.55))]" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
-        <polyline points={shortTermPath} fill="none" className="stroke-accent [filter:drop-shadow(0_0_5px_hsl(var(--accent)/0.6))]" strokeWidth={focus === "shortTerm" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "momentary" ? "0.22" : "1"} />
+        <polyline points={momentaryPath} fill="none" className="stroke-accent" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
+        <polyline points={shortTermPath} fill="none" className="stroke-primary" strokeWidth={focus === "shortTerm" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "momentary" ? "0.22" : "1"} />
         {hoveredPoint && (
           <g pointerEvents="none">
             <line x1={hoverX} y1={paddingTop} x2={hoverX} y2={height - paddingBottom} className="stroke-foreground/40" strokeDasharray="4 4" />
-            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-primary" />}
-            {(focus !== "momentary") && <circle cx={hoverX} cy={hoverShortTermY} r="4" className="fill-accent" />}
+            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-accent" />}
+            {(focus !== "momentary") && <circle cx={hoverX} cy={hoverShortTermY} r="4" className="fill-primary" />}
             <rect x={Math.min(hoverX + 10, width - 176)} y={Math.max(10, Math.min(hoverMomentaryY, hoverShortTermY) - 34)} width="166" height="58" rx="6" className="fill-background stroke-border" />
             <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(30, Math.min(hoverMomentaryY, hoverShortTermY) - 14)} className="fill-foreground text-[11px]">{formatDuration(hoveredPoint.time)}</text>
-            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-primary text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
-            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(62, Math.min(hoverMomentaryY, hoverShortTermY) + 18)} className="fill-accent text-[11px]">S {hoveredPoint.shortTerm.toFixed(1)} LUFS</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-accent text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(62, Math.min(hoverMomentaryY, hoverShortTermY) + 18)} className="fill-primary text-[11px]">S {hoveredPoint.shortTerm.toFixed(1)} LUFS</text>
           </g>
         )}
       </svg>
@@ -364,23 +421,34 @@ const Loudness = () => {
     if (!result) return;
     const report = new jsPDF({ unit: "mm", format: "a4" });
     const pageWidth = report.internal.pageSize.getWidth();
+    const pageHeight = report.internal.pageSize.getHeight();
     const margin = 16;
     const modeLabel = analysisModes.find((mode) => mode.value === result.mode)?.label ?? "Stéréo";
-    report.setFillColor(12, 12, 14);
-    report.rect(0, 0, pageWidth, 34, "F");
+    report.setFillColor(12, 14, 17);
+    report.rect(0, 0, pageWidth, pageHeight, "F");
+    report.setFillColor(255, 112, 54);
+    report.rect(0, 0, 5, pageHeight, "F");
+    report.setFillColor(20, 184, 166);
+    report.rect(5, 0, 2, pageHeight, "F");
+    report.setFillColor(22, 26, 32);
+    report.roundedRect(margin, 14, pageWidth - margin * 2, 42, 4, 4, "F");
     report.setTextColor(255, 255, 255);
     report.setFont("helvetica", "bold");
-    report.setFontSize(20);
-    report.text("Rapport Loudness LUFS", margin, 18);
+    report.setFontSize(22);
+    report.text("Rapport Loudness LUFS", margin + 6, 30);
     report.setFont("helvetica", "normal");
     report.setFontSize(10);
-    report.text("Global Drip Studio", margin, 26);
-    report.setTextColor(24, 24, 27);
+    report.setTextColor(180, 188, 198);
+    report.text("Global Drip Studio · analyse mastering professionnelle", margin + 6, 41);
+    report.setTextColor(245, 245, 245);
     report.setFontSize(11);
-    let y = 48;
-    report.text(`Fichier : ${result.fileName}`, margin, y);
+    let y = 70;
+    report.setFont("helvetica", "bold");
+    report.text(result.fileName, margin, y);
     y += 7;
-    report.text(`Mode : ${modeLabel} · Durée : ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} canal${result.channels > 1 ? "s" : ""}`, margin, y);
+    report.setFont("helvetica", "normal");
+    report.setTextColor(160, 168, 178);
+    report.text(`Mode ${modeLabel} · ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} canal${result.channels > 1 ? "s" : ""}`, margin, y);
     y += 12;
     const metrics = [
       ["LUFS intégré", `${result.lufs.toFixed(1)} LUFS`],
@@ -395,40 +463,51 @@ const Loudness = () => {
     metrics.forEach(([label, value], index) => {
       const x = margin + (index % 2) * 88;
       const rowY = y + Math.floor(index / 2) * 22;
-      report.setFillColor(245, 245, 245);
+      report.setFillColor(24, 29, 35);
       report.roundedRect(x, rowY, 82, 16, 2, 2, "F");
       report.setFont("helvetica", "normal");
       report.setFontSize(8);
-      report.setTextColor(100, 100, 100);
+      report.setTextColor(155, 163, 174);
       report.text(label, x + 4, rowY + 5);
       report.setFont("helvetica", "bold");
       report.setFontSize(12);
-      report.setTextColor(20, 20, 20);
+      report.setTextColor(index === 0 ? 255 : 240, index === 0 ? 112 : 245, index === 0 ? 54 : 248);
       report.text(value, x + 4, rowY + 12);
     });
-    y += 100;
+    y += 94;
+    drawPdfLoudnessCurve(report, result, margin, y, pageWidth - margin * 2, 72);
+    y += 84;
     report.setFont("helvetica", "bold");
     report.setFontSize(13);
+    report.setTextColor(255, 255, 255);
     report.text("Interprétation", margin, y);
     y += 7;
     report.setFont("helvetica", "normal");
     report.setFontSize(10);
+    report.setTextColor(190, 198, 208);
     report.text(report.splitTextToSize(targetHint ?? "Analyse effectuée avec paramètres professionnels BS.1770.", pageWidth - margin * 2), margin, y);
     y += 28;
     report.setFont("helvetica", "bold");
+    report.setTextColor(255, 255, 255);
     report.text("Méthodologie", margin, y);
     y += 7;
     report.setFont("helvetica", "normal");
+    report.setTextColor(175, 184, 194);
     report.text(report.splitTextToSize(`Analyse locale : fenêtre ${professionalSettings.windowMs} ms, pas ${professionalSettings.hopMs} ms, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU, K-weighting BS.1770 et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
     y += 24;
-    report.setDrawColor(220, 220, 220);
+    report.setDrawColor(45, 52, 60);
     report.line(margin, y, pageWidth - margin, y);
     y += 8;
     report.setFont("helvetica", "bold");
+    report.setTextColor(255, 255, 255);
     report.text("Repères", margin, y);
     y += 7;
     report.setFont("helvetica", "normal");
+    report.setTextColor(175, 184, 194);
     report.text("-14 LUFS : streaming dense · -16 LUFS : streaming équilibré · -20 LUFS : dynamique · -23 LUFS : broadcast EBU", margin, y);
+    report.setFontSize(8);
+    report.setTextColor(120, 128, 138);
+    report.text("Rapport généré localement — aucun fichier audio envoyé sur serveur.", margin, pageHeight - 12);
     report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
   }, [inferredContext, result, targetHint]);
 
