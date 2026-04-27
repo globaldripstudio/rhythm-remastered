@@ -477,7 +477,7 @@ const Loudness = () => {
     const pageWidth = report.internal.pageSize.getWidth();
     const pageHeight = report.internal.pageSize.getHeight();
     const margin = 16;
-    const modeLabel = t(t(analysisModes.find((mode) => mode.value === result.mode)?.labelKey ?? "loudness.modes.stereo")Key ?? "loudness.modes.stereo");
+    const modeLabel = t(analysisModes.find((mode) => mode.value === result.mode)?.labelKey ?? "loudness.modes.stereo");
     report.setFillColor(12, 14, 17);
     report.rect(0, 0, pageWidth, pageHeight, "F");
     report.setFillColor(255, 112, 54);
@@ -489,11 +489,11 @@ const Loudness = () => {
     report.setTextColor(255, 255, 255);
     report.setFont("helvetica", "bold");
     report.setFontSize(22);
-    report.text("Rapport Loudness LUFS", margin + 6, 30);
+    report.text(t("loudness.pdf.title"), margin + 6, 30);
     report.setFont("helvetica", "normal");
     report.setFontSize(10);
     report.setTextColor(180, 188, 198);
-    report.text("Global Drip Studio · analyse mastering professionnelle", margin + 6, 41);
+    report.text(t("loudness.pdf.subtitle"), margin + 6, 41);
     report.setTextColor(245, 245, 245);
     report.setFontSize(11);
     let y = 70;
@@ -502,17 +502,17 @@ const Loudness = () => {
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(160, 168, 178);
-    report.text(`Mode ${modeLabel} · ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} canal${result.channels > 1 ? "s" : ""}`, margin, y);
+    report.text(`${t("loudness.pdf.mode")} ${modeLabel} · ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} ${result.channels > 1 ? t("loudness.metrics.channels") : t("loudness.metrics.channel")}`, margin, y);
     y += 12;
     const metrics = [
-      ["{t("loudness.metrics.integrated")}", `${result.lufs.toFixed(1)} LUFS`],
-      ["Momentary actuel", `${result.momentaryLufs.toFixed(1)} LUFS`],
-      ["Short-term actuel", `${result.shortTermLufs.toFixed(1)} LUFS`],
+      [t("loudness.metrics.integrated"), `${result.lufs.toFixed(1)} LUFS`],
+      [t("loudness.metrics.momentaryCurrent"), `${result.momentaryLufs.toFixed(1)} LUFS`],
+      [t("loudness.metrics.shortTermCurrent"), `${result.shortTermLufs.toFixed(1)} LUFS`],
       ["Peak", `${result.peakDb.toFixed(1)} dBFS`],
-      ["True peak estimé", `${result.truePeakDb.toFixed(1)} dBTP`],
+      [t("loudness.metrics.truePeakEstimated"), `${result.truePeakDb.toFixed(1)} dBTP`],
       ["LRA / PLR", `${result.loudnessRange.toFixed(1)} LU / ${result.plr.toFixed(1)} dB`],
-      ["Maximums", `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
-      ["Profil déduit", inferredContext ? t(contextLabelKeys[inferredContext]) : t("loudness.neutralProfile")],
+      [t("loudness.metrics.maximums"), `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
+      [t("loudness.inferredProfile"), inferredContext ? t(contextLabelKeys[inferredContext]) : t("loudness.neutralProfile")],
     ];
     metrics.forEach(([label, value], index) => {
       const x = margin + (index % 2) * 88;
