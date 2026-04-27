@@ -134,6 +134,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   }
 
   const selectedChannels = getSelectedChannels(renderedBuffer, mode);
+  const truePeakDb = estimateTruePeak(selectedChannels);
 
   for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
     let blockPower = 0;
@@ -170,10 +171,20 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
+  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > -70);
+  const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
+  const integratedLufs = dbFromPower(integratedPower);
+  const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
+  const maxShortTermLufs = Math.max(...curve.map((point) => point.shortTerm).filter(Number.isFinite));
 
   return {
-    lufs: dbFromPower(integratedPower),
+    lufs: integratedLufs,
     peakDb: 20 * Math.log10(Math.max(peak, 1e-12)),
+    truePeakDb,
+    loudnessRange: Number.isFinite(loudnessRange) ? loudnessRange : 0,
+    maxMomentaryLufs,
+    maxShortTermLufs,
+    plr: truePeakDb - integratedLufs,
     momentaryLufs: latestCurvePoint?.momentary ?? dbFromPower(integratedPower),
     shortTermLufs: latestCurvePoint?.shortTerm ?? dbFromPower(integratedPower),
     curve,
