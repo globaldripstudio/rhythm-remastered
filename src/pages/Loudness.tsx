@@ -538,6 +538,13 @@ const Loudness = () => {
                       {analysisModes.find((mode) => mode.value === result.mode)?.label}
                     </span>
                   </div>
+                  <div className="mb-5 flex flex-wrap items-center gap-2">
+                    {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">Profil déduit : {contextLabels[inferredContext]}</span>}
+                    <Button type="button" onClick={exportPdfReport} variant="outline" size="sm">
+                      <Download className="h-4 w-4" />
+                      Rapport PDF
+                    </Button>
+                  </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
                       <p className="text-5xl font-bold text-primary">{result.lufs.toFixed(1)}</p>
