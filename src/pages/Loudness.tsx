@@ -29,7 +29,7 @@ type AnalysisResult = {
 type AnalysisMode = "stereo" | "left" | "right";
 type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 type CurveFocus = "both" | "momentary" | "shortTerm";
-const professionalSettings = { windowMs: 400, hopMs: 50, gateLufs: -70, truePeak: true };
+const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
@@ -120,12 +120,72 @@ const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, 
 
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
 
+const createHighShelfCoefficients = (sampleRate: number, gainDb = 3.99984385397, frequency = 1681.974450955533, q = 0.7071752369554196) => {
+  const a = 10 ** (gainDb / 40);
+  const omega = (2 * Math.PI * frequency) / sampleRate;
+  const sin = Math.sin(omega);
+  const cos = Math.cos(omega);
+  const alpha = sin / (2 * q);
+  const sqrtA = Math.sqrt(a);
+  const b0 = a * ((a + 1) + (a - 1) * cos + 2 * sqrtA * alpha);
+  const b1 = -2 * a * ((a - 1) + (a + 1) * cos);
+  const b2 = a * ((a + 1) + (a - 1) * cos - 2 * sqrtA * alpha);
+  const a0 = (a + 1) - (a - 1) * cos + 2 * sqrtA * alpha;
+  const a1 = 2 * ((a - 1) - (a + 1) * cos);
+  const a2 = (a + 1) - (a - 1) * cos - 2 * sqrtA * alpha;
+  return { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0 };
+};
+
+const createHighPassCoefficients = (sampleRate: number, frequency = 38.13547087602444, q = 0.5003270373238773) => {
+  const omega = (2 * Math.PI * frequency) / sampleRate;
+  const sin = Math.sin(omega);
+  const cos = Math.cos(omega);
+  const alpha = sin / (2 * q);
+  const b0 = (1 + cos) / 2;
+  const b1 = -(1 + cos);
+  const b2 = (1 + cos) / 2;
+  const a0 = 1 + alpha;
+  const a1 = -2 * cos;
+  const a2 = 1 - alpha;
+  return { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0 };
+};
+
+const applyBiquad = (input: Float32Array, coefficients: ReturnType<typeof createHighShelfCoefficients>) => {
+  const output = new Float32Array(input.length);
+  let x1 = 0;
+  let x2 = 0;
+  let y1 = 0;
+  let y2 = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    const x0 = input[i];
+    const y0 = coefficients.b0 * x0 + coefficients.b1 * x1 + coefficients.b2 * x2 - coefficients.a1 * y1 - coefficients.a2 * y2;
+    output[i] = y0;
+    x2 = x1;
+    x1 = x0;
+    y2 = y1;
+    y1 = y0;
+  }
+  return output;
+};
+
+const applyBs1770KWeighting = (samples: Float32Array, sampleRate: number) => {
+  const preFiltered = applyBiquad(samples, createHighShelfCoefficients(sampleRate));
+  return applyBiquad(preFiltered, createHighPassCoefficients(sampleRate));
+};
+
 const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
   const left = buffer.getChannelData(0);
   if (mode === "left" || buffer.numberOfChannels === 1) return [left];
   const right = buffer.getChannelData(Math.min(1, buffer.numberOfChannels - 1));
   if (mode === "right") return [right];
   return [left, right];
+};
+
+const getSelectedChannelArrays = (channels: Float32Array[], mode: AnalysisMode) => {
+  if (mode === "left" || channels.length === 1) return [channels[0]];
+  const right = channels[Math.min(1, channels.length - 1)];
+  if (mode === "right") return [right];
+  return [channels[0], right];
 };
 
 const averagePower = (powers: number[]) => powers.reduce((sum, power) => sum + power, 0) / Math.max(powers.length, 1);
@@ -161,32 +221,8 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const arrayBuffer = await file.arrayBuffer();
   const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
   await audioContext.close();
-
-  const offlineContext = new OfflineAudioContext(
-    audioBuffer.numberOfChannels,
-    audioBuffer.length,
-    audioBuffer.sampleRate
-  );
-  const source = offlineContext.createBufferSource();
-  const highPass = offlineContext.createBiquadFilter();
-  const highShelf = offlineContext.createBiquadFilter();
-
-  source.buffer = audioBuffer;
-  highPass.type = "highpass";
-  highPass.frequency.value = 38;
-  highPass.Q.value = 0.5;
-  highShelf.type = "highshelf";
-  highShelf.frequency.value = 1500;
-  highShelf.gain.value = 4;
-
-  source.connect(highPass);
-  highPass.connect(highShelf);
-  highShelf.connect(offlineContext.destination);
-  source.start(0);
-
-  const renderedBuffer = await offlineContext.startRendering();
-  const channelCount = renderedBuffer.numberOfChannels;
-  const sampleRate = renderedBuffer.sampleRate;
+  const channelCount = audioBuffer.numberOfChannels;
+  const sampleRate = audioBuffer.sampleRate;
   const windowSeconds = professionalSettings.windowMs / 1000;
   const hopSeconds = professionalSettings.hopMs / 1000;
   const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
@@ -194,7 +230,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const blocks: number[] = [];
   let peak = 0;
 
-  const channelData = Array.from({ length: channelCount }, (_, index) => renderedBuffer.getChannelData(index));
+  const channelData = Array.from({ length: channelCount }, (_, index) => audioBuffer.getChannelData(index));
 
   for (let channel = 0; channel < channelCount; channel += 1) {
     const samples = channelData[channel];
@@ -203,12 +239,14 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     }
   }
 
-  const selectedChannels = getSelectedChannels(renderedBuffer, mode);
+  const selectedChannels = getSelectedChannels(audioBuffer, mode);
   const truePeakDb = professionalSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
+  const weightedChannels = channelData.map((samples) => applyBs1770KWeighting(samples, sampleRate));
+  const selectedWeightedChannels = getSelectedChannelArrays(weightedChannels, mode);
 
-  for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
+  for (let start = 0; start + blockSize <= audioBuffer.length; start += hopSize) {
     let blockPower = 0;
-    for (const samples of selectedChannels) {
+    for (const samples of selectedWeightedChannels) {
       let sum = 0;
       for (let i = start; i < start + blockSize; i += 1) {
         sum += samples[i] * samples[i];
@@ -218,7 +256,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     blocks.push(blockPower);
   }
 
-  const usableBlocks = blocks.length ? blocks : [selectedChannels.reduce((total, samples) => {
+  const usableBlocks = blocks.length ? blocks : [selectedWeightedChannels.reduce((total, samples) => {
     let sum = 0;
     for (let i = 0; i < samples.length; i += 1) sum += samples[i] * samples[i];
     return total + sum / Math.max(samples.length, 1);
@@ -483,7 +521,7 @@ const Loudness = () => {
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(175, 184, 194);
-    report.text(report.splitTextToSize(`Analyse locale : fenêtre ${professionalSettings.windowMs} ms, pas ${professionalSettings.hopMs} ms, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU, K-weighting BS.1770 et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
+    report.text(report.splitTextToSize(`Analyse locale : filtres K-weighting BS.1770 à coefficients biquad calculés, fenêtre ${professionalSettings.windowMs} ms, recouvrement 75 %, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
     y += 24;
     report.setDrawColor(45, 52, 60);
     report.line(margin, y, pageWidth - margin, y);
@@ -545,7 +583,7 @@ const Loudness = () => {
                 ))}
               </div>
               <div className="rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
-                Analyse professionnelle automatique : fenêtre 400 ms, pas 50 ms, gating BS.1770 à -70 LUFS, estimation true peak et interprétation musicale déduite des mesures.
+                Analyse professionnelle automatique : K-weighting BS.1770 strict, fenêtre 400 ms, recouvrement 75 %, gating à -70 LUFS, estimation true peak et interprétation musicale déduite des mesures.
               </div>
             </div>
 
@@ -621,11 +659,11 @@ const Loudness = () => {
                     </div>
                     <div>
                       <p className="text-4xl font-bold">{result.momentaryLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS momentary</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS momentary actuel</p>
                     </div>
                     <div>
                       <p className="text-4xl font-bold">{result.shortTermLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term actuel</p>
                     </div>
                   </div>
                   {targetHint && (
