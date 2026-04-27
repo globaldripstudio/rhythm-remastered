@@ -87,8 +87,7 @@ const estimateTruePeak = (channels: Float32Array[]) => {
   return 20 * Math.log10(Math.max(peak, 1e-12));
 };
 
-const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: AnalysisSettings): Promise<AnalysisResult> => {
-  const validatedSettings = settingsSchema.parse(settings);
+const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   const audioContext = new AudioContextCtor();
   const arrayBuffer = await file.arrayBuffer();
@@ -120,8 +119,8 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
   const renderedBuffer = await offlineContext.startRendering();
   const channelCount = renderedBuffer.numberOfChannels;
   const sampleRate = renderedBuffer.sampleRate;
-  const windowSeconds = validatedSettings.windowMs / 1000;
-  const hopSeconds = validatedSettings.hopMs / 1000;
+  const windowSeconds = professionalSettings.windowMs / 1000;
+  const hopSeconds = professionalSettings.hopMs / 1000;
   const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
   const hopSize = Math.max(1, Math.round(sampleRate * hopSeconds));
   const blocks: number[] = [];
@@ -137,7 +136,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
   }
 
   const selectedChannels = getSelectedChannels(renderedBuffer, mode);
-  const truePeakDb = validatedSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
+  const truePeakDb = professionalSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
 
   for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
     let blockPower = 0;
@@ -157,7 +156,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
     return total + sum / Math.max(samples.length, 1);
   }, 0)];
 
-  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > validatedSettings.gateLufs);
+  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > professionalSettings.gateLufs);
   const firstPassBlocks = absoluteGatedBlocks.length ? absoluteGatedBlocks : usableBlocks;
   const firstPassPower = firstPassBlocks.reduce((sum, power) => sum + power, 0) / firstPassBlocks.length;
   const relativeGate = dbFromPower(firstPassPower) - 10;
@@ -174,7 +173,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
-  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > validatedSettings.gateLufs);
+  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > professionalSettings.gateLufs);
   const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
   const integratedLufs = dbFromPower(integratedPower);
   const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
