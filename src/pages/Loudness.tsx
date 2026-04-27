@@ -178,14 +178,14 @@ const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
   if (mode === "left" || buffer.numberOfChannels === 1) return [left];
   const right = buffer.getChannelData(Math.min(1, buffer.numberOfChannels - 1));
   if (mode === "right") return [right];
-  return [left, right];
+  return Array.from({ length: buffer.numberOfChannels }, (_, index) => buffer.getChannelData(index));
 };
 
 const getSelectedChannelArrays = <T extends Float32Array | Float64Array>(channels: T[], mode: AnalysisMode) => {
   if (mode === "left" || channels.length === 1) return [channels[0]];
   const right = channels[Math.min(1, channels.length - 1)];
   if (mode === "right") return [right];
-  return [channels[0], right];
+  return channels;
 };
 
 const getChannelWeight = (index: number) => (index === 3 || index === 4 ? 1.41 : 1);
