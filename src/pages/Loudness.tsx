@@ -236,7 +236,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
   const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
 
   return (
-    <div className="rounded-md border border-border bg-background/40 p-4">
+    <div className="min-h-[420px] resize-y overflow-auto rounded-md border border-border bg-background/40 p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Waves className="h-4 w-4 text-primary" />
@@ -250,7 +250,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-72 w-full overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-[340px] min-h-80 w-full overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
