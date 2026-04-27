@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight, Trash2, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trash2, Calendar, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -152,6 +152,20 @@ const WeeklyAgenda = () => {
     setIsDialogOpen(true);
   };
 
+  const openDialogForDay = (day: Date) => {
+    const startDate = setMinutes(setHours(day, STUDIO_OPEN), 0);
+    const endDate = setMinutes(setHours(day, STUDIO_OPEN + 1), 0);
+    setSelection(null);
+    setEditingEvent(null);
+    setFormData({
+      title: '', description: '',
+      start_time: format(startDate, "yyyy-MM-dd'T'HH:mm"),
+      end_time: format(endDate, "yyyy-MM-dd'T'HH:mm"),
+      color: '#4ecdc4'
+    });
+    setIsDialogOpen(true);
+  };
+
   const handleEventClick = (event: Event, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelection(null);
@@ -214,28 +228,28 @@ const WeeklyAgenda = () => {
   return (
     <Card className="border-primary/20">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl flex items-center gap-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
             <Calendar className="w-5 h-5" />
             Agenda
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" className="h-9 flex-1 sm:flex-none" onClick={() => setCurrentDate(new Date())}>
               Aujourd'hui
             </Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentDate(subWeeks(currentDate, 1))}>
+            <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setCurrentDate(subWeeks(currentDate, 1))}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <span className="text-sm font-medium min-w-[200px] text-center">
+            <span className="order-first w-full text-center text-sm font-medium sm:order-none sm:w-auto sm:min-w-[200px]">
               {format(weekStart, 'd MMM', { locale: fr })} - {format(weekEnd, 'd MMM yyyy', { locale: fr })}
             </span>
-            <Button variant="outline" size="icon" onClick={() => setCurrentDate(addWeeks(currentDate, 1))}>
+            <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setCurrentDate(addWeeks(currentDate, 1))}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
         {/* Legend */}
-        <div className="flex gap-4 text-xs text-muted-foreground mt-1">
+        <div className="flex flex-wrap gap-3 sm:gap-4 text-xs text-muted-foreground mt-1">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-muted/80 border border-border/50" />
             <span>Fermé</span>
@@ -244,10 +258,52 @@ const WeeklyAgenda = () => {
             <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(180, 35%, 35%, 0.15)' }} />
             <span>Pause déjeuner</span>
           </div>
-          <span className="ml-auto">Lun-Ven 10h-19h</span>
+          <span className="sm:ml-auto">Lun-Ven 10h-19h</span>
         </div>
       </CardHeader>
       <CardContent className="p-0">
+        <div className="border-y border-border bg-muted/10 p-3 sm:hidden">
+          <div className="space-y-3">
+            {days.map(day => {
+              const dayEvents = getEventsForDay(day);
+              return (
+                <div key={day.toISOString()} className={cn("rounded-lg border border-border bg-card/70 p-3", today(day) && "border-primary/60 bg-primary/5", isWeekend(day) && "opacity-70")}>
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold capitalize">{format(day, 'EEEE d MMM', { locale: fr })}</div>
+                      <div className="text-xs text-muted-foreground">{isWeekend(day) ? 'Fermé' : '10h-19h'}</div>
+                    </div>
+                    <Button type="button" size="sm" onClick={() => openDialogForDay(day)} disabled={isWeekend(day)} className="h-8 px-3">
+                      <Plus className="h-4 w-4" />
+                      RDV
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {dayEvents.length === 0 ? (
+                      <p className="rounded-md border border-dashed border-border p-3 text-center text-xs text-muted-foreground">Aucun rendez-vous</p>
+                    ) : dayEvents.map(event => (
+                      <button
+                        key={event.id}
+                        type="button"
+                        onClick={(e) => handleEventClick(event, e)}
+                        className="w-full rounded-md border border-border bg-background/60 p-3 text-left transition-colors hover:bg-muted/40"
+                        style={{ borderLeft: `4px solid ${event.color}` }}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-medium leading-tight">{event.title}</span>
+                          <span className="shrink-0 text-xs text-muted-foreground">{format(new Date(event.start_time), 'HH:mm')} {event.end_time ? `- ${format(new Date(event.end_time), 'HH:mm')}` : ''}</span>
+                        </div>
+                        {event.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{event.description}</p>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="hidden sm:block overflow-x-auto">
         {/* Header - Days */}
         <div className="grid grid-cols-[40px_repeat(7,1fr)] border-b border-border">
           <div className="p-1" />
@@ -353,52 +409,53 @@ const WeeklyAgenda = () => {
             })}
           </div>
         </div>
+        </div>
 
         {/* Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setSelection(null); }}>
-          <DialogContent>
+          <DialogContent className="max-h-[92dvh] w-[calc(100vw-1.5rem)] overflow-y-auto rounded-lg sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>{editingEvent ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous'}</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 pb-1">
               <div>
                 <Label htmlFor="title">Titre</Label>
-                <Input id="title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Ex: Session mixage" required />
+                <Input id="title" className="mt-1 h-11 text-base" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Ex: Session mixage" required />
               </div>
               <div>
                 <Label htmlFor="description">Description (optionnel)</Label>
-                <Textarea id="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Notes..." />
+                <Textarea id="description" className="mt-1 min-h-28 text-base" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Notes, téléphone, acompte, matériel..." />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="start_time">Début</Label>
-                  <Input id="start_time" type="datetime-local" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} required />
+                  <Input id="start_time" className="mt-1 h-11 text-base" type="datetime-local" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} required />
                 </div>
                 <div>
                   <Label htmlFor="end_time">Fin</Label>
-                  <Input id="end_time" type="datetime-local" value={formData.end_time} onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} />
+                  <Input id="end_time" className="mt-1 h-11 text-base" type="datetime-local" value={formData.end_time} onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} />
                 </div>
               </div>
               <div>
                 <Label>Couleur</Label>
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {COLORS.map(color => (
                     <button key={color} type="button" onClick={() => setFormData({ ...formData, color })}
-                      className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", formData.color === color ? "scale-110 border-foreground" : "border-transparent")}
+                      className={cn("w-9 h-9 rounded-full border-2 transition-transform hover:scale-110 sm:w-7 sm:h-7", formData.color === color ? "scale-110 border-foreground" : "border-transparent")}
                       style={{ backgroundColor: color }}
                     />
                   ))}
                 </div>
               </div>
-              <div className="flex justify-between pt-2">
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-between">
                 {editingEvent && (
-                  <Button type="button" variant="destructive" onClick={() => { handleDelete(editingEvent.id); setIsDialogOpen(false); }}>
+                  <Button type="button" variant="destructive" className="w-full sm:w-auto" onClick={() => { handleDelete(editingEvent.id); setIsDialogOpen(false); }}>
                     <Trash2 className="w-4 h-4 mr-2" /> Supprimer
                   </Button>
                 )}
-                <div className="flex gap-2 ml-auto">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Annuler</Button>
-                  <Button type="submit" className="studio-button">{editingEvent ? 'Modifier' : 'Créer'}</Button>
+                <div className="flex w-full flex-col-reverse gap-2 sm:ml-auto sm:w-auto sm:flex-row">
+                  <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => setIsDialogOpen(false)}>Annuler</Button>
+                  <Button type="submit" className="studio-button w-full sm:w-auto">{editingEvent ? 'Modifier' : 'Créer'}</Button>
                 </div>
               </div>
             </form>

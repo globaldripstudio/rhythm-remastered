@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -47,10 +47,10 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
       <header className="border-b border-primary/20 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-10" />
+              <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-8 sm:h-10" />
               <div className="hidden sm:block">
                 <span className="font-semibold text-lg">Dashboard</span>
                 <span className="text-xs text-muted-foreground block">Centre de pilotage</span>
@@ -58,13 +58,13 @@ const Dashboard = () => {
             </Link>
           </div>
           
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button variant="ghost" size="icon" className="relative hidden sm:inline-flex">
               <Bell className="w-5 h-5" />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button variant="outline" className="flex items-center gap-2 px-2 sm:px-4">
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                     <span className="text-sm font-medium text-primary">
                       {user?.email?.charAt(0).toUpperCase()}
@@ -95,45 +95,47 @@ const Dashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6 h-auto p-1">
-            <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
+          <div className="-mx-3 mb-4 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mb-6 sm:px-0">
+          <TabsList className="inline-grid min-w-max grid-cols-7 h-auto p-1 sm:w-full">
+            <TabsTrigger value="overview" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <LayoutDashboard className="w-4 h-4" />
               <span className="hidden sm:inline">Vue d'ensemble</span>
               <span className="sm:hidden">Accueil</span>
             </TabsTrigger>
-            <TabsTrigger value="site-analytics" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="site-analytics" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <Globe className="w-4 h-4" />
               <span className="hidden sm:inline">Site</span>
               <span className="sm:hidden">Site</span>
             </TabsTrigger>
-            <TabsTrigger value="stripe" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="stripe" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <CreditCard className="w-4 h-4" />
               <span className="hidden sm:inline">Paiements</span>
               <span className="sm:hidden">€</span>
             </TabsTrigger>
-            <TabsTrigger value="ebook" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="ebook" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">E-book</span>
               <span className="sm:hidden">📖</span>
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="calendar" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Agenda</span>
               <span className="sm:hidden">RDV</span>
             </TabsTrigger>
-            <TabsTrigger value="clients" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="clients" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">Clients</span>
               <span className="sm:hidden">CRM</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="analytics" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Stats CRM</span>
               <span className="sm:hidden">Stats</span>
             </TabsTrigger>
           </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
