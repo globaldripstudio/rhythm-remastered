@@ -286,7 +286,10 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
-  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > professionalSettings.gateLufs);
+  const shortTermPowers = calculateWindowPowers(selectedWeightedChannels, Math.max(1, Math.round(sampleRate * 3)), hopSize);
+  const shortTermLoudnessValues = shortTermPowers.map(dbFromPower).filter((value) => value >= professionalSettings.gateLufs);
+  const lraGate = shortTermLoudnessValues.length ? (dbFromPower(calculateIntegratedPower(shortTermPowers)) - 20) : professionalSettings.gateLufs;
+  const gatedShortTerm = shortTermLoudnessValues.filter((value) => value >= lraGate);
   const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
   const integratedLufs = dbFromPower(integratedPower);
   const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
