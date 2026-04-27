@@ -735,17 +735,17 @@ const Loudness = () => {
               </Card>
 
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">Peak</p>
-                  <p className="mt-3 text-3xl font-bold">{result.peakDb.toFixed(1)} dBFS</p>
+                  <p className="mt-3 text-2xl font-bold sm:text-3xl">{result.peakDb.toFixed(1)} dBFS</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.truePeakEstimated")}: {result.truePeakDb.toFixed(1)} dBTP</p>
                 </CardContent>
               </Card>
 
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">{t("loudness.metrics.file")}</p>
-                  <div className="mt-3 flex items-center gap-2 text-3xl font-bold">
+                  <div className="mt-3 flex items-center gap-2 text-2xl font-bold sm:text-3xl">
                     <FileAudio className="w-7 h-7 text-primary" />
                     {formatDuration(result.duration)}
                   </div>
@@ -755,16 +755,16 @@ const Loudness = () => {
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">{t("loudness.metrics.dynamics")}</p>
-                  <p className="mt-3 text-3xl font-bold">{result.loudnessRange.toFixed(1)} LU</p>
+                  <p className="mt-3 text-2xl font-bold sm:text-3xl">{result.loudnessRange.toFixed(1)} LU</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.lraEstimated")} · PLR {result.plr.toFixed(1)} dB</p>
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">{t("loudness.metrics.maximums")}</p>
-                  <p className="mt-3 text-3xl font-bold">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
+                  <p className="mt-3 text-2xl font-bold sm:text-3xl">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.maximumsDesc")}</p>
                 </CardContent>
               </Card>
