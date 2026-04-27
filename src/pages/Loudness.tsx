@@ -60,7 +60,7 @@ const formatDuration = (seconds: number) => {
 
 const safeFileName = (name: string) => name.replace(/[^a-z0-9-_]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "rapport-lufs";
 
-const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, y: number, width: number, height: number) => {
+const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, y: number, width: number, height: number, curveTitle: string) => {
   const data = result.curve.length ? result.curve : [{ time: 0, momentary: -70, shortTerm: -70 }];
   const values = [...data.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
   const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
@@ -106,7 +106,7 @@ const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, 
   report.setTextColor(226, 232, 240);
   report.setFont("helvetica", "bold");
   report.setFontSize(9);
-  report.text(result.mode === "stereo" ? "LUFS curve" : "Courbe LUFS", x + 6, y + 8);
+  report.text(curveTitle, x + 6, y + 8);
   report.setFont("helvetica", "normal");
   report.setFontSize(7);
   report.setTextColor(20, 184, 166);
@@ -529,7 +529,7 @@ const Loudness = () => {
       report.text(value, x + 4, rowY + 12);
     });
     y += 94;
-    drawPdfLoudnessCurve(report, result, margin, y, pageWidth - margin * 2, 72);
+    drawPdfLoudnessCurve(report, result, margin, y, pageWidth - margin * 2, 72, t("loudness.curve.title"));
     y += 84;
     report.setFont("helvetica", "bold");
     report.setTextColor(255, 255, 255);
