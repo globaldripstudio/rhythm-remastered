@@ -478,16 +478,6 @@ const Loudness = () => {
     drawPdfLoudnessCurve(report, result, margin, y, pageWidth - margin * 2, 72);
     y += 84;
     report.setFont("helvetica", "bold");
-    report.setFontSize(13);
-    report.setTextColor(255, 255, 255);
-    report.text("Interprétation", margin, y);
-    y += 7;
-    report.setFont("helvetica", "normal");
-    report.setFontSize(10);
-    report.setTextColor(190, 198, 208);
-    report.text(report.splitTextToSize(targetHint ?? "Analyse effectuée avec paramètres professionnels BS.1770.", pageWidth - margin * 2), margin, y);
-    y += 28;
-    report.setFont("helvetica", "bold");
     report.setTextColor(255, 255, 255);
     report.text("Méthodologie", margin, y);
     y += 7;
@@ -509,7 +499,7 @@ const Loudness = () => {
     report.setTextColor(120, 128, 138);
     report.text("Rapport généré localement — aucun fichier audio envoyé sur serveur.", margin, pageHeight - 12);
     report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
-  }, [inferredContext, result, targetHint]);
+  }, [inferredContext, result]);
 
   return (
     <div className="min-h-screen bg-background">
