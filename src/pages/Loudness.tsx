@@ -217,6 +217,30 @@ const estimateTruePeak = (channels: Float32Array[]) => {
   return 20 * Math.log10(Math.max(peak, 1e-12));
 };
 
+const calculateWindowPowers = (channels: Array<Float32Array | Float64Array>, blockSize: number, hopSize: number) => {
+  const powers: number[] = [];
+  const length = Math.min(...channels.map((samples) => samples.length));
+  for (let start = 0; start + blockSize <= length; start += hopSize) {
+    let blockPower = 0;
+    channels.forEach((samples, channelIndex) => {
+      let sum = 0;
+      for (let i = start; i < start + blockSize; i += 1) sum += samples[i] * samples[i];
+      blockPower += getChannelWeight(channelIndex) * (sum / blockSize);
+    });
+    powers.push(blockPower);
+  }
+  return powers;
+};
+
+const calculateIntegratedPower = (blocks: number[]) => {
+  const absoluteGatedBlocks = blocks.filter((power) => dbFromPower(power) >= professionalSettings.gateLufs);
+  if (!absoluteGatedBlocks.length) return 0;
+  const firstPassPower = averagePower(absoluteGatedBlocks);
+  const relativeGate = dbFromPower(firstPassPower) - 10;
+  const relativeGatedBlocks = absoluteGatedBlocks.filter((power) => dbFromPower(power) >= relativeGate);
+  return relativeGatedBlocks.length ? averagePower(relativeGatedBlocks) : firstPassPower;
+};
+
 const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   const audioContext = new AudioContextCtor();
