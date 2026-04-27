@@ -343,6 +343,22 @@ const Loudness = () => {
                   </Button>
                 ))}
               </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Contexte musical</p>
+                <div className="flex flex-wrap gap-2" aria-label="Contexte musical pour l'interprétation LUFS">
+                  {musicContexts.map((context) => (
+                    <Button
+                      key={context.value}
+                      type="button"
+                      variant={musicContext === context.value ? "default" : "outline"}
+                      onClick={() => setMusicContext(context.value)}
+                      className="min-w-28"
+                    >
+                      {context.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <Card className="equipment-card overflow-hidden border-border/80">
@@ -377,7 +393,7 @@ const Loudness = () => {
                     {isAnalyzing ? "Analyse en cours" : "Dépose ton fichier audio"}
                   </h2>
                   <p className="max-w-md text-sm text-muted-foreground">
-                    WAV, MP3, AIFF, FLAC ou AAC. Le fichier reste sur ton appareil et n'est pas envoyé à un serveur.
+                    WAV, MP3, AIFF, FLAC ou AAC. Analyse BS.1770 avec gating intégré, fenêtres momentary/short-term et estimation true peak, sans envoi serveur.
                   </p>
                 </label>
 
@@ -418,6 +434,15 @@ const Loudness = () => {
                     </div>
                   </div>
                   {targetHint && <p className="mt-4 text-sm text-muted-foreground">{targetHint}</p>}
+                  <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
+                    <div className="mb-2 flex items-center gap-2 font-medium text-foreground">
+                      <Info className="h-4 w-4 text-primary" />
+                      Repères BS.1770
+                    </div>
+                    <p>
+                      <strong className="text-foreground">Momentary</strong> mesure une fenêtre courte de 400 ms pour suivre les variations immédiates. <strong className="text-foreground">Short-term</strong> moyenne environ 3 s pour représenter la perception récente et stable du niveau.
+                    </p>
+                  </div>
                   <div className="mt-6">
                     <LoudnessCurve data={result.curve} />
                   </div>
@@ -428,6 +453,7 @@ const Loudness = () => {
                 <CardContent className="p-6">
                   <p className="text-sm text-muted-foreground">Peak</p>
                   <p className="mt-3 text-3xl font-bold">{result.peakDb.toFixed(1)} dBFS</p>
+                  <p className="mt-2 text-sm text-muted-foreground">True peak estimé : {result.truePeakDb.toFixed(1)} dBTP</p>
                 </CardContent>
               </Card>
 
@@ -441,6 +467,20 @@ const Loudness = () => {
                   <p className="mt-3 text-sm text-muted-foreground">
                     {result.channels} canal{result.channels > 1 ? "s" : ""} · {(result.sampleRate / 1000).toFixed(1)} kHz
                   </p>
+                </CardContent>
+              </Card>
+              <Card className="equipment-card sm:col-span-2">
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">Dynamique</p>
+                  <p className="mt-3 text-3xl font-bold">{result.loudnessRange.toFixed(1)} LU</p>
+                  <p className="mt-2 text-sm text-muted-foreground">LRA estimée · PLR {result.plr.toFixed(1)} dB</p>
+                </CardContent>
+              </Card>
+              <Card className="equipment-card sm:col-span-2">
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">Maximums</p>
+                  <p className="mt-3 text-3xl font-bold">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Pics momentary et short-term relevés sur toute la durée.</p>
                 </CardContent>
               </Card>
             </section>
