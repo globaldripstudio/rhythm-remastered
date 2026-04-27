@@ -6,6 +6,7 @@
     "contact": "Contact",
     "projects": "Projects",
     "blog": "Blog",
+    "loudness": "Loudness",
     "shop": "Shop",
     "shopSoon": "soon",
     "book": "Book Now",
@@ -1244,6 +1245,20 @@
         "lufs": "Integrated LUFS, momentary LUFS and short-term LUFS to assess perceived level.",
         "truePeak": "dBFS peak and estimated true peak dBTP to reduce encoding clipping risks.",
         "platforms": "-14, -16, -20 and -23 LUFS references for streaming, dynamic content and broadcast comparison."
+      },
+      "topics": {
+        "mastering": {
+          "title": "Mastering check",
+          "description": "Compare integrated LUFS, LRA and PLR to validate density without crushing the mix."
+        },
+        "streaming": {
+          "title": "Streaming references",
+          "description": "Place the master against common delivery levels and audio normalization behavior."
+        },
+        "report": {
+          "title": "Shareable report",
+          "description": "Export a clear PDF with true peak, LUFS curve and listening context."
+        }
       }
     }
   }
