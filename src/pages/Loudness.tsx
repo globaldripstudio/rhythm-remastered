@@ -360,6 +360,78 @@ const Loudness = () => {
     await runAnalysis(file, selectedMode);
   }, [runAnalysis, selectedMode]);
 
+  const exportPdfReport = useCallback(() => {
+    if (!result) return;
+    const report = new jsPDF({ unit: "mm", format: "a4" });
+    const pageWidth = report.internal.pageSize.getWidth();
+    const margin = 16;
+    const modeLabel = analysisModes.find((mode) => mode.value === result.mode)?.label ?? "Stéréo";
+    report.setFillColor(12, 12, 14);
+    report.rect(0, 0, pageWidth, 34, "F");
+    report.setTextColor(255, 255, 255);
+    report.setFont("helvetica", "bold");
+    report.setFontSize(20);
+    report.text("Rapport Loudness LUFS", margin, 18);
+    report.setFont("helvetica", "normal");
+    report.setFontSize(10);
+    report.text("Global Drip Studio", margin, 26);
+    report.setTextColor(24, 24, 27);
+    report.setFontSize(11);
+    let y = 48;
+    report.text(`Fichier : ${result.fileName}`, margin, y);
+    y += 7;
+    report.text(`Mode : ${modeLabel} · Durée : ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} canal${result.channels > 1 ? "s" : ""}`, margin, y);
+    y += 12;
+    const metrics = [
+      ["LUFS intégré", `${result.lufs.toFixed(1)} LUFS`],
+      ["Momentary actuel", `${result.momentaryLufs.toFixed(1)} LUFS`],
+      ["Short-term actuel", `${result.shortTermLufs.toFixed(1)} LUFS`],
+      ["Peak", `${result.peakDb.toFixed(1)} dBFS`],
+      ["True peak estimé", `${result.truePeakDb.toFixed(1)} dBTP`],
+      ["LRA / PLR", `${result.loudnessRange.toFixed(1)} LU / ${result.plr.toFixed(1)} dB`],
+      ["Maximums", `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
+      ["Profil déduit", inferredContext ? contextLabels[inferredContext] : "Analyse neutre"],
+    ];
+    metrics.forEach(([label, value], index) => {
+      const x = margin + (index % 2) * 88;
+      const rowY = y + Math.floor(index / 2) * 22;
+      report.setFillColor(245, 245, 245);
+      report.roundedRect(x, rowY, 82, 16, 2, 2, "F");
+      report.setFont("helvetica", "normal");
+      report.setFontSize(8);
+      report.setTextColor(100, 100, 100);
+      report.text(label, x + 4, rowY + 5);
+      report.setFont("helvetica", "bold");
+      report.setFontSize(12);
+      report.setTextColor(20, 20, 20);
+      report.text(value, x + 4, rowY + 12);
+    });
+    y += 100;
+    report.setFont("helvetica", "bold");
+    report.setFontSize(13);
+    report.text("Interprétation", margin, y);
+    y += 7;
+    report.setFont("helvetica", "normal");
+    report.setFontSize(10);
+    report.text(report.splitTextToSize(targetHint ?? "Analyse effectuée avec paramètres professionnels BS.1770.", pageWidth - margin * 2), margin, y);
+    y += 28;
+    report.setFont("helvetica", "bold");
+    report.text("Méthodologie", margin, y);
+    y += 7;
+    report.setFont("helvetica", "normal");
+    report.text(report.splitTextToSize(`Analyse locale : fenêtre ${professionalSettings.windowMs} ms, pas ${professionalSettings.hopMs} ms, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU, K-weighting BS.1770 et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
+    y += 24;
+    report.setDrawColor(220, 220, 220);
+    report.line(margin, y, pageWidth - margin, y);
+    y += 8;
+    report.setFont("helvetica", "bold");
+    report.text("Repères", margin, y);
+    y += 7;
+    report.setFont("helvetica", "normal");
+    report.text("-14 LUFS : streaming dense · -16 LUFS : streaming équilibré · -20 LUFS : dynamique · -23 LUFS : broadcast EBU", margin, y);
+    report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
+  }, [inferredContext, result, targetHint]);
+
   return (
     <div className="min-h-screen bg-background">
       <SEO
