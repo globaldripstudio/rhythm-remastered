@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import Header from "@/components/Header";
@@ -30,6 +30,12 @@ type AnalysisMode = "stereo" | "left" | "right";
 type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 type CurveFocus = "both" | "momentary" | "shortTerm";
 const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
+
+const getTruePeakRisk = (marginDb: number) => {
+  if (marginDb < 0) return { label: "Risque élevé", tone: "destructive", detail: "True Peak au-dessus du plafond cible." } as const;
+  if (marginDb < 0.5) return { label: "À surveiller", tone: "primary", detail: "Marge faible avant encodage." } as const;
+  return { label: "Marge saine", tone: "secondary", detail: "Marge confortable sous le plafond cible." } as const;
+};
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
