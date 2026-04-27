@@ -521,7 +521,7 @@ const Loudness = () => {
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(175, 184, 194);
-    report.text(report.splitTextToSize(`Analyse locale : fenêtre ${professionalSettings.windowMs} ms, pas ${professionalSettings.hopMs} ms, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU, K-weighting BS.1770 et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
+    report.text(report.splitTextToSize(`Analyse locale : filtres K-weighting BS.1770 à coefficients biquad calculés, fenêtre ${professionalSettings.windowMs} ms, recouvrement 75 %, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
     y += 24;
     report.setDrawColor(45, 52, 60);
     report.line(margin, y, pageWidth - margin, y);
@@ -583,7 +583,7 @@ const Loudness = () => {
                 ))}
               </div>
               <div className="rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
-                Analyse professionnelle automatique : fenêtre 400 ms, pas 50 ms, gating BS.1770 à -70 LUFS, estimation true peak et interprétation musicale déduite des mesures.
+                Analyse professionnelle automatique : K-weighting BS.1770 strict, fenêtre 400 ms, recouvrement 75 %, gating à -70 LUFS, estimation true peak et interprétation musicale déduite des mesures.
               </div>
             </div>
 
@@ -659,11 +659,11 @@ const Loudness = () => {
                     </div>
                     <div>
                       <p className="text-4xl font-bold">{result.momentaryLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS momentary</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS momentary actuel</p>
                     </div>
                     <div>
                       <p className="text-4xl font-bold">{result.shortTermLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term actuel</p>
                     </div>
                   </div>
                   {targetHint && (
