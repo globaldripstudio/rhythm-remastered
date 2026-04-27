@@ -1077,9 +1077,9 @@
   },
   "loudness": {
     "badge": "Analyse locale dans le navigateur",
-    "subtitle": "Téléverse un morceau, récupère sa loudness intégrée et son peak pour contrôler ton master avant diffusion.",
+    "subtitle": "Contrôle ton master avec une mesure LUFS complète : niveau intégré, true peak, dynamique, courbe d'évolution et rapport PDF prêt à partager.",
     "modeAria": "Mode d'analyse LUFS",
-    "methodIntro": "Analyse professionnelle automatique : K-weighting BS.1770 strict, fenêtre 400 ms, recouvrement 75 %, gating à -70 LUFS, estimation true peak et interprétation musicale déduite des mesures.",
+    "methodIntro": "Analyse locale avancée : K-weighting BS.1770, fenêtre 400 ms, recouvrement 75 %, gating absolu/relatif, estimation true peak 4x et interprétation musicale automatique.",
     "resultsAria": "Résultats d'analyse loudness",
     "inferredProfile": "Profil déduit",
     "neutralProfile": "Analyse neutre",
@@ -1181,6 +1181,20 @@
       "referencesText": "-14 LUFS : streaming dense · -16 LUFS : streaming équilibré · -20 LUFS : dynamique · -23 LUFS : broadcast EBU",
       "footer": "Rapport généré localement — aucun fichier audio envoyé sur serveur.",
       "fileSuffix": "rapport-lufs"
+    },
+    "presentation": {
+      "integrated": {
+        "title": "Niveau réel perçu",
+        "description": "LUFS intégré, momentary et short-term pour situer précisément la densité du morceau."
+      },
+      "truePeak": {
+        "title": "Sécurité encodage",
+        "description": "Peak dBFS et true peak estimé pour anticiper les plateformes, codecs et limiteurs."
+      },
+      "report": {
+        "title": "Lecture mastering",
+        "description": "Profil musical déduit, repères BS.1770 et export PDF dans la langue active."
+      }
     }
   }
 }
