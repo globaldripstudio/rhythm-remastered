@@ -221,32 +221,8 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const arrayBuffer = await file.arrayBuffer();
   const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
   await audioContext.close();
-
-  const offlineContext = new OfflineAudioContext(
-    audioBuffer.numberOfChannels,
-    audioBuffer.length,
-    audioBuffer.sampleRate
-  );
-  const source = offlineContext.createBufferSource();
-  const highPass = offlineContext.createBiquadFilter();
-  const highShelf = offlineContext.createBiquadFilter();
-
-  source.buffer = audioBuffer;
-  highPass.type = "highpass";
-  highPass.frequency.value = 38;
-  highPass.Q.value = 0.5;
-  highShelf.type = "highshelf";
-  highShelf.frequency.value = 1500;
-  highShelf.gain.value = 4;
-
-  source.connect(highPass);
-  highPass.connect(highShelf);
-  highShelf.connect(offlineContext.destination);
-  source.start(0);
-
-  const renderedBuffer = await offlineContext.startRendering();
-  const channelCount = renderedBuffer.numberOfChannels;
-  const sampleRate = renderedBuffer.sampleRate;
+  const channelCount = audioBuffer.numberOfChannels;
+  const sampleRate = audioBuffer.sampleRate;
   const windowSeconds = professionalSettings.windowMs / 1000;
   const hopSeconds = professionalSettings.hopMs / 1000;
   const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
@@ -254,7 +230,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const blocks: number[] = [];
   let peak = 0;
 
-  const channelData = Array.from({ length: channelCount }, (_, index) => renderedBuffer.getChannelData(index));
+  const channelData = Array.from({ length: channelCount }, (_, index) => audioBuffer.getChannelData(index));
 
   for (let channel = 0; channel < channelCount; channel += 1) {
     const samples = channelData[channel];
@@ -263,12 +239,14 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     }
   }
 
-  const selectedChannels = getSelectedChannels(renderedBuffer, mode);
+  const selectedChannels = getSelectedChannels(audioBuffer, mode);
   const truePeakDb = professionalSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
+  const weightedChannels = channelData.map((samples) => applyBs1770KWeighting(samples, sampleRate));
+  const selectedWeightedChannels = getSelectedChannelArrays(weightedChannels, mode);
 
-  for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
+  for (let start = 0; start + blockSize <= audioBuffer.length; start += hopSize) {
     let blockPower = 0;
-    for (const samples of selectedChannels) {
+    for (const samples of selectedWeightedChannels) {
       let sum = 0;
       for (let i = start; i < start + blockSize; i += 1) {
         sum += samples[i] * samples[i];
@@ -278,7 +256,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     blocks.push(blockPower);
   }
 
-  const usableBlocks = blocks.length ? blocks : [selectedChannels.reduce((total, samples) => {
+  const usableBlocks = blocks.length ? blocks : [selectedWeightedChannels.reduce((total, samples) => {
     let sum = 0;
     for (let i = 0; i < samples.length; i += 1) sum += samples[i] * samples[i];
     return total + sum / Math.max(samples.length, 1);
