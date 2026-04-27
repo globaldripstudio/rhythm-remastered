@@ -1,15 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
+import { jsPDF } from "jspdf";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 
 type AnalysisResult = {
   lufs: number;
@@ -32,43 +29,12 @@ type AnalysisResult = {
 type AnalysisMode = "stereo" | "left" | "right";
 type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 type CurveFocus = "both" | "momentary" | "shortTerm";
-type AnalysisSettings = {
-  windowMs: number;
-  hopMs: number;
-  gateLufs: number;
-  truePeak: boolean;
-};
-
-const professionalDefaults: AnalysisSettings = {
-  windowMs: 400,
-  hopMs: 100,
-  gateLufs: -70,
-  truePeak: true,
-};
-
-const settingsSchema = z.object({
-  windowMs: z.coerce.number().int().min(200, "Fenêtre min. 200 ms").max(3000, "Fenêtre max. 3000 ms"),
-  hopMs: z.coerce.number().int().min(25, "Hop min. 25 ms").max(1000, "Hop max. 1000 ms"),
-  gateLufs: z.coerce.number().min(-90, "Gating min. -90 LUFS").max(-40, "Gating max. -40 LUFS"),
-  truePeak: z.boolean(),
-}).refine((settings) => settings.hopMs <= settings.windowMs, {
-  message: "Le hop size doit rester inférieur ou égal à la fenêtre.",
-  path: ["hopMs"],
-});
+const professionalSettings = { windowMs: 400, hopMs: 50, gateLufs: -70, truePeak: true };
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
   { value: "left", label: "Mono gauche" },
   { value: "right", label: "Mono droite" },
-];
-
-const musicContexts: Array<{ value: MusicContext; label: string }> = [
-  { value: "rap", label: "Rap / Trap" },
-  { value: "pop", label: "Pop / R&B" },
-  { value: "electronic", label: "Électro / Club" },
-  { value: "rock", label: "Rock / Metal" },
-  { value: "acoustic", label: "Acoustique / Jazz" },
-  { value: "broadcast", label: "Podcast / Vidéo" },
 ];
 
 const loudnessMarkers = [
