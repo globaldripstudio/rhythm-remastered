@@ -628,7 +628,15 @@ const Loudness = () => {
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term</p>
                     </div>
                   </div>
-                  {targetHint && <p className="mt-4 text-sm text-muted-foreground">{targetHint}</p>}
+                  {targetHint && (
+                    <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
+                      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                        <Gauge className="h-4 w-4 text-secondary" />
+                        Interprétation automatique
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{targetHint}</p>
+                    </div>
+                  )}
                   <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
                     <div className="mb-2 flex items-center gap-2 font-medium text-foreground">
                       <Info className="h-4 w-4 text-primary" />
