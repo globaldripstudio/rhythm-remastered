@@ -341,21 +341,21 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
   const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
 
   return (
-    <div className="flex min-h-[440px] resize-y flex-col overflow-hidden rounded-md border border-border bg-background/40 p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
+    <div className="flex min-h-[300px] flex-col overflow-hidden rounded-md border border-border bg-background/40 p-3 sm:min-h-[440px] sm:resize-y sm:p-4">
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Waves className="h-4 w-4 text-primary" />
           {t("loudness.curve.title")}
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs text-muted-foreground sm:flex-wrap sm:overflow-visible sm:pb-0">
           {([{ value: "both", label: t("loudness.curve.both") }, { value: "momentary", label: "Momentary" }, { value: "shortTerm", label: "Short-term" }] as const).map((option) => (
-            <button key={option.value} type="button" onClick={() => onFocusChange(option.value)} className={`rounded-full border px-3 py-1 transition-colors ${focus === option.value ? "border-primary bg-primary/15 text-foreground" : "border-border hover:border-primary"}`}>
+            <button key={option.value} type="button" onClick={() => onFocusChange(option.value)} className={`shrink-0 rounded-full border px-3 py-1 transition-colors ${focus === option.value ? "border-primary bg-primary/15 text-foreground" : "border-border hover:border-primary"}`}>
               {option.label}
             </button>
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-80 w-full flex-1 overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-56 w-full flex-1 overflow-visible sm:min-h-80" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
@@ -588,23 +588,23 @@ const Loudness = () => {
           </div>
         </div>
       </header>
-      <main className="py-16 sm:py-20">
+      <main className="py-8 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
-          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <div className="space-y-6 animate-fade-in">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
+          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8">
+            <div className="space-y-4 animate-fade-in sm:space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
                 <Gauge className="w-4 h-4 text-primary" />
                 {t("loudness.badge")}
               </div>
-              <div className="space-y-4">
-                <h1 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
+              <div className="space-y-3 sm:space-y-4">
+                <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
                   Loudness <span className="hero-text">LUFS</span>
                 </h1>
-                <p className="max-w-xl text-lg text-muted-foreground sm:text-xl">
+                <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-xl">
                   {t("loudness.subtitle")}
                 </p>
               </div>
-              <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+              <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-3 sm:gap-3">
                 {(["integrated", "truePeak", "report"] as const).map((item) => (
                   <div key={item} className="rounded-md border border-border bg-background/40 p-3">
                     <p className="font-semibold text-foreground">{t(`loudness.presentation.${item}.title`)}</p>
@@ -612,13 +612,13 @@ const Loudness = () => {
                   </div>
                 ))}
               </div>
-              <div className="rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
+              <div className="rounded-md border border-border bg-background/40 p-3 text-sm leading-relaxed text-muted-foreground sm:p-4">
                 {t("loudness.methodIntro")}
               </div>
             </div>
 
             <Card className="equipment-card overflow-hidden border-border/80">
-              <CardContent className="p-4 sm:p-6">
+              <CardContent className="p-3 sm:p-6">
                 <label
                   htmlFor="audio-upload"
                   onDragOver={(event) => {
@@ -631,7 +631,7 @@ const Loudness = () => {
                     setIsDragging(false);
                     void handleFile(event.dataTransfer.files[0]);
                   }}
-                  className={`flex min-h-[320px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed p-6 text-center transition-all duration-300 ${
+                  className={`flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed p-4 text-center transition-all duration-300 sm:min-h-[320px] sm:p-6 ${
                     isDragging ? "border-primary bg-primary/10" : "border-border bg-background/40 hover:border-primary hover:bg-muted/30"
                   }`}
                 >
@@ -642,10 +642,10 @@ const Loudness = () => {
                     className="sr-only"
                     onChange={(event) => void handleFile(event.target.files?.[0])}
                   />
-                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/15 text-primary">
-                    {isAnalyzing ? <Loader2 className="h-9 w-9 animate-spin" /> : <Upload className="h-9 w-9" />}
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary sm:mb-6 sm:h-20 sm:w-20">
+                    {isAnalyzing ? <Loader2 className="h-8 w-8 animate-spin sm:h-9 sm:w-9" /> : <Upload className="h-8 w-8 sm:h-9 sm:w-9" />}
                   </div>
-                  <h2 className="mb-3 text-2xl font-bold">
+                  <h2 className="mb-2 text-xl font-bold sm:mb-3 sm:text-2xl">
                     {isAnalyzing ? t("loudness.upload.analyzing") : t("loudness.upload.title")}
                   </h2>
                   <p className="max-w-md text-sm text-muted-foreground">
@@ -663,26 +663,26 @@ const Loudness = () => {
           </div>
 
           {result && (
-            <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label={t("loudness.resultsAria")}>
+            <section className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4" aria-label={t("loudness.resultsAria")}>
               <Card className="equipment-card sm:col-span-2 lg:col-span-4">
-                <CardContent className="p-6">
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-muted-foreground">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="mb-4 flex flex-col gap-3 text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex min-w-0 items-center gap-3">
                       <Music2 className="h-5 w-5 shrink-0 text-primary" />
                       <span className="truncate text-sm">{result.fileName}</span>
                     </div>
-                    <span className="rounded-full border border-border px-3 py-1 text-xs">
+                    <span className="w-fit rounded-full border border-border px-3 py-1 text-xs">
                       {t(analysisModes.find((mode) => mode.value === result.mode)?.labelKey ?? "loudness.modes.stereo")}
                     </span>
                   </div>
-                  <div className="mb-5 flex flex-wrap items-center gap-2">
+                  <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                     {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">{t("loudness.inferredProfile")}: {t(contextLabelKeys[inferredContext])}</span>}
-                    <Button type="button" onClick={exportPdfReport} variant="outline" size="sm">
+                    <Button type="button" onClick={exportPdfReport} variant="outline" size="sm" className="w-full sm:w-auto">
                       <Download className="h-4 w-4" />
                       {t("loudness.pdfButton")}
                     </Button>
                   </div>
-                  <div className="mb-6 flex flex-wrap gap-2" aria-label={t("loudness.modeAria")}>
+                  <div className="mb-6 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap" aria-label={t("loudness.modeAria")}>
                     {analysisModes.map((mode) => (
                       <Button
                         key={mode.value}
@@ -690,7 +690,7 @@ const Loudness = () => {
                         variant={selectedMode === mode.value ? "default" : "outline"}
                         onClick={() => handleModeChange(mode.value)}
                         disabled={isAnalyzing}
-                        className="min-w-32"
+                        className="w-full sm:w-auto sm:min-w-32"
                       >
                         {t(mode.labelKey)}
                       </Button>
@@ -698,15 +698,15 @@ const Loudness = () => {
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
-                      <p className="text-5xl font-bold text-primary">{result.lufs.toFixed(1)}</p>
+                      <p className="text-4xl font-bold text-primary sm:text-5xl">{result.lufs.toFixed(1)}</p>
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
                     </div>
                     <div>
-                      <p className="text-4xl font-bold">{result.momentaryLufs.toFixed(1)}</p>
+                      <p className="text-3xl font-bold sm:text-4xl">{result.momentaryLufs.toFixed(1)}</p>
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.momentaryCurrent")}</p>
                     </div>
                     <div>
-                      <p className="text-4xl font-bold">{result.shortTermLufs.toFixed(1)}</p>
+                      <p className="text-3xl font-bold sm:text-4xl">{result.shortTermLufs.toFixed(1)}</p>
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.shortTermCurrent")}</p>
                     </div>
                   </div>
@@ -735,17 +735,17 @@ const Loudness = () => {
               </Card>
 
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">Peak</p>
-                  <p className="mt-3 text-3xl font-bold">{result.peakDb.toFixed(1)} dBFS</p>
+                  <p className="mt-3 text-2xl font-bold sm:text-3xl">{result.peakDb.toFixed(1)} dBFS</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.truePeakEstimated")}: {result.truePeakDb.toFixed(1)} dBTP</p>
                 </CardContent>
               </Card>
 
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">{t("loudness.metrics.file")}</p>
-                  <div className="mt-3 flex items-center gap-2 text-3xl font-bold">
+                  <div className="mt-3 flex items-center gap-2 text-2xl font-bold sm:text-3xl">
                     <FileAudio className="w-7 h-7 text-primary" />
                     {formatDuration(result.duration)}
                   </div>
@@ -755,16 +755,16 @@ const Loudness = () => {
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">{t("loudness.metrics.dynamics")}</p>
-                  <p className="mt-3 text-3xl font-bold">{result.loudnessRange.toFixed(1)} LU</p>
+                  <p className="mt-3 text-2xl font-bold sm:text-3xl">{result.loudnessRange.toFixed(1)} LU</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.lraEstimated")} · PLR {result.plr.toFixed(1)} dB</p>
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <p className="text-sm text-muted-foreground">{t("loudness.metrics.maximums")}</p>
-                  <p className="mt-3 text-3xl font-bold">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
+                  <p className="mt-3 text-2xl font-bold sm:text-3xl">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.maximumsDesc")}</p>
                 </CardContent>
               </Card>
