@@ -673,13 +673,21 @@ const Loudness = () => {
             </Card>
           </div>
 
-          <section className="mt-8 grid gap-4 md:grid-cols-[1.1fr_0.9fr]" aria-label={t("loudness.seoBlock.aria")}>
+          <section className="mt-8 grid gap-4 md:grid-cols-[1.1fr_0.9fr]" aria-labelledby="loudness-seo-title">
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
-              <h2 className="text-xl font-bold sm:text-2xl">{t("loudness.seoBlock.title")}</h2>
+              <h2 id="loudness-seo-title" className="text-xl font-bold sm:text-2xl">{t("loudness.seoBlock.title")}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{t("loudness.seoBlock.description")}</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {(["mastering", "streaming", "report"] as const).map((item) => (
+                  <div key={item} className="rounded-md bg-muted/25 p-3">
+                    <h3 className="text-sm font-semibold text-foreground">{t(`loudness.seoBlock.topics.${item}.title`)}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t(`loudness.seoBlock.topics.${item}.description`)}</p>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
-              <p className="text-sm font-semibold text-foreground">{t("loudness.seoBlock.checksTitle")}</p>
+              <h2 className="text-base font-bold text-foreground sm:text-lg">{t("loudness.seoBlock.checksTitle")}</h2>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
                 {(["lufs", "truePeak", "platforms"] as const).map((item) => (
                   <li key={item}>• {t(`loudness.seoBlock.checks.${item}`)}</li>
@@ -762,7 +770,7 @@ const Loudness = () => {
 
               <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-4 sm:p-6">
-                  <p className="text-sm text-muted-foreground">Peak</p>
+                  <h3 className="text-sm font-semibold text-muted-foreground">Peak / true peak</h3>
                   <p className="mt-3 text-2xl font-bold sm:text-3xl">{result.peakDb.toFixed(1)} dBFS</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.truePeakEstimated")}: {result.truePeakDb.toFixed(1)} dBTP</p>
                 </CardContent>
@@ -770,7 +778,7 @@ const Loudness = () => {
 
               <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-4 sm:p-6">
-                  <p className="text-sm text-muted-foreground">{t("loudness.metrics.file")}</p>
+                  <h3 className="text-sm font-semibold text-muted-foreground">{t("loudness.metrics.file")}</h3>
                   <div className="mt-3 flex items-center gap-2 text-2xl font-bold sm:text-3xl">
                     <FileAudio className="w-7 h-7 text-primary" />
                     {formatDuration(result.duration)}
@@ -782,14 +790,14 @@ const Loudness = () => {
               </Card>
               <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-4 sm:p-6">
-                  <p className="text-sm text-muted-foreground">{t("loudness.metrics.dynamics")}</p>
+                  <h3 className="text-sm font-semibold text-muted-foreground">{t("loudness.metrics.dynamics")}</h3>
                   <p className="mt-3 text-2xl font-bold sm:text-3xl">{result.loudnessRange.toFixed(1)} LU</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.lraEstimated")} · PLR {result.plr.toFixed(1)} dB</p>
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-4 sm:p-6">
-                  <p className="text-sm text-muted-foreground">{t("loudness.metrics.maximums")}</p>
+                  <h3 className="text-sm font-semibold text-muted-foreground">{t("loudness.metrics.maximums")}</h3>
                   <p className="mt-3 text-2xl font-bold sm:text-3xl">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.maximumsDesc")}</p>
                 </CardContent>
