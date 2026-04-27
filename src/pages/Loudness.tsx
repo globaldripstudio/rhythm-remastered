@@ -44,11 +44,22 @@ const loudnessMarkers = [
   { value: -23, label: "-23 LUFS", hint: "Broadcast EBU" },
 ];
 
+const contextLabels: Record<MusicContext, string> = {
+  rap: "Rap / Trap",
+  pop: "Pop / R&B",
+  electronic: "Électro / Club",
+  rock: "Rock / Metal",
+  acoustic: "Acoustique / Jazz",
+  broadcast: "Podcast / Vidéo",
+};
+
 const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.round(seconds % 60).toString().padStart(2, "0");
   return `${minutes}:${remainingSeconds}`;
 };
+
+const safeFileName = (name: string) => name.replace(/[^a-z0-9-_]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "rapport-lufs";
 
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
 
