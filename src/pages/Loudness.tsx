@@ -327,6 +327,9 @@ const Loudness = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
   const [musicContext, setMusicContext] = useState<MusicContext>("rap");
+  const [settings, setSettings] = useState<AnalysisSettings>(professionalDefaults);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const targetHint = useMemo(() => {
@@ -343,21 +346,27 @@ const Loudness = () => {
     return `${contextAdvice[musicContext]}${technical}`;
   }, [musicContext, result]);
 
-  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
+  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode, nextSettings = settings) => {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const analysis = await analyzeLoudness(file, mode);
+      const validatedSettings = settingsSchema.parse(nextSettings);
+      setSettingsError(null);
+      const analysis = await analyzeLoudness(file, mode, validatedSettings);
       setResult(analysis);
     } catch (analysisError) {
       console.error(analysisError);
+      if (analysisError instanceof z.ZodError) {
+        setSettingsError(analysisError.errors[0]?.message ?? "Réglages d'analyse invalides.");
+        return;
+      }
       setError("Impossible d'analyser ce fichier. Essaie un WAV, MP3, AIFF, FLAC ou AAC exporté correctement.");
     } finally {
       setIsAnalyzing(false);
     }
-  }, []);
+  }, [settings]);
 
   const handleModeChange = useCallback((mode: AnalysisMode) => {
     setSelectedMode(mode);
