@@ -150,8 +150,8 @@ const createHighPassCoefficients = (sampleRate: number, frequency = 38.135470876
   return { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0 };
 };
 
-const applyBiquad = (input: Float32Array, coefficients: ReturnType<typeof createHighShelfCoefficients>) => {
-  const output = new Float32Array(input.length);
+const applyBiquad = (input: Float32Array | Float64Array, coefficients: ReturnType<typeof createHighShelfCoefficients>) => {
+  const output = new Float64Array(input.length);
   let x1 = 0;
   let x2 = 0;
   let y1 = 0;
@@ -181,12 +181,14 @@ const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
   return [left, right];
 };
 
-const getSelectedChannelArrays = (channels: Float32Array[], mode: AnalysisMode) => {
+const getSelectedChannelArrays = <T extends Float32Array | Float64Array>(channels: T[], mode: AnalysisMode) => {
   if (mode === "left" || channels.length === 1) return [channels[0]];
   const right = channels[Math.min(1, channels.length - 1)];
   if (mode === "right") return [right];
   return [channels[0], right];
 };
+
+const getChannelWeight = (index: number) => (index === 3 || index === 4 ? 1.41 : 1);
 
 const averagePower = (powers: number[]) => powers.reduce((sum, power) => sum + power, 0) / Math.max(powers.length, 1);
 
