@@ -28,7 +28,7 @@ const Footer = ({ onOpenService }: FooterProps) => {
   return (
     <footer className="bg-card border-t border-border" role="contentinfo">
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-2">
             <div className="flex items-center space-x-3 mb-3 sm:mb-4">
