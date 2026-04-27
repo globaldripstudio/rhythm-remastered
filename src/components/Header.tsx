@@ -55,7 +55,7 @@ const Header = () => {
             <a href="/blog" className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.blog')}</a>
             <span className="relative inline-flex items-center cursor-not-allowed mr-1">
               <span className="text-muted-foreground/50 text-sm lg:text-base">{t('nav.shop')}</span>
-              <span className="absolute -top-5 -right-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium leading-none text-primary-foreground whitespace-nowrap">
+              <span className="absolute -top-3 -right-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium leading-none text-primary-foreground whitespace-nowrap">
                 {t('nav.shopSoon')}
               </span>
             </span>
