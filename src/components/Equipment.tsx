@@ -47,7 +47,7 @@ const Equipment = () => {
       { name: "LOM Geofon", type: "Géophone contact", status: "creative" }
     ],
     preamps: [
-      { name: "Neve 1073", type: "Préampli vintage légendaire", status: "vintage" },
+      { name: "Neve 1073", type: "Préampli vintage légendaire", status: "premium" },
       { name: "Unison Pre (x8)", type: "Préamplis UA", status: "premium" },
       { name: "DBX 286s", type: "Préampli/processeur voix", status: "standard" }
     ],
