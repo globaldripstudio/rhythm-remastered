@@ -1179,7 +1179,8 @@
       "methodologyText": "Local analysis: BS.1770 K-weighting filters with calculated biquad coefficients, {{windowMs}} ms window, 75% overlap, {{gateLufs}} LUFS absolute gating, -10 LU relative gating and true peak estimated with 4x interpolation.",
       "references": "References",
       "referencesText": "-14 LUFS: dense streaming · -16 LUFS: balanced streaming · -20 LUFS: dynamic · -23 LUFS: EBU broadcast",
-      "footer": "Report generated locally — no audio file sent to a server."
+      "footer": "Report generated locally — no audio file sent to a server.",
+      "fileSuffix": "lufs-report"
     }
   }
 }
