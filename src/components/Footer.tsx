@@ -1,5 +1,6 @@
-import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
+import { Instagram, Facebook, Mail, Phone, MapPin, Gauge } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const footerServices = [
   { labelKey: "services.data.mixage-mastering.title", id: "mixage-mastering" },
@@ -61,6 +62,23 @@ const Footer = ({ onOpenService }: FooterProps) => {
                   </button>
                 </li>
               ))}
+            </ul>
+          </nav>
+
+          <nav aria-label={t('footer.pagesTitle')}>
+            <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4">{t('footer.pagesTitle')}</h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-sm sm:text-base text-muted-foreground">
+              <li><Link to="/projets" className="hover:text-primary transition-colors">{t('nav.projects')}</Link></li>
+              <li><Link to="/blog" className="hover:text-primary transition-colors">{t('nav.blog')}</Link></li>
+              <li>
+                <Link to="/loudness" className="group mt-2 flex rounded-md border border-border bg-background/40 p-3 transition-colors hover:border-primary/60 hover:bg-muted/30">
+                  <Gauge className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span className="ml-2">
+                    <span className="block font-semibold text-foreground group-hover:text-primary">{t('footer.loudnessTitle')}</span>
+                    <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{t('footer.loudnessDesc')}</span>
+                  </span>
+                </Link>
+              </li>
             </ul>
           </nav>
 
