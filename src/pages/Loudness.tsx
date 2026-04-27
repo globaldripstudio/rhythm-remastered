@@ -1,15 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
+import { jsPDF } from "jspdf";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 
 type AnalysisResult = {
   lufs: number;
@@ -32,43 +29,12 @@ type AnalysisResult = {
 type AnalysisMode = "stereo" | "left" | "right";
 type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 type CurveFocus = "both" | "momentary" | "shortTerm";
-type AnalysisSettings = {
-  windowMs: number;
-  hopMs: number;
-  gateLufs: number;
-  truePeak: boolean;
-};
-
-const professionalDefaults: AnalysisSettings = {
-  windowMs: 400,
-  hopMs: 100,
-  gateLufs: -70,
-  truePeak: true,
-};
-
-const settingsSchema = z.object({
-  windowMs: z.coerce.number().int().min(200, "Fenêtre min. 200 ms").max(3000, "Fenêtre max. 3000 ms"),
-  hopMs: z.coerce.number().int().min(25, "Hop min. 25 ms").max(1000, "Hop max. 1000 ms"),
-  gateLufs: z.coerce.number().min(-90, "Gating min. -90 LUFS").max(-40, "Gating max. -40 LUFS"),
-  truePeak: z.boolean(),
-}).refine((settings) => settings.hopMs <= settings.windowMs, {
-  message: "Le hop size doit rester inférieur ou égal à la fenêtre.",
-  path: ["hopMs"],
-});
+const professionalSettings = { windowMs: 400, hopMs: 50, gateLufs: -70, truePeak: true };
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
   { value: "left", label: "Mono gauche" },
   { value: "right", label: "Mono droite" },
-];
-
-const musicContexts: Array<{ value: MusicContext; label: string }> = [
-  { value: "rap", label: "Rap / Trap" },
-  { value: "pop", label: "Pop / R&B" },
-  { value: "electronic", label: "Électro / Club" },
-  { value: "rock", label: "Rock / Metal" },
-  { value: "acoustic", label: "Acoustique / Jazz" },
-  { value: "broadcast", label: "Podcast / Vidéo" },
 ];
 
 const loudnessMarkers = [
@@ -78,11 +44,22 @@ const loudnessMarkers = [
   { value: -23, label: "-23 LUFS", hint: "Broadcast EBU" },
 ];
 
+const contextLabels: Record<MusicContext, string> = {
+  rap: "Rap / Trap",
+  pop: "Pop / R&B",
+  electronic: "Électro / Club",
+  rock: "Rock / Metal",
+  acoustic: "Acoustique / Jazz",
+  broadcast: "Podcast / Vidéo",
+};
+
 const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.round(seconds % 60).toString().padStart(2, "0");
   return `${minutes}:${remainingSeconds}`;
 };
+
+const safeFileName = (name: string) => name.replace(/[^a-z0-9-_]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "rapport-lufs";
 
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
 
@@ -121,8 +98,7 @@ const estimateTruePeak = (channels: Float32Array[]) => {
   return 20 * Math.log10(Math.max(peak, 1e-12));
 };
 
-const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: AnalysisSettings): Promise<AnalysisResult> => {
-  const validatedSettings = settingsSchema.parse(settings);
+const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   const audioContext = new AudioContextCtor();
   const arrayBuffer = await file.arrayBuffer();
@@ -154,8 +130,8 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
   const renderedBuffer = await offlineContext.startRendering();
   const channelCount = renderedBuffer.numberOfChannels;
   const sampleRate = renderedBuffer.sampleRate;
-  const windowSeconds = validatedSettings.windowMs / 1000;
-  const hopSeconds = validatedSettings.hopMs / 1000;
+  const windowSeconds = professionalSettings.windowMs / 1000;
+  const hopSeconds = professionalSettings.hopMs / 1000;
   const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
   const hopSize = Math.max(1, Math.round(sampleRate * hopSeconds));
   const blocks: number[] = [];
@@ -171,7 +147,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
   }
 
   const selectedChannels = getSelectedChannels(renderedBuffer, mode);
-  const truePeakDb = validatedSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
+  const truePeakDb = professionalSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
 
   for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
     let blockPower = 0;
@@ -191,7 +167,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
     return total + sum / Math.max(samples.length, 1);
   }, 0)];
 
-  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > validatedSettings.gateLufs);
+  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > professionalSettings.gateLufs);
   const firstPassBlocks = absoluteGatedBlocks.length ? absoluteGatedBlocks : usableBlocks;
   const firstPassPower = firstPassBlocks.reduce((sum, power) => sum + power, 0) / firstPassBlocks.length;
   const relativeGate = dbFromPower(firstPassPower) - 10;
@@ -208,7 +184,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
-  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > validatedSettings.gateLufs);
+  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > professionalSettings.gateLufs);
   const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
   const integratedLufs = dbFromPower(integratedPower);
   const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
@@ -260,7 +236,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
   const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
 
   return (
-    <div className="rounded-md border border-border bg-background/40 p-4">
+    <div className="min-h-[420px] resize-y overflow-auto rounded-md border border-border bg-background/40 p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Waves className="h-4 w-4 text-primary" />
@@ -274,7 +250,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-72 w-full overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-[340px] min-h-80 w-full overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
@@ -326,14 +302,21 @@ const Loudness = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
-  const [musicContext, setMusicContext] = useState<MusicContext>("rap");
-  const [settings, setSettings] = useState<AnalysisSettings>(professionalDefaults);
-  const [settingsError, setSettingsError] = useState<string | null>(null);
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const targetHint = useMemo(() => {
+  const inferredContext = useMemo<MusicContext | null>(() => {
     if (!result) return null;
+    if (result.lufs > -11 && result.loudnessRange < 5) return "electronic";
+    if (result.lufs > -12.5 && result.plr < 10) return "rap";
+    if (result.lufs > -15 && result.loudnessRange < 8) return "pop";
+    if (result.loudnessRange > 12 && result.lufs < -17) return "acoustic";
+    if (result.lufs < -20) return "broadcast";
+    return "rock";
+  }, [result]);
+
+  const targetHint = useMemo(() => {
+    if (!result || !inferredContext) return null;
     const contextAdvice: Record<MusicContext, string> = {
       rap: result.lufs > -10.5 ? "Master très fort pour rap/trap : impact immédiat, mais surveille la fatigue et la marge true peak." : result.lufs > -14 ? "Zone solide pour rap/trap streaming : densité moderne avec encore un peu de respiration." : "Master rap/trap plutôt dynamique : utile pour préserver les transitoires, moins compétitif en lecture directe.",
       pop: result.lufs > -11 ? "Pop/R&B très dense : efficace en A/B, à contrôler sur voix lead, sibilances et plateformes normalisées." : result.lufs > -15 ? "Bon équilibre pop/R&B : présence moderne, voix lisible et risque limité de normalisation agressive." : "Pop/R&B très dynamique : musical, mais potentiellement plus bas perçu face aux sorties commerciales.",
@@ -343,51 +326,29 @@ const Loudness = () => {
       broadcast: result.lufs > -16 ? "Podcast/vidéo fort : risque de réduction par normalisation, vise souvent plus bas selon la destination." : result.lufs > -21 ? "Podcast/vidéo confortable : voix présente, compatible avec de nombreux usages web." : "Niveau proche broadcast très dynamique : adapté à certains contenus EBU, peut sembler bas en social media.",
     };
     const technical = result.truePeakDb > -1 ? " True peak élevé : prévois un plafond de limiteur plus prudent pour l'encodage." : " True peak sain pour l'export et les encodages courants.";
-    return `${contextAdvice[musicContext]}${technical}`;
-  }, [musicContext, result]);
+    return `${contextAdvice[inferredContext]}${technical}`;
+  }, [inferredContext, result]);
 
-  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode, nextSettings = settings) => {
+  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const validatedSettings = settingsSchema.parse(nextSettings) as AnalysisSettings;
-      setSettingsError(null);
-      const analysis = await analyzeLoudness(file, mode, validatedSettings);
+      const analysis = await analyzeLoudness(file, mode);
       setResult(analysis);
     } catch (analysisError) {
       console.error(analysisError);
-      if (analysisError instanceof z.ZodError) {
-        setSettingsError(analysisError.errors[0]?.message ?? "Réglages d'analyse invalides.");
-        return;
-      }
       setError("Impossible d'analyser ce fichier. Essaie un WAV, MP3, AIFF, FLAC ou AAC exporté correctement.");
     } finally {
       setIsAnalyzing(false);
     }
-  }, [settings]);
+  }, []);
 
   const handleModeChange = useCallback((mode: AnalysisMode) => {
     setSelectedMode(mode);
     if (selectedFile) void runAnalysis(selectedFile, mode);
   }, [runAnalysis, selectedFile]);
-
-  const updateSetting = useCallback(<Key extends keyof AnalysisSettings>(key: Key, value: AnalysisSettings[Key]) => {
-    const nextSettings = { ...settings, [key]: value };
-    const validation = settingsSchema.safeParse(nextSettings);
-    setSettings(nextSettings);
-    setSettingsError(validation.success ? null : validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
-  }, [settings]);
-
-  const reanalyzeWithSettings = useCallback(() => {
-    const validation = settingsSchema.safeParse(settings);
-    if (!validation.success) {
-      setSettingsError(validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
-      return;
-    }
-    if (selectedFile) void runAnalysis(selectedFile, selectedMode, validation.data as AnalysisSettings);
-  }, [runAnalysis, selectedFile, selectedMode, settings]);
 
   const handleFile = useCallback(async (file?: File) => {
     if (!file) return;
@@ -398,6 +359,78 @@ const Loudness = () => {
     setSelectedFile(file);
     await runAnalysis(file, selectedMode);
   }, [runAnalysis, selectedMode]);
+
+  const exportPdfReport = useCallback(() => {
+    if (!result) return;
+    const report = new jsPDF({ unit: "mm", format: "a4" });
+    const pageWidth = report.internal.pageSize.getWidth();
+    const margin = 16;
+    const modeLabel = analysisModes.find((mode) => mode.value === result.mode)?.label ?? "Stéréo";
+    report.setFillColor(12, 12, 14);
+    report.rect(0, 0, pageWidth, 34, "F");
+    report.setTextColor(255, 255, 255);
+    report.setFont("helvetica", "bold");
+    report.setFontSize(20);
+    report.text("Rapport Loudness LUFS", margin, 18);
+    report.setFont("helvetica", "normal");
+    report.setFontSize(10);
+    report.text("Global Drip Studio", margin, 26);
+    report.setTextColor(24, 24, 27);
+    report.setFontSize(11);
+    let y = 48;
+    report.text(`Fichier : ${result.fileName}`, margin, y);
+    y += 7;
+    report.text(`Mode : ${modeLabel} · Durée : ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} canal${result.channels > 1 ? "s" : ""}`, margin, y);
+    y += 12;
+    const metrics = [
+      ["LUFS intégré", `${result.lufs.toFixed(1)} LUFS`],
+      ["Momentary actuel", `${result.momentaryLufs.toFixed(1)} LUFS`],
+      ["Short-term actuel", `${result.shortTermLufs.toFixed(1)} LUFS`],
+      ["Peak", `${result.peakDb.toFixed(1)} dBFS`],
+      ["True peak estimé", `${result.truePeakDb.toFixed(1)} dBTP`],
+      ["LRA / PLR", `${result.loudnessRange.toFixed(1)} LU / ${result.plr.toFixed(1)} dB`],
+      ["Maximums", `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
+      ["Profil déduit", inferredContext ? contextLabels[inferredContext] : "Analyse neutre"],
+    ];
+    metrics.forEach(([label, value], index) => {
+      const x = margin + (index % 2) * 88;
+      const rowY = y + Math.floor(index / 2) * 22;
+      report.setFillColor(245, 245, 245);
+      report.roundedRect(x, rowY, 82, 16, 2, 2, "F");
+      report.setFont("helvetica", "normal");
+      report.setFontSize(8);
+      report.setTextColor(100, 100, 100);
+      report.text(label, x + 4, rowY + 5);
+      report.setFont("helvetica", "bold");
+      report.setFontSize(12);
+      report.setTextColor(20, 20, 20);
+      report.text(value, x + 4, rowY + 12);
+    });
+    y += 100;
+    report.setFont("helvetica", "bold");
+    report.setFontSize(13);
+    report.text("Interprétation", margin, y);
+    y += 7;
+    report.setFont("helvetica", "normal");
+    report.setFontSize(10);
+    report.text(report.splitTextToSize(targetHint ?? "Analyse effectuée avec paramètres professionnels BS.1770.", pageWidth - margin * 2), margin, y);
+    y += 28;
+    report.setFont("helvetica", "bold");
+    report.text("Méthodologie", margin, y);
+    y += 7;
+    report.setFont("helvetica", "normal");
+    report.text(report.splitTextToSize(`Analyse locale : fenêtre ${professionalSettings.windowMs} ms, pas ${professionalSettings.hopMs} ms, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU, K-weighting BS.1770 et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
+    y += 24;
+    report.setDrawColor(220, 220, 220);
+    report.line(margin, y, pageWidth - margin, y);
+    y += 8;
+    report.setFont("helvetica", "bold");
+    report.text("Repères", margin, y);
+    y += 7;
+    report.setFont("helvetica", "normal");
+    report.text("-14 LUFS : streaming dense · -16 LUFS : streaming équilibré · -20 LUFS : dynamique · -23 LUFS : broadcast EBU", margin, y);
+    report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
+  }, [inferredContext, result, targetHint]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -442,53 +475,9 @@ const Loudness = () => {
                   </Button>
                 ))}
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Contexte musical</p>
-                <div className="flex flex-wrap gap-2" aria-label="Contexte musical pour l'interprétation LUFS">
-                  {musicContexts.map((context) => (
-                    <Button
-                      key={context.value}
-                      type="button"
-                      variant={musicContext === context.value ? "default" : "outline"}
-                      onClick={() => setMusicContext(context.value)}
-                      className="min-w-28"
-                    >
-                      {context.label}
-                    </Button>
-                  ))}
-                </div>
+              <div className="rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
+                Analyse professionnelle automatique : fenêtre 400 ms, pas 50 ms, gating BS.1770 à -70 LUFS, estimation true peak et interprétation musicale déduite des mesures.
               </div>
-              <Card className="equipment-card border-border/80">
-                <CardContent className="space-y-4 p-4">
-                  <div>
-                    <p className="text-sm font-medium">Réglages avancés</p>
-                    <p className="text-xs text-muted-foreground">Valeurs professionnelles par défaut, validation stricte avant analyse.</p>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="window-ms">Fenêtre (ms)</Label>
-                      <Input id="window-ms" type="number" min={200} max={3000} step={50} value={settings.windowMs} onChange={(event) => updateSetting("windowMs", Number(event.target.value))} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="hop-ms">Hop size (ms)</Label>
-                      <Input id="hop-ms" type="number" min={25} max={1000} step={25} value={settings.hopMs} onChange={(event) => updateSetting("hopMs", Number(event.target.value))} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="gate-lufs">Seuil gating (LUFS)</Label>
-                      <Input id="gate-lufs" type="number" min={-90} max={-40} step={1} value={settings.gateLufs} onChange={(event) => updateSetting("gateLufs", Number(event.target.value))} />
-                    </div>
-                    <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
-                      <Label htmlFor="true-peak" className="text-sm">Approx. true peak</Label>
-                      <Switch id="true-peak" checked={settings.truePeak} onCheckedChange={(checked) => updateSetting("truePeak", checked)} />
-                    </div>
-                  </div>
-                  {settingsError && <p className="text-sm text-destructive">{settingsError}</p>}
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="outline" onClick={() => { setSettings(professionalDefaults); setSettingsError(null); }} disabled={isAnalyzing}>Réinitialiser</Button>
-                    <Button type="button" onClick={reanalyzeWithSettings} disabled={isAnalyzing || !selectedFile || Boolean(settingsError)}>Analyser précisément</Button>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
             <Card className="equipment-card overflow-hidden border-border/80">
@@ -548,6 +537,13 @@ const Loudness = () => {
                     <span className="rounded-full border border-border px-3 py-1 text-xs">
                       {analysisModes.find((mode) => mode.value === result.mode)?.label}
                     </span>
+                  </div>
+                  <div className="mb-5 flex flex-wrap items-center gap-2">
+                    {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">Profil déduit : {contextLabels[inferredContext]}</span>}
+                    <Button type="button" onClick={exportPdfReport} variant="outline" size="sm">
+                      <Download className="h-4 w-4" />
+                      Rapport PDF
+                    </Button>
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
