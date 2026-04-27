@@ -211,10 +211,10 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
 
 const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const width = 760;
-  const height = 280;
+  const width = 860;
+  const height = 320;
   const paddingLeft = 54;
-  const paddingRight = 30;
+  const paddingRight = 118;
   const paddingTop = 24;
   const paddingBottom = 42;
   const usableData = data.length ? data : [{ time: 0, momentary: -70, shortTerm: -70 }];
@@ -236,7 +236,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
   const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
 
   return (
-    <div className="min-h-[420px] resize-y overflow-auto rounded-md border border-border bg-background/40 p-4">
+    <div className="flex min-h-[440px] resize-y flex-col overflow-hidden rounded-md border border-border bg-background/40 p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Waves className="h-4 w-4 text-primary" />
@@ -250,7 +250,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-[340px] min-h-80 w-full overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label="Courbe LUFS momentary et short-term" className="min-h-80 w-full flex-1 overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
@@ -272,13 +272,13 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
           const y = paddingTop + ((maxValue - marker.value) / valueRange) * (height - paddingTop - paddingBottom);
           return y >= paddingTop && y <= height - paddingBottom ? (
             <g key={marker.value}>
-              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
-              <text x={width - paddingRight} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[10px]">{marker.label}</text>
+              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} className="stroke-border/60" strokeDasharray="5 6" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+              <text x={width - paddingRight + 12} y={y + 4} textAnchor="start" className="fill-muted-foreground text-[10px]">{marker.label}</text>
             </g>
           ) : null;
         })}
-        <polyline points={momentaryPath} fill="none" className="stroke-primary" strokeWidth={focus === "momentary" ? "4" : "2.5"} strokeLinecap="round" strokeLinejoin="round" opacity={focus === "shortTerm" ? "0.25" : "1"} />
-        <polyline points={shortTermPath} fill="none" className="stroke-accent" strokeWidth={focus === "shortTerm" ? "4" : "2.5"} strokeLinecap="round" strokeLinejoin="round" opacity={focus === "momentary" ? "0.25" : "0.95"} />
+        <polyline points={momentaryPath} fill="none" className="stroke-primary [filter:drop-shadow(0_0_5px_hsl(var(--primary)/0.55))]" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
+        <polyline points={shortTermPath} fill="none" className="stroke-accent [filter:drop-shadow(0_0_5px_hsl(var(--accent)/0.6))]" strokeWidth={focus === "shortTerm" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "momentary" ? "0.22" : "1"} />
         {hoveredPoint && (
           <g pointerEvents="none">
             <line x1={hoverX} y1={paddingTop} x2={hoverX} y2={height - paddingBottom} className="stroke-foreground/40" strokeDasharray="4 4" />
