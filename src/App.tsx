@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { SpotifyPlayerProvider } from "@/contexts/SpotifyPlayerContext";
 import Index from "./pages/Index";
@@ -27,6 +27,11 @@ import PageTracker from "./components/PageTracker";
 
 const queryClient = new QueryClient();
 
+const ConditionalLiveChat = () => {
+  const { pathname } = useLocation();
+  return pathname.startsWith("/admin") ? null : <LiveChat />;
+};
+
 const App = () => (
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
@@ -34,8 +39,8 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <LiveChat />
         <BrowserRouter>
+            <ConditionalLiveChat />
           <PageTracker />
           <Routes>
             <Route path="/" element={<Index />} />

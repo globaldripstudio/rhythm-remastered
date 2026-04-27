@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 type AnalysisResult = {
   lufs: number;
@@ -401,7 +401,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
 };
 
 const Loudness = () => {
-  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -409,6 +409,12 @@ const Loudness = () => {
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const toggleLanguage = () => {
+    document.body.classList.add('lang-switching');
+    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    setTimeout(() => document.body.classList.remove('lang-switching'), 500);
+  };
 
   const inferredContext = useMemo<MusicContext | null>(() => {
     if (!result) return null;
@@ -556,14 +562,34 @@ const Loudness = () => {
         description="Téléversez un fichier audio et mesurez sa loudness LUFS directement dans votre navigateur."
         path="/loudness"
       />
-      <Header />
-      <main className="pt-28 pb-16 sm:pt-32 sm:pb-20">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+                <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
+              </Link>
+              <Link to="/">
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">← {t('nav.backHome')}</span>
+                  <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
+                </Button>
+              </Link>
+            </div>
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
+              aria-label="Switch language"
+            >
+              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className="text-muted-foreground/40">|</span>
+              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+            </button>
+          </div>
+        </div>
+      </header>
+      <main className="py-16 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
-          <Button variant="ghost" onClick={() => navigate("/")} className="mb-8">
-            <ArrowLeft className="w-4 h-4" />
-            Retour au studio
-          </Button>
-
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div className="space-y-6 animate-fade-in">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
