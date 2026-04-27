@@ -29,7 +29,7 @@ type AnalysisResult = {
 type AnalysisMode = "stereo" | "left" | "right";
 type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 type CurveFocus = "both" | "momentary" | "shortTerm";
-const professionalSettings = { windowMs: 400, hopMs: 50, gateLufs: -70, truePeak: true };
+const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
@@ -120,12 +120,72 @@ const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, 
 
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
 
+const createHighShelfCoefficients = (sampleRate: number, gainDb = 3.99984385397, frequency = 1681.974450955533, q = 0.7071752369554196) => {
+  const a = 10 ** (gainDb / 40);
+  const omega = (2 * Math.PI * frequency) / sampleRate;
+  const sin = Math.sin(omega);
+  const cos = Math.cos(omega);
+  const alpha = sin / (2 * q);
+  const sqrtA = Math.sqrt(a);
+  const b0 = a * ((a + 1) + (a - 1) * cos + 2 * sqrtA * alpha);
+  const b1 = -2 * a * ((a - 1) + (a + 1) * cos);
+  const b2 = a * ((a + 1) + (a - 1) * cos - 2 * sqrtA * alpha);
+  const a0 = (a + 1) - (a - 1) * cos + 2 * sqrtA * alpha;
+  const a1 = 2 * ((a - 1) - (a + 1) * cos);
+  const a2 = (a + 1) - (a - 1) * cos - 2 * sqrtA * alpha;
+  return { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0 };
+};
+
+const createHighPassCoefficients = (sampleRate: number, frequency = 38.13547087602444, q = 0.5003270373238773) => {
+  const omega = (2 * Math.PI * frequency) / sampleRate;
+  const sin = Math.sin(omega);
+  const cos = Math.cos(omega);
+  const alpha = sin / (2 * q);
+  const b0 = (1 + cos) / 2;
+  const b1 = -(1 + cos);
+  const b2 = (1 + cos) / 2;
+  const a0 = 1 + alpha;
+  const a1 = -2 * cos;
+  const a2 = 1 - alpha;
+  return { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0 };
+};
+
+const applyBiquad = (input: Float32Array, coefficients: ReturnType<typeof createHighShelfCoefficients>) => {
+  const output = new Float32Array(input.length);
+  let x1 = 0;
+  let x2 = 0;
+  let y1 = 0;
+  let y2 = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    const x0 = input[i];
+    const y0 = coefficients.b0 * x0 + coefficients.b1 * x1 + coefficients.b2 * x2 - coefficients.a1 * y1 - coefficients.a2 * y2;
+    output[i] = y0;
+    x2 = x1;
+    x1 = x0;
+    y2 = y1;
+    y1 = y0;
+  }
+  return output;
+};
+
+const applyBs1770KWeighting = (samples: Float32Array, sampleRate: number) => {
+  const preFiltered = applyBiquad(samples, createHighShelfCoefficients(sampleRate));
+  return applyBiquad(preFiltered, createHighPassCoefficients(sampleRate));
+};
+
 const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
   const left = buffer.getChannelData(0);
   if (mode === "left" || buffer.numberOfChannels === 1) return [left];
   const right = buffer.getChannelData(Math.min(1, buffer.numberOfChannels - 1));
   if (mode === "right") return [right];
   return [left, right];
+};
+
+const getSelectedChannelArrays = (channels: Float32Array[], mode: AnalysisMode) => {
+  if (mode === "left" || channels.length === 1) return [channels[0]];
+  const right = channels[Math.min(1, channels.length - 1)];
+  if (mode === "right") return [right];
+  return [channels[0], right];
 };
 
 const averagePower = (powers: number[]) => powers.reduce((sum, power) => sum + power, 0) / Math.max(powers.length, 1);

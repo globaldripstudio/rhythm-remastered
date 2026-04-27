@@ -1,89 +1,38 @@
+Je vais remplacer l’approximation actuelle par un calcul LUFS plus strictement aligné sur BS.1770 / EBU R128, afin de rapprocher le LUFS intégré de loudness.info.
 
+Plan d’implémentation :
 
-# Plan : Système e-book protégé avec lecteur PDF plein écran
+1. Remplacer le K-weighting approximatif
+   - Retirer le chaînage actuel `highpass + highshelf` basé sur les filtres WebAudio approximatifs.
+   - Implémenter directement les filtres numériques BS.1770 avec coefficients biquad précis :
+     - pré-filtre high-shelf K-weighting,
+     - filtre high-pass RLB.
+   - Appliquer ces filtres canal par canal sur les samples décodés avant tout calcul d’énergie.
 
-## Résumé
+2. Corriger le calcul d’énergie multicanal
+   - Calculer la loudness sur les samples K-weighted.
+   - Sommer correctement l’énergie des canaux selon BS.1770 pour stéréo/mono.
+   - Conserver les modes “Stéréo”, “Mono gauche”, “Mono droite”, mais avec un comportement plus rigoureux.
 
-Mettre en place un système complet d'achat, d'authentification client, et de lecture en ligne de l'e-book avec un lecteur PDF immersif plein écran, téléchargeable et imprimable.
+3. Rendre le gating intégré plus conforme EBU R128
+   - Utiliser des blocs de 400 ms avec recouvrement cohérent.
+   - Appliquer :
+     - gate absolu à -70 LUFS,
+     - moyenne préliminaire,
+     - gate relatif à -10 LU,
+     - loudness intégrée finale sur les blocs retenus.
+   - Éviter les biais liés aux silences de fin de morceau.
 
-## Architecture
+4. Améliorer les valeurs affichées
+   - Garder le LUFS intégré comme valeur principale.
+   - Clarifier les libellés “momentary” et “short-term” si besoin pour éviter de les confondre avec le LUFS global.
+   - Continuer à afficher les maximums momentary/short-term, plus utiles musicalement que la dernière valeur si le morceau finit par un silence.
 
-```text
-ACHAT                    BACKEND                      CLIENT
-┌──────────┐   webhook   ┌──────────────────┐   login   ┌─────────────┐
-│ Stripe   │────────────▶│ ebook_purchases  │◀──────────│ /ebook/login│
-│ Checkout │             │ (table)          │           └──────┬──────┘
-└──────────┘             └──────────────────┘                  │
-                                                               ▼
-┌──────────┐   upload    ┌──────────────────┐   serve   ┌─────────────┐
-│ Admin    │────────────▶│ ebook-files      │──────────▶│/ebook/reader│
-│ Dashboard│             │ (storage bucket) │           │ PDF plein   │
-└──────────┘             └──────────────────┘           │ écran       │
-                                                        └─────────────┘
-```
+5. Mettre à jour le rapport PDF
+   - Actualiser la méthodologie pour indiquer une conformité BS.1770 plus stricte.
+   - Garder la courbe LUFS et la direction artistique actuelle du rapport.
 
-## Étapes
-
-### 1. Base de données
-
-- Créer table `ebook_purchases` : `id`, `email`, `stripe_session_id`, `created_at`
-- RLS : un utilisateur authentifié ne peut lire que sa propre ligne (email = auth.email())
-- Les admins peuvent tout lire
-
-### 2. Storage bucket `ebook-files`
-
-- Bucket privé pour stocker le PDF
-- Pas d'accès public direct — servi uniquement via Edge Function
-
-### 3. Edge Function `stripe-ebook-webhook`
-
-- Écoute `checkout.session.completed` depuis Stripe
-- Insère l'email du client dans `ebook_purchases`
-- Configurer le webhook dans Stripe avec le bon endpoint
-
-### 4. Edge Function `serve-ebook`
-
-- Vérifie le JWT de l'utilisateur
-- Vérifie que son email est dans `ebook_purchases`
-- Retourne le PDF depuis le bucket avec les headers appropriés pour permettre le téléchargement et l'impression
-- Deux modes : `view` (inline) et `download` (attachment)
-
-### 5. Pages client
-
-**`/ebook/login`** — Connexion/inscription client
-- Formulaire email + mot de passe
-- À chaque connexion : `signOut({ scope: 'global' })` avant le sign-in pour invalider les autres sessions (anti-partage)
-- Redirige vers `/ebook/reader` si achat validé
-
-**`/ebook/reader`** — Lecteur PDF plein écran
-- Route protégée (redirige si non connecté ou pas d'achat)
-- **Lecteur immersif plein écran** : le PDF occupe 100% du viewport, pas de header ni footer du site
-- Barre d'outils minimale en overlay (semi-transparente, auto-hide) avec :
-  - Bouton télécharger (appelle `serve-ebook?mode=download`)
-  - Bouton imprimer (`window.print()` ou impression via iframe)
-  - Navigation de pages (précédent/suivant, numéro de page)
-  - Bouton plein écran natif (Fullscreen API)
-  - Bouton retour/déconnexion
-- Utilisation de `react-pdf` (bibliothèque basée sur PDF.js) pour le rendu natif dans le navigateur
-- Zoom adaptatif : le PDF s'adapte à la largeur de l'écran par défaut, avec possibilité de zoomer
-
-### 6. Mise à jour du flow d'achat
-
-- Modifier `create-payment` pour inclure `customer_email` et activer le webhook
-- Mettre à jour `PaymentSuccess` pour inviter le client à créer son compte avec un lien vers `/ebook/login`
-
-### 7. Dashboard Admin — Section E-book
-
-- Nouvel onglet dans le dashboard admin
-- Upload de PDF (remplace le fichier existant dans le bucket)
-- Affichage de la date de dernière mise à jour
-- Liste des achats récents (emails, dates)
-
-## Détails techniques
-
-- **react-pdf** : rendu page par page du PDF dans un composant React, avec contrôle total sur le zoom, la navigation, et le style — pas d'iframe externe
-- **Anti-partage** : invalidation globale des sessions à chaque login = 1 seul appareil connecté à la fois
-- **Téléchargement** : le bouton déclenche un fetch authentifié vers `serve-ebook?mode=download`, le fichier est servi avec `Content-Disposition: attachment`
-- **Impression** : le PDF est chargé dans un iframe caché et `iframe.contentWindow.print()` est appelé, ou directement via `window.print()` avec un style d'impression dédié
-- **Sécurité** : aucune URL publique vers le PDF, tout passe par l'Edge Function avec vérification JWT + achat
-
+6. Vérification
+   - Lancer le build TypeScript.
+   - Si possible, tester avec le fichier WAV fourni et comparer le nouveau LUFS intégré avec la référence loudness.info `-9.1 LUFS`.
+   - L’objectif est de réduire fortement l’écart, en gardant en tête que de petites différences peuvent subsister selon les détails d’implémentation, décodage navigateur et arrondis.
