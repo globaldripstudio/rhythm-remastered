@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, FileAudio, Gauge, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { ArrowLeft, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,6 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 type AnalysisResult = {
   lufs: number;
   peakDb: number;
+  truePeakDb: number;
+  loudnessRange: number;
+  maxMomentaryLufs: number;
+  maxShortTermLufs: number;
+  plr: number;
   momentaryLufs: number;
   shortTermLufs: number;
   curve: Array<{ time: number; momentary: number; shortTerm: number }>;
@@ -21,11 +26,28 @@ type AnalysisResult = {
 };
 
 type AnalysisMode = "stereo" | "left" | "right";
+type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
   { value: "left", label: "Mono gauche" },
   { value: "right", label: "Mono droite" },
+];
+
+const musicContexts: Array<{ value: MusicContext; label: string }> = [
+  { value: "rap", label: "Rap / Trap" },
+  { value: "pop", label: "Pop / R&B" },
+  { value: "electronic", label: "Électro / Club" },
+  { value: "rock", label: "Rock / Metal" },
+  { value: "acoustic", label: "Acoustique / Jazz" },
+  { value: "broadcast", label: "Podcast / Vidéo" },
+];
+
+const loudnessMarkers = [
+  { value: -14, label: "-14 LUFS", hint: "Streaming dense" },
+  { value: -16, label: "-16 LUFS", hint: "Streaming équilibré" },
+  { value: -20, label: "-20 LUFS", hint: "Très dynamique" },
+  { value: -23, label: "-23 LUFS", hint: "Broadcast EBU" },
 ];
 
 const formatDuration = (seconds: number) => {
@@ -45,6 +67,25 @@ const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
 };
 
 const averagePower = (powers: number[]) => powers.reduce((sum, power) => sum + power, 0) / Math.max(powers.length, 1);
+
+const percentile = (values: number[], ratio: number) => {
+  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (!sorted.length) return Number.NaN;
+  return sorted[Math.min(sorted.length - 1, Math.max(0, Math.round((sorted.length - 1) * ratio)))];
+};
+
+const estimateTruePeak = (channels: Float32Array[]) => {
+  let peak = 0;
+  for (const samples of channels) {
+    for (let i = 0; i < samples.length - 1; i += 1) {
+      const current = samples[i];
+      const next = samples[i + 1];
+      peak = Math.max(peak, Math.abs(current), Math.abs(current * 0.75 + next * 0.25), Math.abs(current * 0.5 + next * 0.5), Math.abs(current * 0.25 + next * 0.75));
+    }
+    peak = Math.max(peak, Math.abs(samples[samples.length - 1] ?? 0));
+  }
+  return 20 * Math.log10(Math.max(peak, 1e-12));
+};
 
 const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
