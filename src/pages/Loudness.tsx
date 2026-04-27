@@ -458,6 +458,37 @@ const Loudness = () => {
                   ))}
                 </div>
               </div>
+              <Card className="equipment-card border-border/80">
+                <CardContent className="space-y-4 p-4">
+                  <div>
+                    <p className="text-sm font-medium">Réglages avancés</p>
+                    <p className="text-xs text-muted-foreground">Valeurs professionnelles par défaut, validation stricte avant analyse.</p>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="window-ms">Fenêtre (ms)</Label>
+                      <Input id="window-ms" type="number" min={200} max={3000} step={50} value={settings.windowMs} onChange={(event) => updateSetting("windowMs", Number(event.target.value))} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="hop-ms">Hop size (ms)</Label>
+                      <Input id="hop-ms" type="number" min={25} max={1000} step={25} value={settings.hopMs} onChange={(event) => updateSetting("hopMs", Number(event.target.value))} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="gate-lufs">Seuil gating (LUFS)</Label>
+                      <Input id="gate-lufs" type="number" min={-90} max={-40} step={1} value={settings.gateLufs} onChange={(event) => updateSetting("gateLufs", Number(event.target.value))} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
+                      <Label htmlFor="true-peak" className="text-sm">Approx. true peak</Label>
+                      <Switch id="true-peak" checked={settings.truePeak} onCheckedChange={(checked) => updateSetting("truePeak", checked)} />
+                    </div>
+                  </div>
+                  {settingsError && <p className="text-sm text-destructive">{settingsError}</p>}
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" onClick={() => { setSettings(professionalDefaults); setSettingsError(null); }} disabled={isAnalyzing}>Réinitialiser</Button>
+                    <Button type="button" onClick={reanalyzeWithSettings} disabled={isAnalyzing || !selectedFile || Boolean(settingsError)}>Analyser précisément</Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <Card className="equipment-card overflow-hidden border-border/80">
@@ -543,7 +574,7 @@ const Loudness = () => {
                     </p>
                   </div>
                   <div className="mt-6">
-                    <LoudnessCurve data={result.curve} />
+                    <LoudnessCurve data={result.curve} focus={curveFocus} onFocusChange={setCurveFocus} />
                   </div>
                 </CardContent>
               </Card>
