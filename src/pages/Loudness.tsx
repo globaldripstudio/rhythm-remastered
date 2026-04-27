@@ -291,14 +291,21 @@ const Loudness = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
-  const [musicContext, setMusicContext] = useState<MusicContext>("rap");
-  const [settings, setSettings] = useState<AnalysisSettings>(professionalDefaults);
-  const [settingsError, setSettingsError] = useState<string | null>(null);
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const targetHint = useMemo(() => {
+  const inferredContext = useMemo<MusicContext | null>(() => {
     if (!result) return null;
+    if (result.lufs > -11 && result.loudnessRange < 5) return "electronic";
+    if (result.lufs > -12.5 && result.plr < 10) return "rap";
+    if (result.lufs > -15 && result.loudnessRange < 8) return "pop";
+    if (result.loudnessRange > 12 && result.lufs < -17) return "acoustic";
+    if (result.lufs < -20) return "broadcast";
+    return "rock";
+  }, [result]);
+
+  const targetHint = useMemo(() => {
+    if (!result || !inferredContext) return null;
     const contextAdvice: Record<MusicContext, string> = {
       rap: result.lufs > -10.5 ? "Master très fort pour rap/trap : impact immédiat, mais surveille la fatigue et la marge true peak." : result.lufs > -14 ? "Zone solide pour rap/trap streaming : densité moderne avec encore un peu de respiration." : "Master rap/trap plutôt dynamique : utile pour préserver les transitoires, moins compétitif en lecture directe.",
       pop: result.lufs > -11 ? "Pop/R&B très dense : efficace en A/B, à contrôler sur voix lead, sibilances et plateformes normalisées." : result.lufs > -15 ? "Bon équilibre pop/R&B : présence moderne, voix lisible et risque limité de normalisation agressive." : "Pop/R&B très dynamique : musical, mais potentiellement plus bas perçu face aux sorties commerciales.",
@@ -308,51 +315,29 @@ const Loudness = () => {
       broadcast: result.lufs > -16 ? "Podcast/vidéo fort : risque de réduction par normalisation, vise souvent plus bas selon la destination." : result.lufs > -21 ? "Podcast/vidéo confortable : voix présente, compatible avec de nombreux usages web." : "Niveau proche broadcast très dynamique : adapté à certains contenus EBU, peut sembler bas en social media.",
     };
     const technical = result.truePeakDb > -1 ? " True peak élevé : prévois un plafond de limiteur plus prudent pour l'encodage." : " True peak sain pour l'export et les encodages courants.";
-    return `${contextAdvice[musicContext]}${technical}`;
-  }, [musicContext, result]);
+    return `${contextAdvice[inferredContext]}${technical}`;
+  }, [inferredContext, result]);
 
-  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode, nextSettings = settings) => {
+  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const validatedSettings = settingsSchema.parse(nextSettings) as AnalysisSettings;
-      setSettingsError(null);
-      const analysis = await analyzeLoudness(file, mode, validatedSettings);
+      const analysis = await analyzeLoudness(file, mode);
       setResult(analysis);
     } catch (analysisError) {
       console.error(analysisError);
-      if (analysisError instanceof z.ZodError) {
-        setSettingsError(analysisError.errors[0]?.message ?? "Réglages d'analyse invalides.");
-        return;
-      }
       setError("Impossible d'analyser ce fichier. Essaie un WAV, MP3, AIFF, FLAC ou AAC exporté correctement.");
     } finally {
       setIsAnalyzing(false);
     }
-  }, [settings]);
+  }, []);
 
   const handleModeChange = useCallback((mode: AnalysisMode) => {
     setSelectedMode(mode);
     if (selectedFile) void runAnalysis(selectedFile, mode);
   }, [runAnalysis, selectedFile]);
-
-  const updateSetting = useCallback(<Key extends keyof AnalysisSettings>(key: Key, value: AnalysisSettings[Key]) => {
-    const nextSettings = { ...settings, [key]: value };
-    const validation = settingsSchema.safeParse(nextSettings);
-    setSettings(nextSettings);
-    setSettingsError(validation.success ? null : validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
-  }, [settings]);
-
-  const reanalyzeWithSettings = useCallback(() => {
-    const validation = settingsSchema.safeParse(settings);
-    if (!validation.success) {
-      setSettingsError(validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
-      return;
-    }
-    if (selectedFile) void runAnalysis(selectedFile, selectedMode, validation.data as AnalysisSettings);
-  }, [runAnalysis, selectedFile, selectedMode, settings]);
 
   const handleFile = useCallback(async (file?: File) => {
     if (!file) return;
