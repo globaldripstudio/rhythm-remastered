@@ -373,6 +373,22 @@ const Loudness = () => {
     if (selectedFile) void runAnalysis(selectedFile, mode);
   }, [runAnalysis, selectedFile]);
 
+  const updateSetting = useCallback(<Key extends keyof AnalysisSettings>(key: Key, value: AnalysisSettings[Key]) => {
+    const nextSettings = { ...settings, [key]: value };
+    const validation = settingsSchema.safeParse(nextSettings);
+    setSettings(nextSettings);
+    setSettingsError(validation.success ? null : validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
+  }, [settings]);
+
+  const reanalyzeWithSettings = useCallback(() => {
+    const validation = settingsSchema.safeParse(settings);
+    if (!validation.success) {
+      setSettingsError(validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
+      return;
+    }
+    if (selectedFile) void runAnalysis(selectedFile, selectedMode, validation.data as AnalysisSettings);
+  }, [runAnalysis, selectedFile, selectedMode, settings]);
+
   const handleFile = useCallback(async (file?: File) => {
     if (!file) return;
     if (!file.type.startsWith("audio/")) {
