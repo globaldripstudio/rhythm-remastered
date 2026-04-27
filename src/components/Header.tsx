@@ -124,16 +124,16 @@ const Header = () => {
               <div className="border-t border-border my-2"></div>
               <a href="/projets" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>{t('nav.projects')}</a>
               <a href="/blog" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>{t('nav.blog')}</a>
-              <a href="/loudness" className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-3 text-muted-foreground transition-colors hover:border-primary/70 hover:text-foreground" onClick={toggleMenu}>
-                <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
-                <span>{t('nav.loudness')}</span>
-              </a>
               <span className="py-2 relative inline-flex items-center cursor-not-allowed">
                 <span className="text-muted-foreground/50">{t('nav.shop')}</span>
                 <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
                   {t('nav.shopSoon')}
                 </span>
               </span>
+              <a href="/loudness" className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-3 text-muted-foreground transition-colors hover:border-primary/70 hover:text-foreground" onClick={toggleMenu}>
+                <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
+                <span>{t('nav.loudness')}</span>
+              </a>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />
