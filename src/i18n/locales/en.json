@@ -1077,9 +1077,9 @@
   },
   "loudness": {
     "badge": "Local in-browser analysis",
-    "subtitle": "Upload a track, get its integrated loudness and peak values, and check your master before release.",
+    "subtitle": "Check your master with a complete LUFS readout: integrated level, true peak, dynamics, evolution curve and a share-ready PDF report.",
     "modeAria": "LUFS analysis mode",
-    "methodIntro": "Automatic professional analysis: strict BS.1770 K-weighting, 400 ms window, 75% overlap, -70 LUFS gating, true peak estimation and musical interpretation inferred from the measurements.",
+    "methodIntro": "Advanced local analysis: BS.1770 K-weighting, 400 ms window, 75% overlap, absolute/relative gating, 4x true peak estimation and automatic musical interpretation.",
     "resultsAria": "Loudness analysis results",
     "inferredProfile": "Inferred profile",
     "neutralProfile": "Neutral analysis",
@@ -1181,6 +1181,20 @@
       "referencesText": "-14 LUFS: dense streaming · -16 LUFS: balanced streaming · -20 LUFS: dynamic · -23 LUFS: EBU broadcast",
       "footer": "Report generated locally — no audio file sent to a server.",
       "fileSuffix": "lufs-report"
+    },
+    "presentation": {
+      "integrated": {
+        "title": "Perceived loudness",
+        "description": "Integrated, momentary and short-term LUFS to place the track density accurately."
+      },
+      "truePeak": {
+        "title": "Encoding safety",
+        "description": "dBFS peak and estimated true peak to anticipate platforms, codecs and limiters."
+      },
+      "report": {
+        "title": "Mastering readout",
+        "description": "Inferred musical profile, BS.1770 references and PDF export in the active language."
+      }
     }
   }
 }

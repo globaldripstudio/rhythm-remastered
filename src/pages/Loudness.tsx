@@ -604,6 +604,14 @@ const Loudness = () => {
                   {t("loudness.subtitle")}
                 </p>
               </div>
+              <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+                {(["integrated", "truePeak", "report"] as const).map((item) => (
+                  <div key={item} className="rounded-md border border-border bg-background/40 p-3">
+                    <p className="font-semibold text-foreground">{t(`loudness.presentation.${item}.title`)}</p>
+                    <p className="mt-1 leading-relaxed">{t(`loudness.presentation.${item}.description`)}</p>
+                  </div>
+                ))}
+              </div>
               <div className="flex flex-wrap gap-2" aria-label={t("loudness.modeAria")}>
                 {analysisModes.map((mode) => (
                   <Button
