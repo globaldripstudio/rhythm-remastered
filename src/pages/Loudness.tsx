@@ -588,23 +588,23 @@ const Loudness = () => {
           </div>
         </div>
       </header>
-      <main className="py-16 sm:py-20">
+      <main className="py-8 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
-          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <div className="space-y-6 animate-fade-in">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
+          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8">
+            <div className="space-y-4 animate-fade-in sm:space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
                 <Gauge className="w-4 h-4 text-primary" />
                 {t("loudness.badge")}
               </div>
-              <div className="space-y-4">
-                <h1 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
+              <div className="space-y-3 sm:space-y-4">
+                <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
                   Loudness <span className="hero-text">LUFS</span>
                 </h1>
-                <p className="max-w-xl text-lg text-muted-foreground sm:text-xl">
+                <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-xl">
                   {t("loudness.subtitle")}
                 </p>
               </div>
-              <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+              <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-3 sm:gap-3">
                 {(["integrated", "truePeak", "report"] as const).map((item) => (
                   <div key={item} className="rounded-md border border-border bg-background/40 p-3">
                     <p className="font-semibold text-foreground">{t(`loudness.presentation.${item}.title`)}</p>
@@ -612,13 +612,13 @@ const Loudness = () => {
                   </div>
                 ))}
               </div>
-              <div className="rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
+              <div className="rounded-md border border-border bg-background/40 p-3 text-sm leading-relaxed text-muted-foreground sm:p-4">
                 {t("loudness.methodIntro")}
               </div>
             </div>
 
             <Card className="equipment-card overflow-hidden border-border/80">
-              <CardContent className="p-4 sm:p-6">
+              <CardContent className="p-3 sm:p-6">
                 <label
                   htmlFor="audio-upload"
                   onDragOver={(event) => {
@@ -631,7 +631,7 @@ const Loudness = () => {
                     setIsDragging(false);
                     void handleFile(event.dataTransfer.files[0]);
                   }}
-                  className={`flex min-h-[320px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed p-6 text-center transition-all duration-300 ${
+                  className={`flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed p-4 text-center transition-all duration-300 sm:min-h-[320px] sm:p-6 ${
                     isDragging ? "border-primary bg-primary/10" : "border-border bg-background/40 hover:border-primary hover:bg-muted/30"
                   }`}
                 >
@@ -642,10 +642,10 @@ const Loudness = () => {
                     className="sr-only"
                     onChange={(event) => void handleFile(event.target.files?.[0])}
                   />
-                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/15 text-primary">
-                    {isAnalyzing ? <Loader2 className="h-9 w-9 animate-spin" /> : <Upload className="h-9 w-9" />}
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary sm:mb-6 sm:h-20 sm:w-20">
+                    {isAnalyzing ? <Loader2 className="h-8 w-8 animate-spin sm:h-9 sm:w-9" /> : <Upload className="h-8 w-8 sm:h-9 sm:w-9" />}
                   </div>
-                  <h2 className="mb-3 text-2xl font-bold">
+                  <h2 className="mb-2 text-xl font-bold sm:mb-3 sm:text-2xl">
                     {isAnalyzing ? t("loudness.upload.analyzing") : t("loudness.upload.title")}
                   </h2>
                   <p className="max-w-md text-sm text-muted-foreground">
