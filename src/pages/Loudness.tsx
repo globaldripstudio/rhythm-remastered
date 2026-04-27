@@ -252,14 +252,22 @@ const Loudness = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
+  const [musicContext, setMusicContext] = useState<MusicContext>("rap");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const targetHint = useMemo(() => {
     if (!result) return null;
-    if (result.lufs > -12) return "Master très fort, proche des références modernes agressives.";
-    if (result.lufs > -16) return "Zone streaming moderne, bonne densité générale.";
-    return "Master plus dynamique, confortable pour les styles respirants.";
-  }, [result]);
+    const contextAdvice: Record<MusicContext, string> = {
+      rap: result.lufs > -10.5 ? "Master très fort pour rap/trap : impact immédiat, mais surveille la fatigue et la marge true peak." : result.lufs > -14 ? "Zone solide pour rap/trap streaming : densité moderne avec encore un peu de respiration." : "Master rap/trap plutôt dynamique : utile pour préserver les transitoires, moins compétitif en lecture directe.",
+      pop: result.lufs > -11 ? "Pop/R&B très dense : efficace en A/B, à contrôler sur voix lead, sibilances et plateformes normalisées." : result.lufs > -15 ? "Bon équilibre pop/R&B : présence moderne, voix lisible et risque limité de normalisation agressive." : "Pop/R&B très dynamique : musical, mais potentiellement plus bas perçu face aux sorties commerciales.",
+      electronic: result.lufs > -9.5 ? "Électro/club très poussé : adapté à certains masters agressifs, vérifie kick/bass et distorsion inter-sample." : result.lufs > -13 ? "Électro/club dense et exploitable : bonne énergie tout en gardant du punch." : "Électro/club dynamique : intéressant pour versions extended, moins frontal pour playlists loud.",
+      rock: result.lufs > -10 ? "Rock/metal très comprimé : puissant, mais attention à l'écrasement des cymbales et guitares." : result.lufs > -14 ? "Rock/metal moderne équilibré : énergie, largeur et transitoires encore contrôlables." : "Rock/metal dynamique : garde l'impact batterie, idéal si l'arrangement respire.",
+      acoustic: result.lufs > -14 ? "Acoustique/jazz assez fort : vérifie que les nuances et attaques naturelles restent intactes." : result.lufs > -20 ? "Acoustique/jazz cohérent : dynamique naturelle et confort d'écoute préservés." : "Très dynamique : pertinent pour musique intimiste, piano, jazz ou livraisons audiophiles.",
+      broadcast: result.lufs > -16 ? "Podcast/vidéo fort : risque de réduction par normalisation, vise souvent plus bas selon la destination." : result.lufs > -21 ? "Podcast/vidéo confortable : voix présente, compatible avec de nombreux usages web." : "Niveau proche broadcast très dynamique : adapté à certains contenus EBU, peut sembler bas en social media.",
+    };
+    const technical = result.truePeakDb > -1 ? " True peak élevé : prévois un plafond de limiteur plus prudent pour l'encodage." : " True peak sain pour l'export et les encodages courants.";
+    return `${contextAdvice[musicContext]}${technical}`;
+  }, [musicContext, result]);
 
   const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
