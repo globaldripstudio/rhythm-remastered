@@ -277,17 +277,17 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
             </g>
           ) : null;
         })}
-        <polyline points={momentaryPath} fill="none" className="stroke-primary [filter:drop-shadow(0_0_5px_hsl(var(--primary)/0.55))]" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
-        <polyline points={shortTermPath} fill="none" className="stroke-accent [filter:drop-shadow(0_0_5px_hsl(var(--accent)/0.6))]" strokeWidth={focus === "shortTerm" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "momentary" ? "0.22" : "1"} />
+        <polyline points={momentaryPath} fill="none" className="stroke-accent" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
+        <polyline points={shortTermPath} fill="none" className="stroke-primary" strokeWidth={focus === "shortTerm" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "momentary" ? "0.22" : "1"} />
         {hoveredPoint && (
           <g pointerEvents="none">
             <line x1={hoverX} y1={paddingTop} x2={hoverX} y2={height - paddingBottom} className="stroke-foreground/40" strokeDasharray="4 4" />
-            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-primary" />}
-            {(focus !== "momentary") && <circle cx={hoverX} cy={hoverShortTermY} r="4" className="fill-accent" />}
+            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-accent" />}
+            {(focus !== "momentary") && <circle cx={hoverX} cy={hoverShortTermY} r="4" className="fill-primary" />}
             <rect x={Math.min(hoverX + 10, width - 176)} y={Math.max(10, Math.min(hoverMomentaryY, hoverShortTermY) - 34)} width="166" height="58" rx="6" className="fill-background stroke-border" />
             <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(30, Math.min(hoverMomentaryY, hoverShortTermY) - 14)} className="fill-foreground text-[11px]">{formatDuration(hoveredPoint.time)}</text>
-            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-primary text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
-            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(62, Math.min(hoverMomentaryY, hoverShortTermY) + 18)} className="fill-accent text-[11px]">S {hoveredPoint.shortTerm.toFixed(1)} LUFS</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-accent text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(62, Math.min(hoverMomentaryY, hoverShortTermY) + 18)} className="fill-primary text-[11px]">S {hoveredPoint.shortTerm.toFixed(1)} LUFS</text>
           </g>
         )}
       </svg>
