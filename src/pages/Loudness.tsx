@@ -150,8 +150,8 @@ const createHighPassCoefficients = (sampleRate: number, frequency = 38.135470876
   return { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0 };
 };
 
-const applyBiquad = (input: Float32Array, coefficients: ReturnType<typeof createHighShelfCoefficients>) => {
-  const output = new Float32Array(input.length);
+const applyBiquad = (input: Float32Array | Float64Array, coefficients: ReturnType<typeof createHighShelfCoefficients>) => {
+  const output = new Float64Array(input.length);
   let x1 = 0;
   let x2 = 0;
   let y1 = 0;
@@ -178,15 +178,17 @@ const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
   if (mode === "left" || buffer.numberOfChannels === 1) return [left];
   const right = buffer.getChannelData(Math.min(1, buffer.numberOfChannels - 1));
   if (mode === "right") return [right];
-  return [left, right];
+  return Array.from({ length: buffer.numberOfChannels }, (_, index) => buffer.getChannelData(index));
 };
 
-const getSelectedChannelArrays = (channels: Float32Array[], mode: AnalysisMode) => {
+const getSelectedChannelArrays = <T extends Float32Array | Float64Array>(channels: T[], mode: AnalysisMode) => {
   if (mode === "left" || channels.length === 1) return [channels[0]];
   const right = channels[Math.min(1, channels.length - 1)];
   if (mode === "right") return [right];
-  return [channels[0], right];
+  return channels;
 };
+
+const getChannelWeight = (index: number) => (index === 3 || index === 4 ? 1.41 : 1);
 
 const averagePower = (powers: number[]) => powers.reduce((sum, power) => sum + power, 0) / Math.max(powers.length, 1);
 
@@ -215,6 +217,30 @@ const estimateTruePeak = (channels: Float32Array[]) => {
   return 20 * Math.log10(Math.max(peak, 1e-12));
 };
 
+const calculateWindowPowers = (channels: Array<Float32Array | Float64Array>, blockSize: number, hopSize: number) => {
+  const powers: number[] = [];
+  const length = Math.min(...channels.map((samples) => samples.length));
+  for (let start = 0; start + blockSize <= length; start += hopSize) {
+    let blockPower = 0;
+    channels.forEach((samples, channelIndex) => {
+      let sum = 0;
+      for (let i = start; i < start + blockSize; i += 1) sum += samples[i] * samples[i];
+      blockPower += getChannelWeight(channelIndex) * (sum / blockSize);
+    });
+    powers.push(blockPower);
+  }
+  return powers;
+};
+
+const calculateIntegratedPower = (blocks: number[]) => {
+  const absoluteGatedBlocks = blocks.filter((power) => dbFromPower(power) >= professionalSettings.gateLufs);
+  if (!absoluteGatedBlocks.length) return 0;
+  const firstPassPower = averagePower(absoluteGatedBlocks);
+  const relativeGate = dbFromPower(firstPassPower) - 10;
+  const relativeGatedBlocks = absoluteGatedBlocks.filter((power) => dbFromPower(power) >= relativeGate);
+  return relativeGatedBlocks.length ? averagePower(relativeGatedBlocks) : firstPassPower;
+};
+
 const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   const audioContext = new AudioContextCtor();
@@ -227,7 +253,6 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const hopSeconds = professionalSettings.hopMs / 1000;
   const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
   const hopSize = Math.max(1, Math.round(sampleRate * hopSeconds));
-  const blocks: number[] = [];
   let peak = 0;
 
   const channelData = Array.from({ length: channelCount }, (_, index) => audioBuffer.getChannelData(index));
@@ -243,32 +268,14 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const truePeakDb = professionalSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
   const weightedChannels = channelData.map((samples) => applyBs1770KWeighting(samples, sampleRate));
   const selectedWeightedChannels = getSelectedChannelArrays(weightedChannels, mode);
-
-  for (let start = 0; start + blockSize <= audioBuffer.length; start += hopSize) {
-    let blockPower = 0;
-    for (const samples of selectedWeightedChannels) {
-      let sum = 0;
-      for (let i = start; i < start + blockSize; i += 1) {
-        sum += samples[i] * samples[i];
-      }
-      blockPower += sum / blockSize;
-    }
-    blocks.push(blockPower);
-  }
-
-  const usableBlocks = blocks.length ? blocks : [selectedWeightedChannels.reduce((total, samples) => {
+  const momentaryBlocks = calculateWindowPowers(selectedWeightedChannels, blockSize, hopSize);
+  const fallbackPower = selectedWeightedChannels.reduce((total, samples, channelIndex) => {
     let sum = 0;
     for (let i = 0; i < samples.length; i += 1) sum += samples[i] * samples[i];
-    return total + sum / Math.max(samples.length, 1);
-  }, 0)];
-
-  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > professionalSettings.gateLufs);
-  const firstPassBlocks = absoluteGatedBlocks.length ? absoluteGatedBlocks : usableBlocks;
-  const firstPassPower = firstPassBlocks.reduce((sum, power) => sum + power, 0) / firstPassBlocks.length;
-  const relativeGate = dbFromPower(firstPassPower) - 10;
-  const relativeGatedBlocks = firstPassBlocks.filter((power) => dbFromPower(power) > relativeGate);
-  const finalBlocks = relativeGatedBlocks.length ? relativeGatedBlocks : firstPassBlocks;
-  const integratedPower = finalBlocks.reduce((sum, power) => sum + power, 0) / finalBlocks.length;
+    return total + getChannelWeight(channelIndex) * (sum / Math.max(samples.length, 1));
+  }, 0);
+  const usableBlocks = momentaryBlocks.length ? momentaryBlocks : [fallbackPower];
+  const integratedPower = calculateIntegratedPower(usableBlocks);
   const shortTermWindow = Math.max(1, Math.round(3 / hopSeconds));
   const curve = usableBlocks.map((power, index) => {
     const shortTermBlocks = usableBlocks.slice(Math.max(0, index - shortTermWindow + 1), index + 1);
@@ -279,7 +286,10 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
-  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > professionalSettings.gateLufs);
+  const shortTermPowers = calculateWindowPowers(selectedWeightedChannels, Math.max(1, Math.round(sampleRate * 3)), hopSize);
+  const shortTermLoudnessValues = shortTermPowers.map(dbFromPower).filter((value) => value >= professionalSettings.gateLufs);
+  const lraGate = shortTermLoudnessValues.length ? (dbFromPower(calculateIntegratedPower(shortTermPowers)) - 20) : professionalSettings.gateLufs;
+  const gatedShortTerm = shortTermLoudnessValues.filter((value) => value >= lraGate);
   const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
   const integratedLufs = dbFromPower(integratedPower);
   const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
