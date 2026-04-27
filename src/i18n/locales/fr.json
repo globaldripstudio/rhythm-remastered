@@ -1179,7 +1179,8 @@
       "methodologyText": "Analyse locale : filtres K-weighting BS.1770 à coefficients biquad calculés, fenêtre {{windowMs}} ms, recouvrement 75 %, gating absolu {{gateLufs}} LUFS, gating relatif -10 LU et true peak estimé par interpolation 4x.",
       "references": "Repères",
       "referencesText": "-14 LUFS : streaming dense · -16 LUFS : streaming équilibré · -20 LUFS : dynamique · -23 LUFS : broadcast EBU",
-      "footer": "Rapport généré localement — aucun fichier audio envoyé sur serveur."
+      "footer": "Rapport généré localement — aucun fichier audio envoyé sur serveur.",
+      "fileSuffix": "rapport-lufs"
     }
   }
 }
