@@ -413,49 +413,49 @@ const WeeklyAgenda = () => {
 
         {/* Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setSelection(null); }}>
-          <DialogContent>
+          <DialogContent className="max-h-[92dvh] w-[calc(100vw-1.5rem)] overflow-y-auto rounded-lg sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>{editingEvent ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous'}</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 pb-1">
               <div>
                 <Label htmlFor="title">Titre</Label>
-                <Input id="title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Ex: Session mixage" required />
+                <Input id="title" className="mt-1 h-11 text-base" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Ex: Session mixage" required />
               </div>
               <div>
                 <Label htmlFor="description">Description (optionnel)</Label>
-                <Textarea id="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Notes..." />
+                <Textarea id="description" className="mt-1 min-h-28 text-base" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Notes, téléphone, acompte, matériel..." />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="start_time">Début</Label>
-                  <Input id="start_time" type="datetime-local" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} required />
+                  <Input id="start_time" className="mt-1 h-11 text-base" type="datetime-local" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} required />
                 </div>
                 <div>
                   <Label htmlFor="end_time">Fin</Label>
-                  <Input id="end_time" type="datetime-local" value={formData.end_time} onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} />
+                  <Input id="end_time" className="mt-1 h-11 text-base" type="datetime-local" value={formData.end_time} onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} />
                 </div>
               </div>
               <div>
                 <Label>Couleur</Label>
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {COLORS.map(color => (
                     <button key={color} type="button" onClick={() => setFormData({ ...formData, color })}
-                      className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", formData.color === color ? "scale-110 border-foreground" : "border-transparent")}
+                      className={cn("w-9 h-9 rounded-full border-2 transition-transform hover:scale-110 sm:w-7 sm:h-7", formData.color === color ? "scale-110 border-foreground" : "border-transparent")}
                       style={{ backgroundColor: color }}
                     />
                   ))}
                 </div>
               </div>
-              <div className="flex justify-between pt-2">
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-between">
                 {editingEvent && (
-                  <Button type="button" variant="destructive" onClick={() => { handleDelete(editingEvent.id); setIsDialogOpen(false); }}>
+                  <Button type="button" variant="destructive" className="w-full sm:w-auto" onClick={() => { handleDelete(editingEvent.id); setIsDialogOpen(false); }}>
                     <Trash2 className="w-4 h-4 mr-2" /> Supprimer
                   </Button>
                 )}
-                <div className="flex gap-2 ml-auto">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Annuler</Button>
-                  <Button type="submit" className="studio-button">{editingEvent ? 'Modifier' : 'Créer'}</Button>
+                <div className="flex w-full flex-col-reverse gap-2 sm:ml-auto sm:w-auto sm:flex-row">
+                  <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => setIsDialogOpen(false)}>Annuler</Button>
+                  <Button type="submit" className="studio-button w-full sm:w-auto">{editingEvent ? 'Modifier' : 'Créer'}</Button>
                 </div>
               </div>
             </form>
