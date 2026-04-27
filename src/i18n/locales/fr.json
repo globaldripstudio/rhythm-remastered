@@ -874,8 +874,8 @@
       "description": "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio."
     },
     "loudness": {
-      "title": "Analyse LUFS en ligne | Global Drip Studio",
-      "description": "Téléversez un fichier audio et mesurez sa loudness LUFS directement dans votre navigateur."
+      "title": "Analyse LUFS en ligne gratuite | True Peak & LRA",
+      "description": "Analysez un fichier audio en ligne : LUFS intégré, true peak dBTP, LRA, momentary/short-term et rapport PDF, sans upload serveur."
     }
   },
   "legalPages": {
@@ -1194,6 +1194,17 @@
       "report": {
         "title": "Lecture mastering",
         "description": "Profil musical déduit, repères BS.1770 et export PDF dans la langue active."
+      }
+    },
+    "seoBlock": {
+      "aria": "Informations SEO sur l’analyse loudness LUFS",
+      "title": "Analyseur LUFS en ligne pour mastering, streaming et contrôle loudness",
+      "description": "Cet outil mesure la loudness audio directement dans le navigateur avec des repères utiles pour le mastering musical, la diffusion streaming, le podcast et la vidéo. Il aide à contrôler le niveau LUFS intégré, le true peak, la plage dynamique LRA et les variations momentary/short-term avant export.",
+      "checksTitle": "Mesures disponibles",
+      "checks": {
+        "lufs": "LUFS intégré, momentary LUFS et short-term LUFS pour évaluer le niveau perçu.",
+        "truePeak": "Peak dBFS et true peak dBTP estimé pour limiter les risques d’écrêtage à l’encodage.",
+        "platforms": "Repères -14, -16, -20 et -23 LUFS pour comparer streaming, contenus dynamiques et broadcast."
       }
     }
   }
