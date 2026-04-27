@@ -341,21 +341,21 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
   const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
 
   return (
-    <div className="flex min-h-[440px] resize-y flex-col overflow-hidden rounded-md border border-border bg-background/40 p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
+    <div className="flex min-h-[300px] flex-col overflow-hidden rounded-md border border-border bg-background/40 p-3 sm:min-h-[440px] sm:resize-y sm:p-4">
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Waves className="h-4 w-4 text-primary" />
           {t("loudness.curve.title")}
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs text-muted-foreground sm:flex-wrap sm:overflow-visible sm:pb-0">
           {([{ value: "both", label: t("loudness.curve.both") }, { value: "momentary", label: "Momentary" }, { value: "shortTerm", label: "Short-term" }] as const).map((option) => (
-            <button key={option.value} type="button" onClick={() => onFocusChange(option.value)} className={`rounded-full border px-3 py-1 transition-colors ${focus === option.value ? "border-primary bg-primary/15 text-foreground" : "border-border hover:border-primary"}`}>
+            <button key={option.value} type="button" onClick={() => onFocusChange(option.value)} className={`shrink-0 rounded-full border px-3 py-1 transition-colors ${focus === option.value ? "border-primary bg-primary/15 text-foreground" : "border-border hover:border-primary"}`}>
               {option.label}
             </button>
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-80 w-full flex-1 overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-56 w-full flex-1 overflow-visible sm:min-h-80" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
