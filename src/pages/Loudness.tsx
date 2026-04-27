@@ -253,7 +253,6 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const hopSeconds = professionalSettings.hopMs / 1000;
   const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
   const hopSize = Math.max(1, Math.round(sampleRate * hopSeconds));
-  const blocks: number[] = [];
   let peak = 0;
 
   const channelData = Array.from({ length: channelCount }, (_, index) => audioBuffer.getChannelData(index));
@@ -269,32 +268,14 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const truePeakDb = professionalSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
   const weightedChannels = channelData.map((samples) => applyBs1770KWeighting(samples, sampleRate));
   const selectedWeightedChannels = getSelectedChannelArrays(weightedChannels, mode);
-
-  for (let start = 0; start + blockSize <= audioBuffer.length; start += hopSize) {
-    let blockPower = 0;
-    for (const samples of selectedWeightedChannels) {
-      let sum = 0;
-      for (let i = start; i < start + blockSize; i += 1) {
-        sum += samples[i] * samples[i];
-      }
-      blockPower += sum / blockSize;
-    }
-    blocks.push(blockPower);
-  }
-
-  const usableBlocks = blocks.length ? blocks : [selectedWeightedChannels.reduce((total, samples) => {
+  const momentaryBlocks = calculateWindowPowers(selectedWeightedChannels, blockSize, hopSize);
+  const fallbackPower = selectedWeightedChannels.reduce((total, samples, channelIndex) => {
     let sum = 0;
     for (let i = 0; i < samples.length; i += 1) sum += samples[i] * samples[i];
-    return total + sum / Math.max(samples.length, 1);
-  }, 0)];
-
-  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > professionalSettings.gateLufs);
-  const firstPassBlocks = absoluteGatedBlocks.length ? absoluteGatedBlocks : usableBlocks;
-  const firstPassPower = firstPassBlocks.reduce((sum, power) => sum + power, 0) / firstPassBlocks.length;
-  const relativeGate = dbFromPower(firstPassPower) - 10;
-  const relativeGatedBlocks = firstPassBlocks.filter((power) => dbFromPower(power) > relativeGate);
-  const finalBlocks = relativeGatedBlocks.length ? relativeGatedBlocks : firstPassBlocks;
-  const integratedPower = finalBlocks.reduce((sum, power) => sum + power, 0) / finalBlocks.length;
+    return total + getChannelWeight(channelIndex) * (sum / Math.max(samples.length, 1));
+  }, 0);
+  const usableBlocks = momentaryBlocks.length ? momentaryBlocks : [fallbackPower];
+  const integratedPower = calculateIntegratedPower(usableBlocks);
   const shortTermWindow = Math.max(1, Math.round(3 / hopSeconds));
   const curve = usableBlocks.map((power, index) => {
     const shortTermBlocks = usableBlocks.slice(Math.max(0, index - shortTermWindow + 1), index + 1);
