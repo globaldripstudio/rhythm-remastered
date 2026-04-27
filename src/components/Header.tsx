@@ -44,26 +44,24 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-3 text-sm lg:space-x-4 xl:space-x-5 xl:text-base" aria-label="Navigation principale">
-            <a href="#accueil" className="nav-link">{t('nav.home')}</a>
-            <a href="#services" className="nav-link">{t('nav.services')}</a>
-            <a href="#equipement" className="nav-link">{t('nav.equipment')}</a>
-            <a href="#contact" className="nav-link">{t('nav.contact')}</a>
+          {/* Desktop Navigation - Espacement normalisé */}
+          <nav className="hidden md:flex items-center space-x-2 lg:space-x-3 xl:space-x-4" aria-label="Navigation principale">
+            <a href="#accueil" className="nav-link text-sm lg:text-base">{t('nav.home')}</a>
+            <a href="#services" className="nav-link text-sm lg:text-base">{t('nav.services')}</a>
+            <a href="#equipement" className="nav-link text-sm lg:text-base">{t('nav.equipment')}</a>
+            <a href="#contact" className="nav-link text-sm lg:text-base">{t('nav.contact')}</a>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/projets" className="nav-link text-muted-foreground">{t('nav.projects')}</a>
-            <span className="text-muted-foreground/50">|</span>
-            <a href="/blog" className="nav-link text-muted-foreground">{t('nav.blog')}</a>
-            <span className="text-muted-foreground/50">|</span>
+            <a href="/projets" className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.projects')}</a>
+            <a href="/blog" className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.blog')}</a>
             <span className="relative inline-flex items-center cursor-not-allowed">
-              <span className="text-muted-foreground/50">{t('nav.shop')}</span>
-              <span className="absolute -top-2.5 -right-3 rounded-full bg-primary px-1 py-px text-[8px] font-medium leading-none text-primary-foreground whitespace-nowrap">
+              <span className="text-muted-foreground/50 text-sm lg:text-base">{t('nav.shop')}</span>
+              <span className="absolute -top-3 -right-5 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-medium leading-none text-primary-foreground whitespace-nowrap">
                 {t('nav.shopSoon')}
               </span>
             </span>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/loudness" className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground xl:gap-2 xl:px-3">
-              <Gauge className="h-4 w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
+            <a href="/loudness" className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground lg:px-2.5 lg:py-1.5">
+              <Gauge className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
               {t('nav.loudness')}
             </a>
           </nav>
