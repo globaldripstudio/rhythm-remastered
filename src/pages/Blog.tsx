@@ -21,6 +21,11 @@ const Blog = () => {
 
   const posts = [
     {
+      id: 5, titleKey: "blog.cards.loudness.title", excerptKey: "blog.cards.loudness.excerpt",
+      categoryKey: "blog.cards.loudness.category", author: "Global Drip Studio", date: "2026-04-27",
+      readTime: "6 min", image: "/lovable-uploads/Image-23.jpg", slug: "analyse-lufs-en-ligne-controle-master", comingSoon: false
+    },
+    {
       id: 1, titleKey: "blog.cards.venin.title", excerptKey: "blog.cards.venin.excerpt",
       categoryKey: "blog.cards.venin.category", author: "Global Drip Studio", date: "2024-12-20",
       readTime: "8 min", image: "/lovable-uploads/venin-album-cover.jpg", slug: "venin-le-premier-sang", comingSoon: false

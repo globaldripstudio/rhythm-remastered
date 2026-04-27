@@ -410,6 +410,11 @@
         "title": "10 sound design techniques to create unique atmospheres",
         "excerpt": "Explore advanced sound creation techniques: field recording, granular synthesis, convolution reverb and spectral manipulation for immersive sonic worlds.",
         "category": "Sound Design"
+      },
+      "loudness": {
+        "title": "Online LUFS analysis: our new tool for checking masters",
+        "excerpt": "Discover the Global Drip Studio LUFS analyzer: integrated loudness, true peak, dynamics, curve and PDF report directly in the browser.",
+        "category": "Mastering"
       }
     },
     "articles": {
@@ -606,6 +611,36 @@
         "conclusionDesc": "These techniques are just tools. The real magic comes from experimentation, creative intuition and attentive listening. At Global Drip Studio, we combine technical expertise and artistic vision to create sonic worlds that leave their mark.",
         "conclusionQuote": "\"Sound design is painting with sound. Every texture tells a story, every atmosphere evokes an emotion.\"",
         "ctaButton": "Collaborate on your sound design project"
+      },
+      "loudness": {
+        "badge": "Mastering",
+        "title": "Online LUFS analysis: check a master before release",
+        "subtitle": "A simple and precise tool to check integrated loudness, true peak, dynamics and level variations before releasing a track.",
+        "meta": "Global Drip Studio • April 27, 2026 • 6 min read",
+        "intro": "Loudness is not just a number shown by a plugin. It is a way to understand how a track will be perceived, compared, normalized and sometimes altered by platforms. With the /loudness page, we created a fast checking tool to analyze a master directly in the browser.",
+        "whyTitle": "Why measure loudness before sending a master?",
+        "whyP1": "A master can feel loud in the studio and lose impact after normalization. Conversely, a very dynamic track can feel quieter than commercial references. Measuring integrated LUFS, true peak and loudness range helps make decisions with more perspective.",
+        "whyP2": "The goal is not to chase a magic number, but to know where the track sits: dense streaming release, more open master, video content, podcast or delivery closer to broadcast standards.",
+        "toolTitle": "What the tool measures",
+        "toolItems": [
+          "Integrated LUFS to assess average perceived level across the full duration.",
+          "Momentary and short-term LUFS to visualize immediate and recent level variations.",
+          "dBFS peak and estimated true peak dBTP to monitor headroom before encoding.",
+          "LRA and PLR to understand the real dynamics of the track.",
+          "LUFS curve and PDF report exportable in French or English."
+        ],
+        "localTitle": "Local analysis, no server upload",
+        "localP": "The audio file stays in the browser. The analysis is computed locally with a mastering-oriented logic: K-weighting, momentary window, overlap, gating and true peak estimation. It is practical for testing an export, comparing versions or documenting a delivered master.",
+        "howTitle": "How to use it effectively",
+        "howItems": [
+          "Export your master in a clean format: WAV, AIFF, FLAC, MP3 or AAC.",
+          "Drop the file into the tool and first read integrated LUFS and true peak.",
+          "Then check the dynamics: LRA, PLR, momentary and short-term maximums.",
+          "Download the PDF report if you want to keep a record or send it with a delivery."
+        ],
+        "ctaTitle": "Try the LUFS analyzer",
+        "ctaDesc": "The tool is available for free on the website. Use it to check exports, compare masters and prepare releases with more confidence.",
+        "ctaButton": "Open the LUFS tool"
       }
     },
     "diagrams": {
@@ -874,8 +909,12 @@
       "description": "Compression demystified: ratio, attack, release, knee. Complete guide to mastering this essential mixing tool."
     },
     "loudness": {
-      "title": "Online LUFS Analysis | Global Drip Studio",
-      "description": "Upload an audio file and measure its LUFS loudness directly in your browser."
+      "title": "Free Online LUFS Analyzer | True Peak & LRA",
+      "description": "Analyze audio online: integrated LUFS, true peak dBTP, LRA, momentary/short-term loudness and PDF report, with no server upload."
+    },
+    "loudnessArticle": {
+      "title": "Online LUFS analysis: check a master | Global Drip",
+      "description": "Introducing our online LUFS analyzer: true peak, LRA, integrated loudness, curve and PDF report to prepare your masters."
     }
   },
   "legalPages": {
@@ -1194,6 +1233,17 @@
       "report": {
         "title": "Mastering readout",
         "description": "Inferred musical profile, BS.1770 references and PDF export in the active language."
+      }
+    },
+    "seoBlock": {
+      "aria": "SEO information about LUFS loudness analysis",
+      "title": "Online LUFS analyzer for mastering, streaming and loudness checks",
+      "description": "This tool measures audio loudness directly in the browser with practical references for music mastering, streaming release, podcast and video delivery. It helps check integrated LUFS, true peak, loudness range and momentary/short-term variations before export.",
+      "checksTitle": "Available measurements",
+      "checks": {
+        "lufs": "Integrated LUFS, momentary LUFS and short-term LUFS to assess perceived level.",
+        "truePeak": "dBFS peak and estimated true peak dBTP to reduce encoding clipping risks.",
+        "platforms": "-14, -16, -20 and -23 LUFS references for streaming, dynamic content and broadcast comparison."
       }
     }
   }

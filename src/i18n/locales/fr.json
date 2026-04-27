@@ -410,6 +410,11 @@
         "title": "10 techniques de sound design pour créer des ambiances uniques",
         "excerpt": "Explorez les techniques avancées de création sonore : field recording, granular synthesis, convolution reverb et manipulation spectrale pour des univers sonores immersifs.",
         "category": "Sound Design"
+      },
+      "loudness": {
+        "title": "Analyse LUFS en ligne : notre nouvel outil pour contrôler vos masters",
+        "excerpt": "Découvrez l’analyseur LUFS Global Drip Studio : loudness intégrée, true peak, dynamique, courbe et rapport PDF directement dans le navigateur.",
+        "category": "Mastering"
       }
     },
     "articles": {
@@ -606,6 +611,36 @@
         "conclusionDesc": "Ces techniques ne sont que des outils. La véritable magie naît de l'expérimentation, de l'intuition créative et de l'écoute attentive. Au Global Drip Studio, nous combinons expertise technique et vision artistique pour créer des univers sonores qui marquent les esprits.",
         "conclusionQuote": "\"Le sound design, c'est peindre avec le son. Chaque texture raconte une histoire, chaque ambiance évoque une émotion.\"",
         "ctaButton": "Collaborer sur votre projet sound design"
+      },
+      "loudness": {
+        "badge": "Mastering",
+        "title": "Analyse LUFS en ligne : contrôler un master avant diffusion",
+        "subtitle": "Un outil simple et précis pour vérifier la loudness intégrée, le true peak, la dynamique et les variations de niveau d’un morceau avant sa sortie.",
+        "meta": "Global Drip Studio • 27 avril 2026 • 6 min de lecture",
+        "intro": "La loudness n’est pas seulement une valeur affichée par un plugin. C’est une manière de comprendre comment un morceau sera perçu, comparé, normalisé et parfois transformé par les plateformes. Avec la page /loudness, nous avons créé un outil de contrôle rapide pour analyser un master directement dans le navigateur.",
+        "whyTitle": "Pourquoi mesurer la loudness avant d’envoyer un master ?",
+        "whyP1": "Un master peut sembler fort en studio et perdre son impact après normalisation. À l’inverse, un morceau très dynamique peut paraître plus bas que les références commerciales. Mesurer le LUFS intégré, le true peak et la plage dynamique permet de prendre des décisions avec plus de recul.",
+        "whyP2": "L’objectif n’est pas de viser une valeur magique, mais de savoir où se situe le morceau : streaming dense, master plus respirant, contenu vidéo, podcast ou livraison plus proche des standards broadcast.",
+        "toolTitle": "Ce que mesure l’outil",
+        "toolItems": [
+          "LUFS intégré pour évaluer le niveau moyen perçu sur toute la durée.",
+          "Momentary et short-term LUFS pour visualiser les variations immédiates et récentes.",
+          "Peak dBFS et true peak dBTP estimé pour surveiller la marge avant encodage.",
+          "LRA et PLR pour comprendre la dynamique réelle du morceau.",
+          "Courbe LUFS et rapport PDF exportable en français ou en anglais."
+        ],
+        "localTitle": "Une analyse locale, sans envoi serveur",
+        "localP": "Le fichier audio reste dans le navigateur. L’analyse est calculée localement avec une logique orientée mastering : K-weighting, fenêtre momentary, recouvrement, gating et estimation true peak. C’est pratique pour tester un export, comparer plusieurs versions ou documenter un master livré.",
+        "howTitle": "Comment l’utiliser efficacement",
+        "howItems": [
+          "Exportez votre master dans un format propre : WAV, AIFF, FLAC, MP3 ou AAC.",
+          "Déposez le fichier dans l’outil et lisez d’abord le LUFS intégré et le true peak.",
+          "Regardez ensuite la dynamique : LRA, PLR, maximums momentary et short-term.",
+          "Téléchargez le rapport PDF si vous voulez garder une trace ou l’envoyer avec une livraison."
+        ],
+        "ctaTitle": "Tester l’analyseur LUFS",
+        "ctaDesc": "L’outil est disponible gratuitement sur le site. Utilisez-le pour contrôler vos exports, comparer vos masters et préparer une diffusion plus sereine.",
+        "ctaButton": "Ouvrir l’outil LUFS"
       }
     },
     "diagrams": {
@@ -874,8 +909,12 @@
       "description": "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio."
     },
     "loudness": {
-      "title": "Analyse LUFS en ligne | Global Drip Studio",
-      "description": "Téléversez un fichier audio et mesurez sa loudness LUFS directement dans votre navigateur."
+      "title": "Analyse LUFS en ligne gratuite | True Peak & LRA",
+      "description": "Analysez un fichier audio en ligne : LUFS intégré, true peak dBTP, LRA, momentary/short-term et rapport PDF, sans upload serveur."
+    },
+    "loudnessArticle": {
+      "title": "Analyse LUFS en ligne : contrôler un master | Global Drip",
+      "description": "Présentation de notre analyseur LUFS en ligne : true peak, LRA, loudness intégrée, courbe et rapport PDF pour préparer vos masters."
     }
   },
   "legalPages": {
@@ -1194,6 +1233,17 @@
       "report": {
         "title": "Lecture mastering",
         "description": "Profil musical déduit, repères BS.1770 et export PDF dans la langue active."
+      }
+    },
+    "seoBlock": {
+      "aria": "Informations SEO sur l’analyse loudness LUFS",
+      "title": "Analyseur LUFS en ligne pour mastering, streaming et contrôle loudness",
+      "description": "Cet outil mesure la loudness audio directement dans le navigateur avec des repères utiles pour le mastering musical, la diffusion streaming, le podcast et la vidéo. Il aide à contrôler le niveau LUFS intégré, le true peak, la plage dynamique LRA et les variations momentary/short-term avant export.",
+      "checksTitle": "Mesures disponibles",
+      "checks": {
+        "lufs": "LUFS intégré, momentary LUFS et short-term LUFS pour évaluer le niveau perçu.",
+        "truePeak": "Peak dBFS et true peak dBTP estimé pour limiter les risques d’écrêtage à l’encodage.",
+        "platforms": "Repères -14, -16, -20 et -23 LUFS pour comparer streaming, contenus dynamiques et broadcast."
       }
     }
   }
