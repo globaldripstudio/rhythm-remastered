@@ -233,10 +233,14 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: Analysi
   };
 };
 
-const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
-  const width = 640;
-  const height = 180;
-  const padding = 18;
+const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void }) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const width = 760;
+  const height = 280;
+  const paddingLeft = 54;
+  const paddingRight = 30;
+  const paddingTop = 24;
+  const paddingBottom = 42;
   const usableData = data.length ? data : [{ time: 0, momentary: -70, shortTerm: -70 }];
   const values = [...usableData.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
   const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
@@ -244,10 +248,14 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
   const valueRange = Math.max(maxValue - minValue, 1);
   const timeMax = Math.max(usableData[usableData.length - 1].time, 0.1);
   const pointToCoord = (point: { time: number }, value: number) => {
-    const x = padding + (point.time / timeMax) * (width - padding * 2);
-    const y = padding + ((maxValue - value) / valueRange) * (height - padding * 2);
+    const x = paddingLeft + (point.time / timeMax) * (width - paddingLeft - paddingRight);
+    const y = paddingTop + ((maxValue - value) / valueRange) * (height - paddingTop - paddingBottom);
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   };
+  const hoveredPoint = hoveredIndex === null ? null : usableData[hoveredIndex];
+  const hoverX = hoveredPoint ? paddingLeft + (hoveredPoint.time / timeMax) * (width - paddingLeft - paddingRight) : 0;
+  const hoverMomentaryY = hoveredPoint ? paddingTop + ((maxValue - hoveredPoint.momentary) / valueRange) * (height - paddingTop - paddingBottom) : 0;
+  const hoverShortTermY = hoveredPoint ? paddingTop + ((maxValue - hoveredPoint.shortTerm) / valueRange) * (height - paddingTop - paddingBottom) : 0;
   const momentaryPath = usableData.map((point) => pointToCoord(point, point.momentary)).join(" ");
   const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
 
@@ -258,25 +266,54 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
           <Waves className="h-4 w-4 text-primary" />
           Courbe LUFS
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" />Momentary</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-accent" />Short-term</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          {([{ value: "both", label: "Les deux" }, { value: "momentary", label: "Momentary" }, { value: "shortTerm", label: "Short-term" }] as const).map((option) => (
+            <button key={option.value} type="button" onClick={() => onFocusChange(option.value)} className={`rounded-full border px-3 py-1 transition-colors ${focus === option.value ? "border-primary bg-primary/15 text-foreground" : "border-border hover:border-primary"}`}>
+              {option.label}
+            </button>
+          ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-44 w-full overflow-visible">
-        <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
-        <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-72 w-full overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * width;
+        const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
+        setHoveredIndex(Math.min(usableData.length - 1, Math.max(0, Math.round(ratio * (usableData.length - 1)))));
+      }}>
+        <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
+        <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
+        <text x={paddingLeft - 8} y={paddingTop - 6} textAnchor="end" className="fill-muted-foreground text-[11px]">LUFS</text>
+        <text x={width - paddingRight} y={height - 10} textAnchor="end" className="fill-muted-foreground text-[11px]">temps</text>
+        {[minValue, Math.round((minValue + maxValue) / 2), maxValue].map((tick) => {
+          const y = paddingTop + ((maxValue - tick) / valueRange) * (height - paddingTop - paddingBottom);
+          return <text key={tick} x={paddingLeft - 8} y={y + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{tick}</text>;
+        })}
+        {[0, timeMax / 2, timeMax].map((tick) => {
+          const x = paddingLeft + (tick / timeMax) * (width - paddingLeft - paddingRight);
+          return <text key={tick} x={x} y={height - 22} textAnchor="middle" className="fill-muted-foreground text-[10px]">{formatDuration(tick)}</text>;
+        })}
         {loudnessMarkers.map((marker) => {
-          const y = padding + ((maxValue - marker.value) / valueRange) * (height - padding * 2);
-          return y >= padding && y <= height - padding ? (
+          const y = paddingTop + ((maxValue - marker.value) / valueRange) * (height - paddingTop - paddingBottom);
+          return y >= paddingTop && y <= height - paddingBottom ? (
             <g key={marker.value}>
-              <line x1={padding} y1={y} x2={width - padding} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
-              <text x={width - padding} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[11px]">{marker.label} · {marker.hint}</text>
+              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
+              <text x={width - paddingRight} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[10px]">{marker.label}</text>
             </g>
           ) : null;
         })}
-        <polyline points={momentaryPath} fill="none" className="stroke-primary" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <polyline points={shortTermPath} fill="none" className="stroke-accent" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+        <polyline points={momentaryPath} fill="none" className="stroke-primary" strokeWidth={focus === "momentary" ? "4" : "2.5"} strokeLinecap="round" strokeLinejoin="round" opacity={focus === "shortTerm" ? "0.25" : "1"} />
+        <polyline points={shortTermPath} fill="none" className="stroke-accent" strokeWidth={focus === "shortTerm" ? "4" : "2.5"} strokeLinecap="round" strokeLinejoin="round" opacity={focus === "momentary" ? "0.25" : "0.95"} />
+        {hoveredPoint && (
+          <g pointerEvents="none">
+            <line x1={hoverX} y1={paddingTop} x2={hoverX} y2={height - paddingBottom} className="stroke-foreground/40" strokeDasharray="4 4" />
+            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-primary" />}
+            {(focus !== "momentary") && <circle cx={hoverX} cy={hoverShortTermY} r="4" className="fill-accent" />}
+            <rect x={Math.min(hoverX + 10, width - 176)} y={Math.max(10, Math.min(hoverMomentaryY, hoverShortTermY) - 34)} width="166" height="58" rx="6" className="fill-background stroke-border" />
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(30, Math.min(hoverMomentaryY, hoverShortTermY) - 14)} className="fill-foreground text-[11px]">{formatDuration(hoveredPoint.time)}</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-primary text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(62, Math.min(hoverMomentaryY, hoverShortTermY) + 18)} className="fill-accent text-[11px]">S {hoveredPoint.shortTerm.toFixed(1)} LUFS</text>
+          </g>
+        )}
       </svg>
     </div>
   );
