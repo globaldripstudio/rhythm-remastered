@@ -533,27 +533,27 @@ const Loudness = () => {
     y += 84;
     report.setFont("helvetica", "bold");
     report.setTextColor(255, 255, 255);
-    report.text("Méthodologie", margin, y);
+    report.text(t("loudness.pdf.methodology"), margin, y);
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(175, 184, 194);
-    report.text(report.splitTextToSize(`Analyse locale : filtres K-weighting BS.1770 à coefficients biquad calculés, fenêtre ${professionalSettings.windowMs} ms, recouvrement 75 %, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
+    report.text(report.splitTextToSize(t("loudness.pdf.methodologyText", { windowMs: professionalSettings.windowMs, gateLufs: professionalSettings.gateLufs }), pageWidth - margin * 2), margin, y);
     y += 24;
     report.setDrawColor(45, 52, 60);
     report.line(margin, y, pageWidth - margin, y);
     y += 8;
     report.setFont("helvetica", "bold");
     report.setTextColor(255, 255, 255);
-    report.text("Repères", margin, y);
+    report.text(t("loudness.pdf.references"), margin, y);
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(175, 184, 194);
-    report.text("-14 LUFS : streaming dense · -16 LUFS : streaming équilibré · -20 LUFS : dynamique · -23 LUFS : broadcast EBU", margin, y);
+    report.text(t("loudness.pdf.referencesText"), margin, y);
     report.setFontSize(8);
     report.setTextColor(120, 128, 138);
-    report.text("Rapport généré localement — aucun fichier audio envoyé sur serveur.", margin, pageHeight - 12);
+    report.text(t("loudness.pdf.footer"), margin, pageHeight - 12);
     report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
-  }, [inferredContext, result]);
+  }, [inferredContext, result, t]);
 
   return (
     <div className="min-h-screen bg-background">
