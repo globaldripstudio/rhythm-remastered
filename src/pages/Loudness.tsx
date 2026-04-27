@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, FileAudio, Gauge, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { ArrowLeft, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,6 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 type AnalysisResult = {
   lufs: number;
   peakDb: number;
+  truePeakDb: number;
+  loudnessRange: number;
+  maxMomentaryLufs: number;
+  maxShortTermLufs: number;
+  plr: number;
   momentaryLufs: number;
   shortTermLufs: number;
   curve: Array<{ time: number; momentary: number; shortTerm: number }>;
@@ -21,11 +26,28 @@ type AnalysisResult = {
 };
 
 type AnalysisMode = "stereo" | "left" | "right";
+type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
   { value: "left", label: "Mono gauche" },
   { value: "right", label: "Mono droite" },
+];
+
+const musicContexts: Array<{ value: MusicContext; label: string }> = [
+  { value: "rap", label: "Rap / Trap" },
+  { value: "pop", label: "Pop / R&B" },
+  { value: "electronic", label: "Électro / Club" },
+  { value: "rock", label: "Rock / Metal" },
+  { value: "acoustic", label: "Acoustique / Jazz" },
+  { value: "broadcast", label: "Podcast / Vidéo" },
+];
+
+const loudnessMarkers = [
+  { value: -14, label: "-14 LUFS", hint: "Streaming dense" },
+  { value: -16, label: "-16 LUFS", hint: "Streaming équilibré" },
+  { value: -20, label: "-20 LUFS", hint: "Très dynamique" },
+  { value: -23, label: "-23 LUFS", hint: "Broadcast EBU" },
 ];
 
 const formatDuration = (seconds: number) => {
@@ -45,6 +67,25 @@ const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
 };
 
 const averagePower = (powers: number[]) => powers.reduce((sum, power) => sum + power, 0) / Math.max(powers.length, 1);
+
+const percentile = (values: number[], ratio: number) => {
+  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (!sorted.length) return Number.NaN;
+  return sorted[Math.min(sorted.length - 1, Math.max(0, Math.round((sorted.length - 1) * ratio)))];
+};
+
+const estimateTruePeak = (channels: Float32Array[]) => {
+  let peak = 0;
+  for (const samples of channels) {
+    for (let i = 0; i < samples.length - 1; i += 1) {
+      const current = samples[i];
+      const next = samples[i + 1];
+      peak = Math.max(peak, Math.abs(current), Math.abs(current * 0.75 + next * 0.25), Math.abs(current * 0.5 + next * 0.5), Math.abs(current * 0.25 + next * 0.75));
+    }
+    peak = Math.max(peak, Math.abs(samples[samples.length - 1] ?? 0));
+  }
+  return 20 * Math.log10(Math.max(peak, 1e-12));
+};
 
 const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -93,6 +134,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   }
 
   const selectedChannels = getSelectedChannels(renderedBuffer, mode);
+  const truePeakDb = estimateTruePeak(selectedChannels);
 
   for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
     let blockPower = 0;
@@ -129,10 +171,20 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
+  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > -70);
+  const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
+  const integratedLufs = dbFromPower(integratedPower);
+  const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
+  const maxShortTermLufs = Math.max(...curve.map((point) => point.shortTerm).filter(Number.isFinite));
 
   return {
-    lufs: dbFromPower(integratedPower),
+    lufs: integratedLufs,
     peakDb: 20 * Math.log10(Math.max(peak, 1e-12)),
+    truePeakDb,
+    loudnessRange: Number.isFinite(loudnessRange) ? loudnessRange : 0,
+    maxMomentaryLufs,
+    maxShortTermLufs,
+    plr: truePeakDb - integratedLufs,
     momentaryLufs: latestCurvePoint?.momentary ?? dbFromPower(integratedPower),
     shortTermLufs: latestCurvePoint?.shortTerm ?? dbFromPower(integratedPower),
     curve,
@@ -149,9 +201,9 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
   const height = 180;
   const padding = 18;
   const usableData = data.length ? data : [{ time: 0, momentary: -70, shortTerm: -70 }];
-  const values = usableData.flatMap((point) => [point.momentary, point.shortTerm]).filter(Number.isFinite);
-  const minValue = Math.min(-8, Math.floor(Math.min(...values) / 5) * 5);
-  const maxValue = Math.max(-36, Math.ceil(Math.max(...values) / 5) * 5);
+  const values = [...usableData.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
+  const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
+  const maxValue = Math.ceil(Math.max(...values, -8) / 5) * 5;
   const valueRange = Math.max(maxValue - minValue, 1);
   const timeMax = Math.max(usableData[usableData.length - 1].time, 0.1);
   const pointToCoord = (point: { time: number }, value: number) => {
@@ -177,12 +229,12 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
       <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-44 w-full overflow-visible">
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
-        {[-14, -23].map((reference) => {
-          const y = padding + ((maxValue - reference) / valueRange) * (height - padding * 2);
+        {loudnessMarkers.map((marker) => {
+          const y = padding + ((maxValue - marker.value) / valueRange) * (height - padding * 2);
           return y >= padding && y <= height - padding ? (
-            <g key={reference}>
+            <g key={marker.value}>
               <line x1={padding} y1={y} x2={width - padding} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
-              <text x={width - padding} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[11px]">{reference} LUFS</text>
+              <text x={width - padding} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[11px]">{marker.label} · {marker.hint}</text>
             </g>
           ) : null;
         })}
@@ -200,14 +252,22 @@ const Loudness = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
+  const [musicContext, setMusicContext] = useState<MusicContext>("rap");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const targetHint = useMemo(() => {
     if (!result) return null;
-    if (result.lufs > -12) return "Master très fort, proche des références modernes agressives.";
-    if (result.lufs > -16) return "Zone streaming moderne, bonne densité générale.";
-    return "Master plus dynamique, confortable pour les styles respirants.";
-  }, [result]);
+    const contextAdvice: Record<MusicContext, string> = {
+      rap: result.lufs > -10.5 ? "Master très fort pour rap/trap : impact immédiat, mais surveille la fatigue et la marge true peak." : result.lufs > -14 ? "Zone solide pour rap/trap streaming : densité moderne avec encore un peu de respiration." : "Master rap/trap plutôt dynamique : utile pour préserver les transitoires, moins compétitif en lecture directe.",
+      pop: result.lufs > -11 ? "Pop/R&B très dense : efficace en A/B, à contrôler sur voix lead, sibilances et plateformes normalisées." : result.lufs > -15 ? "Bon équilibre pop/R&B : présence moderne, voix lisible et risque limité de normalisation agressive." : "Pop/R&B très dynamique : musical, mais potentiellement plus bas perçu face aux sorties commerciales.",
+      electronic: result.lufs > -9.5 ? "Électro/club très poussé : adapté à certains masters agressifs, vérifie kick/bass et distorsion inter-sample." : result.lufs > -13 ? "Électro/club dense et exploitable : bonne énergie tout en gardant du punch." : "Électro/club dynamique : intéressant pour versions extended, moins frontal pour playlists loud.",
+      rock: result.lufs > -10 ? "Rock/metal très comprimé : puissant, mais attention à l'écrasement des cymbales et guitares." : result.lufs > -14 ? "Rock/metal moderne équilibré : énergie, largeur et transitoires encore contrôlables." : "Rock/metal dynamique : garde l'impact batterie, idéal si l'arrangement respire.",
+      acoustic: result.lufs > -14 ? "Acoustique/jazz assez fort : vérifie que les nuances et attaques naturelles restent intactes." : result.lufs > -20 ? "Acoustique/jazz cohérent : dynamique naturelle et confort d'écoute préservés." : "Très dynamique : pertinent pour musique intimiste, piano, jazz ou livraisons audiophiles.",
+      broadcast: result.lufs > -16 ? "Podcast/vidéo fort : risque de réduction par normalisation, vise souvent plus bas selon la destination." : result.lufs > -21 ? "Podcast/vidéo confortable : voix présente, compatible avec de nombreux usages web." : "Niveau proche broadcast très dynamique : adapté à certains contenus EBU, peut sembler bas en social media.",
+    };
+    const technical = result.truePeakDb > -1 ? " True peak élevé : prévois un plafond de limiteur plus prudent pour l'encodage." : " True peak sain pour l'export et les encodages courants.";
+    return `${contextAdvice[musicContext]}${technical}`;
+  }, [musicContext, result]);
 
   const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
@@ -283,6 +343,22 @@ const Loudness = () => {
                   </Button>
                 ))}
               </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Contexte musical</p>
+                <div className="flex flex-wrap gap-2" aria-label="Contexte musical pour l'interprétation LUFS">
+                  {musicContexts.map((context) => (
+                    <Button
+                      key={context.value}
+                      type="button"
+                      variant={musicContext === context.value ? "default" : "outline"}
+                      onClick={() => setMusicContext(context.value)}
+                      className="min-w-28"
+                    >
+                      {context.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <Card className="equipment-card overflow-hidden border-border/80">
@@ -317,7 +393,7 @@ const Loudness = () => {
                     {isAnalyzing ? "Analyse en cours" : "Dépose ton fichier audio"}
                   </h2>
                   <p className="max-w-md text-sm text-muted-foreground">
-                    WAV, MP3, AIFF, FLAC ou AAC. Le fichier reste sur ton appareil et n'est pas envoyé à un serveur.
+                    WAV, MP3, AIFF, FLAC ou AAC. Analyse BS.1770 avec gating intégré, fenêtres momentary/short-term et estimation true peak, sans envoi serveur.
                   </p>
                 </label>
 
@@ -358,6 +434,15 @@ const Loudness = () => {
                     </div>
                   </div>
                   {targetHint && <p className="mt-4 text-sm text-muted-foreground">{targetHint}</p>}
+                  <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
+                    <div className="mb-2 flex items-center gap-2 font-medium text-foreground">
+                      <Info className="h-4 w-4 text-primary" />
+                      Repères BS.1770
+                    </div>
+                    <p>
+                      <strong className="text-foreground">Momentary</strong> mesure une fenêtre courte de 400 ms pour suivre les variations immédiates. <strong className="text-foreground">Short-term</strong> moyenne environ 3 s pour représenter la perception récente et stable du niveau.
+                    </p>
+                  </div>
                   <div className="mt-6">
                     <LoudnessCurve data={result.curve} />
                   </div>
@@ -368,6 +453,7 @@ const Loudness = () => {
                 <CardContent className="p-6">
                   <p className="text-sm text-muted-foreground">Peak</p>
                   <p className="mt-3 text-3xl font-bold">{result.peakDb.toFixed(1)} dBFS</p>
+                  <p className="mt-2 text-sm text-muted-foreground">True peak estimé : {result.truePeakDb.toFixed(1)} dBTP</p>
                 </CardContent>
               </Card>
 
@@ -381,6 +467,20 @@ const Loudness = () => {
                   <p className="mt-3 text-sm text-muted-foreground">
                     {result.channels} canal{result.channels > 1 ? "s" : ""} · {(result.sampleRate / 1000).toFixed(1)} kHz
                   </p>
+                </CardContent>
+              </Card>
+              <Card className="equipment-card sm:col-span-2">
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">Dynamique</p>
+                  <p className="mt-3 text-3xl font-bold">{result.loudnessRange.toFixed(1)} LU</p>
+                  <p className="mt-2 text-sm text-muted-foreground">LRA estimée · PLR {result.plr.toFixed(1)} dB</p>
+                </CardContent>
+              </Card>
+              <Card className="equipment-card sm:col-span-2">
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">Maximums</p>
+                  <p className="mt-3 text-3xl font-bold">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Pics momentary et short-term relevés sur toute la durée.</p>
                 </CardContent>
               </Card>
             </section>
