@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, FileAudio, Gauge, Loader2, Music2, Upload } from "lucide-react";
+import { ArrowLeft, FileAudio, Gauge, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,11 +10,23 @@ import { Card, CardContent } from "@/components/ui/card";
 type AnalysisResult = {
   lufs: number;
   peakDb: number;
+  momentaryLufs: number;
+  shortTermLufs: number;
+  curve: Array<{ time: number; momentary: number; shortTerm: number }>;
   duration: number;
   sampleRate: number;
   channels: number;
   fileName: string;
+  mode: AnalysisMode;
 };
+
+type AnalysisMode = "stereo" | "left" | "right";
+
+const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
+  { value: "stereo", label: "Stéréo" },
+  { value: "left", label: "Mono gauche" },
+  { value: "right", label: "Mono droite" },
+];
 
 const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -24,7 +36,17 @@ const formatDuration = (seconds: number) => {
 
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
 
-const analyzeLoudness = async (file: File): Promise<AnalysisResult> => {
+const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
+  const left = buffer.getChannelData(0);
+  if (mode === "left" || buffer.numberOfChannels === 1) return [left];
+  const right = buffer.getChannelData(Math.min(1, buffer.numberOfChannels - 1));
+  if (mode === "right") return [right];
+  return [left, right];
+};
+
+const averagePower = (powers: number[]) => powers.reduce((sum, power) => sum + power, 0) / Math.max(powers.length, 1);
+
+const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   const audioContext = new AudioContextCtor();
   const arrayBuffer = await file.arrayBuffer();
@@ -70,10 +92,11 @@ const analyzeLoudness = async (file: File): Promise<AnalysisResult> => {
     }
   }
 
+  const selectedChannels = getSelectedChannels(renderedBuffer, mode);
+
   for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
     let blockPower = 0;
-    for (let channel = 0; channel < channelCount; channel += 1) {
-      const samples = channelData[channel];
+    for (const samples of selectedChannels) {
       let sum = 0;
       for (let i = start; i < start + blockSize; i += 1) {
         sum += samples[i] * samples[i];
@@ -83,7 +106,7 @@ const analyzeLoudness = async (file: File): Promise<AnalysisResult> => {
     blocks.push(blockPower);
   }
 
-  const usableBlocks = blocks.length ? blocks : [channelData.reduce((total, samples) => {
+  const usableBlocks = blocks.length ? blocks : [selectedChannels.reduce((total, samples) => {
     let sum = 0;
     for (let i = 0; i < samples.length; i += 1) sum += samples[i] * samples[i];
     return total + sum / Math.max(samples.length, 1);
@@ -96,15 +119,78 @@ const analyzeLoudness = async (file: File): Promise<AnalysisResult> => {
   const relativeGatedBlocks = firstPassBlocks.filter((power) => dbFromPower(power) > relativeGate);
   const finalBlocks = relativeGatedBlocks.length ? relativeGatedBlocks : firstPassBlocks;
   const integratedPower = finalBlocks.reduce((sum, power) => sum + power, 0) / finalBlocks.length;
+  const shortTermWindow = Math.max(1, Math.round(3 / 0.1));
+  const curve = usableBlocks.map((power, index) => {
+    const shortTermBlocks = usableBlocks.slice(Math.max(0, index - shortTermWindow + 1), index + 1);
+    return {
+      time: index * 0.1,
+      momentary: dbFromPower(power),
+      shortTerm: dbFromPower(averagePower(shortTermBlocks)),
+    };
+  });
+  const latestCurvePoint = curve[curve.length - 1];
 
   return {
     lufs: dbFromPower(integratedPower),
     peakDb: 20 * Math.log10(Math.max(peak, 1e-12)),
+    momentaryLufs: latestCurvePoint?.momentary ?? dbFromPower(integratedPower),
+    shortTermLufs: latestCurvePoint?.shortTerm ?? dbFromPower(integratedPower),
+    curve,
     duration: audioBuffer.duration,
     sampleRate,
     channels: channelCount,
     fileName: file.name,
+    mode,
   };
+};
+
+const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
+  const width = 640;
+  const height = 180;
+  const padding = 18;
+  const usableData = data.length ? data : [{ time: 0, momentary: -70, shortTerm: -70 }];
+  const values = usableData.flatMap((point) => [point.momentary, point.shortTerm]).filter(Number.isFinite);
+  const minValue = Math.min(-8, Math.floor(Math.min(...values) / 5) * 5);
+  const maxValue = Math.max(-36, Math.ceil(Math.max(...values) / 5) * 5);
+  const valueRange = Math.max(maxValue - minValue, 1);
+  const timeMax = Math.max(usableData[usableData.length - 1].time, 0.1);
+  const pointToCoord = (point: { time: number }, value: number) => {
+    const x = padding + (point.time / timeMax) * (width - padding * 2);
+    const y = padding + ((maxValue - value) / valueRange) * (height - padding * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  };
+  const momentaryPath = usableData.map((point) => pointToCoord(point, point.momentary)).join(" ");
+  const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
+
+  return (
+    <div className="rounded-md border border-border bg-background/40 p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <Waves className="h-4 w-4 text-primary" />
+          Courbe LUFS
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" />Momentary</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-accent" />Short-term</span>
+        </div>
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-44 w-full overflow-visible">
+        <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
+        <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
+        {[-14, -23].map((reference) => {
+          const y = padding + ((maxValue - reference) / valueRange) * (height - padding * 2);
+          return y >= padding && y <= height - padding ? (
+            <g key={reference}>
+              <line x1={padding} y1={y} x2={width - padding} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
+              <text x={width - padding} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[11px]">{reference} LUFS</text>
+            </g>
+          ) : null;
+        })}
+        <polyline points={momentaryPath} fill="none" className="stroke-primary" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points={shortTermPath} fill="none" className="stroke-accent" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+      </svg>
+    </div>
+  );
 };
 
 const Loudness = () => {
@@ -113,6 +199,8 @@ const Loudness = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const targetHint = useMemo(() => {
     if (!result) return null;
@@ -121,19 +209,13 @@ const Loudness = () => {
     return "Master plus dynamique, confortable pour les styles respirants.";
   }, [result]);
 
-  const handleFile = useCallback(async (file?: File) => {
-    if (!file) return;
-    if (!file.type.startsWith("audio/")) {
-      setError("Sélectionne un fichier audio valide.");
-      return;
-    }
-
+  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const analysis = await analyzeLoudness(file);
+      const analysis = await analyzeLoudness(file, mode);
       setResult(analysis);
     } catch (analysisError) {
       console.error(analysisError);
@@ -142,6 +224,21 @@ const Loudness = () => {
       setIsAnalyzing(false);
     }
   }, []);
+
+  const handleModeChange = useCallback((mode: AnalysisMode) => {
+    setSelectedMode(mode);
+    if (selectedFile) void runAnalysis(selectedFile, mode);
+  }, [runAnalysis, selectedFile]);
+
+  const handleFile = useCallback(async (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("audio/")) {
+      setError("Sélectionne un fichier audio valide.");
+      return;
+    }
+    setSelectedFile(file);
+    await runAnalysis(file, selectedMode);
+  }, [runAnalysis, selectedMode]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -171,6 +268,20 @@ const Loudness = () => {
                 <p className="max-w-xl text-lg text-muted-foreground sm:text-xl">
                   Téléverse un morceau, récupère sa loudness intégrée et son peak pour contrôler ton master avant diffusion.
                 </p>
+              </div>
+              <div className="flex flex-wrap gap-2" aria-label="Mode d'analyse LUFS">
+                {analysisModes.map((mode) => (
+                  <Button
+                    key={mode.value}
+                    type="button"
+                    variant={selectedMode === mode.value ? "default" : "outline"}
+                    onClick={() => handleModeChange(mode.value)}
+                    disabled={isAnalyzing}
+                    className="min-w-32"
+                  >
+                    {mode.label}
+                  </Button>
+                ))}
               </div>
             </div>
 
@@ -221,26 +332,46 @@ const Loudness = () => {
 
           {result && (
             <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Résultats d'analyse loudness">
-              <Card className="equipment-card sm:col-span-2">
+              <Card className="equipment-card sm:col-span-2 lg:col-span-4">
                 <CardContent className="p-6">
-                  <div className="mb-4 flex items-center gap-3 text-muted-foreground">
-                    <Music2 className="w-5 h-5 text-primary" />
-                    <span className="truncate text-sm">{result.fileName}</span>
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-muted-foreground">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Music2 className="h-5 w-5 shrink-0 text-primary" />
+                      <span className="truncate text-sm">{result.fileName}</span>
+                    </div>
+                    <span className="rounded-full border border-border px-3 py-1 text-xs">
+                      {analysisModes.find((mode) => mode.value === result.mode)?.label}
+                    </span>
                   </div>
-                  <p className="text-5xl font-bold text-primary">{result.lufs.toFixed(1)}</p>
-                  <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS intégré</p>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div>
+                      <p className="text-5xl font-bold text-primary">{result.lufs.toFixed(1)}</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS intégré</p>
+                    </div>
+                    <div>
+                      <p className="text-4xl font-bold">{result.momentaryLufs.toFixed(1)}</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS momentary</p>
+                    </div>
+                    <div>
+                      <p className="text-4xl font-bold">{result.shortTermLufs.toFixed(1)}</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term</p>
+                    </div>
+                  </div>
                   {targetHint && <p className="mt-4 text-sm text-muted-foreground">{targetHint}</p>}
+                  <div className="mt-6">
+                    <LoudnessCurve data={result.curve} />
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="equipment-card">
+              <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-6">
                   <p className="text-sm text-muted-foreground">Peak</p>
                   <p className="mt-3 text-3xl font-bold">{result.peakDb.toFixed(1)} dBFS</p>
                 </CardContent>
               </Card>
 
-              <Card className="equipment-card">
+              <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-6">
                   <p className="text-sm text-muted-foreground">Fichier</p>
                   <div className="mt-3 flex items-center gap-2 text-3xl font-bold">
