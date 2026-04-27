@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import { ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 type AnalysisResult = {
   lufs: number;
