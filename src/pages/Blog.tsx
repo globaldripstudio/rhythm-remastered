@@ -23,7 +23,7 @@ const Blog = () => {
     {
       id: 5, titleKey: "blog.cards.loudness.title", excerptKey: "blog.cards.loudness.excerpt",
       categoryKey: "blog.cards.loudness.category", author: "Global Drip Studio", date: "2026-04-27",
-      readTime: "6 min", image: "/lovable-uploads/Image-23.jpg", slug: "analyse-lufs-en-ligne-controle-master", comingSoon: false
+      readTime: "6 min", image: "/lovable-uploads/loudness-tool-card.png", slug: "analyse-lufs-en-ligne-controle-master", comingSoon: false
     },
     {
       id: 1, titleKey: "blog.cards.venin.title", excerptKey: "blog.cards.venin.excerpt",
