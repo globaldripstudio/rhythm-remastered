@@ -86,8 +86,17 @@
         "category": "Production",
         "duration": "3-5 days",
         "process": "Analysis → Mixing → Mastering → Revisions → Final delivery",
-        "included": ["Professional multi-track mixing", "Hybrid analog/digital mastering", "3 revisions included", "WAV + MP3 delivery"],
-        "deliverables": ["Master WAV 24bit/96kHz file", "MP3 320kbps version", "Streaming-optimized version"]
+        "included": [
+          "Professional multi-track mixing",
+          "Hybrid analog/digital mastering",
+          "3 revisions included",
+          "WAV + MP3 delivery"
+        ],
+        "deliverables": [
+          "Master WAV 24bit/96kHz file",
+          "MP3 320kbps version",
+          "Streaming-optimized version"
+        ]
       },
       "mixage-mastering-express": {
         "title": "Mixing + Mastering | Essential",
@@ -97,8 +106,16 @@
         "category": "Production",
         "duration": "4 hours",
         "process": "Analysis → Mixing → Mastering → Revisions → Final delivery",
-        "included": ["Professional instrumental + vocal multi-track mixing", "Full digital mastering", "2 revisions included", "WAV + MP3 delivery"],
-        "deliverables": ["Master WAV 24bit/96kHz file", "MP3 320kbps version"]
+        "included": [
+          "Professional instrumental + vocal multi-track mixing",
+          "Full digital mastering",
+          "2 revisions included",
+          "WAV + MP3 delivery"
+        ],
+        "deliverables": [
+          "Master WAV 24bit/96kHz file",
+          "MP3 320kbps version"
+        ]
       },
       "stem-mastering": {
         "title": "Stem Mastering",
@@ -107,8 +124,16 @@
         "category": "Production",
         "duration": "24-48h",
         "process": "Receive stems → Hybrid mastering → Revisions → Final delivery",
-        "included": ["Hybrid analog/digital stem mastering", "For: 1 production stem + 1 vocal stem (already mixed)", "2 revisions included", "Master WAV + MP3 delivery"],
-        "deliverables": ["Master WAV 24bit/96kHz", "MP3 320kbps version"]
+        "included": [
+          "Hybrid analog/digital stem mastering",
+          "For: 1 production stem + 1 vocal stem (already mixed)",
+          "2 revisions included",
+          "Master WAV + MP3 delivery"
+        ],
+        "deliverables": [
+          "Master WAV 24bit/96kHz",
+          "MP3 320kbps version"
+        ]
       },
       "mixage-hybride": {
         "title": "Hybrid Mixing",
@@ -117,8 +142,16 @@
         "category": "Production",
         "duration": "3-5 days",
         "process": "Analysis → Hybrid mixing → Revisions → Delivery",
-        "included": ["Hybrid analog/digital mixing", "Balance, dynamics, space, automation", "Overall mix coherence", "3 revisions included"],
-        "deliverables": ["Stereo mix WAV 24bit", "Stems on request"]
+        "included": [
+          "Hybrid analog/digital mixing",
+          "Balance, dynamics, space, automation",
+          "Overall mix coherence",
+          "3 revisions included"
+        ],
+        "deliverables": [
+          "Stereo mix WAV 24bit",
+          "Stems on request"
+        ]
       },
       "captation-sonore": {
         "title": "Sound Recording",
@@ -127,8 +160,17 @@
         "category": "Recording",
         "duration": "On demand",
         "process": "Preparation → Setup → Recording → Monitoring → Post-production",
-        "included": ["Professional studio recording", "Mobile event recording", "High-quality equipment", "Post-production included"],
-        "deliverables": ["Raw multitrack files", "Working mixes", "Synchronized files"]
+        "included": [
+          "Professional studio recording",
+          "Mobile event recording",
+          "High-quality equipment",
+          "Post-production included"
+        ],
+        "deliverables": [
+          "Raw multitrack files",
+          "Working mixes",
+          "Synchronized files"
+        ]
       },
       "direction-artistique": {
         "title": "Artistic Direction / Arrangement",
@@ -137,8 +179,16 @@
         "category": "Consulting",
         "duration": "Variable",
         "process": "Artistic analysis → Strategic advice → Arrangements → Follow-up → Optimization",
-        "included": ["Custom artistic direction", "Instrumental arrangements", "Personalized creative advice", "Customizable management"],
-        "deliverables": ["Detailed artistic plan", "Finalized arrangements"],
+        "included": [
+          "Custom artistic direction",
+          "Instrumental arrangements",
+          "Personalized creative advice",
+          "Customizable management"
+        ],
+        "deliverables": [
+          "Detailed artistic plan",
+          "Finalized arrangements"
+        ],
         "equipmentLabel": "Methods"
       },
       "composition": {
@@ -148,8 +198,16 @@
         "category": "Creation",
         "duration": "1-3 weeks",
         "process": "Artistic brief → Creation → Arrangements → Production → Finalization",
-        "included": ["Original composition", "Full production", "Custom arrangements", "Exclusive composition (rights transfer negotiable)"],
-        "deliverables": ["Complete composition", "Multistems negotiable"]
+        "included": [
+          "Original composition",
+          "Full production",
+          "Custom arrangements",
+          "Exclusive composition (rights transfer negotiable)"
+        ],
+        "deliverables": [
+          "Complete composition",
+          "Multistems negotiable"
+        ]
       },
       "sound-design": {
         "title": "Sound Design",
@@ -159,8 +217,18 @@
         "category": "Creation",
         "duration": "Variable",
         "process": "Creative brief → Sound research → Creation → Synchronization → Global mix → Finalization",
-        "included": ["Sound design for film and games", "Soundscape creation", "Custom sound effects", "Advanced audio post-production"],
-        "deliverables": ["Isolated sound effects", "Multitrack stems", "Synchronized final mix", "Master to target format standards"]
+        "included": [
+          "Sound design for film and games",
+          "Soundscape creation",
+          "Custom sound effects",
+          "Advanced audio post-production"
+        ],
+        "deliverables": [
+          "Isolated sound effects",
+          "Multitrack stems",
+          "Synchronized final mix",
+          "Master to target format standards"
+        ]
       },
       "formation": {
         "title": "Music Production / Mixing Training",
@@ -169,8 +237,17 @@
         "category": "Training",
         "duration": "Flexible",
         "process": "Level assessment → Custom program → Hands-on training → Progress tracking",
-        "included": ["Private or group lessons", "DAW software training", "Advanced mixing techniques", "Educational support included"],
-        "deliverables": ["Training materials", "Practice projects", "Summary sheets after each session"]
+        "included": [
+          "Private or group lessons",
+          "DAW software training",
+          "Advanced mixing techniques",
+          "Educational support included"
+        ],
+        "deliverables": [
+          "Training materials",
+          "Practice projects",
+          "Summary sheets after each session"
+        ]
       },
       "pack-single": {
         "title": "\"Single\" Pack",
@@ -180,8 +257,20 @@
         "duration": "2-3 weeks",
         "process": "Composition → Recording → Editing → Production → Mixing → Mastering → Delivery",
         "details": "The complete Single pack: from production to final delivery. Includes beat composition, a 3h recording session, editing, production, hybrid mixing and mastering. Everything you need to release a professional single.",
-        "included": ["Production / Beatmaking", "Artistic direction/Production", "Recording session (3h block)", "Full editing", "Production", "Hybrid Mix + Master", "WAV + MP3 delivery"],
-        "deliverables": ["Single master WAV 24bit/96kHz", "MP3 320kbps version", "Live version (PBO)"]
+        "included": [
+          "Production / Beatmaking",
+          "Artistic direction/Production",
+          "Recording session (3h block)",
+          "Full editing",
+          "Production",
+          "Hybrid Mix + Master",
+          "WAV + MP3 delivery"
+        ],
+        "deliverables": [
+          "Single master WAV 24bit/96kHz",
+          "MP3 320kbps version",
+          "Live version (PBO)"
+        ]
       }
     }
   },
@@ -402,7 +491,12 @@
         "step1Desc": "Before any processing, remove parasitic noises, unwanted breaths and correct timing. Use a noise gate to eliminate background noise between phrases. This step determines the baseline quality of your mix.",
         "step2Title": "2. Equalization (EQ)",
         "step2Desc": "EQ is your best ally for shaping vocal timbre:",
-        "step2Items": ["80-200 Hz: Cut unnecessary low frequencies", "200-800 Hz: Critical zone for warmth and boxiness", "2-5 kHz: Presence and intelligibility", "8-12 kHz: Air and brilliance"],
+        "step2Items": [
+          "80-200 Hz: Cut unnecessary low frequencies",
+          "200-800 Hz: Critical zone for warmth and boxiness",
+          "2-5 kHz: Presence and intelligibility",
+          "8-12 kHz: Air and brilliance"
+        ],
         "step3Title": "3. Compression",
         "step3Desc": "Compression controls dynamics and ensures consistency. Use a ratio of 3:1 to 6:1, with a slow attack (10-30ms) to preserve transients and a release adapted to tempo (100-300ms). Aim for 3-6 dB of gain reduction.",
         "step4Title": "4. De-esser",
@@ -411,7 +505,11 @@
         "step5Desc": "Add color with subtle saturation. Tube or tape emulation brings warmth and character. Stay subtle: 5-15% saturation is enough to enrich the timbre without denaturing the voice.",
         "step6Title": "6. Time-based effects",
         "step6Desc": "Create space and depth:",
-        "step6Items": ["Reverb: Hall, plate or room depending on desired ambiance", "Delay: Subtle echo (1/8 or 1/4 note) for thickness", "Chorus/Doubling: Stereo widening in moderation"],
+        "step6Items": [
+          "Reverb: Hall, plate or room depending on desired ambiance",
+          "Delay: Subtle echo (1/8 or 1/4 note) for thickness",
+          "Chorus/Doubling: Stereo widening in moderation"
+        ],
         "step7Title": "7. Placement in the mix",
         "step7Desc": "Position the voice at the center of the stereo panorama and find the optimal level relative to instruments. Use automation to maintain consistent presence and create intensity variations across song sections.",
         "proTipTitle": "Pro tip from Global Drip Studio",
@@ -427,19 +525,36 @@
         "introSub": "Here are 10 professional techniques we use at Global Drip Studio to create impactful sonic worlds.",
         "t1Title": "1. Field Recording & Sampling",
         "t1Desc": "Capture real-world sounds to create authentic and organic textures.",
-        "t1Items": ["Record natural environments (forest, ocean, city)", "Exploit transformed everyday object sounds", "Manipulate playback speed for dramatic effects", "Layer multiple takes to enrich texture"],
+        "t1Items": [
+          "Record natural environments (forest, ocean, city)",
+          "Exploit transformed everyday object sounds",
+          "Manipulate playback speed for dramatic effects",
+          "Layer multiple takes to enrich texture"
+        ],
         "t2Title": "2. Granular Synthesis",
         "t2Desc": "Decompose and recompose sound at the microscopic level for evolving textures.",
         "t2Params": "Key parameters:",
-        "t2ParamItems": ["Grain size (1-100ms)", "Grain density", "Position randomization"],
+        "t2ParamItems": [
+          "Grain size (1-100ms)",
+          "Grain density",
+          "Position randomization"
+        ],
         "t2Apps": "Applications:",
-        "t2AppItems": ["Ethereal pads", "Organic transitions", "Evolving textures"],
+        "t2AppItems": [
+          "Ethereal pads",
+          "Organic transitions",
+          "Evolving textures"
+        ],
         "t3Title": "3. Convolution Reverb",
         "t3Desc": "Use impulse responses from real spaces to place your sounds in impossible environments.",
         "t3Quote": "\"Imagine making a voice resonate in a Gothic cathedral, an industrial hangar, or even... a grand piano!\"",
         "t4Title": "4. Spectral Processing",
         "t4Desc": "Manipulate frequency content in real-time for radical transformations.",
-        "t4Items": ["Spectral freeze: Freeze harmonics in time", "Spectral blur: Create frequency fades", "Spectral shift: Shift formants for alien voices"],
+        "t4Items": [
+          "Spectral freeze: Freeze harmonics in time",
+          "Spectral blur: Create frequency fades",
+          "Spectral shift: Shift formants for alien voices"
+        ],
         "t5Title": "5. Creative modulation",
         "t5Desc": "Use LFOs, envelopes and sequencers to animate your sonic textures.",
         "t5Lfo": "LFO",
@@ -450,23 +565,43 @@
         "t5EnvDesc": "Precise parameter control",
         "t6Title": "6. Creative distortion",
         "t6Desc": "Beyond classic saturation, explore alternative distortion modes.",
-        "t6Items": ["Bitcrushing: Digital resolution reduction", "Ring modulation: Frequency multiplication", "Waveshaping: Mathematical signal deformation"],
+        "t6Items": [
+          "Bitcrushing: Digital resolution reduction",
+          "Ring modulation: Frequency multiplication",
+          "Waveshaping: Mathematical signal deformation"
+        ],
         "t7Title": "7. Spatial Audio & Binaural",
         "t7Desc": "Create immersive 3D experiences for headphones and surround systems.",
         "t7Techniques": "Advanced techniques:",
-        "t7Items": ["HRTF (Head-Related Transfer Function)", "Ambisonic encoding/decoding", "Distance modeling with filtering and delay"],
+        "t7Items": [
+          "HRTF (Head-Related Transfer Function)",
+          "Ambisonic encoding/decoding",
+          "Distance modeling with filtering and delay"
+        ],
         "t8Title": "8. Applied psychoacoustics",
         "t8Desc": "Exploit the peculiarities of human hearing to create sonic illusions.",
-        "t8Items": ["Frequency masking: Hide elements within others", "Haas effect: Stereo width illusion", "Shepard tones: Apparent infinite rise"],
+        "t8Items": [
+          "Frequency masking: Hide elements within others",
+          "Haas effect: Stereo width illusion",
+          "Shepard tones: Apparent infinite rise"
+        ],
         "t9Title": "9. Feedback & Re-injection",
         "t9Desc": "Create controlled loops to generate evolving and complex textures.",
         "t9Apps": "Creative applications:",
-        "t9AppItems": ["Resonant delays", "Self-oscillating filters", "Processing loops"],
+        "t9AppItems": [
+          "Resonant delays",
+          "Self-oscillating filters",
+          "Processing loops"
+        ],
         "t9Warning": "⚠️ Warning: always control gain to avoid destructive saturation!",
         "t10Title": "10. Morphing & Interpolation",
         "t10Desc": "Gradually transform one sound into another for organic transitions.",
         "t10Methods": "Morphing methods:",
-        "t10Items": ["Spectral morphing: Interpolation in the frequency domain", "Cross-synthesis: Combining two sources", "Envelope following: Dynamics transfer between sources"],
+        "t10Items": [
+          "Spectral morphing: Interpolation in the frequency domain",
+          "Cross-synthesis: Combining two sources",
+          "Envelope following: Dynamics transfer between sources"
+        ],
         "conclusionTitle": "The art of sound design at Global Drip Studio",
         "conclusionDesc": "These techniques are just tools. The real magic comes from experimentation, creative intuition and attentive listening. At Global Drip Studio, we combine technical expertise and artistic vision to create sonic worlds that leave their mark.",
         "conclusionQuote": "\"Sound design is painting with sound. Every texture tells a story, every atmosphere evokes an emotion.\"",
@@ -515,72 +650,140 @@
       "zeu": {
         "description": "Creative collaborations with a renowned underground rap artist with authentic flows.",
         "collaborationDetails": "I composed and recorded 'JDAY', as well as recorded 'J'DEVRAIS' and 'RARE' with ZEU. An intense creative collaboration that gave birth to authentic tracks blending catchy flows and polished productions.",
-        "services": ["Composition", "Recording"]
+        "services": [
+          "Composition",
+          "Recording"
+        ]
       },
       "tany": {
         "description": "Privileged partnership and strong artistic relationship with custom direction.",
         "collaborationDetails": "Privileged partnership with Tany, we've developed a strong and lasting artistic relationship. Together, we build a unique artistic direction that defines his musical identity.",
-        "services": ["Full production", "Recording", "Mixing", "Mastering", "Artistic direction"]
+        "services": [
+          "Full production",
+          "Recording",
+          "Mixing",
+          "Mastering",
+          "Artistic direction"
+        ]
       },
       "lil-moine": {
         "description": "Close collaboration since 2020, near-exclusive production of his tracks and audiovisual projects.",
         "collaborationDetails": "Privileged collaboration since 2020 with Lil Moine. I produce almost every track and project for him, creating a coherent and evolving sound. This lasting artistic relationship allows us to constantly explore new sonic territories while maintaining his strong musical identity.",
-        "services": ["Production", "Composition", "Recording", "Mixing", "Mastering", "Artistic direction", "Live sound engineer", "Sound Design"]
+        "services": [
+          "Production",
+          "Composition",
+          "Recording",
+          "Mixing",
+          "Mastering",
+          "Artistic direction",
+          "Live sound engineer",
+          "Sound Design"
+        ]
       },
       "eddy-de-mart": {
         "description": "Mixing and mastering since 2022, bringing technical dimension to his creations.",
         "collaborationDetails": "Since 2022, I handle the mixing and mastering of Eddy de Mart's projects. Our collaboration focuses on achieving a professional and impactful sound, showcasing his compositions with a rigorous technical approach.",
-        "services": ["Mixing", "Mastering", "Post-production", "Arrangement"]
+        "services": [
+          "Mixing",
+          "Mastering",
+          "Post-production",
+          "Arrangement"
+        ]
       },
       "black-beanie-dub": {
         "description": "Project co-founded with Mathieu Battini in 2017, our most recognized achievement.",
         "collaborationDetails": "Black Beanie Dub is a project I founded with Mathieu Battini in 2017. It became our most successful project, exploring the territories of dub and roots reggae, electronic music and sonic experimentation, always respecting the traditional foundations of the genre. An artistic adventure that continues to evolve.",
-        "services": ["Co-founder", "Production", "Composition", "Sound Design"]
+        "services": [
+          "Co-founder",
+          "Production",
+          "Composition",
+          "Sound Design"
+        ]
       },
       "lofai": {
         "description": "Collaborative project exploring the intersection between artificial intelligence and lofi music.",
         "collaborationDetails": "LOFAI is a fascinating collaborative project exploring the intersection between artificial intelligence and lofi music. We work with talented musicians and exceptional jazz players — LOFAI wouldn't exist without them. We experiment with AI tools to create unique sonic textures while preserving the authenticity and warmth of traditional lofi.",
-        "services": ["AI Experimentation", "Production", "Sound Design", "Mixing", "Mastering", "Artistic direction", "Management"]
+        "services": [
+          "AI Experimentation",
+          "Production",
+          "Sound Design",
+          "Mixing",
+          "Mastering",
+          "Artistic direction",
+          "Management"
+        ]
       },
       "ekzo": {
         "description": "My beatmaker/producer alias since 2022 for my personal creative projects.",
         "collaborationDetails": "Ekzo is my beatmaker/producer name since 2022. Under this alias, I release all my personal projects, exploring different styles and production approaches. It's my creative laboratory where I express my personal artistic vision.",
-        "services": ["Beatmaking", "Personal production", "Experimentation"]
+        "services": [
+          "Beatmaking",
+          "Personal production",
+          "Experimentation"
+        ]
       },
       "lave": {
         "description": "Promising young talent, mixing and mastering of the track 'Bête noir'.",
         "collaborationDetails": "I had the pleasure of mixing and mastering 'Bête noir' for Lavé, a very talented young artist. The project required a delicate approach to preserve the authenticity of his voice while delivering the depth and impact needed.",
-        "services": ["Mixing", "Mastering"]
+        "services": [
+          "Mixing",
+          "Mastering"
+        ]
       },
       "mamood": {
         "description": "Collaboration on the recording, mixing and mastering of Adios and MPLPVP.",
         "collaborationDetails": "I recorded and mixed 'Adios' and 'MPLPVP' for Mamood. These sessions were particularly enriching, exploring contemporary urban sounds with a precise technical approach to capture the energy of his performances.",
-        "services": ["Recording", "Mixing"]
+        "services": [
+          "Recording",
+          "Mixing"
+        ]
       },
       "theo-bachelier": {
         "description": "Privileged collaboration around sound design, post-production and creative mixing.",
         "collaborationDetails": "Privileged collaboration with Théo Bachelier around sound design. I work on the post-production, sound design and mixing of his creative projects. An artistic synergy that allows us to push the boundaries of contemporary sound creation.",
-        "services": ["Sound Design", "Post-production", "Mixing", "Creative collaboration"]
+        "services": [
+          "Sound Design",
+          "Post-production",
+          "Mixing",
+          "Creative collaboration"
+        ]
       },
       "timothe-chatenoud": {
         "description": "Self-produced artist with a unique musical identity, we bring the finishing touch to Timothé's creations with hybrid mastering.",
         "collaborationDetails": "Timothé Chatenoud is a self-produced artist with a strong and unique musical identity. We step in to bring the professional finishing touch to his creations, preserving his authenticity while optimizing sound quality.",
-        "services": ["Mastering"]
+        "services": [
+          "Mastering"
+        ]
       },
       "venin": {
         "description": "Iconic rock band from Southern France, recording, editing, mixing and mastering of the album 'Le Premier Sang'.",
         "collaborationDetails": "For their album 'Le Premier Sang', I had the honor of welcoming Venin to Global Drip Studio. I handled the editing, mixing and mastering of the 9 new tracks, as well as the recording of vocals, solo parts, and some keyboard arrangements. A project entirely designed to sound eighties with an authentic approach — no copy-paste, no triggers.",
-        "services": ["Editing", "Mixing", "Mastering", "Vocal & guitar recording", "Arrangements"]
+        "services": [
+          "Editing",
+          "Mixing",
+          "Mastering",
+          "Vocal & guitar recording",
+          "Arrangements"
+        ]
       },
       "ritualz": {
         "description": "A powerful comeback in 2025 after ten years of experience, mixing and mastering his new productions.",
         "collaborationDetails": "Ritualz is an explosive blend of hard-hitting rhythms, powerful bass and diverse sounds. After more than ten years of production experience but being away from the scene, he returns in 2025 with renewed energy, ready to rebuild his artistic project from scratch. We work alongside him on mixing and mastering.",
-        "services": ["Mixing", "Mastering"]
+        "services": [
+          "Mixing",
+          "Mastering"
+        ]
       },
       "jibbs-arenas": {
         "description": "Swiss and Spanish artist, close collaboration from recording to artistic direction.",
         "collaborationDetails": "Jibbs Arenas is a Swiss and Spanish artist who draws inspiration from his roots and adapts them to any style. We work in close collaboration at Global Drip Studio, from recording to mixing and mastering, including production.",
-        "services": ["Recording", "Production", "Mixing", "Mastering", "Artistic direction"]
+        "services": [
+          "Recording",
+          "Production",
+          "Mixing",
+          "Mastering",
+          "Artistic direction"
+        ]
       }
     }
   },
@@ -669,6 +872,10 @@
     "compression": {
       "title": "Understanding Audio Compression in 5 Minutes | Global Drip Studio",
       "description": "Compression demystified: ratio, attack, release, knee. Complete guide to mastering this essential mixing tool."
+    },
+    "loudness": {
+      "title": "Online LUFS Analysis | Global Drip Studio",
+      "description": "Upload an audio file and measure its LUFS loudness directly in your browser."
     }
   },
   "legalPages": {
@@ -866,6 +1073,113 @@
       "s18title": "18. Amendment of T&C",
       "s18text": "The Studio reserves the right to amend these T&C at any time. The applicable T&C are those in effect at the date of acceptance of the quote by the Client.",
       "lastUpdate": "Last updated: January 2025"
+    }
+  },
+  "loudness": {
+    "badge": "Local in-browser analysis",
+    "subtitle": "Upload a track, get its integrated loudness and peak values, and check your master before release.",
+    "modeAria": "LUFS analysis mode",
+    "methodIntro": "Automatic professional analysis: strict BS.1770 K-weighting, 400 ms window, 75% overlap, -70 LUFS gating, true peak estimation and musical interpretation inferred from the measurements.",
+    "resultsAria": "Loudness analysis results",
+    "inferredProfile": "Inferred profile",
+    "neutralProfile": "Neutral analysis",
+    "pdfButton": "PDF report",
+    "interpretationTitle": "Automatic interpretation",
+    "referencesTitle": "BS.1770 references",
+    "modes": {
+      "stereo": "Stereo",
+      "left": "Left mono",
+      "right": "Right mono"
+    },
+    "markers": {
+      "dense": "Dense streaming",
+      "balanced": "Balanced streaming",
+      "dynamic": "Very dynamic",
+      "broadcast": "EBU broadcast"
+    },
+    "contexts": {
+      "rap": "Rap / Trap",
+      "pop": "Pop / R&B",
+      "electronic": "Electronic / Club",
+      "rock": "Rock / Metal",
+      "acoustic": "Acoustic / Jazz",
+      "broadcast": "Podcast / Video"
+    },
+    "curve": {
+      "title": "LUFS curve",
+      "both": "Both",
+      "time": "time",
+      "aria": "Momentary and short-term LUFS curve"
+    },
+    "upload": {
+      "analyzing": "Analyzing",
+      "title": "Drop your audio file",
+      "description": "WAV, MP3, AIFF, FLAC or AAC. BS.1770 analysis with integrated gating, momentary/short-term windows and true peak estimation, without server upload."
+    },
+    "errors": {
+      "analysis": "Unable to analyze this file. Try a properly exported WAV, MP3, AIFF, FLAC or AAC file.",
+      "invalidFile": "Select a valid audio file."
+    },
+    "metrics": {
+      "integrated": "Integrated LUFS",
+      "momentaryCurrent": "Current momentary LUFS",
+      "shortTermCurrent": "Current short-term LUFS",
+      "truePeakEstimated": "Estimated true peak",
+      "file": "File",
+      "channel": "channel",
+      "channels": "channels",
+      "dynamics": "Dynamics",
+      "lraEstimated": "Estimated LRA",
+      "maximums": "Maximums",
+      "maximumsDesc": "Momentary and short-term peaks measured across the full duration."
+    },
+    "references": {
+      "momentary": "measures a short 400 ms window to follow immediate level changes.",
+      "shortTerm": "averages roughly 3 s to represent the recent, stable perception of level."
+    },
+    "advice": {
+      "rap": {
+        "hot": "Very loud rap/trap master: immediate impact, but watch listening fatigue and true peak headroom.",
+        "solid": "Solid rap/trap streaming zone: modern density with a little breathing room left.",
+        "dynamic": "Rather dynamic rap/trap master: useful for preserving transients, less competitive in direct playback."
+      },
+      "pop": {
+        "hot": "Very dense pop/R&B: effective in A/B checks, but monitor lead vocal, sibilance and normalized platforms.",
+        "solid": "Good pop/R&B balance: modern presence, readable vocal and limited risk of aggressive normalization.",
+        "dynamic": "Very dynamic pop/R&B: musical, but potentially perceived lower than commercial releases."
+      },
+      "electronic": {
+        "hot": "Very pushed electronic/club master: suitable for some aggressive masters, check kick/bass and inter-sample distortion.",
+        "solid": "Dense and usable electronic/club master: strong energy while keeping punch.",
+        "dynamic": "Dynamic electronic/club master: interesting for extended versions, less upfront for loud playlists."
+      },
+      "rock": {
+        "hot": "Very compressed rock/metal: powerful, but watch crushed cymbals and guitars.",
+        "solid": "Balanced modern rock/metal: energy, width and transients remain controllable.",
+        "dynamic": "Dynamic rock/metal: keeps drum impact, ideal when the arrangement breathes."
+      },
+      "acoustic": {
+        "hot": "Fairly loud acoustic/jazz: check that natural nuances and attacks remain intact.",
+        "solid": "Coherent acoustic/jazz: natural dynamics and listening comfort are preserved.",
+        "dynamic": "Very dynamic: relevant for intimate music, piano, jazz or audiophile deliveries."
+      },
+      "broadcast": {
+        "hot": "Loud podcast/video: normalization reduction risk, often aim lower depending on destination.",
+        "solid": "Comfortable podcast/video level: present voice, compatible with many web uses.",
+        "dynamic": "Very dynamic near-broadcast level: suitable for some EBU content, may feel low on social media."
+      },
+      "truePeakHigh": "High true peak: use a more conservative limiter ceiling for encoding.",
+      "truePeakHealthy": "Healthy true peak for export and common encodes."
+    },
+    "pdf": {
+      "title": "LUFS Loudness Report",
+      "subtitle": "Global Drip Studio · professional mastering analysis",
+      "mode": "Mode",
+      "methodology": "Methodology",
+      "methodologyText": "Local analysis: BS.1770 K-weighting filters with calculated biquad coefficients, {{windowMs}} ms window, 75% overlap, {{gateLufs}} LUFS absolute gating, -10 LU relative gating and true peak estimated with 4x interpolation.",
+      "references": "References",
+      "referencesText": "-14 LUFS: dense streaming · -16 LUFS: balanced streaming · -20 LUFS: dynamic · -23 LUFS: EBU broadcast",
+      "footer": "Report generated locally — no audio file sent to a server."
     }
   }
 }

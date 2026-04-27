@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from "react";
 import { Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
-import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,26 +30,26 @@ type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadc
 type CurveFocus = "both" | "momentary" | "shortTerm";
 const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
 
-const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
-  { value: "stereo", label: "Stéréo" },
-  { value: "left", label: "Mono gauche" },
-  { value: "right", label: "Mono droite" },
+const analysisModes: Array<{ value: AnalysisMode; labelKey: string }> = [
+  { value: "stereo", labelKey: "loudness.modes.stereo" },
+  { value: "left", labelKey: "loudness.modes.left" },
+  { value: "right", labelKey: "loudness.modes.right" },
 ];
 
 const loudnessMarkers = [
-  { value: -14, label: "-14 LUFS", hint: "Streaming dense" },
-  { value: -16, label: "-16 LUFS", hint: "Streaming équilibré" },
-  { value: -20, label: "-20 LUFS", hint: "Très dynamique" },
-  { value: -23, label: "-23 LUFS", hint: "Broadcast EBU" },
+  { value: -14, label: "-14 LUFS", hintKey: "loudness.markers.dense" },
+  { value: -16, label: "-16 LUFS", hintKey: "loudness.markers.balanced" },
+  { value: -20, label: "-20 LUFS", hintKey: "loudness.markers.dynamic" },
+  { value: -23, label: "-23 LUFS", hintKey: "loudness.markers.broadcast" },
 ];
 
-const contextLabels: Record<MusicContext, string> = {
-  rap: "Rap / Trap",
-  pop: "Pop / R&B",
-  electronic: "Électro / Club",
-  rock: "Rock / Metal",
-  acoustic: "Acoustique / Jazz",
-  broadcast: "Podcast / Vidéo",
+const contextLabelKeys: Record<MusicContext, string> = {
+  rap: "loudness.contexts.rap",
+  pop: "loudness.contexts.pop",
+  electronic: "loudness.contexts.electronic",
+  rock: "loudness.contexts.rock",
+  acoustic: "loudness.contexts.acoustic",
+  broadcast: "loudness.contexts.broadcast",
 };
 
 const formatDuration = (seconds: number) => {
@@ -61,7 +60,7 @@ const formatDuration = (seconds: number) => {
 
 const safeFileName = (name: string) => name.replace(/[^a-z0-9-_]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "rapport-lufs";
 
-const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, y: number, width: number, height: number) => {
+const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, y: number, width: number, height: number, curveTitle: string) => {
   const data = result.curve.length ? result.curve : [{ time: 0, momentary: -70, shortTerm: -70 }];
   const values = [...data.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
   const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
@@ -107,7 +106,7 @@ const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, 
   report.setTextColor(226, 232, 240);
   report.setFont("helvetica", "bold");
   report.setFontSize(9);
-  report.text("Courbe LUFS", x + 6, y + 8);
+  report.text(curveTitle, x + 6, y + 8);
   report.setFont("helvetica", "normal");
   report.setFontSize(7);
   report.setTextColor(20, 184, 166);
@@ -315,6 +314,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
 };
 
 const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void }) => {
+  const { t } = useTranslation();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const width = 860;
   const height = 320;
@@ -345,17 +345,17 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Waves className="h-4 w-4 text-primary" />
-          Courbe LUFS
+          {t("loudness.curve.title")}
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {([{ value: "both", label: "Les deux" }, { value: "momentary", label: "Momentary" }, { value: "shortTerm", label: "Short-term" }] as const).map((option) => (
+          {([{ value: "both", label: t("loudness.curve.both") }, { value: "momentary", label: "Momentary" }, { value: "shortTerm", label: "Short-term" }] as const).map((option) => (
             <button key={option.value} type="button" onClick={() => onFocusChange(option.value)} className={`rounded-full border px-3 py-1 transition-colors ${focus === option.value ? "border-primary bg-primary/15 text-foreground" : "border-border hover:border-primary"}`}>
               {option.label}
             </button>
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label="Courbe LUFS momentary et short-term" className="min-h-80 w-full flex-1 overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-80 w-full flex-1 overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
@@ -364,7 +364,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
         <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
         <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
         <text x={paddingLeft - 8} y={paddingTop - 6} textAnchor="end" className="fill-muted-foreground text-[11px]">LUFS</text>
-        <text x={width - paddingRight} y={height - 10} textAnchor="end" className="fill-muted-foreground text-[11px]">temps</text>
+        <text x={width - paddingRight} y={height - 10} textAnchor="end" className="fill-muted-foreground text-[11px]">{t("loudness.curve.time")}</text>
         {[minValue, Math.round((minValue + maxValue) / 2), maxValue].map((tick) => {
           const y = paddingTop + ((maxValue - tick) / valueRange) * (height - paddingTop - paddingBottom);
           return <text key={tick} x={paddingLeft - 8} y={y + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{tick}</text>;
@@ -429,16 +429,16 @@ const Loudness = () => {
   const targetHint = useMemo(() => {
     if (!result || !inferredContext) return null;
     const contextAdvice: Record<MusicContext, string> = {
-      rap: result.lufs > -10.5 ? "Master très fort pour rap/trap : impact immédiat, mais surveille la fatigue et la marge true peak." : result.lufs > -14 ? "Zone solide pour rap/trap streaming : densité moderne avec encore un peu de respiration." : "Master rap/trap plutôt dynamique : utile pour préserver les transitoires, moins compétitif en lecture directe.",
-      pop: result.lufs > -11 ? "Pop/R&B très dense : efficace en A/B, à contrôler sur voix lead, sibilances et plateformes normalisées." : result.lufs > -15 ? "Bon équilibre pop/R&B : présence moderne, voix lisible et risque limité de normalisation agressive." : "Pop/R&B très dynamique : musical, mais potentiellement plus bas perçu face aux sorties commerciales.",
-      electronic: result.lufs > -9.5 ? "Électro/club très poussé : adapté à certains masters agressifs, vérifie kick/bass et distorsion inter-sample." : result.lufs > -13 ? "Électro/club dense et exploitable : bonne énergie tout en gardant du punch." : "Électro/club dynamique : intéressant pour versions extended, moins frontal pour playlists loud.",
-      rock: result.lufs > -10 ? "Rock/metal très comprimé : puissant, mais attention à l'écrasement des cymbales et guitares." : result.lufs > -14 ? "Rock/metal moderne équilibré : énergie, largeur et transitoires encore contrôlables." : "Rock/metal dynamique : garde l'impact batterie, idéal si l'arrangement respire.",
-      acoustic: result.lufs > -14 ? "Acoustique/jazz assez fort : vérifie que les nuances et attaques naturelles restent intactes." : result.lufs > -20 ? "Acoustique/jazz cohérent : dynamique naturelle et confort d'écoute préservés." : "Très dynamique : pertinent pour musique intimiste, piano, jazz ou livraisons audiophiles.",
-      broadcast: result.lufs > -16 ? "Podcast/vidéo fort : risque de réduction par normalisation, vise souvent plus bas selon la destination." : result.lufs > -21 ? "Podcast/vidéo confortable : voix présente, compatible avec de nombreux usages web." : "Niveau proche broadcast très dynamique : adapté à certains contenus EBU, peut sembler bas en social media.",
+      rap: result.lufs > -10.5 ? t("loudness.advice.rap.hot") : result.lufs > -14 ? t("loudness.advice.rap.solid") : t("loudness.advice.rap.dynamic"),
+      pop: result.lufs > -11 ? t("loudness.advice.pop.hot") : result.lufs > -15 ? t("loudness.advice.pop.solid") : t("loudness.advice.pop.dynamic"),
+      electronic: result.lufs > -9.5 ? t("loudness.advice.electronic.hot") : result.lufs > -13 ? t("loudness.advice.electronic.solid") : t("loudness.advice.electronic.dynamic"),
+      rock: result.lufs > -10 ? t("loudness.advice.rock.hot") : result.lufs > -14 ? t("loudness.advice.rock.solid") : t("loudness.advice.rock.dynamic"),
+      acoustic: result.lufs > -14 ? t("loudness.advice.acoustic.hot") : result.lufs > -20 ? t("loudness.advice.acoustic.solid") : t("loudness.advice.acoustic.dynamic"),
+      broadcast: result.lufs > -16 ? t("loudness.advice.broadcast.hot") : result.lufs > -21 ? t("loudness.advice.broadcast.solid") : t("loudness.advice.broadcast.dynamic"),
     };
-    const technical = result.truePeakDb > -1 ? " True peak élevé : prévois un plafond de limiteur plus prudent pour l'encodage." : " True peak sain pour l'export et les encodages courants.";
+    const technical = result.truePeakDb > -1 ? ` ${t("loudness.advice.truePeakHigh")}` : ` ${t("loudness.advice.truePeakHealthy")}`;
     return `${contextAdvice[inferredContext]}${technical}`;
-  }, [inferredContext, result]);
+  }, [inferredContext, result, t]);
 
   const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
@@ -450,11 +450,11 @@ const Loudness = () => {
       setResult(analysis);
     } catch (analysisError) {
       console.error(analysisError);
-      setError("Impossible d'analyser ce fichier. Essaie un WAV, MP3, AIFF, FLAC ou AAC exporté correctement.");
+      setError(t("loudness.errors.analysis"));
     } finally {
       setIsAnalyzing(false);
     }
-  }, []);
+  }, [t]);
 
   const handleModeChange = useCallback((mode: AnalysisMode) => {
     setSelectedMode(mode);
@@ -464,7 +464,7 @@ const Loudness = () => {
   const handleFile = useCallback(async (file?: File) => {
     if (!file) return;
     if (!file.type.startsWith("audio/")) {
-      setError("Sélectionne un fichier audio valide.");
+      setError(t("loudness.errors.invalidFile"));
       return;
     }
     setSelectedFile(file);
@@ -477,7 +477,7 @@ const Loudness = () => {
     const pageWidth = report.internal.pageSize.getWidth();
     const pageHeight = report.internal.pageSize.getHeight();
     const margin = 16;
-    const modeLabel = analysisModes.find((mode) => mode.value === result.mode)?.label ?? "Stéréo";
+    const modeLabel = t(analysisModes.find((mode) => mode.value === result.mode)?.labelKey ?? "loudness.modes.stereo");
     report.setFillColor(12, 14, 17);
     report.rect(0, 0, pageWidth, pageHeight, "F");
     report.setFillColor(255, 112, 54);
@@ -489,11 +489,11 @@ const Loudness = () => {
     report.setTextColor(255, 255, 255);
     report.setFont("helvetica", "bold");
     report.setFontSize(22);
-    report.text("Rapport Loudness LUFS", margin + 6, 30);
+    report.text(t("loudness.pdf.title"), margin + 6, 30);
     report.setFont("helvetica", "normal");
     report.setFontSize(10);
     report.setTextColor(180, 188, 198);
-    report.text("Global Drip Studio · analyse mastering professionnelle", margin + 6, 41);
+    report.text(t("loudness.pdf.subtitle"), margin + 6, 41);
     report.setTextColor(245, 245, 245);
     report.setFontSize(11);
     let y = 70;
@@ -502,17 +502,17 @@ const Loudness = () => {
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(160, 168, 178);
-    report.text(`Mode ${modeLabel} · ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} canal${result.channels > 1 ? "s" : ""}`, margin, y);
+    report.text(`${t("loudness.pdf.mode")} ${modeLabel} · ${formatDuration(result.duration)} · ${(result.sampleRate / 1000).toFixed(1)} kHz · ${result.channels} ${result.channels > 1 ? t("loudness.metrics.channels") : t("loudness.metrics.channel")}`, margin, y);
     y += 12;
     const metrics = [
-      ["LUFS intégré", `${result.lufs.toFixed(1)} LUFS`],
-      ["Momentary actuel", `${result.momentaryLufs.toFixed(1)} LUFS`],
-      ["Short-term actuel", `${result.shortTermLufs.toFixed(1)} LUFS`],
+      [t("loudness.metrics.integrated"), `${result.lufs.toFixed(1)} LUFS`],
+      [t("loudness.metrics.momentaryCurrent"), `${result.momentaryLufs.toFixed(1)} LUFS`],
+      [t("loudness.metrics.shortTermCurrent"), `${result.shortTermLufs.toFixed(1)} LUFS`],
       ["Peak", `${result.peakDb.toFixed(1)} dBFS`],
-      ["True peak estimé", `${result.truePeakDb.toFixed(1)} dBTP`],
+      [t("loudness.metrics.truePeakEstimated"), `${result.truePeakDb.toFixed(1)} dBTP`],
       ["LRA / PLR", `${result.loudnessRange.toFixed(1)} LU / ${result.plr.toFixed(1)} dB`],
-      ["Maximums", `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
-      ["Profil déduit", inferredContext ? contextLabels[inferredContext] : "Analyse neutre"],
+      [t("loudness.metrics.maximums"), `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
+      [t("loudness.inferredProfile"), inferredContext ? t(contextLabelKeys[inferredContext]) : t("loudness.neutralProfile")],
     ];
     metrics.forEach(([label, value], index) => {
       const x = margin + (index % 2) * 88;
@@ -529,37 +529,37 @@ const Loudness = () => {
       report.text(value, x + 4, rowY + 12);
     });
     y += 94;
-    drawPdfLoudnessCurve(report, result, margin, y, pageWidth - margin * 2, 72);
+    drawPdfLoudnessCurve(report, result, margin, y, pageWidth - margin * 2, 72, t("loudness.curve.title"));
     y += 84;
     report.setFont("helvetica", "bold");
     report.setTextColor(255, 255, 255);
-    report.text("Méthodologie", margin, y);
+    report.text(t("loudness.pdf.methodology"), margin, y);
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(175, 184, 194);
-    report.text(report.splitTextToSize(`Analyse locale : filtres K-weighting BS.1770 à coefficients biquad calculés, fenêtre ${professionalSettings.windowMs} ms, recouvrement 75 %, gating absolu ${professionalSettings.gateLufs} LUFS, gating relatif -10 LU et true peak estimé par interpolation 4x.`, pageWidth - margin * 2), margin, y);
+    report.text(report.splitTextToSize(t("loudness.pdf.methodologyText", { windowMs: professionalSettings.windowMs, gateLufs: professionalSettings.gateLufs }), pageWidth - margin * 2), margin, y);
     y += 24;
     report.setDrawColor(45, 52, 60);
     report.line(margin, y, pageWidth - margin, y);
     y += 8;
     report.setFont("helvetica", "bold");
     report.setTextColor(255, 255, 255);
-    report.text("Repères", margin, y);
+    report.text(t("loudness.pdf.references"), margin, y);
     y += 7;
     report.setFont("helvetica", "normal");
     report.setTextColor(175, 184, 194);
-    report.text("-14 LUFS : streaming dense · -16 LUFS : streaming équilibré · -20 LUFS : dynamique · -23 LUFS : broadcast EBU", margin, y);
+    report.text(t("loudness.pdf.referencesText"), margin, y);
     report.setFontSize(8);
     report.setTextColor(120, 128, 138);
-    report.text("Rapport généré localement — aucun fichier audio envoyé sur serveur.", margin, pageHeight - 12);
+    report.text(t("loudness.pdf.footer"), margin, pageHeight - 12);
     report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
-  }, [inferredContext, result]);
+  }, [inferredContext, result, t]);
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Analyse LUFS en ligne | Global Drip Studio"
-        description="Téléversez un fichier audio et mesurez sa loudness LUFS directement dans votre navigateur."
+        title={t("seo.loudness.title")}
+        description={t("seo.loudness.description")}
         path="/loudness"
       />
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -594,17 +594,17 @@ const Loudness = () => {
             <div className="space-y-6 animate-fade-in">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
                 <Gauge className="w-4 h-4 text-primary" />
-                Analyse locale dans le navigateur
+                {t("loudness.badge")}
               </div>
               <div className="space-y-4">
                 <h1 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
                   Loudness <span className="hero-text">LUFS</span>
                 </h1>
                 <p className="max-w-xl text-lg text-muted-foreground sm:text-xl">
-                  Téléverse un morceau, récupère sa loudness intégrée et son peak pour contrôler ton master avant diffusion.
+                  {t("loudness.subtitle")}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2" aria-label="Mode d'analyse LUFS">
+              <div className="flex flex-wrap gap-2" aria-label={t("loudness.modeAria")}>
                 {analysisModes.map((mode) => (
                   <Button
                     key={mode.value}
@@ -614,12 +614,12 @@ const Loudness = () => {
                     disabled={isAnalyzing}
                     className="min-w-32"
                   >
-                    {mode.label}
+                    {t(mode.labelKey)}
                   </Button>
                 ))}
               </div>
               <div className="rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
-                Analyse professionnelle automatique : K-weighting BS.1770 strict, fenêtre 400 ms, recouvrement 75 %, gating à -70 LUFS, estimation true peak et interprétation musicale déduite des mesures.
+                {t("loudness.methodIntro")}
               </div>
             </div>
 
@@ -652,10 +652,10 @@ const Loudness = () => {
                     {isAnalyzing ? <Loader2 className="h-9 w-9 animate-spin" /> : <Upload className="h-9 w-9" />}
                   </div>
                   <h2 className="mb-3 text-2xl font-bold">
-                    {isAnalyzing ? "Analyse en cours" : "Dépose ton fichier audio"}
+                    {isAnalyzing ? t("loudness.upload.analyzing") : t("loudness.upload.title")}
                   </h2>
                   <p className="max-w-md text-sm text-muted-foreground">
-                    WAV, MP3, AIFF, FLAC ou AAC. Analyse BS.1770 avec gating intégré, fenêtres momentary/short-term et estimation true peak, sans envoi serveur.
+                    {t("loudness.upload.description")}
                   </p>
                 </label>
 
@@ -669,7 +669,7 @@ const Loudness = () => {
           </div>
 
           {result && (
-            <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Résultats d'analyse loudness">
+            <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label={t("loudness.resultsAria")}>
               <Card className="equipment-card sm:col-span-2 lg:col-span-4">
                 <CardContent className="p-6">
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-muted-foreground">
@@ -678,35 +678,35 @@ const Loudness = () => {
                       <span className="truncate text-sm">{result.fileName}</span>
                     </div>
                     <span className="rounded-full border border-border px-3 py-1 text-xs">
-                      {analysisModes.find((mode) => mode.value === result.mode)?.label}
+                      {t(analysisModes.find((mode) => mode.value === result.mode)?.labelKey ?? "loudness.modes.stereo")}
                     </span>
                   </div>
                   <div className="mb-5 flex flex-wrap items-center gap-2">
-                    {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">Profil déduit : {contextLabels[inferredContext]}</span>}
+                    {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">{t("loudness.inferredProfile")}: {t(contextLabelKeys[inferredContext])}</span>}
                     <Button type="button" onClick={exportPdfReport} variant="outline" size="sm">
                       <Download className="h-4 w-4" />
-                      Rapport PDF
+                      {t("loudness.pdfButton")}
                     </Button>
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
                       <p className="text-5xl font-bold text-primary">{result.lufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS intégré</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
                     </div>
                     <div>
                       <p className="text-4xl font-bold">{result.momentaryLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS momentary actuel</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.momentaryCurrent")}</p>
                     </div>
                     <div>
                       <p className="text-4xl font-bold">{result.shortTermLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term actuel</p>
+                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.shortTermCurrent")}</p>
                     </div>
                   </div>
                   {targetHint && (
                     <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
                       <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
                         <Gauge className="h-4 w-4 text-secondary" />
-                        Interprétation automatique
+                        {t("loudness.interpretationTitle")}
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground">{targetHint}</p>
                     </div>
@@ -714,10 +714,10 @@ const Loudness = () => {
                   <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
                     <div className="mb-2 flex items-center gap-2 font-medium text-foreground">
                       <Info className="h-4 w-4 text-primary" />
-                      Repères BS.1770
+                      {t("loudness.referencesTitle")}
                     </div>
                     <p>
-                      <strong className="text-foreground">Momentary</strong> mesure une fenêtre courte de 400 ms pour suivre les variations immédiates. <strong className="text-foreground">Short-term</strong> moyenne environ 3 s pour représenter la perception récente et stable du niveau.
+                      <strong className="text-foreground">Momentary</strong> {t("loudness.references.momentary")} <strong className="text-foreground">Short-term</strong> {t("loudness.references.shortTerm")}
                     </p>
                   </div>
                   <div className="mt-6">
@@ -730,41 +730,58 @@ const Loudness = () => {
                 <CardContent className="p-6">
                   <p className="text-sm text-muted-foreground">Peak</p>
                   <p className="mt-3 text-3xl font-bold">{result.peakDb.toFixed(1)} dBFS</p>
-                  <p className="mt-2 text-sm text-muted-foreground">True peak estimé : {result.truePeakDb.toFixed(1)} dBTP</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.truePeakEstimated")}: {result.truePeakDb.toFixed(1)} dBTP</p>
                 </CardContent>
               </Card>
 
               <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">Fichier</p>
+                  <p className="text-sm text-muted-foreground">{t("loudness.metrics.file")}</p>
                   <div className="mt-3 flex items-center gap-2 text-3xl font-bold">
                     <FileAudio className="w-7 h-7 text-primary" />
                     {formatDuration(result.duration)}
                   </div>
                   <p className="mt-3 text-sm text-muted-foreground">
-                    {result.channels} canal{result.channels > 1 ? "s" : ""} · {(result.sampleRate / 1000).toFixed(1)} kHz
+                    {result.channels} {result.channels > 1 ? t("loudness.metrics.channels") : t("loudness.metrics.channel")} · {(result.sampleRate / 1000).toFixed(1)} kHz
                   </p>
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">Dynamique</p>
+                  <p className="text-sm text-muted-foreground">{t("loudness.metrics.dynamics")}</p>
                   <p className="mt-3 text-3xl font-bold">{result.loudnessRange.toFixed(1)} LU</p>
-                  <p className="mt-2 text-sm text-muted-foreground">LRA estimée · PLR {result.plr.toFixed(1)} dB</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.lraEstimated")} · PLR {result.plr.toFixed(1)} dB</p>
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2">
                 <CardContent className="p-6">
-                  <p className="text-sm text-muted-foreground">Maximums</p>
+                  <p className="text-sm text-muted-foreground">{t("loudness.metrics.maximums")}</p>
                   <p className="mt-3 text-3xl font-bold">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
-                  <p className="mt-2 text-sm text-muted-foreground">Pics momentary et short-term relevés sur toute la durée.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.maximumsDesc")}</p>
                 </CardContent>
               </Card>
             </section>
           )}
         </section>
       </main>
-      <Footer />
+
+      <section className="py-10 sm:py-16 bg-gradient-to-b from-muted/20 to-background">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
+              {t("projects.readyToJoin")} <span className="hero-text">{t("projects.collaborationsWord")}</span> ?
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
+              {t("projects.readyDesc")}
+            </p>
+            <a href="/#contact">
+              <Button size="lg" className="studio-button text-sm sm:text-base">
+                {t("projects.startProject")}
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
