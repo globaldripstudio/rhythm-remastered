@@ -561,6 +561,17 @@ const Loudness = () => {
         title={t("seo.loudness.title")}
         description={t("seo.loudness.description")}
         path="/loudness"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Global Drip Studio LUFS Analyzer",
+          "applicationCategory": "MultimediaApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://globaldripstudio.fr/loudness",
+          "description": t("seo.loudness.description"),
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+          "featureList": ["Integrated LUFS", "True Peak", "Loudness Range", "Momentary LUFS", "Short-term LUFS", "PDF report"]
+        }}
       />
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
@@ -661,6 +672,21 @@ const Loudness = () => {
               </CardContent>
             </Card>
           </div>
+
+          <section className="mt-8 grid gap-4 md:grid-cols-[1.1fr_0.9fr]" aria-label={t("loudness.seoBlock.aria")}>
+            <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+              <h2 className="text-xl font-bold sm:text-2xl">{t("loudness.seoBlock.title")}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{t("loudness.seoBlock.description")}</p>
+            </div>
+            <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+              <p className="text-sm font-semibold text-foreground">{t("loudness.seoBlock.checksTitle")}</p>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
+                {(["lufs", "truePeak", "platforms"] as const).map((item) => (
+                  <li key={item}>• {t(`loudness.seoBlock.checks.${item}`)}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
 
           {result && (
             <section className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4" aria-label={t("loudness.resultsAria")}>
