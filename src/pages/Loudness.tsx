@@ -730,7 +730,7 @@ const Loudness = () => {
                 <CardContent className="p-6">
                   <p className="text-sm text-muted-foreground">Peak</p>
                   <p className="mt-3 text-3xl font-bold">{result.peakDb.toFixed(1)} dBFS</p>
-                  <p className="mt-2 text-sm text-muted-foreground">True peak estimé : {result.truePeakDb.toFixed(1)} dBTP</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.truePeakEstimated")}: {result.truePeakDb.toFixed(1)} dBTP</p>
                 </CardContent>
               </Card>
 
