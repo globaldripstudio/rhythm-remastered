@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { AlertTriangle, ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { ArrowLeft, Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import Header from "@/components/Header";
@@ -30,12 +30,6 @@ type AnalysisMode = "stereo" | "left" | "right";
 type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 type CurveFocus = "both" | "momentary" | "shortTerm";
 const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
-
-const getTruePeakRisk = (marginDb: number) => {
-  if (marginDb < 0) return { label: "Risque élevé", tone: "destructive", detail: "True Peak au-dessus du plafond cible." } as const;
-  if (marginDb < 0.5) return { label: "À surveiller", tone: "primary", detail: "Marge faible avant encodage." } as const;
-  return { label: "Marge saine", tone: "secondary", detail: "Marge confortable sous le plafond cible." } as const;
-};
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
@@ -415,10 +409,6 @@ const Loudness = () => {
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [truePeakCeiling, setTruePeakCeiling] = useState(-1);
-
-  const truePeakMargin = result ? truePeakCeiling - result.truePeakDb : 0;
-  const truePeakRisk = getTruePeakRisk(truePeakMargin);
 
   const inferredContext = useMemo<MusicContext | null>(() => {
     if (!result) return null;
@@ -684,44 +674,6 @@ const Loudness = () => {
                     <div>
                       <p className="text-4xl font-bold">{result.shortTermLufs.toFixed(1)}</p>
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term actuel</p>
-                    </div>
-                  </div>
-                  <div className="mt-6 rounded-md border border-border bg-background/40 p-5">
-                    <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm text-muted-foreground">True Peak max</p>
-                        <p className="mt-2 text-4xl font-bold">{result.truePeakDb.toFixed(2)} dBTP</p>
-                      </div>
-                      <div className={`rounded-full border px-3 py-1 text-xs font-semibold ${truePeakRisk.tone === "destructive" ? "border-destructive/50 bg-destructive/10 text-destructive" : truePeakRisk.tone === "primary" ? "border-primary/50 bg-primary/10 text-primary" : "border-secondary/50 bg-secondary/10 text-secondary"}`}>
-                        {truePeakRisk.label}
-                      </div>
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-[1fr_0.75fr] md:items-end">
-                      <label className="space-y-2 text-sm text-muted-foreground">
-                        <span>Plafond cible dBTP</span>
-                        <input
-                          type="range"
-                          min="-2"
-                          max="0"
-                          step="0.1"
-                          value={truePeakCeiling}
-                          onChange={(event) => setTruePeakCeiling(Number(event.target.value))}
-                          className="w-full accent-primary"
-                          aria-label="Plafond cible True Peak en dBTP"
-                        />
-                        <div className="flex justify-between text-xs">
-                          <span>-2.0</span>
-                          <span>0.0 dBTP</span>
-                        </div>
-                      </label>
-                      <div className="rounded-md border border-border bg-muted/20 p-4">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <AlertTriangle className="h-4 w-4 text-primary" />
-                          Marge restante vs {truePeakCeiling.toFixed(1)} dBTP
-                        </div>
-                        <p className="mt-2 text-3xl font-bold">{truePeakMargin.toFixed(2)} dB</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{truePeakRisk.detail}</p>
-                      </div>
                     </div>
                   </div>
                   {targetHint && (
