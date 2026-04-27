@@ -61,6 +61,63 @@ const formatDuration = (seconds: number) => {
 
 const safeFileName = (name: string) => name.replace(/[^a-z0-9-_]+/gi, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "rapport-lufs";
 
+const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, y: number, width: number, height: number) => {
+  const data = result.curve.length ? result.curve : [{ time: 0, momentary: -70, shortTerm: -70 }];
+  const values = [...data.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
+  const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
+  const maxValue = Math.ceil(Math.max(...values, -8) / 5) * 5;
+  const valueRange = Math.max(maxValue - minValue, 1);
+  const timeMax = Math.max(data[data.length - 1].time, 0.1);
+  const plot = { left: x + 12, top: y + 13, right: x + width - 30, bottom: y + height - 14 };
+  const toPoint = (point: { time: number }, value: number) => ({
+    x: plot.left + (point.time / timeMax) * (plot.right - plot.left),
+    y: plot.top + ((maxValue - value) / valueRange) * (plot.bottom - plot.top),
+  });
+
+  report.setFillColor(17, 20, 24);
+  report.roundedRect(x, y, width, height, 3, 3, "F");
+  report.setDrawColor(45, 52, 60);
+  report.line(plot.left, plot.bottom, plot.right, plot.bottom);
+  report.line(plot.left, plot.top, plot.left, plot.bottom);
+  loudnessMarkers.forEach((marker) => {
+    const markerY = toPoint({ time: 0 }, marker.value).y;
+    if (markerY >= plot.top && markerY <= plot.bottom) {
+      report.setDrawColor(48, 56, 64);
+      report.setLineDashPattern([1.5, 2], 0);
+      report.line(plot.left, markerY, plot.right, markerY);
+      report.setLineDashPattern([], 0);
+      report.setTextColor(150, 158, 170);
+      report.setFontSize(6.5);
+      report.text(marker.label, plot.right + 3, markerY + 1.5);
+    }
+  });
+
+  const drawSeries = (key: "momentary" | "shortTerm", color: [number, number, number]) => {
+    report.setDrawColor(...color);
+    report.setLineWidth(0.45);
+    data.forEach((point, index) => {
+      if (index === 0) return;
+      const previous = toPoint(data[index - 1], data[index - 1][key]);
+      const current = toPoint(point, point[key]);
+      report.line(previous.x, previous.y, current.x, current.y);
+    });
+  };
+  drawSeries("momentary", [20, 184, 166]);
+  drawSeries("shortTerm", [255, 112, 54]);
+  report.setTextColor(226, 232, 240);
+  report.setFont("helvetica", "bold");
+  report.setFontSize(9);
+  report.text("Courbe LUFS", x + 6, y + 8);
+  report.setFont("helvetica", "normal");
+  report.setFontSize(7);
+  report.setTextColor(20, 184, 166);
+  report.text("Momentary", x + width - 58, y + 8);
+  report.setTextColor(255, 112, 54);
+  report.text("Short-term", x + width - 30, y + 8);
+  report.setTextColor(150, 158, 170);
+  report.text(`${formatDuration(0)}                     ${formatDuration(timeMax / 2)}                     ${formatDuration(timeMax)}`, plot.left, y + height - 4);
+};
+
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
 
 const getSelectedChannels = (buffer: AudioBuffer, mode: AnalysisMode) => {
