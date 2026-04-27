@@ -201,9 +201,9 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
   const height = 180;
   const padding = 18;
   const usableData = data.length ? data : [{ time: 0, momentary: -70, shortTerm: -70 }];
-  const values = usableData.flatMap((point) => [point.momentary, point.shortTerm]).filter(Number.isFinite);
-  const minValue = Math.min(-8, Math.floor(Math.min(...values) / 5) * 5);
-  const maxValue = Math.max(-36, Math.ceil(Math.max(...values) / 5) * 5);
+  const values = [...usableData.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
+  const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
+  const maxValue = Math.ceil(Math.max(...values, -8) / 5) * 5;
   const valueRange = Math.max(maxValue - minValue, 1);
   const timeMax = Math.max(usableData[usableData.length - 1].time, 0.1);
   const pointToCoord = (point: { time: number }, value: number) => {
@@ -229,12 +229,12 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
       <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-44 w-full overflow-visible">
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
         <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
-        {[-14, -23].map((reference) => {
-          const y = padding + ((maxValue - reference) / valueRange) * (height - padding * 2);
+        {loudnessMarkers.map((marker) => {
+          const y = padding + ((maxValue - marker.value) / valueRange) * (height - padding * 2);
           return y >= padding && y <= height - padding ? (
-            <g key={reference}>
+            <g key={marker.value}>
               <line x1={padding} y1={y} x2={width - padding} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
-              <text x={width - padding} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[11px]">{reference} LUFS</text>
+              <text x={width - padding} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[11px]">{marker.label} · {marker.hint}</text>
             </g>
           ) : null;
         })}
