@@ -105,17 +105,24 @@ const percentile = (values: number[], ratio: number) => {
 const estimateTruePeak = (channels: Float32Array[]) => {
   let peak = 0;
   for (const samples of channels) {
-    for (let i = 0; i < samples.length - 1; i += 1) {
-      const current = samples[i];
-      const next = samples[i + 1];
-      peak = Math.max(peak, Math.abs(current), Math.abs(current * 0.75 + next * 0.25), Math.abs(current * 0.5 + next * 0.5), Math.abs(current * 0.25 + next * 0.75));
+    for (let i = 1; i < samples.length - 2; i += 1) {
+      for (let phase = 0; phase < 4; phase += 1) {
+        const t = phase / 4;
+        const y0 = samples[i - 1];
+        const y1 = samples[i];
+        const y2 = samples[i + 1];
+        const y3 = samples[i + 2];
+        const interpolated = 0.5 * ((2 * y1) + (-y0 + y2) * t + (2 * y0 - 5 * y1 + 4 * y2 - y3) * t * t + (-y0 + 3 * y1 - 3 * y2 + y3) * t * t * t);
+        peak = Math.max(peak, Math.abs(interpolated));
+      }
     }
     peak = Math.max(peak, Math.abs(samples[samples.length - 1] ?? 0));
   }
   return 20 * Math.log10(Math.max(peak, 1e-12));
 };
 
-const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
+const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: AnalysisSettings): Promise<AnalysisResult> => {
+  const validatedSettings = settingsSchema.parse(settings);
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   const audioContext = new AudioContextCtor();
   const arrayBuffer = await file.arrayBuffer();
@@ -147,8 +154,10 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const renderedBuffer = await offlineContext.startRendering();
   const channelCount = renderedBuffer.numberOfChannels;
   const sampleRate = renderedBuffer.sampleRate;
-  const blockSize = Math.max(1, Math.round(sampleRate * 0.4));
-  const hopSize = Math.max(1, Math.round(sampleRate * 0.1));
+  const windowSeconds = validatedSettings.windowMs / 1000;
+  const hopSeconds = validatedSettings.hopMs / 1000;
+  const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
+  const hopSize = Math.max(1, Math.round(sampleRate * hopSeconds));
   const blocks: number[] = [];
   let peak = 0;
 
@@ -162,7 +171,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   }
 
   const selectedChannels = getSelectedChannels(renderedBuffer, mode);
-  const truePeakDb = estimateTruePeak(selectedChannels);
+  const truePeakDb = validatedSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
 
   for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
     let blockPower = 0;
@@ -182,24 +191,24 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     return total + sum / Math.max(samples.length, 1);
   }, 0)];
 
-  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > -70);
+  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > validatedSettings.gateLufs);
   const firstPassBlocks = absoluteGatedBlocks.length ? absoluteGatedBlocks : usableBlocks;
   const firstPassPower = firstPassBlocks.reduce((sum, power) => sum + power, 0) / firstPassBlocks.length;
   const relativeGate = dbFromPower(firstPassPower) - 10;
   const relativeGatedBlocks = firstPassBlocks.filter((power) => dbFromPower(power) > relativeGate);
   const finalBlocks = relativeGatedBlocks.length ? relativeGatedBlocks : firstPassBlocks;
   const integratedPower = finalBlocks.reduce((sum, power) => sum + power, 0) / finalBlocks.length;
-  const shortTermWindow = Math.max(1, Math.round(3 / 0.1));
+  const shortTermWindow = Math.max(1, Math.round(3 / hopSeconds));
   const curve = usableBlocks.map((power, index) => {
     const shortTermBlocks = usableBlocks.slice(Math.max(0, index - shortTermWindow + 1), index + 1);
     return {
-      time: index * 0.1,
+      time: index * hopSeconds,
       momentary: dbFromPower(power),
       shortTerm: dbFromPower(averagePower(shortTermBlocks)),
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
-  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > -70);
+  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > validatedSettings.gateLufs);
   const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
   const integratedLufs = dbFromPower(integratedPower);
   const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
