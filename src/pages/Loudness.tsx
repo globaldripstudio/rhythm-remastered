@@ -352,7 +352,7 @@ const Loudness = () => {
     setResult(null);
 
     try {
-      const validatedSettings = settingsSchema.parse(nextSettings);
+      const validatedSettings = settingsSchema.parse(nextSettings) as AnalysisSettings;
       setSettingsError(null);
       const analysis = await analyzeLoudness(file, mode, validatedSettings);
       setResult(analysis);
