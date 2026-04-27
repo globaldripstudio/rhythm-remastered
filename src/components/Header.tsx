@@ -29,7 +29,7 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border" role="banner">
-      <div className="container mx-auto px-6 py-4">
+      <div className="container mx-auto px-4 py-4 xl:px-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
@@ -45,7 +45,7 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-5 xl:space-x-7" aria-label="Navigation principale">
+          <nav className="hidden md:flex items-center space-x-3 text-sm lg:space-x-4 xl:space-x-5 xl:text-base" aria-label="Navigation principale">
             <a href="#accueil" className="nav-link">{t('nav.home')}</a>
             <a href="#services" className="nav-link">{t('nav.services')}</a>
             <a href="#equipement" className="nav-link">{t('nav.equipment')}</a>
@@ -62,18 +62,18 @@ const Header = () => {
               </span>
             </span>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/loudness" className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/20 px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground">
+            <a href="/loudness" className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground xl:gap-2 xl:px-3">
               <Gauge className="h-4 w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
               {t('nav.loudness')}
             </a>
           </nav>
 
           {/* Contact Info & CTA & Language Switch */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <div className="hidden 2xl:flex items-center space-x-2 text-sm text-muted-foreground">
+          <div className="hidden lg:flex items-center space-x-2 xl:space-x-3">
+            <a href="tel:+33659797342" className="hidden xl:flex items-center space-x-1.5 rounded-full border border-border/60 bg-muted/20 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground 2xl:text-sm">
               <Phone className="w-4 h-4" />
               <span>+33 6 59 79 73 42</span>
-            </div>
+            </a>
             <Button variant="default" className="studio-button" onClick={scrollToContact}>
               {t('nav.book')}
             </Button>
