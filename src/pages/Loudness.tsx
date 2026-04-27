@@ -612,20 +612,6 @@ const Loudness = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-2" aria-label={t("loudness.modeAria")}>
-                {analysisModes.map((mode) => (
-                  <Button
-                    key={mode.value}
-                    type="button"
-                    variant={selectedMode === mode.value ? "default" : "outline"}
-                    onClick={() => handleModeChange(mode.value)}
-                    disabled={isAnalyzing}
-                    className="min-w-32"
-                  >
-                    {t(mode.labelKey)}
-                  </Button>
-                ))}
-              </div>
               <div className="rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
                 {t("loudness.methodIntro")}
               </div>
@@ -695,6 +681,20 @@ const Loudness = () => {
                       <Download className="h-4 w-4" />
                       {t("loudness.pdfButton")}
                     </Button>
+                  </div>
+                  <div className="mb-6 flex flex-wrap gap-2" aria-label={t("loudness.modeAria")}>
+                    {analysisModes.map((mode) => (
+                      <Button
+                        key={mode.value}
+                        type="button"
+                        variant={selectedMode === mode.value ? "default" : "outline"}
+                        onClick={() => handleModeChange(mode.value)}
+                        disabled={isAnalyzing}
+                        className="min-w-32"
+                      >
+                        {t(mode.labelKey)}
+                      </Button>
+                    ))}
                   </div>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
