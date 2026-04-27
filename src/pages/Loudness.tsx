@@ -1,11 +1,15 @@
 import { useCallback, useMemo, useState } from "react";
 import { ArrowLeft, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 type AnalysisResult = {
   lufs: number;
@@ -27,6 +31,30 @@ type AnalysisResult = {
 
 type AnalysisMode = "stereo" | "left" | "right";
 type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
+type CurveFocus = "both" | "momentary" | "shortTerm";
+type AnalysisSettings = {
+  windowMs: number;
+  hopMs: number;
+  gateLufs: number;
+  truePeak: boolean;
+};
+
+const professionalDefaults: AnalysisSettings = {
+  windowMs: 400,
+  hopMs: 100,
+  gateLufs: -70,
+  truePeak: true,
+};
+
+const settingsSchema = z.object({
+  windowMs: z.coerce.number().int().min(200, "Fenêtre min. 200 ms").max(3000, "Fenêtre max. 3000 ms"),
+  hopMs: z.coerce.number().int().min(25, "Hop min. 25 ms").max(1000, "Hop max. 1000 ms"),
+  gateLufs: z.coerce.number().min(-90, "Gating min. -90 LUFS").max(-40, "Gating max. -40 LUFS"),
+  truePeak: z.boolean(),
+}).refine((settings) => settings.hopMs <= settings.windowMs, {
+  message: "Le hop size doit rester inférieur ou égal à la fenêtre.",
+  path: ["hopMs"],
+});
 
 const analysisModes: Array<{ value: AnalysisMode; label: string }> = [
   { value: "stereo", label: "Stéréo" },
@@ -77,17 +105,24 @@ const percentile = (values: number[], ratio: number) => {
 const estimateTruePeak = (channels: Float32Array[]) => {
   let peak = 0;
   for (const samples of channels) {
-    for (let i = 0; i < samples.length - 1; i += 1) {
-      const current = samples[i];
-      const next = samples[i + 1];
-      peak = Math.max(peak, Math.abs(current), Math.abs(current * 0.75 + next * 0.25), Math.abs(current * 0.5 + next * 0.5), Math.abs(current * 0.25 + next * 0.75));
+    for (let i = 1; i < samples.length - 2; i += 1) {
+      for (let phase = 0; phase < 4; phase += 1) {
+        const t = phase / 4;
+        const y0 = samples[i - 1];
+        const y1 = samples[i];
+        const y2 = samples[i + 1];
+        const y3 = samples[i + 2];
+        const interpolated = 0.5 * ((2 * y1) + (-y0 + y2) * t + (2 * y0 - 5 * y1 + 4 * y2 - y3) * t * t + (-y0 + 3 * y1 - 3 * y2 + y3) * t * t * t);
+        peak = Math.max(peak, Math.abs(interpolated));
+      }
     }
     peak = Math.max(peak, Math.abs(samples[samples.length - 1] ?? 0));
   }
   return 20 * Math.log10(Math.max(peak, 1e-12));
 };
 
-const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<AnalysisResult> => {
+const analyzeLoudness = async (file: File, mode: AnalysisMode, settings: AnalysisSettings): Promise<AnalysisResult> => {
+  const validatedSettings = settingsSchema.parse(settings);
   const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
   const audioContext = new AudioContextCtor();
   const arrayBuffer = await file.arrayBuffer();
@@ -119,8 +154,10 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   const renderedBuffer = await offlineContext.startRendering();
   const channelCount = renderedBuffer.numberOfChannels;
   const sampleRate = renderedBuffer.sampleRate;
-  const blockSize = Math.max(1, Math.round(sampleRate * 0.4));
-  const hopSize = Math.max(1, Math.round(sampleRate * 0.1));
+  const windowSeconds = validatedSettings.windowMs / 1000;
+  const hopSeconds = validatedSettings.hopMs / 1000;
+  const blockSize = Math.max(1, Math.round(sampleRate * windowSeconds));
+  const hopSize = Math.max(1, Math.round(sampleRate * hopSeconds));
   const blocks: number[] = [];
   let peak = 0;
 
@@ -134,7 +171,7 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   }
 
   const selectedChannels = getSelectedChannels(renderedBuffer, mode);
-  const truePeakDb = estimateTruePeak(selectedChannels);
+  const truePeakDb = validatedSettings.truePeak ? estimateTruePeak(selectedChannels) : 20 * Math.log10(Math.max(peak, 1e-12));
 
   for (let start = 0; start + blockSize <= renderedBuffer.length; start += hopSize) {
     let blockPower = 0;
@@ -154,24 +191,24 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
     return total + sum / Math.max(samples.length, 1);
   }, 0)];
 
-  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > -70);
+  const absoluteGatedBlocks = usableBlocks.filter((power) => dbFromPower(power) > validatedSettings.gateLufs);
   const firstPassBlocks = absoluteGatedBlocks.length ? absoluteGatedBlocks : usableBlocks;
   const firstPassPower = firstPassBlocks.reduce((sum, power) => sum + power, 0) / firstPassBlocks.length;
   const relativeGate = dbFromPower(firstPassPower) - 10;
   const relativeGatedBlocks = firstPassBlocks.filter((power) => dbFromPower(power) > relativeGate);
   const finalBlocks = relativeGatedBlocks.length ? relativeGatedBlocks : firstPassBlocks;
   const integratedPower = finalBlocks.reduce((sum, power) => sum + power, 0) / finalBlocks.length;
-  const shortTermWindow = Math.max(1, Math.round(3 / 0.1));
+  const shortTermWindow = Math.max(1, Math.round(3 / hopSeconds));
   const curve = usableBlocks.map((power, index) => {
     const shortTermBlocks = usableBlocks.slice(Math.max(0, index - shortTermWindow + 1), index + 1);
     return {
-      time: index * 0.1,
+      time: index * hopSeconds,
       momentary: dbFromPower(power),
       shortTerm: dbFromPower(averagePower(shortTermBlocks)),
     };
   });
   const latestCurvePoint = curve[curve.length - 1];
-  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > -70);
+  const gatedShortTerm = curve.map((point) => point.shortTerm).filter((value) => value > validatedSettings.gateLufs);
   const loudnessRange = percentile(gatedShortTerm, 0.95) - percentile(gatedShortTerm, 0.10);
   const integratedLufs = dbFromPower(integratedPower);
   const maxMomentaryLufs = Math.max(...curve.map((point) => point.momentary).filter(Number.isFinite));
@@ -196,10 +233,14 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   };
 };
 
-const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
-  const width = 640;
-  const height = 180;
-  const padding = 18;
+const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void }) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const width = 760;
+  const height = 280;
+  const paddingLeft = 54;
+  const paddingRight = 30;
+  const paddingTop = 24;
+  const paddingBottom = 42;
   const usableData = data.length ? data : [{ time: 0, momentary: -70, shortTerm: -70 }];
   const values = [...usableData.flatMap((point) => [point.momentary, point.shortTerm]), ...loudnessMarkers.map((marker) => marker.value)].filter(Number.isFinite);
   const minValue = Math.floor(Math.min(...values, -24) / 5) * 5;
@@ -207,10 +248,14 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
   const valueRange = Math.max(maxValue - minValue, 1);
   const timeMax = Math.max(usableData[usableData.length - 1].time, 0.1);
   const pointToCoord = (point: { time: number }, value: number) => {
-    const x = padding + (point.time / timeMax) * (width - padding * 2);
-    const y = padding + ((maxValue - value) / valueRange) * (height - padding * 2);
+    const x = paddingLeft + (point.time / timeMax) * (width - paddingLeft - paddingRight);
+    const y = paddingTop + ((maxValue - value) / valueRange) * (height - paddingTop - paddingBottom);
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   };
+  const hoveredPoint = hoveredIndex === null ? null : usableData[hoveredIndex];
+  const hoverX = hoveredPoint ? paddingLeft + (hoveredPoint.time / timeMax) * (width - paddingLeft - paddingRight) : 0;
+  const hoverMomentaryY = hoveredPoint ? paddingTop + ((maxValue - hoveredPoint.momentary) / valueRange) * (height - paddingTop - paddingBottom) : 0;
+  const hoverShortTermY = hoveredPoint ? paddingTop + ((maxValue - hoveredPoint.shortTerm) / valueRange) * (height - paddingTop - paddingBottom) : 0;
   const momentaryPath = usableData.map((point) => pointToCoord(point, point.momentary)).join(" ");
   const shortTermPath = usableData.map((point) => pointToCoord(point, point.shortTerm)).join(" ");
 
@@ -221,25 +266,54 @@ const LoudnessCurve = ({ data }: { data: AnalysisResult["curve"] }) => {
           <Waves className="h-4 w-4 text-primary" />
           Courbe LUFS
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" />Momentary</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-accent" />Short-term</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          {([{ value: "both", label: "Les deux" }, { value: "momentary", label: "Momentary" }, { value: "shortTerm", label: "Short-term" }] as const).map((option) => (
+            <button key={option.value} type="button" onClick={() => onFocusChange(option.value)} className={`rounded-full border px-3 py-1 transition-colors ${focus === option.value ? "border-primary bg-primary/15 text-foreground" : "border-border hover:border-primary"}`}>
+              {option.label}
+            </button>
+          ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-44 w-full overflow-visible">
-        <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
-        <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="stroke-border" strokeWidth="1" />
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Courbe LUFS momentary et short-term" className="h-72 w-full overflow-visible" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * width;
+        const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
+        setHoveredIndex(Math.min(usableData.length - 1, Math.max(0, Math.round(ratio * (usableData.length - 1)))));
+      }}>
+        <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
+        <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
+        <text x={paddingLeft - 8} y={paddingTop - 6} textAnchor="end" className="fill-muted-foreground text-[11px]">LUFS</text>
+        <text x={width - paddingRight} y={height - 10} textAnchor="end" className="fill-muted-foreground text-[11px]">temps</text>
+        {[minValue, Math.round((minValue + maxValue) / 2), maxValue].map((tick) => {
+          const y = paddingTop + ((maxValue - tick) / valueRange) * (height - paddingTop - paddingBottom);
+          return <text key={tick} x={paddingLeft - 8} y={y + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{tick}</text>;
+        })}
+        {[0, timeMax / 2, timeMax].map((tick) => {
+          const x = paddingLeft + (tick / timeMax) * (width - paddingLeft - paddingRight);
+          return <text key={tick} x={x} y={height - 22} textAnchor="middle" className="fill-muted-foreground text-[10px]">{formatDuration(tick)}</text>;
+        })}
         {loudnessMarkers.map((marker) => {
-          const y = padding + ((maxValue - marker.value) / valueRange) * (height - padding * 2);
-          return y >= padding && y <= height - padding ? (
+          const y = paddingTop + ((maxValue - marker.value) / valueRange) * (height - paddingTop - paddingBottom);
+          return y >= paddingTop && y <= height - paddingBottom ? (
             <g key={marker.value}>
-              <line x1={padding} y1={y} x2={width - padding} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
-              <text x={width - padding} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[11px]">{marker.label} · {marker.hint}</text>
+              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} className="stroke-border/70" strokeDasharray="5 5" strokeWidth="1" />
+              <text x={width - paddingRight} y={y - 5} textAnchor="end" className="fill-muted-foreground text-[10px]">{marker.label}</text>
             </g>
           ) : null;
         })}
-        <polyline points={momentaryPath} fill="none" className="stroke-primary" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <polyline points={shortTermPath} fill="none" className="stroke-accent" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+        <polyline points={momentaryPath} fill="none" className="stroke-primary" strokeWidth={focus === "momentary" ? "4" : "2.5"} strokeLinecap="round" strokeLinejoin="round" opacity={focus === "shortTerm" ? "0.25" : "1"} />
+        <polyline points={shortTermPath} fill="none" className="stroke-accent" strokeWidth={focus === "shortTerm" ? "4" : "2.5"} strokeLinecap="round" strokeLinejoin="round" opacity={focus === "momentary" ? "0.25" : "0.95"} />
+        {hoveredPoint && (
+          <g pointerEvents="none">
+            <line x1={hoverX} y1={paddingTop} x2={hoverX} y2={height - paddingBottom} className="stroke-foreground/40" strokeDasharray="4 4" />
+            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-primary" />}
+            {(focus !== "momentary") && <circle cx={hoverX} cy={hoverShortTermY} r="4" className="fill-accent" />}
+            <rect x={Math.min(hoverX + 10, width - 176)} y={Math.max(10, Math.min(hoverMomentaryY, hoverShortTermY) - 34)} width="166" height="58" rx="6" className="fill-background stroke-border" />
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(30, Math.min(hoverMomentaryY, hoverShortTermY) - 14)} className="fill-foreground text-[11px]">{formatDuration(hoveredPoint.time)}</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-primary text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(62, Math.min(hoverMomentaryY, hoverShortTermY) + 18)} className="fill-accent text-[11px]">S {hoveredPoint.shortTerm.toFixed(1)} LUFS</text>
+          </g>
+        )}
       </svg>
     </div>
   );
@@ -253,6 +327,9 @@ const Loudness = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
   const [musicContext, setMusicContext] = useState<MusicContext>("rap");
+  const [settings, setSettings] = useState<AnalysisSettings>(professionalDefaults);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const targetHint = useMemo(() => {
@@ -269,26 +346,48 @@ const Loudness = () => {
     return `${contextAdvice[musicContext]}${technical}`;
   }, [musicContext, result]);
 
-  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
+  const runAnalysis = useCallback(async (file: File, mode: AnalysisMode, nextSettings = settings) => {
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const analysis = await analyzeLoudness(file, mode);
+      const validatedSettings = settingsSchema.parse(nextSettings) as AnalysisSettings;
+      setSettingsError(null);
+      const analysis = await analyzeLoudness(file, mode, validatedSettings);
       setResult(analysis);
     } catch (analysisError) {
       console.error(analysisError);
+      if (analysisError instanceof z.ZodError) {
+        setSettingsError(analysisError.errors[0]?.message ?? "Réglages d'analyse invalides.");
+        return;
+      }
       setError("Impossible d'analyser ce fichier. Essaie un WAV, MP3, AIFF, FLAC ou AAC exporté correctement.");
     } finally {
       setIsAnalyzing(false);
     }
-  }, []);
+  }, [settings]);
 
   const handleModeChange = useCallback((mode: AnalysisMode) => {
     setSelectedMode(mode);
     if (selectedFile) void runAnalysis(selectedFile, mode);
   }, [runAnalysis, selectedFile]);
+
+  const updateSetting = useCallback(<Key extends keyof AnalysisSettings>(key: Key, value: AnalysisSettings[Key]) => {
+    const nextSettings = { ...settings, [key]: value };
+    const validation = settingsSchema.safeParse(nextSettings);
+    setSettings(nextSettings);
+    setSettingsError(validation.success ? null : validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
+  }, [settings]);
+
+  const reanalyzeWithSettings = useCallback(() => {
+    const validation = settingsSchema.safeParse(settings);
+    if (!validation.success) {
+      setSettingsError(validation.error.errors[0]?.message ?? "Réglages d'analyse invalides.");
+      return;
+    }
+    if (selectedFile) void runAnalysis(selectedFile, selectedMode, validation.data as AnalysisSettings);
+  }, [runAnalysis, selectedFile, selectedMode, settings]);
 
   const handleFile = useCallback(async (file?: File) => {
     if (!file) return;
@@ -359,6 +458,37 @@ const Loudness = () => {
                   ))}
                 </div>
               </div>
+              <Card className="equipment-card border-border/80">
+                <CardContent className="space-y-4 p-4">
+                  <div>
+                    <p className="text-sm font-medium">Réglages avancés</p>
+                    <p className="text-xs text-muted-foreground">Valeurs professionnelles par défaut, validation stricte avant analyse.</p>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="window-ms">Fenêtre (ms)</Label>
+                      <Input id="window-ms" type="number" min={200} max={3000} step={50} value={settings.windowMs} onChange={(event) => updateSetting("windowMs", Number(event.target.value))} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="hop-ms">Hop size (ms)</Label>
+                      <Input id="hop-ms" type="number" min={25} max={1000} step={25} value={settings.hopMs} onChange={(event) => updateSetting("hopMs", Number(event.target.value))} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="gate-lufs">Seuil gating (LUFS)</Label>
+                      <Input id="gate-lufs" type="number" min={-90} max={-40} step={1} value={settings.gateLufs} onChange={(event) => updateSetting("gateLufs", Number(event.target.value))} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
+                      <Label htmlFor="true-peak" className="text-sm">Approx. true peak</Label>
+                      <Switch id="true-peak" checked={settings.truePeak} onCheckedChange={(checked) => updateSetting("truePeak", checked)} />
+                    </div>
+                  </div>
+                  {settingsError && <p className="text-sm text-destructive">{settingsError}</p>}
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" onClick={() => { setSettings(professionalDefaults); setSettingsError(null); }} disabled={isAnalyzing}>Réinitialiser</Button>
+                    <Button type="button" onClick={reanalyzeWithSettings} disabled={isAnalyzing || !selectedFile || Boolean(settingsError)}>Analyser précisément</Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <Card className="equipment-card overflow-hidden border-border/80">
@@ -444,7 +574,7 @@ const Loudness = () => {
                     </p>
                   </div>
                   <div className="mt-6">
-                    <LoudnessCurve data={result.curve} />
+                    <LoudnessCurve data={result.curve} focus={curveFocus} onFocusChange={setCurveFocus} />
                   </div>
                 </CardContent>
               </Card>
