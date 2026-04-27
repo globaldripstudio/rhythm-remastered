@@ -334,16 +334,16 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
             </g>
           ) : null;
         })}
-        <polyline points={momentaryPath} fill="none" className="stroke-accent" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
+        <polyline points={momentaryPath} fill="none" className="stroke-secondary" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
         <polyline points={shortTermPath} fill="none" className="stroke-primary" strokeWidth={focus === "shortTerm" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "momentary" ? "0.22" : "1"} />
         {hoveredPoint && (
           <g pointerEvents="none">
             <line x1={hoverX} y1={paddingTop} x2={hoverX} y2={height - paddingBottom} className="stroke-foreground/40" strokeDasharray="4 4" />
-            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-accent" />}
+            {(focus !== "shortTerm") && <circle cx={hoverX} cy={hoverMomentaryY} r="4" className="fill-secondary" />}
             {(focus !== "momentary") && <circle cx={hoverX} cy={hoverShortTermY} r="4" className="fill-primary" />}
             <rect x={Math.min(hoverX + 10, width - 176)} y={Math.max(10, Math.min(hoverMomentaryY, hoverShortTermY) - 34)} width="166" height="58" rx="6" className="fill-background stroke-border" />
             <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(30, Math.min(hoverMomentaryY, hoverShortTermY) - 14)} className="fill-foreground text-[11px]">{formatDuration(hoveredPoint.time)}</text>
-            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-accent text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
+            <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(46, Math.min(hoverMomentaryY, hoverShortTermY) + 2)} className="fill-secondary text-[11px]">M {hoveredPoint.momentary.toFixed(1)} LUFS</text>
             <text x={Math.min(hoverX + 20, width - 166)} y={Math.max(62, Math.min(hoverMomentaryY, hoverShortTermY) + 18)} className="fill-primary text-[11px]">S {hoveredPoint.shortTerm.toFixed(1)} LUFS</text>
           </g>
         )}
@@ -478,16 +478,6 @@ const Loudness = () => {
     drawPdfLoudnessCurve(report, result, margin, y, pageWidth - margin * 2, 72);
     y += 84;
     report.setFont("helvetica", "bold");
-    report.setFontSize(13);
-    report.setTextColor(255, 255, 255);
-    report.text("Interprétation", margin, y);
-    y += 7;
-    report.setFont("helvetica", "normal");
-    report.setFontSize(10);
-    report.setTextColor(190, 198, 208);
-    report.text(report.splitTextToSize(targetHint ?? "Analyse effectuée avec paramètres professionnels BS.1770.", pageWidth - margin * 2), margin, y);
-    y += 28;
-    report.setFont("helvetica", "bold");
     report.setTextColor(255, 255, 255);
     report.text("Méthodologie", margin, y);
     y += 7;
@@ -509,7 +499,7 @@ const Loudness = () => {
     report.setTextColor(120, 128, 138);
     report.text("Rapport généré localement — aucun fichier audio envoyé sur serveur.", margin, pageHeight - 12);
     report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
-  }, [inferredContext, result, targetHint]);
+  }, [inferredContext, result]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -638,7 +628,15 @@ const Loudness = () => {
                       <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">LUFS short-term</p>
                     </div>
                   </div>
-                  {targetHint && <p className="mt-4 text-sm text-muted-foreground">{targetHint}</p>}
+                  {targetHint && (
+                    <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
+                      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                        <Gauge className="h-4 w-4 text-secondary" />
+                        Interprétation automatique
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{targetHint}</p>
+                    </div>
+                  )}
                   <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
                     <div className="mb-2 flex items-center gap-2 font-medium text-foreground">
                       <Info className="h-4 w-4 text-primary" />
