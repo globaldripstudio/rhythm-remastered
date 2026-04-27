@@ -552,7 +552,7 @@ const Loudness = () => {
     report.setFontSize(8);
     report.setTextColor(120, 128, 138);
     report.text(t("loudness.pdf.footer"), margin, pageHeight - 12);
-    report.save(`${safeFileName(result.fileName)}-rapport-lufs.pdf`);
+    report.save(`${safeFileName(result.fileName)}-${t("loudness.pdf.fileSuffix")}.pdf`);
   }, [inferredContext, result, t]);
 
   return (
@@ -760,28 +760,25 @@ const Loudness = () => {
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.maximumsDesc")}</p>
                 </CardContent>
               </Card>
+              <Card className="equipment-card sm:col-span-2 lg:col-span-4">
+                <CardContent className="p-6 sm:p-8 text-center">
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
+                    {t("projects.readyToJoin")} <span className="hero-text">{t("projects.collaborationsWord")}</span> ?
+                  </h2>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto">
+                    {t("projects.readyDesc")}
+                  </p>
+                  <a href="/#contact">
+                    <Button size="lg" className="studio-button text-sm sm:text-base">
+                      {t("projects.startProject")}
+                    </Button>
+                  </a>
+                </CardContent>
+              </Card>
             </section>
           )}
         </section>
       </main>
-
-      <section className="py-10 sm:py-16 bg-gradient-to-b from-muted/20 to-background">
-        <div className="container mx-auto px-4 sm:px-6 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
-              {t("projects.readyToJoin")} <span className="hero-text">{t("projects.collaborationsWord")}</span> ?
-            </h2>
-            <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
-              {t("projects.readyDesc")}
-            </p>
-            <a href="/#contact">
-              <Button size="lg" className="studio-button text-sm sm:text-base">
-                {t("projects.startProject")}
-              </Button>
-            </a>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
