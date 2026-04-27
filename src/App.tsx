@@ -19,6 +19,7 @@ import Ebook from "./pages/Ebook";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import EbookLogin from "./pages/EbookLogin";
 import EbookReader from "./pages/EbookReader";
+import Loudness from "./pages/Loudness";
 import Admin from "./pages/Admin";
 
 import LiveChat from "./components/LiveChat";
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/ebook" element={<Ebook />} />
             <Route path="/ebook/login" element={<EbookLogin />} />
             <Route path="/ebook/reader" element={<EbookReader />} />
+            <Route path="/loudness" element={<Loudness />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
             
