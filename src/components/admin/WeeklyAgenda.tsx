@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight, Trash2, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trash2, Calendar, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -152,6 +152,20 @@ const WeeklyAgenda = () => {
     setIsDialogOpen(true);
   };
 
+  const openDialogForDay = (day: Date) => {
+    const startDate = setMinutes(setHours(day, STUDIO_OPEN), 0);
+    const endDate = setMinutes(setHours(day, STUDIO_OPEN + 1), 0);
+    setSelection(null);
+    setEditingEvent(null);
+    setFormData({
+      title: '', description: '',
+      start_time: format(startDate, "yyyy-MM-dd'T'HH:mm"),
+      end_time: format(endDate, "yyyy-MM-dd'T'HH:mm"),
+      color: '#4ecdc4'
+    });
+    setIsDialogOpen(true);
+  };
+
   const handleEventClick = (event: Event, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelection(null);
@@ -214,28 +228,28 @@ const WeeklyAgenda = () => {
   return (
     <Card className="border-primary/20">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl flex items-center gap-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
             <Calendar className="w-5 h-5" />
             Agenda
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" className="h-9 flex-1 sm:flex-none" onClick={() => setCurrentDate(new Date())}>
               Aujourd'hui
             </Button>
-            <Button variant="outline" size="icon" onClick={() => setCurrentDate(subWeeks(currentDate, 1))}>
+            <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setCurrentDate(subWeeks(currentDate, 1))}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <span className="text-sm font-medium min-w-[200px] text-center">
+            <span className="order-first w-full text-center text-sm font-medium sm:order-none sm:w-auto sm:min-w-[200px]">
               {format(weekStart, 'd MMM', { locale: fr })} - {format(weekEnd, 'd MMM yyyy', { locale: fr })}
             </span>
-            <Button variant="outline" size="icon" onClick={() => setCurrentDate(addWeeks(currentDate, 1))}>
+            <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setCurrentDate(addWeeks(currentDate, 1))}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
         {/* Legend */}
-        <div className="flex gap-4 text-xs text-muted-foreground mt-1">
+        <div className="flex flex-wrap gap-3 sm:gap-4 text-xs text-muted-foreground mt-1">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-muted/80 border border-border/50" />
             <span>Fermé</span>
@@ -244,7 +258,7 @@ const WeeklyAgenda = () => {
             <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(180, 35%, 35%, 0.15)' }} />
             <span>Pause déjeuner</span>
           </div>
-          <span className="ml-auto">Lun-Ven 10h-19h</span>
+          <span className="sm:ml-auto">Lun-Ven 10h-19h</span>
         </div>
       </CardHeader>
       <CardContent className="p-0">
