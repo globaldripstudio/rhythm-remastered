@@ -295,6 +295,32 @@ const KeyBpmFinder = () => {
               </Card>
             </section>
           )}
+
+          {/* SEO content block — moved below results to keep them above the fold */}
+          {result && (
+            <section className="mt-8 grid gap-4 md:grid-cols-[1.1fr_0.9fr]" aria-labelledby="keybpm-seo-title-after">
+              <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+                <h2 id="keybpm-seo-title-after" className="text-xl font-bold sm:text-2xl">{t("keybpm.seoBlock.title")}</h2>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{t("keybpm.seoBlock.description")}</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {(["djmix", "production", "remix"] as const).map((item) => (
+                    <div key={item} className="rounded-md bg-muted/25 p-3">
+                      <h3 className="text-sm font-semibold text-foreground">{t(`keybpm.seoBlock.topics.${item}.title`)}</h3>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t(`keybpm.seoBlock.topics.${item}.description`)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+                <h2 className="text-base font-bold text-foreground sm:text-lg">{t("keybpm.seoBlock.howTitle")}</h2>
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
+                  {(["bpm", "key", "camelot", "privacy"] as const).map((item) => (
+                    <li key={item}>• {t(`keybpm.seoBlock.how.${item}`)}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
         </section>
       </main>
     </div>
