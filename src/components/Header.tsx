@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Gauge, Menu, Phone, X } from "lucide-react";
+import { Gauge, KeyRound, Menu, Phone, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Header = () => {
@@ -63,6 +63,10 @@ const Header = () => {
             <a href="/loudness" className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground lg:px-2.5 lg:py-1.5">
               <Gauge className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
               {t('nav.loudness')}
+            </a>
+            <a href="/key-bpm-finder" className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground lg:px-2.5 lg:py-1.5">
+              <KeyRound className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
+              {t('nav.keybpm')}
             </a>
           </nav>
 
