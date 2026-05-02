@@ -737,13 +737,32 @@ const Loudness = () => {
                     </div>
                     <div>
                       <p className="text-3xl font-bold sm:text-4xl">{result.momentaryLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.momentaryCurrent")}</p>
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold sm:text-4xl">{result.shortTermLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.shortTermCurrent")}</p>
-                    </div>
-                  </div>
+                  {(() => {
+                    const hovered = curveHoverIndex !== null ? result.curve[curveHoverIndex] : null;
+                    const displayMomentary = hovered ? hovered.momentary : result.momentaryLufs;
+                    const displayShortTerm = hovered ? hovered.shortTerm : result.shortTermLufs;
+                    const hoverLabel = hovered ? formatDuration(hovered.time) : null;
+                    return (
+                      <div className="grid gap-4 md:grid-cols-3">
+                        <div>
+                          <p className="text-4xl font-bold text-primary sm:text-5xl">{result.lufs.toFixed(1)}</p>
+                          <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
+                        </div>
+                        <div>
+                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-secondary" : ""}`}>{displayMomentary.toFixed(1)}</p>
+                          <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">
+                            {hoverLabel ? `M @ ${hoverLabel}` : t("loudness.metrics.momentaryCurrent")}
+                          </p>
+                        </div>
+                        <div>
+                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-primary" : ""}`}>{displayShortTerm.toFixed(1)}</p>
+                          <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">
+                            {hoverLabel ? `S @ ${hoverLabel}` : t("loudness.metrics.shortTermCurrent")}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {targetHint && (
                     <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
                       <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -763,7 +782,7 @@ const Loudness = () => {
                     </p>
                   </div>
                   <div className="mt-6">
-                    <LoudnessCurve data={result.curve} focus={curveFocus} onFocusChange={setCurveFocus} />
+                    <LoudnessCurve data={result.curve} focus={curveFocus} onFocusChange={setCurveFocus} hoveredIndex={curveHoverIndex} onHoverChange={setCurveHoverIndex} />
                   </div>
                 </CardContent>
               </Card>
