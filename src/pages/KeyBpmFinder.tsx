@@ -218,9 +218,6 @@ const KeyBpmFinder = () => {
                       <p className="mt-3 text-5xl font-bold text-primary sm:text-6xl">
                         {result.bpm.bpm > 0 ? result.bpm.bpm.toFixed(1) : "—"}
                       </p>
-                      <p className={`mt-2 text-xs uppercase ${confidenceColor(result.bpm.confidence)}`}>
-                        {t("keybpm.confidence.label")}: {confidenceLabel(result.bpm.confidence, t)} ({Math.round(result.bpm.confidence * 100)}%)
-                      </p>
                       {result.bpm.candidates.length > 1 && (
                         <div className="mt-3 text-xs text-muted-foreground">
                           <span className="text-foreground">{t("keybpm.alternatives")}:</span>{" "}
