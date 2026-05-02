@@ -7,6 +7,7 @@
     "projects": "Projets",
     "blog": "Blog",
     "loudness": "Loudness",
+    "keybpm": "Key & BPM",
     "shop": "Boutique",
     "shopSoon": "bientôt",
     "book": "Réserver",
@@ -916,6 +917,10 @@
     "loudnessArticle": {
       "title": "Analyse LUFS en ligne : contrôler un master | Global Drip",
       "description": "Présentation de notre analyseur LUFS en ligne : true peak, LRA, loudness intégrée, courbe et rapport PDF pour préparer vos masters."
+    },
+    "keybpm": {
+      "title": "Key & BPM Finder gratuit en ligne | Détecteur de tonalité et tempo",
+      "description": "Trouve la tonalité (key), le BPM et le code Camelot d'un morceau directement dans le navigateur. Analyse rapide, précise et 100% locale, sans upload serveur."
     }
   },
   "legalPages": {
