@@ -122,7 +122,7 @@ class FFT {
   // In-place real FFT — returns magnitudes (length n/2)
   forwardMagnitudes(real: Float64Array): Float64Array {
     const n = this.n;
-    const imag = new Float64Array(n);
+    const imag = new Float64Array(new ArrayBuffer(n * 8));
     // Bit reversal
     let j = 0;
     for (let i = 0; i < n - 1; i += 1) {
@@ -255,17 +255,17 @@ const detectBpm = (samples: Float32Array, sampleRate: number): BpmResult => {
     return total;
   };
 
-  candidates.forEach((c) => { (c as { lag: number; score: number; bpm: number; harmScore?: number }).harmScore = scoreWithHarmonics(c); });
-  candidates.sort((a, b) => ((b as { harmScore: number }).harmScore) - ((a as { harmScore: number }).harmScore));
+  const scored = candidates.map((c) => ({ ...c, harmScore: scoreWithHarmonics(c) }));
+  scored.sort((a, b) => b.harmScore - a.harmScore);
 
   // Take top candidate, then apply octave correction:
   // Prefer values in the 70-180 BPM "musical sweet spot"
-  const top = candidates.slice(0, 6);
+  const top = scored.slice(0, 6);
   const adjusted = top.map((c) => {
     let bpm = c.bpm;
     while (bpm < 70 && bpm * 2 <= 200) bpm *= 2;
     while (bpm > 180 && bpm / 2 >= 60) bpm /= 2;
-    return { bpm, score: (c as { harmScore: number }).harmScore };
+    return { bpm, score: c.harmScore };
   });
 
   // Aggregate: round-bin BPMs and sum scores (tracks with similar BPMs reinforce)
