@@ -730,13 +730,6 @@ const Loudness = () => {
                       </Button>
                     ))}
                   </div>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div>
-                      <p className="text-4xl font-bold text-primary sm:text-5xl">{result.lufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold sm:text-4xl">{result.momentaryLufs.toFixed(1)}</p>
                   {(() => {
                     const hovered = curveHoverIndex !== null ? result.curve[curveHoverIndex] : null;
                     const displayMomentary = hovered ? hovered.momentary : result.momentaryLufs;
