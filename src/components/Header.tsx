@@ -166,14 +166,20 @@ const Header = () => {
                   {t('nav.shopSoon')}
                 </span>
               </span>
-              <a href="/loudness" className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-3 text-muted-foreground transition-colors hover:border-primary/70 hover:text-foreground" onClick={toggleMenu}>
-                <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
-                <span>{t('nav.loudness')}</span>
-              </a>
-              <a href="/key-bpm-finder" className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-3 text-muted-foreground transition-colors hover:border-primary/70 hover:text-foreground" onClick={toggleMenu}>
-                <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
-                <span>{t('nav.keybpm')}</span>
-              </a>
+              <div className="rounded-md border border-border bg-muted/10 p-2">
+                <div className="flex items-center gap-2 px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <Wrench className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                  {t('nav.toolkit')}
+                </div>
+                <a href="/loudness" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                  <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <span>{t('nav.loudness')}</span>
+                </a>
+                <a href="/key-bpm-finder" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                  <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <span>{t('nav.keybpm')}</span>
+                </a>
+              </div>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />
