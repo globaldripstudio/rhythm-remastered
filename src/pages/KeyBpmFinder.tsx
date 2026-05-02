@@ -241,7 +241,7 @@ const KeyBpmFinder = () => {
                       </div>
                       {result.key.alternative && (
                         <p className="mt-2 text-xs text-muted-foreground">
-                          {t("keybpm.alternative")}: <span className="text-foreground">{formatKey(result.key.alternative.tonic, result.key.alternative.mode, t)}</span> · Camelot {result.key.alternative.camelot}
+                          {t("keybpm.alternativeKey")}: <span className="text-foreground">{formatKey(result.key.alternative.tonic, result.key.alternative.mode, t)}</span> · Camelot {result.key.alternative.camelot}
                         </p>
                       )}
                     </div>
