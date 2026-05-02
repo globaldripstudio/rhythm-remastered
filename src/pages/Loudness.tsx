@@ -740,8 +740,6 @@ const Loudness = () => {
                   </div>
                   {(() => {
                     const hovered = curveHoverIndex !== null ? result.curve[curveHoverIndex] : null;
-                    const displayMomentary = hovered ? hovered.momentary : result.momentaryLufs;
-                    const displayShortTerm = hovered ? hovered.shortTerm : result.shortTermLufs;
                     const hoverLabel = hovered ? formatDuration(hovered.time) : null;
                     return (
                       <div className="grid gap-4 md:grid-cols-3">
@@ -750,13 +748,13 @@ const Loudness = () => {
                           <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
                         </div>
                         <div>
-                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-secondary" : ""}`}>{displayMomentary.toFixed(1)}</p>
+                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-secondary" : "text-muted-foreground"}`}>{hovered ? hovered.momentary.toFixed(1) : "—"}</p>
                           <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">
                             {hoverLabel ? `M @ ${hoverLabel}` : t("loudness.metrics.momentaryCurrent")}
                           </p>
                         </div>
                         <div>
-                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-primary" : ""}`}>{displayShortTerm.toFixed(1)}</p>
+                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-primary" : "text-muted-foreground"}`}>{hovered ? hovered.shortTerm.toFixed(1) : "—"}</p>
                           <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">
                             {hoverLabel ? `S @ ${hoverLabel}` : t("loudness.metrics.shortTermCurrent")}
                           </p>
