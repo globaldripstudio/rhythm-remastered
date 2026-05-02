@@ -586,6 +586,13 @@ const Loudness = () => {
                   <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
                 </Button>
               </Link>
+              <Link to="/key-bpm-finder">
+                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 text-muted-foreground hover:text-foreground">
+                  <KeyRound className="h-3.5 w-3.5 text-primary" />
+                  <span className="hidden sm:inline">{t('nav.keybpm')}</span>
+                  <span className="sm:hidden">Key/BPM</span>
+                </Button>
+              </Link>
             </div>
             <button
               onClick={toggleLanguage}
