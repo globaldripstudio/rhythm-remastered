@@ -16,17 +16,6 @@ const formatDuration = (seconds: number) => {
 const formatKey = (tonic: string, mode: "major" | "minor", t: (k: string) => string) =>
   `${tonic} ${mode === "major" ? t("keybpm.modes.major") : t("keybpm.modes.minor")}`;
 
-const confidenceLabel = (c: number, t: (k: string) => string) => {
-  if (c >= 0.7) return t("keybpm.confidence.high");
-  if (c >= 0.4) return t("keybpm.confidence.medium");
-  return t("keybpm.confidence.low");
-};
-
-const confidenceColor = (c: number) => {
-  if (c >= 0.7) return "text-primary";
-  if (c >= 0.4) return "text-secondary";
-  return "text-muted-foreground";
-};
 
 const KeyBpmFinder = () => {
   const { t, i18n } = useTranslation();
