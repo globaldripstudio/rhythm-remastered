@@ -220,10 +220,8 @@ const KeyBpmFinder = () => {
                       </p>
                       {result.bpm.candidates.length > 1 && (
                         <div className="mt-3 text-xs text-muted-foreground">
-                          <span className="text-foreground">{t("keybpm.alternatives")}:</span>{" "}
-                          {result.bpm.candidates.slice(1, 4).map((c, i) => (
-                            <span key={i}>{i > 0 && " · "}{c.bpm.toFixed(1)}</span>
-                          ))}
+                          <span className="text-foreground">{t("keybpm.alternative")}:</span>{" "}
+                          {result.bpm.candidates[1].bpm.toFixed(1)}
                         </div>
                       )}
                     </div>
