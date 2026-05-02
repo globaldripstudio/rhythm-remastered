@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Gauge, KeyRound, Menu, Phone, X } from "lucide-react";
+import { ChevronDown, Gauge, KeyRound, Menu, Phone, Wrench, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Header = () => {
@@ -60,14 +60,48 @@ const Header = () => {
               </span>
             </span>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/loudness" className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground lg:px-2.5 lg:py-1.5">
-              <Gauge className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
-              {t('nav.loudness')}
-            </a>
-            <a href="/key-bpm-finder" className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors hover:border-primary/70 hover:bg-primary/10 hover:text-foreground lg:px-2.5 lg:py-1.5">
-              <KeyRound className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
-              {t('nav.keybpm')}
-            </a>
+            {/* Toolkit dropdown — opens on hover, no click needed */}
+            <div className="relative group">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors group-hover:border-primary/70 group-hover:bg-primary/10 group-hover:text-foreground lg:px-2.5 lg:py-1.5"
+                aria-haspopup="menu"
+                aria-expanded="false"
+              >
+                <Wrench className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
+                {t('nav.toolkit')}
+                <ChevronDown className="h-3 w-3 lg:h-3.5 lg:w-3.5 transition-transform group-hover:rotate-180" aria-hidden="true" />
+              </button>
+              {/* Invisible bridge so the cursor can travel from button to menu without flicker */}
+              <div className="absolute left-0 right-0 top-full h-2" aria-hidden="true" />
+              <div
+                role="menu"
+                className="invisible absolute left-1/2 top-[calc(100%+0.5rem)] z-50 w-64 -translate-x-1/2 translate-y-1 rounded-xl border border-border bg-card/95 p-2 opacity-0 shadow-xl backdrop-blur-lg transition-all duration-200 ease-out group-hover:visible group-hover:translate-y-0 group-hover:opacity-100"
+              >
+                <a
+                  href="/loudness"
+                  role="menuitem"
+                  className="flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-primary/10"
+                >
+                  <Gauge className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">{t('nav.loudness')}</span>
+                    <span className="block text-xs text-muted-foreground">{t('nav.loudnessDesc')}</span>
+                  </span>
+                </a>
+                <a
+                  href="/key-bpm-finder"
+                  role="menuitem"
+                  className="flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-primary/10"
+                >
+                  <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">{t('nav.keybpm')}</span>
+                    <span className="block text-xs text-muted-foreground">{t('nav.keybpmDesc')}</span>
+                  </span>
+                </a>
+              </div>
+            </div>
           </nav>
 
           {/* Contact Info & CTA & Language Switch */}
@@ -132,14 +166,20 @@ const Header = () => {
                   {t('nav.shopSoon')}
                 </span>
               </span>
-              <a href="/loudness" className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-3 text-muted-foreground transition-colors hover:border-primary/70 hover:text-foreground" onClick={toggleMenu}>
-                <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
-                <span>{t('nav.loudness')}</span>
-              </a>
-              <a href="/key-bpm-finder" className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-3 text-muted-foreground transition-colors hover:border-primary/70 hover:text-foreground" onClick={toggleMenu}>
-                <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
-                <span>{t('nav.keybpm')}</span>
-              </a>
+              <div className="rounded-md border border-border bg-muted/10 p-2">
+                <div className="flex items-center gap-2 px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <Wrench className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                  {t('nav.toolkit')}
+                </div>
+                <a href="/loudness" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                  <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <span>{t('nav.loudness')}</span>
+                </a>
+                <a href="/key-bpm-finder" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                  <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <span>{t('nav.keybpm')}</span>
+                </a>
+              </div>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />
