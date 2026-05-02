@@ -313,9 +313,8 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   };
 };
 
-const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void }) => {
+const LoudnessCurve = ({ data, focus, onFocusChange, hoveredIndex, onHoverChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void; hoveredIndex: number | null; onHoverChange: (index: number | null) => void }) => {
   const { t } = useTranslation();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const width = 860;
   const height = 320;
   const paddingLeft = 54;
@@ -355,11 +354,11 @@ const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["c
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-56 w-full flex-1 overflow-visible sm:min-h-80" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-56 w-full flex-1 overflow-visible sm:min-h-80" onMouseLeave={() => onHoverChange(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
-        setHoveredIndex(Math.min(usableData.length - 1, Math.max(0, Math.round(ratio * (usableData.length - 1)))));
+        onHoverChange(Math.min(usableData.length - 1, Math.max(0, Math.round(ratio * (usableData.length - 1)))));
       }}>
         <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
         <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
@@ -408,6 +407,7 @@ const Loudness = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
+  const [curveHoverIndex, setCurveHoverIndex] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const toggleLanguage = () => {
@@ -730,20 +730,32 @@ const Loudness = () => {
                       </Button>
                     ))}
                   </div>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div>
-                      <p className="text-4xl font-bold text-primary sm:text-5xl">{result.lufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold sm:text-4xl">{result.momentaryLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.momentaryCurrent")}</p>
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold sm:text-4xl">{result.shortTermLufs.toFixed(1)}</p>
-                      <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.shortTermCurrent")}</p>
-                    </div>
-                  </div>
+                  {(() => {
+                    const hovered = curveHoverIndex !== null ? result.curve[curveHoverIndex] : null;
+                    const displayMomentary = hovered ? hovered.momentary : result.momentaryLufs;
+                    const displayShortTerm = hovered ? hovered.shortTerm : result.shortTermLufs;
+                    const hoverLabel = hovered ? formatDuration(hovered.time) : null;
+                    return (
+                      <div className="grid gap-4 md:grid-cols-3">
+                        <div>
+                          <p className="text-4xl font-bold text-primary sm:text-5xl">{result.lufs.toFixed(1)}</p>
+                          <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">{t("loudness.metrics.integrated")}</p>
+                        </div>
+                        <div>
+                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-secondary" : ""}`}>{displayMomentary.toFixed(1)}</p>
+                          <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">
+                            {hoverLabel ? `M @ ${hoverLabel}` : t("loudness.metrics.momentaryCurrent")}
+                          </p>
+                        </div>
+                        <div>
+                          <p className={`text-3xl font-bold sm:text-4xl transition-colors ${hovered ? "text-primary" : ""}`}>{displayShortTerm.toFixed(1)}</p>
+                          <p className="mt-2 text-sm uppercase tracking-wide text-muted-foreground">
+                            {hoverLabel ? `S @ ${hoverLabel}` : t("loudness.metrics.shortTermCurrent")}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {targetHint && (
                     <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
                       <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -763,7 +775,7 @@ const Loudness = () => {
                     </p>
                   </div>
                   <div className="mt-6">
-                    <LoudnessCurve data={result.curve} focus={curveFocus} onFocusChange={setCurveFocus} />
+                    <LoudnessCurve data={result.curve} focus={curveFocus} onFocusChange={setCurveFocus} hoveredIndex={curveHoverIndex} onHoverChange={setCurveHoverIndex} />
                   </div>
                 </CardContent>
               </Card>
