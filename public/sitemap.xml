@@ -31,6 +31,18 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://globaldripstudio.fr/loudness</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/key-bpm-finder</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://globaldripstudio.fr/blog/venin-le-premier-sang</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>monthly</changefreq>
