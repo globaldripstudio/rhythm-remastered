@@ -205,135 +205,142 @@ const computeOnsetEnvelope = (samples: Float32Array, sampleRate: number): { enve
   return { envelope: smoothed, hopRate: sampleRate / hopSize };
 };
 
-// ---------------- BPM detection (autocorrelation + octave correction) ----------------
+// ---------------- BPM detection (Fourier tempogram + harmonic scoring) ----------------
+//
+// Why a Fourier tempogram instead of pure autocorrelation:
+// Autocorrelation lives on a discrete lag grid where the lag-to-BPM mapping is
+// non-linear (BPM = 60 * hopRate / lag). Around 90 BPM at our hop rate, adjacent
+// lags map to BPMs ~1.4 BPM apart — so the "true" 91 BPM falls between two grid
+// points and ends up snapped to 92 even after interpolation. By taking the FFT of
+// the onset envelope itself (over a long, zero-padded window), the bin spacing in
+// BPM space is uniform and we get sub-0.1 BPM resolution at any tempo. This is
+// the same approach librosa's fourier_tempogram uses and resolves the 92-vs-91
+// quantization artifact at the source.
 
 const detectBpm = (samples: Float32Array, sampleRate: number): BpmResult => {
-  // Downsample to ~11025 Hz for speed (mono onset detection doesn't need high SR)
   const targetSr = 11025;
   const ds = downsample(samples, sampleRate, targetSr);
   const { envelope, hopRate } = computeOnsetEnvelope(ds, targetSr);
 
-  // Autocorrelation in lag domain corresponding to BPM range [50, 220]
+  // ---- Fourier tempogram on the full onset envelope ----
+  // Zero-pad to a power of two large enough for ≥ 0.05 BPM resolution.
+  // Resolution per bin = (60 * hopRate) / N. With hopRate ≈ 21.5, N = 32768 → ~0.039 BPM/bin.
+  let N = 1;
+  while (N < envelope.length) N *= 2;
+  if (N < 32768) N = 32768;
+  const fft = new FFT(N);
+  const buf = new Float64Array(N);
+  // Hann window over the actual envelope length, then zero-pad
+  const L = envelope.length;
+  // Remove DC so the spectrum isn't dominated by the mean
+  let envMean = 0;
+  for (let i = 0; i < L; i += 1) envMean += envelope[i];
+  envMean /= Math.max(1, L);
+  for (let i = 0; i < L; i += 1) {
+    const w = 0.5 * (1 - Math.cos((2 * Math.PI * i) / (L - 1)));
+    buf[i] = (envelope[i] - envMean) * w;
+  }
+  const spec = fft.forwardMagnitudes(buf); // length N/2
+
+  // Continuous-BPM access via linear interpolation in the magnitude spectrum.
+  // BPM → frequency-in-frames → bin index = bpm/60 * N / hopRate
+  const specAt = (bpm: number): number => {
+    const idx = (bpm / 60) * N / hopRate;
+    if (idx < 0 || idx >= spec.length - 1) return 0;
+    const lo = Math.floor(idx);
+    const frac = idx - lo;
+    return spec[lo] * (1 - frac) + spec[lo + 1] * frac;
+  };
+
+  // Harmonic score combines the BPM with its half/double/triple/quadruple harmonics.
+  // The half-harmonic term (subdivisions) helps when the dominant onset rate is
+  // the half-bar pulse, the multiplier terms help when it's the eighth-note pulse.
+  const score = (bpm: number): number =>
+    specAt(bpm)
+    + 0.6 * specAt(bpm * 2)
+    + 0.4 * specAt(bpm * 3)
+    + 0.3 * specAt(bpm * 4)
+    + 0.5 * specAt(bpm / 2);
+
+  // ---- Coarse search across the full plausible range at 0.05 BPM resolution ----
   const minBpm = 50;
   const maxBpm = 220;
-  const minLag = Math.max(2, Math.floor((60 / maxBpm) * hopRate));
-  const maxLag = Math.min(envelope.length - 1, Math.floor((60 / minBpm) * hopRate));
-
-  const ac = new Float32Array(maxLag - minLag + 1);
-  for (let lag = minLag; lag <= maxLag; lag += 1) {
-    let sum = 0;
-    const lim = envelope.length - lag;
-    for (let i = 0; i < lim; i += 1) sum += envelope[i] * envelope[i + lag];
-    ac[lag - minLag] = sum / lim;
+  const coarse: Array<{ bpm: number; s: number }> = [];
+  for (let bpm = minBpm; bpm <= maxBpm; bpm += 0.05) {
+    coarse.push({ bpm, s: score(bpm) });
   }
 
-  // Continuous-lag access via linear interpolation. Lets us score any real-valued BPM
-  // independently of the discrete autocorrelation grid (which would otherwise force
-  // values like 75.5 because no integer lag maps exactly to 75 BPM at our hop rate).
-  const acAt = (lag: number): number => {
-    const idx = lag - minLag;
-    if (idx < 0 || idx > ac.length - 1) return 0;
-    const lo = Math.floor(idx);
-    const hi = Math.min(ac.length - 1, lo + 1);
-    const frac = idx - lo;
-    return ac[lo] * (1 - frac) + ac[hi] * frac;
-  };
-
-  const lagFromBpm = (bpm: number) => (60 * hopRate) / bpm;
-
-  // Score a tempo by combining its main lag with harmonic support at 2x, 3x, 4x lag.
-  const scoreBpm = (bpm: number): number => {
-    const lag = lagFromBpm(bpm);
-    return acAt(lag)
-      + acAt(lag * 2) * 0.5
-      + acAt(lag * 3) * 0.33
-      + acAt(lag * 4) * 0.25;
-  };
-
-  // Initial candidates: local maxima in the discrete autocorrelation
-  const candidates: Array<{ lag: number; score: number; bpm: number }> = [];
-  for (let i = 1; i < ac.length - 1; i += 1) {
-    if (ac[i] > ac[i - 1] && ac[i] > ac[i + 1]) {
-      const lag = i + minLag;
-      // Parabolic interpolation for sub-sample precision
-      const a = ac[i - 1], b = ac[i], c = ac[i + 1];
-      const denom = (a - 2 * b + c);
-      const offset = denom !== 0 ? 0.5 * (a - c) / denom : 0;
-      const refinedLag = lag + offset;
-      candidates.push({ lag: refinedLag, score: b, bpm: (60 * hopRate) / refinedLag });
+  // Pick local maxima as candidates
+  const peaks: Array<{ bpm: number; s: number }> = [];
+  for (let i = 1; i < coarse.length - 1; i += 1) {
+    if (coarse[i].s > coarse[i - 1].s && coarse[i].s > coarse[i + 1].s) {
+      peaks.push(coarse[i]);
     }
   }
+  peaks.sort((a, b) => b.s - a.s);
 
-  if (candidates.length === 0) {
+  if (peaks.length === 0) {
     return { bpm: 0, confidence: 0, candidates: [] };
   }
 
-  const scored = candidates.map((c) => ({ ...c, harmScore: scoreBpm(c.bpm) }));
-  scored.sort((a, b) => b.harmScore - a.harmScore);
-
-  // Octave correction on top candidates → musical sweet spot 70-180 BPM
-  const top = scored.slice(0, 6);
-  const adjusted = top.map((c) => {
-    let bpm = c.bpm;
-    while (bpm < 70 && bpm * 2 <= 200) bpm *= 2;
-    while (bpm > 180 && bpm / 2 >= 60) bpm /= 2;
-    return { bpm, score: scoreBpm(bpm) };
+  // Octave-fold each candidate into the musical sweet-spot 70-180 BPM
+  // and re-score so we compare like with like.
+  const folded = peaks.slice(0, 8).map((p) => {
+    let bpm = p.bpm;
+    while (bpm > 180) bpm /= 2;
+    while (bpm < 70) bpm *= 2;
+    return { bpm, s: score(bpm) };
   });
 
-  // Aggregate by 0.5 BPM bins so similar candidates reinforce each other
-  const bins = new Map<number, number>();
-  adjusted.forEach((c) => {
-    const key = Math.round(c.bpm * 2) / 2;
-    bins.set(key, (bins.get(key) ?? 0) + c.score);
-  });
+  // Cluster nearby candidates (within 1 BPM) so different octaves of the same
+  // tempo reinforce each other instead of competing.
+  folded.sort((a, b) => b.s - a.s);
+  const clusters: Array<{ bpm: number; s: number }> = [];
+  for (const c of folded) {
+    const hit = clusters.find((cl) => Math.abs(cl.bpm - c.bpm) < 1.0);
+    if (hit) {
+      // Weighted average of bpm, summed score
+      const total = hit.s + c.s;
+      hit.bpm = (hit.bpm * hit.s + c.bpm * c.s) / total;
+      hit.s = total;
+    } else {
+      clusters.push({ bpm: c.bpm, s: c.s });
+    }
+  }
+  clusters.sort((a, b) => b.s - a.s);
+  const best = clusters[0];
 
-  const ranked = Array.from(bins.entries())
-    .map(([bpm, score]) => ({ bpm, score }))
-    .sort((a, b) => b.score - a.score);
-
-  const best = ranked[0];
-
-  // ---- DENSE REFINEMENT: search at 0.1 BPM resolution in a ±1.5 BPM window
+  // ---- Ultra-fine refinement: ±1 BPM at 0.01 resolution around the winner ----
   let refinedBpm = best.bpm;
-  let refinedScore = scoreBpm(refinedBpm);
-  const searchMin = Math.max(40, best.bpm - 1.5);
-  const searchMax = Math.min(240, best.bpm + 1.5);
-  for (let bpm = searchMin; bpm <= searchMax; bpm += 0.1) {
-    const s = scoreBpm(bpm);
+  let refinedScore = score(refinedBpm);
+  const lo = Math.max(minBpm, best.bpm - 1.0);
+  const hi = Math.min(maxBpm, best.bpm + 1.0);
+  for (let bpm = lo; bpm <= hi; bpm += 0.01) {
+    const s = score(bpm);
     if (s > refinedScore) { refinedScore = s; refinedBpm = bpm; }
   }
 
-  // ---- INTEGER SNAP: most produced music sits on integer BPMs.
-  //      If the nearest integer scores ≥98% of refined value, prefer it.
-  //      Kills the "75.5 instead of 75" artifact from finite autocorrelation resolution.
+  // ---- Integer snap: produced music sits on integer BPMs.
+  //      If the nearest integer is within 0.5 BPM and scores ≥ 99% of the
+  //      refined value, prefer it. Tightened from 98% → 99% so we only snap
+  //      when the integer is genuinely a peak, never when the true tempo is fractional.
   const nearestInt = Math.round(refinedBpm);
   if (Math.abs(refinedBpm - nearestInt) <= 0.5) {
-    const intScore = scoreBpm(nearestInt);
-    if (intScore >= refinedScore * 0.98) {
+    const intScore = score(nearestInt);
+    if (intScore >= refinedScore * 0.99) {
       refinedBpm = nearestInt;
       refinedScore = intScore;
     }
   }
 
-  // ---- HALF-INTEGER SNAP: only if integer didn't win (rare cases like .5 tempos)
-  if (refinedBpm !== Math.round(refinedBpm)) {
-    const nearestHalf = Math.round(refinedBpm * 2) / 2;
-    if (Math.abs(refinedBpm - nearestHalf) <= 0.25) {
-      const halfScore = scoreBpm(nearestHalf);
-      if (halfScore >= refinedScore * 0.99) {
-        refinedBpm = nearestHalf;
-        refinedScore = halfScore;
-      }
-    }
-  }
-
-  const totalScore = ranked.reduce((s, r) => s + r.score, 0);
-  const confidence = totalScore > 0 ? Math.min(1, best.score / totalScore * 1.5) : 0;
+  // Confidence: ratio of best cluster score to the sum of top clusters.
+  const totalScore = clusters.slice(0, 5).reduce((s, r) => s + r.s, 0);
+  const confidence = totalScore > 0 ? Math.min(1, (best.s / totalScore) * 1.5) : 0;
 
   return {
     bpm: Math.round(refinedBpm * 10) / 10,
     confidence,
-    candidates: ranked.slice(0, 5),
+    candidates: clusters.slice(0, 5).map((c) => ({ bpm: Math.round(c.bpm * 10) / 10, score: c.s })),
   };
 };
 

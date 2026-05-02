@@ -16,17 +16,6 @@ const formatDuration = (seconds: number) => {
 const formatKey = (tonic: string, mode: "major" | "minor", t: (k: string) => string) =>
   `${tonic} ${mode === "major" ? t("keybpm.modes.major") : t("keybpm.modes.minor")}`;
 
-const confidenceLabel = (c: number, t: (k: string) => string) => {
-  if (c >= 0.7) return t("keybpm.confidence.high");
-  if (c >= 0.4) return t("keybpm.confidence.medium");
-  return t("keybpm.confidence.low");
-};
-
-const confidenceColor = (c: number) => {
-  if (c >= 0.7) return "text-primary";
-  if (c >= 0.4) return "text-secondary";
-  return "text-muted-foreground";
-};
 
 const KeyBpmFinder = () => {
   const { t, i18n } = useTranslation();
@@ -229,9 +218,6 @@ const KeyBpmFinder = () => {
                       <p className="mt-3 text-5xl font-bold text-primary sm:text-6xl">
                         {result.bpm.bpm > 0 ? result.bpm.bpm.toFixed(1) : "—"}
                       </p>
-                      <p className={`mt-2 text-xs uppercase ${confidenceColor(result.bpm.confidence)}`}>
-                        {t("keybpm.confidence.label")}: {confidenceLabel(result.bpm.confidence, t)} ({Math.round(result.bpm.confidence * 100)}%)
-                      </p>
                       {result.bpm.candidates.length > 1 && (
                         <div className="mt-3 text-xs text-muted-foreground">
                           <span className="text-foreground">{t("keybpm.alternatives")}:</span>{" "}
@@ -255,9 +241,6 @@ const KeyBpmFinder = () => {
                         <Disc3 className="h-3.5 w-3.5" />
                         Camelot {result.key.camelot}
                       </div>
-                      <p className={`mt-3 text-xs uppercase ${confidenceColor(result.key.confidence)}`}>
-                        {t("keybpm.confidence.label")}: {confidenceLabel(result.key.confidence, t)} ({Math.round(result.key.confidence * 100)}%)
-                      </p>
                       {result.key.alternative && (
                         <p className="mt-2 text-xs text-muted-foreground">
                           {t("keybpm.alternative")}: <span className="text-foreground">{formatKey(result.key.alternative.tonic, result.key.alternative.mode, t)}</span> · Camelot {result.key.alternative.camelot}
