@@ -354,11 +354,11 @@ const LoudnessCurve = ({ data, focus, onFocusChange, hoveredIndex, onHoverChange
           ))}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-56 w-full flex-1 overflow-visible sm:min-h-80" onMouseLeave={() => setHoveredIndex(null)} onMouseMove={(event) => {
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={t("loudness.curve.aria")} className="min-h-56 w-full flex-1 overflow-visible sm:min-h-80" onMouseLeave={() => onHoverChange(null)} onMouseMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * width;
         const ratio = Math.min(1, Math.max(0, (x - paddingLeft) / (width - paddingLeft - paddingRight)));
-        setHoveredIndex(Math.min(usableData.length - 1, Math.max(0, Math.round(ratio * (usableData.length - 1)))));
+        onHoverChange(Math.min(usableData.length - 1, Math.max(0, Math.round(ratio * (usableData.length - 1)))));
       }}>
         <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
         <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} className="stroke-border" strokeWidth="1" />
