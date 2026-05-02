@@ -1278,6 +1278,8 @@
     "analyzedIn": "Analyzed in {{seconds}}s",
     "alternatives": "BPM alternatives",
     "alternative": "Alternative key",
+    "alternativeBpm": "Alternative BPM",
+    "alternativeKey": "Alternative key",
     "modes": {
       "major": "major",
       "minor": "minor"
