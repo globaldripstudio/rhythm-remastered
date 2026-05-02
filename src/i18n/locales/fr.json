@@ -1266,5 +1266,86 @@
         }
       }
     }
+  },
+  "keybpm": {
+    "badge": "Détection locale dans le navigateur",
+    "subtitle": "Identifie en quelques secondes la tonalité, le tempo et le code Camelot d'un morceau. Analyse 100% locale, aucun fichier n'est envoyé sur un serveur.",
+    "methodIntro": "Méthode pro : flux spectral pour la détection des onsets, autocorrélation avec correction d'octave par support harmonique, chromagramme pondéré et profils de Krumhansl-Schmuckler pour la tonalité.",
+    "resultsAria": "Résultats de l'analyse Key et BPM",
+    "analyzedIn": "Analysé en {{seconds}}s",
+    "alternatives": "Alternatives BPM",
+    "alternative": "Alternative tonalité",
+    "modes": {
+      "major": "majeur",
+      "minor": "mineur"
+    },
+    "confidence": {
+      "label": "Confiance",
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible"
+    },
+    "metrics": {
+      "key": "Tonalité",
+      "file": "Fichier",
+      "channel": "canal",
+      "channels": "canaux"
+    },
+    "upload": {
+      "analyzing": "Analyse en cours",
+      "title": "Dépose ton fichier audio",
+      "description": "WAV, MP3, AIFF, FLAC ou AAC. Détection de la tonalité, du BPM et du code Camelot, sans envoi serveur."
+    },
+    "errors": {
+      "analysis": "Impossible d'analyser ce fichier. Essaie un WAV, MP3, AIFF, FLAC ou AAC exporté correctement.",
+      "invalidFile": "Sélectionne un fichier audio valide."
+    },
+    "presentation": {
+      "bpm": {
+        "title": "BPM précis",
+        "description": "Détection du tempo avec correction automatique des octaves (×2 / ÷2) pour éviter les pièges classiques."
+      },
+      "key": {
+        "title": "Tonalité musicale",
+        "description": "Détection majeur/mineur via chromagramme pondéré et profils de Krumhansl-Schmuckler."
+      },
+      "camelot": {
+        "title": "Code Camelot",
+        "description": "Notation DJ universelle pour le mix harmonique : mélange tes morceaux dans des tonalités compatibles."
+      }
+    },
+    "camelotHelp": {
+      "title": "Comprendre le Camelot Wheel",
+      "description": "Le Camelot Wheel est une notation utilisée par les DJ pour le mix harmonique. Deux morceaux dans des codes adjacents (ex. 8A et 9A, ou 8A et 8B) sonneront naturellement bien ensemble. Les chiffres représentent la position sur le cercle des quintes, A indique mineur et B indique majeur."
+    },
+    "tip": {
+      "title": "Conseil pour des résultats optimaux",
+      "description": "Privilégie un fichier complet (intro + couplet + refrain) plutôt qu'un extrait court. Un master avec une grosse caisse claire améliore la précision du BPM, et une instrumentation tonale (piano, basse, voix) améliore la détection de la tonalité."
+    },
+    "seoBlock": {
+      "title": "Détecteur de tonalité et BPM en ligne pour DJ, producteurs et beatmakers",
+      "description": "Cet outil analyse n'importe quel fichier audio directement dans ton navigateur pour détecter le tempo (BPM), la tonalité musicale (key) et le code Camelot correspondant. Aucun upload serveur, aucune attente : l'analyse se fait localement en quelques secondes.",
+      "howTitle": "Comment ça marche",
+      "how": {
+        "bpm": "Le BPM est détecté par autocorrélation de la fonction d'onset spectral, avec correction harmonique pour éviter les erreurs ×2 / ÷2.",
+        "key": "La tonalité est identifiée via chromagramme et corrélation avec les profils Krumhansl-Schmuckler (24 profils majeur/mineur).",
+        "camelot": "Le code Camelot facilite le mix harmonique : mélange entre clés compatibles pour des transitions fluides.",
+        "privacy": "Aucun fichier n'est envoyé sur un serveur — tout est traité localement dans ton navigateur."
+      },
+      "topics": {
+        "djmix": {
+          "title": "Mix DJ harmonique",
+          "description": "Identifie tonalité et BPM pour préparer tes sets et trouver les transitions parfaites avec le Camelot Wheel."
+        },
+        "production": {
+          "title": "Production musicale",
+          "description": "Aligne le tempo de tes samples et identifie la tonalité d'une référence pour composer en cohérence."
+        },
+        "remix": {
+          "title": "Remix & sampling",
+          "description": "Analyse rapidement un acapella ou un instrumental pour caler ton remix dans la bonne tonalité."
+        }
+      }
+    }
   }
 }
