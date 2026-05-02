@@ -241,9 +241,6 @@ const KeyBpmFinder = () => {
                         <Disc3 className="h-3.5 w-3.5" />
                         Camelot {result.key.camelot}
                       </div>
-                      <p className={`mt-3 text-xs uppercase ${confidenceColor(result.key.confidence)}`}>
-                        {t("keybpm.confidence.label")}: {confidenceLabel(result.key.confidence, t)} ({Math.round(result.key.confidence * 100)}%)
-                      </p>
                       {result.key.alternative && (
                         <p className="mt-2 text-xs text-muted-foreground">
                           {t("keybpm.alternative")}: <span className="text-foreground">{formatKey(result.key.alternative.tonic, result.key.alternative.mode, t)}</span> · Camelot {result.key.alternative.camelot}
