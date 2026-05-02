@@ -7,6 +7,7 @@
     "projects": "Projects",
     "blog": "Blog",
     "loudness": "Loudness",
+    "keybpm": "Key & BPM",
     "shop": "Shop",
     "shopSoon": "soon",
     "book": "Book Now",
@@ -916,6 +917,10 @@
     "loudnessArticle": {
       "title": "Online LUFS analysis: check a master | Global Drip",
       "description": "Introducing our online LUFS analyzer: true peak, LRA, integrated loudness, curve and PDF report to prepare your masters."
+    },
+    "keybpm": {
+      "title": "Free Online Key & BPM Finder | Tempo and Musical Key Detector",
+      "description": "Detect the musical key, BPM and Camelot code of any track right in your browser. Fast, accurate and 100% local — no server upload."
     }
   },
   "legalPages": {
@@ -1258,6 +1263,87 @@
         "report": {
           "title": "Shareable report",
           "description": "Export a clear PDF with true peak, LUFS curve and listening context."
+        }
+      }
+    }
+  },
+  "keybpm": {
+    "badge": "Local in-browser detection",
+    "subtitle": "Identify the key, tempo and Camelot code of a track in seconds. 100% local analysis — no file is ever uploaded.",
+    "methodIntro": "Pro method: spectral flux for onset detection, autocorrelation with octave correction via harmonic support, weighted chromagram and Krumhansl-Schmuckler profiles for key.",
+    "resultsAria": "Key and BPM analysis results",
+    "analyzedIn": "Analyzed in {{seconds}}s",
+    "alternatives": "BPM alternatives",
+    "alternative": "Alternative key",
+    "modes": {
+      "major": "major",
+      "minor": "minor"
+    },
+    "confidence": {
+      "label": "Confidence",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "metrics": {
+      "key": "Key",
+      "file": "File",
+      "channel": "channel",
+      "channels": "channels"
+    },
+    "upload": {
+      "analyzing": "Analyzing",
+      "title": "Drop your audio file",
+      "description": "WAV, MP3, AIFF, FLAC or AAC. Detects key, BPM and Camelot code, no server upload."
+    },
+    "errors": {
+      "analysis": "Could not analyze this file. Try a properly exported WAV, MP3, AIFF, FLAC or AAC.",
+      "invalidFile": "Please select a valid audio file."
+    },
+    "presentation": {
+      "bpm": {
+        "title": "Accurate BPM",
+        "description": "Tempo detection with automatic octave correction (×2 / ÷2) to avoid the classic pitfalls."
+      },
+      "key": {
+        "title": "Musical key",
+        "description": "Major/minor detection via weighted chromagram and Krumhansl-Schmuckler profiles."
+      },
+      "camelot": {
+        "title": "Camelot code",
+        "description": "Universal DJ notation for harmonic mixing: blend tracks in compatible keys effortlessly."
+      }
+    },
+    "camelotHelp": {
+      "title": "Understanding the Camelot Wheel",
+      "description": "The Camelot Wheel is a notation used by DJs for harmonic mixing. Two tracks in adjacent codes (e.g. 8A and 9A, or 8A and 8B) will naturally sound great together. Numbers represent the position on the circle of fifths; A means minor, B means major."
+    },
+    "tip": {
+      "title": "Tip for best results",
+      "description": "Prefer a full track (intro + verse + chorus) over a short clip. A master with strong drums improves BPM accuracy, and tonal instrumentation (piano, bass, vocals) improves key detection."
+    },
+    "seoBlock": {
+      "title": "Online key and BPM detector for DJs, producers and beatmakers",
+      "description": "This tool analyzes any audio file directly in your browser to detect tempo (BPM), musical key and the corresponding Camelot code. No upload, no waiting — analysis runs locally in seconds.",
+      "howTitle": "How it works",
+      "how": {
+        "bpm": "BPM is detected via autocorrelation of the spectral onset function, with harmonic correction to avoid ×2 / ÷2 errors.",
+        "key": "The key is identified using a weighted chromagram correlated with Krumhansl-Schmuckler profiles (24 major/minor profiles).",
+        "camelot": "The Camelot code makes harmonic mixing easy: blend between compatible keys for smooth transitions.",
+        "privacy": "No file is ever uploaded — everything runs locally in your browser."
+      },
+      "topics": {
+        "djmix": {
+          "title": "Harmonic DJ mixing",
+          "description": "Identify key and BPM to prepare your sets and find perfect transitions using the Camelot Wheel."
+        },
+        "production": {
+          "title": "Music production",
+          "description": "Match the tempo of your samples and identify a reference's key to compose in tune."
+        },
+        "remix": {
+          "title": "Remix & sampling",
+          "description": "Quickly analyze an acapella or instrumental to lock your remix in the right key."
         }
       }
     }

@@ -20,6 +20,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import EbookLogin from "./pages/EbookLogin";
 import EbookReader from "./pages/EbookReader";
 import Loudness from "./pages/Loudness";
+import KeyBpmFinder from "./pages/KeyBpmFinder";
 import Admin from "./pages/Admin";
 
 import LiveChat from "./components/LiveChat";
@@ -56,6 +57,9 @@ const App = () => (
             <Route path="/ebook/login" element={<EbookLogin />} />
             <Route path="/ebook/reader" element={<EbookReader />} />
             <Route path="/loudness" element={<Loudness />} />
+            <Route path="/key-bpm-finder" element={<KeyBpmFinder />} />
+            <Route path="/bpm-finder" element={<Navigate to="/key-bpm-finder" replace />} />
+            <Route path="/key-finder" element={<Navigate to="/key-bpm-finder" replace />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
             
