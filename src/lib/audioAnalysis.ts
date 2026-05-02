@@ -170,7 +170,7 @@ const computeOnsetEnvelope = (samples: Float32Array, sampleRate: number): { enve
   }
   const numFrames = Math.max(1, Math.floor((samples.length - fftSize) / hopSize) + 1);
   const envelope = new Float32Array(numFrames);
-  let prevMags = new Float64Array(fftSize / 2);
+  let prevMags: Float64Array = new Float64Array(new ArrayBuffer((fftSize / 2) * 8));
   const buf = new Float64Array(fftSize);
 
   for (let f = 0; f < numFrames; f += 1) {
