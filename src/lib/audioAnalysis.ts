@@ -227,7 +227,30 @@ const detectBpm = (samples: Float32Array, sampleRate: number): BpmResult => {
     ac[lag - minLag] = sum / lim;
   }
 
-  // Find local maxima as candidates
+  // Continuous-lag access via linear interpolation. Lets us score any real-valued BPM
+  // independently of the discrete autocorrelation grid (which would otherwise force
+  // values like 75.5 because no integer lag maps exactly to 75 BPM at our hop rate).
+  const acAt = (lag: number): number => {
+    const idx = lag - minLag;
+    if (idx < 0 || idx > ac.length - 1) return 0;
+    const lo = Math.floor(idx);
+    const hi = Math.min(ac.length - 1, lo + 1);
+    const frac = idx - lo;
+    return ac[lo] * (1 - frac) + ac[hi] * frac;
+  };
+
+  const lagFromBpm = (bpm: number) => (60 * hopRate) / bpm;
+
+  // Score a tempo by combining its main lag with harmonic support at 2x, 3x, 4x lag.
+  const scoreBpm = (bpm: number): number => {
+    const lag = lagFromBpm(bpm);
+    return acAt(lag)
+      + acAt(lag * 2) * 0.5
+      + acAt(lag * 3) * 0.33
+      + acAt(lag * 4) * 0.25;
+  };
+
+  // Initial candidates: local maxima in the discrete autocorrelation
   const candidates: Array<{ lag: number; score: number; bpm: number }> = [];
   for (let i = 1; i < ac.length - 1; i += 1) {
     if (ac[i] > ac[i - 1] && ac[i] > ac[i + 1]) {
@@ -245,33 +268,22 @@ const detectBpm = (samples: Float32Array, sampleRate: number): BpmResult => {
     return { bpm: 0, confidence: 0, candidates: [] };
   }
 
-  // Score each candidate by considering harmonic support: a true tempo will have peaks at 2x and 3x its lag too
-  const scoreWithHarmonics = (cand: { lag: number; score: number }) => {
-    let total = cand.score;
-    for (const mult of [2, 3, 4]) {
-      const idx = Math.round(cand.lag * mult - minLag);
-      if (idx >= 0 && idx < ac.length) total += ac[idx] * (1 / mult);
-    }
-    return total;
-  };
-
-  const scored = candidates.map((c) => ({ ...c, harmScore: scoreWithHarmonics(c) }));
+  const scored = candidates.map((c) => ({ ...c, harmScore: scoreBpm(c.bpm) }));
   scored.sort((a, b) => b.harmScore - a.harmScore);
 
-  // Take top candidate, then apply octave correction:
-  // Prefer values in the 70-180 BPM "musical sweet spot"
+  // Octave correction on top candidates → musical sweet spot 70-180 BPM
   const top = scored.slice(0, 6);
   const adjusted = top.map((c) => {
     let bpm = c.bpm;
     while (bpm < 70 && bpm * 2 <= 200) bpm *= 2;
     while (bpm > 180 && bpm / 2 >= 60) bpm /= 2;
-    return { bpm, score: c.harmScore };
+    return { bpm, score: scoreBpm(bpm) };
   });
 
-  // Aggregate: round-bin BPMs and sum scores (tracks with similar BPMs reinforce)
+  // Aggregate by 0.5 BPM bins so similar candidates reinforce each other
   const bins = new Map<number, number>();
   adjusted.forEach((c) => {
-    const key = Math.round(c.bpm * 2) / 2; // 0.5 BPM resolution for binning
+    const key = Math.round(c.bpm * 2) / 2;
     bins.set(key, (bins.get(key) ?? 0) + c.score);
   });
 
@@ -280,11 +292,46 @@ const detectBpm = (samples: Float32Array, sampleRate: number): BpmResult => {
     .sort((a, b) => b.score - a.score);
 
   const best = ranked[0];
+
+  // ---- DENSE REFINEMENT: search at 0.1 BPM resolution in a ±1.5 BPM window
+  let refinedBpm = best.bpm;
+  let refinedScore = scoreBpm(refinedBpm);
+  const searchMin = Math.max(40, best.bpm - 1.5);
+  const searchMax = Math.min(240, best.bpm + 1.5);
+  for (let bpm = searchMin; bpm <= searchMax; bpm += 0.1) {
+    const s = scoreBpm(bpm);
+    if (s > refinedScore) { refinedScore = s; refinedBpm = bpm; }
+  }
+
+  // ---- INTEGER SNAP: most produced music sits on integer BPMs.
+  //      If the nearest integer scores ≥98% of refined value, prefer it.
+  //      Kills the "75.5 instead of 75" artifact from finite autocorrelation resolution.
+  const nearestInt = Math.round(refinedBpm);
+  if (Math.abs(refinedBpm - nearestInt) <= 0.5) {
+    const intScore = scoreBpm(nearestInt);
+    if (intScore >= refinedScore * 0.98) {
+      refinedBpm = nearestInt;
+      refinedScore = intScore;
+    }
+  }
+
+  // ---- HALF-INTEGER SNAP: only if integer didn't win (rare cases like .5 tempos)
+  if (refinedBpm !== Math.round(refinedBpm)) {
+    const nearestHalf = Math.round(refinedBpm * 2) / 2;
+    if (Math.abs(refinedBpm - nearestHalf) <= 0.25) {
+      const halfScore = scoreBpm(nearestHalf);
+      if (halfScore >= refinedScore * 0.99) {
+        refinedBpm = nearestHalf;
+        refinedScore = halfScore;
+      }
+    }
+  }
+
   const totalScore = ranked.reduce((s, r) => s + r.score, 0);
   const confidence = totalScore > 0 ? Math.min(1, best.score / totalScore * 1.5) : 0;
 
   return {
-    bpm: Math.round(best.bpm * 10) / 10,
+    bpm: Math.round(refinedBpm * 10) / 10,
     confidence,
     candidates: ranked.slice(0, 5),
   };
