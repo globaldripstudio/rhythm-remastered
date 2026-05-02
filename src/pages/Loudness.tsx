@@ -313,9 +313,8 @@ const analyzeLoudness = async (file: File, mode: AnalysisMode): Promise<Analysis
   };
 };
 
-const LoudnessCurve = ({ data, focus, onFocusChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void }) => {
+const LoudnessCurve = ({ data, focus, onFocusChange, hoveredIndex, onHoverChange }: { data: AnalysisResult["curve"]; focus: CurveFocus; onFocusChange: (focus: CurveFocus) => void; hoveredIndex: number | null; onHoverChange: (index: number | null) => void }) => {
   const { t } = useTranslation();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const width = 860;
   const height = 320;
   const paddingLeft = 54;
