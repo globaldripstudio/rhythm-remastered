@@ -150,7 +150,7 @@ class FFT {
         }
       }
     }
-    const mags = new Float64Array(n / 2);
+    const mags: Float64Array = new Float64Array(new ArrayBuffer((n / 2) * 8));
     for (let i = 0; i < n / 2; i += 1) {
       mags[i] = Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
     }
