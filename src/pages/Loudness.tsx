@@ -506,8 +506,6 @@ const Loudness = () => {
     y += 12;
     const metrics = [
       [t("loudness.metrics.integrated"), `${result.lufs.toFixed(1)} LUFS`],
-      [t("loudness.metrics.momentaryCurrent"), `${result.momentaryLufs.toFixed(1)} LUFS`],
-      [t("loudness.metrics.shortTermCurrent"), `${result.shortTermLufs.toFixed(1)} LUFS`],
       ["Peak", `${result.peakDb.toFixed(1)} dBFS`],
       [t("loudness.metrics.truePeakEstimated"), `${result.truePeakDb.toFixed(1)} dBTP`],
       ["LRA / PLR", `${result.loudnessRange.toFixed(1)} LU / ${result.plr.toFixed(1)} dB`],
