@@ -220,7 +220,7 @@ const KeyBpmFinder = () => {
                       </p>
                       {result.bpm.candidates.length > 1 && (
                         <div className="mt-3 text-xs text-muted-foreground">
-                          <span className="text-foreground">{t("keybpm.alternative")}:</span>{" "}
+                          <span className="text-foreground">{t("keybpm.alternativeBpm")}:</span>{" "}
                           {result.bpm.candidates[1].bpm.toFixed(1)}
                         </div>
                       )}
