@@ -136,6 +136,10 @@ const Header = () => {
                 <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
                 <span>{t('nav.loudness')}</span>
               </a>
+              <a href="/key-bpm-finder" className="flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-3 text-muted-foreground transition-colors hover:border-primary/70 hover:text-foreground" onClick={toggleMenu}>
+                <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
+                <span>{t('nav.keybpm')}</span>
+              </a>
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
                   <Phone className="w-4 h-4" />
