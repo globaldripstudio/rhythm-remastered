@@ -408,6 +408,7 @@ const Loudness = () => {
   const [selectedMode, setSelectedMode] = useState<AnalysisMode>("stereo");
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [curveHoverIndex, setCurveHoverIndex] = useState<number | null>(null);
+  useEffect(() => { setCurveHoverIndex(null); }, [/* reset on new analysis */]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const toggleLanguage = () => {
