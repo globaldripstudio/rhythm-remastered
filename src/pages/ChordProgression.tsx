@@ -1,0 +1,457 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import {
+  ChevronLeft,
+  Copy,
+  Dice5,
+  Download,
+  Guitar,
+  Music2,
+  Pause,
+  Piano,
+  Play,
+  Shuffle,
+} from "lucide-react";
+import SEO from "@/components/SEO";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import {
+  MODES,
+  NOTE_NAMES,
+  type ModeId,
+  type NoteName,
+  scalePitchClasses,
+} from "@/lib/musicTheory/scales";
+import {
+  PROGRESSION_PRESETS,
+  chordFromRoman,
+  progressionFromRomans,
+  randomProgression,
+  type Chord,
+} from "@/lib/musicTheory/chords";
+import { playChord, getAudioContext } from "@/lib/musicTheory/audio";
+import { chordsToMidiBlob, downloadBlob } from "@/lib/musicTheory/midiExport";
+import { PianoKeyboard } from "@/components/music/PianoKeyboard";
+import { GuitarFretboard } from "@/components/music/GuitarFretboard";
+
+type ViewMode = "both" | "piano" | "guitar";
+type Timbre = "piano" | "guitar";
+
+const STORAGE_KEY = "chord-progression:settings";
+
+interface PersistedSettings {
+  tonic: NoteName;
+  modeId: ModeId;
+  view: ViewMode;
+  bpm: number;
+  beatsPerChord: number;
+  timbre: Timbre;
+  presetId: string;
+}
+
+const DEFAULTS: PersistedSettings = {
+  tonic: "C",
+  modeId: "ionian",
+  view: "both",
+  bpm: 90,
+  beatsPerChord: 4,
+  timbre: "piano",
+  presetId: "pop-axis",
+};
+
+function loadSettings(): PersistedSettings {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULTS;
+    return { ...DEFAULTS, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULTS;
+  }
+}
+
+const ChordProgression = () => {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+
+  const initial = useMemo(loadSettings, []);
+  const [tonic, setTonic] = useState<NoteName>(initial.tonic);
+  const [modeId, setModeId] = useState<ModeId>(initial.modeId);
+  const [view, setView] = useState<ViewMode>(initial.view);
+  const [bpm, setBpm] = useState(initial.bpm);
+  const [beatsPerChord, setBeatsPerChord] = useState(initial.beatsPerChord);
+  const [timbre, setTimbre] = useState<Timbre>(initial.timbre);
+  const [tokens, setTokens] = useState<string[]>(
+    PROGRESSION_PRESETS.find((p) => p.id === initial.presetId)?.tokens ?? PROGRESSION_PRESETS[0].tokens,
+  );
+  const [presetId, setPresetId] = useState<string>(initial.presetId);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
+
+  // Persist
+  useEffect(() => {
+    try {
+      const data: PersistedSettings = { tonic, modeId, view, bpm, beatsPerChord, timbre, presetId };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      /* ignore */
+    }
+  }, [tonic, modeId, view, bpm, beatsPerChord, timbre, presetId]);
+
+  const scalePcs = useMemo(() => scalePitchClasses(tonic, modeId), [tonic, modeId]);
+
+  const chords: Chord[] = useMemo(
+    () => progressionFromRomans(tokens, tonic, modeId, 4),
+    [tokens, tonic, modeId],
+  );
+
+  const highlightPcs = useMemo(() => {
+    if (activeIndex === null) return undefined;
+    const c = chords[activeIndex];
+    if (!c) return undefined;
+    return new Set(c.midi.map((m) => m % 12));
+  }, [activeIndex, chords]);
+
+  const handleApplyPreset = (id: string) => {
+    const preset = PROGRESSION_PRESETS.find((p) => p.id === id);
+    if (!preset) return;
+    setPresetId(id);
+    setTokens([...preset.tokens]);
+    // Auto-switch tonic family if needed
+    if (preset.mood === "minor" && (modeId === "ionian" || modeId === "lydian")) {
+      setModeId("aeolian");
+    } else if (preset.mood === "major" && (modeId === "aeolian" || modeId === "phrygian")) {
+      setModeId("ionian");
+    }
+  };
+
+  const handlePlayProgression = async () => {
+    if (isPlaying) {
+      stopRef.current.cancelled = true;
+      setIsPlaying(false);
+      setActiveIndex(null);
+      return;
+    }
+    const ctx = getAudioContext();
+    setIsPlaying(true);
+    stopRef.current.cancelled = false;
+    const beatSec = 60 / bpm;
+    const chordSec = beatSec * beatsPerChord;
+    let t0 = ctx.currentTime + 0.05;
+    for (let i = 0; i < chords.length; i++) {
+      if (stopRef.current.cancelled) break;
+      const c = chords[i];
+      const startAt = t0;
+      playChord(c.midi, timbre, { durationMs: chordSec * 950, startAt, velocity: 0.75 });
+      const indexNow = i;
+      const delay = (startAt - ctx.currentTime) * 1000;
+      window.setTimeout(() => {
+        if (!stopRef.current.cancelled) setActiveIndex(indexNow);
+      }, Math.max(0, delay));
+      await new Promise((r) => setTimeout(r, chordSec * 1000));
+      t0 += chordSec;
+    }
+    setIsPlaying(false);
+    setActiveIndex(null);
+  };
+
+  const handlePlayChord = (idx: number) => {
+    const c = chords[idx];
+    if (!c) return;
+    setActiveIndex(idx);
+    playChord(c.midi, timbre, { durationMs: 1400, velocity: 0.8 });
+    window.setTimeout(() => setActiveIndex((cur) => (cur === idx ? null : cur)), 1300);
+  };
+
+  const handleRandomize = () => {
+    const mood = (MODES[modeId].diatonicQualities?.[0] === "min" ? "minor" : "major") as
+      | "minor"
+      | "major";
+    setTokens(randomProgression(mood));
+    setPresetId("custom");
+  };
+
+  const handleCopy = () => {
+    const text = chords.map((c) => c.symbol).join(" – ");
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copié", description: text });
+  };
+
+  const handleExport = () => {
+    const blob = chordsToMidiBlob(chords, bpm, beatsPerChord);
+    downloadBlob(blob, `progression-${tonic}-${modeId}.mid`);
+  };
+
+  const handleEditToken = (idx: number, value: string) => {
+    const next = [...tokens];
+    next[idx] = value;
+    setTokens(next);
+    setPresetId("custom");
+  };
+
+  const handleAddBar = () => {
+    setTokens([...tokens, "I"]);
+    setPresetId("custom");
+  };
+
+  const handleRemoveBar = (idx: number) => {
+    if (tokens.length <= 1) return;
+    setTokens(tokens.filter((_, i) => i !== idx));
+    setPresetId("custom");
+  };
+
+  const groupedPresets = useMemo(() => {
+    const map = new Map<string, typeof PROGRESSION_PRESETS>();
+    PROGRESSION_PRESETS.forEach((p) => {
+      const arr = map.get(p.genre) ?? [];
+      arr.push(p);
+      map.set(p.genre, arr);
+    });
+    return Array.from(map.entries());
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SEO
+        title="Générateur d'accords & gammes — piano et guitare interactifs | Global Drip Studio"
+        description="Générez des progressions d'accords par tonalité et mode, écoutez-les, exportez en MIDI. Piano et manche de guitare interactifs et jouables. 100% gratuit, dans le navigateur."
+        path="/chord-progression"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Chord Progression Generator — Global Drip Studio",
+          applicationCategory: "MultimediaApplication",
+          operatingSystem: "Web",
+          isAccessibleForFree: true,
+          offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+        }}
+      />
+
+      <div className="container mx-auto max-w-6xl px-4 py-8 sm:py-12">
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ChevronLeft className="h-4 w-4" /> Accueil
+          </Link>
+          <Badge variant="outline" className="border-primary/40 text-primary">
+            Toolkit
+          </Badge>
+        </div>
+
+        <header className="mb-8 space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <Music2 className="h-3.5 w-3.5" /> Générateur d'accords
+          </div>
+          <h1 className="text-3xl font-bold sm:text-4xl">Progressions, gammes & modes — piano et guitare</h1>
+          <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
+            Choisis une tonalité et un mode, sélectionne une progression ou crée la tienne. Visualise les
+            notes sur le piano et le manche de guitare, joue chaque touche, écoute la progression et exporte-la
+            en MIDI. Tout fonctionne dans ton navigateur, sans inscription.
+          </p>
+        </header>
+
+        {/* Key + mode + view controls */}
+        <Card className="mb-6 border-border/60">
+          <CardContent className="grid gap-4 p-4 sm:p-6 md:grid-cols-4">
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tonique</Label>
+              <Select value={tonic} onValueChange={(v) => setTonic(v as NoteName)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {NOTE_NAMES.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Mode / gamme</Label>
+              <Select value={modeId} onValueChange={(v) => setModeId(v as ModeId)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.values(MODES).map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Affichage</Label>
+              <div className="flex flex-wrap gap-1.5">
+                <Button size="sm" variant={view === "piano" ? "default" : "outline"} onClick={() => setView("piano")}>
+                  <Piano className="mr-1.5 h-4 w-4" /> Piano
+                </Button>
+                <Button size="sm" variant={view === "guitar" ? "default" : "outline"} onClick={() => setView("guitar")}>
+                  <Guitar className="mr-1.5 h-4 w-4" /> Guitare
+                </Button>
+                <Button size="sm" variant={view === "both" ? "default" : "outline"} onClick={() => setView("both")}>
+                  Les deux
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Timbre de lecture</Label>
+              <Select value={timbre} onValueChange={(v) => setTimbre(v as Timbre)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="piano">Piano</SelectItem>
+                  <SelectItem value="guitar">Guitare</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Progression builder */}
+        <Card className="mb-6 border-border/60">
+          <CardContent className="space-y-4 p-4 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold">Progression</h2>
+                <p className="text-xs text-muted-foreground">Sélectionne un preset ou modifie librement les degrés (I, ii, V7, bVII…).</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={handleRandomize}>
+                  <Dice5 className="mr-1.5 h-4 w-4" /> Aléatoire
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleCopy}>
+                  <Copy className="mr-1.5 h-4 w-4" /> Copier
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleExport}>
+                  <Download className="mr-1.5 h-4 w-4" /> MIDI
+                </Button>
+                <Button size="sm" onClick={handlePlayProgression}>
+                  {isPlaying ? <Pause className="mr-1.5 h-4 w-4" /> : <Play className="mr-1.5 h-4 w-4" />}
+                  {isPlaying ? "Stop" : "Lire"}
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Preset</Label>
+                <Select value={presetId} onValueChange={handleApplyPreset}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {presetId === "custom" && <SelectItem value="custom">Personnalisé</SelectItem>}
+                    {groupedPresets.map(([genre, presets]) => (
+                      <div key={genre}>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{genre}</div>
+                        {presets.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>
+                        ))}
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tempo {bpm} BPM</Label>
+                  <Slider value={[bpm]} min={40} max={200} step={1} onValueChange={(v) => setBpm(v[0])} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Temps / accord</Label>
+                  <Slider value={[beatsPerChord]} min={1} max={8} step={1} onValueChange={(v) => setBeatsPerChord(v[0])} />
+                </div>
+              </div>
+            </div>
+
+            {/* Chord cards */}
+            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-4">
+              {chords.map((c, idx) => (
+                <div
+                  key={idx}
+                  className={`group relative rounded-lg border p-3 transition-colors ${
+                    activeIndex === idx
+                      ? "border-secondary bg-secondary/15"
+                      : "border-border/60 bg-card/40 hover:border-primary/40"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="text-2xl font-bold">{c.symbol}</div>
+                      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{c.roman}</div>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveBar(idx)}
+                      className="text-xs text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                      aria-label="Supprimer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="mt-1.5 text-xs text-muted-foreground">
+                    {c.midi.map((m) => NOTE_NAMES[m % 12]).join(" · ")}
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <input
+                      value={tokens[idx]}
+                      onChange={(e) => handleEditToken(idx, e.target.value)}
+                      className="w-20 rounded border border-border/60 bg-background px-2 py-1 text-xs"
+                      aria-label="Degré romain"
+                    />
+                    <Button size="sm" variant="ghost" onClick={() => handlePlayChord(idx)} className="ml-auto">
+                      <Play className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              <button
+                onClick={handleAddBar}
+                className="flex min-h-[88px] items-center justify-center rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              >
+                + Ajouter
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Visualizers */}
+        <div className="space-y-6">
+          {(view === "piano" || view === "both") && (
+            <Card className="border-border/60">
+              <CardContent className="space-y-3 p-4 sm:p-6">
+                <div className="flex items-center gap-2">
+                  <Piano className="h-4 w-4 text-primary" />
+                  <h3 className="text-base font-semibold">Piano — {tonic} {MODES[modeId].label}</h3>
+                </div>
+                <PianoKeyboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
+                <p className="text-xs text-muted-foreground">
+                  Clique ou tape sur n'importe quelle touche pour la jouer. Les notes de la gamme sont surlignées,
+                  la tonique encadrée. L'accord en cours de lecture apparaît en orange/teal.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          {(view === "guitar" || view === "both") && (
+            <Card className="border-border/60">
+              <CardContent className="space-y-3 p-4 sm:p-6">
+                <div className="flex items-center gap-2">
+                  <Guitar className="h-4 w-4 text-primary" />
+                  <h3 className="text-base font-semibold">Guitare (accordage standard) — {tonic} {MODES[modeId].label}</h3>
+                </div>
+                <GuitarFretboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
+                <p className="text-xs text-muted-foreground">
+                  Clique sur une pastille pour entendre la note. Les positions de la gamme sont marquées sur tout le manche,
+                  la tonique en orange.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChordProgression;
