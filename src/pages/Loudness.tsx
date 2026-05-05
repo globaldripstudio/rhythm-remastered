@@ -591,6 +591,13 @@ const Loudness = () => {
                   <span className="sm:hidden">Key/BPM</span>
                 </Button>
               </Link>
+              <Link to="/tap-tempo-metronome">
+                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 text-muted-foreground hover:text-foreground">
+                  <Drum className="h-3.5 w-3.5 text-primary" />
+                  <span className="hidden sm:inline">{t('nav.tempoTools')}</span>
+                  <span className="sm:hidden">Tempo</span>
+                </Button>
+              </Link>
             </div>
             <button
               onClick={toggleLanguage}
