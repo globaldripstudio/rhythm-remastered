@@ -303,27 +303,27 @@ const TapTempoMetronome = () => {
       />
 
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 sm:gap-6">
-              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+        <div className="container mx-auto px-3 sm:px-6 py-2.5 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-6 min-w-0 flex-1 overflow-x-auto no-scrollbar">
+              <Link to="/" className="flex items-center shrink-0">
                 <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
               </Link>
-              <Link to="/">
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
+              <Link to="/" className="shrink-0">
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4 h-8">
                   <span className="hidden sm:inline">← {t("nav.backHome")}</span>
-                  <span className="sm:hidden">← {t("nav.backHomeShort")}</span>
+                  <span className="sm:hidden">←</span>
                 </Button>
               </Link>
-              <Link to="/loudness">
-                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 text-muted-foreground hover:text-foreground">
+              <Link to="/loudness" className="shrink-0">
+                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 h-8 text-muted-foreground hover:text-foreground">
                   <Gauge className="h-3.5 w-3.5 text-primary" />
                   <span className="hidden sm:inline">{t("nav.loudness")}</span>
                   <span className="sm:hidden">LUFS</span>
                 </Button>
               </Link>
-              <Link to="/key-bpm-finder">
-                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 text-muted-foreground hover:text-foreground">
+              <Link to="/key-bpm-finder" className="shrink-0">
+                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 h-8 text-muted-foreground hover:text-foreground">
                   <KeyRound className="h-3.5 w-3.5 text-primary" />
                   <span className="hidden sm:inline">{t("nav.keybpm")}</span>
                   <span className="sm:hidden">Key/BPM</span>
@@ -332,7 +332,7 @@ const TapTempoMetronome = () => {
             </div>
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
+              className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
               aria-label="Switch language"
             >
               <span className={i18n.language === "fr" ? "text-foreground font-bold" : ""}>FR</span>
@@ -439,12 +439,13 @@ const TapTempoMetronome = () => {
                 <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
                   {/* Visual */}
                   <div className="rounded-xl border border-border bg-background/40 p-5 sm:p-6">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
                       <div>
                         <label htmlFor="metro-bpm-display" className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</label>
                         <input
                           id="metro-bpm-display"
                           type="number"
+                          inputMode="numeric"
                           min={30}
                           max={300}
                           value={metro.bpm}
@@ -453,10 +454,10 @@ const TapTempoMetronome = () => {
                             if (!Number.isNaN(n)) metro.setBpm(Math.min(300, Math.max(30, n)));
                           }}
                           aria-label={t("tempoTools.metronome.tempo")}
-                          className="w-[3.5ch] bg-transparent text-5xl sm:text-6xl font-bold text-primary tabular-nums outline-none border-b border-transparent focus:border-primary/60 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-[3.5ch] bg-transparent text-4xl sm:text-6xl font-bold text-primary tabular-nums outline-none border-b border-transparent focus:border-primary/60 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
-                      <Button onClick={metro.toggle} size="lg" className="studio-button gap-2 min-w-[120px]">
+                      <Button onClick={metro.toggle} size="lg" className="studio-button gap-2 min-w-[110px]">
                         {metro.isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                         {metro.isPlaying ? t("tempoTools.metronome.stop") : t("tempoTools.metronome.start")}
                       </Button>
@@ -469,7 +470,7 @@ const TapTempoMetronome = () => {
                         return (
                           <div
                             key={i}
-                            className={`h-12 w-12 rounded-full border-2 transition-all duration-100 ${
+                            className={`h-9 w-9 sm:h-12 sm:w-12 rounded-full border-2 transition-all duration-100 ${
                               active
                                 ? accent
                                   ? "border-primary bg-primary scale-110 shadow-[0_0_24px_hsl(var(--primary)/0.6)]"
