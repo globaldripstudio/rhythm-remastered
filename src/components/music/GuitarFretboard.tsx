@@ -27,7 +27,7 @@ export function GuitarFretboard({
   const stringsOrdered = useMemo(() => [...TUNING_MIDI].reverse(), []);
   const labelsOrdered = useMemo(() => [...STRING_LABELS].reverse(), []);
 
-  const cellW = `minmax(36px, 1fr)`;
+  const cellW = `minmax(32px, 1fr)`;
   const gridTemplate = `48px repeat(${frets}, ${cellW})`;
 
   return (
