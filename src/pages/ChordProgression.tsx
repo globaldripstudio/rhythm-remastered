@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import {
-  ChevronLeft,
   Copy,
   Dice5,
   Download,
@@ -11,7 +9,6 @@ import {
   Pause,
   Piano,
   Play,
-  Shuffle,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
