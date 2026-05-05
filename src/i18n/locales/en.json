@@ -10,6 +10,8 @@
     "loudnessDesc": "LUFS, true peak and dynamics measurement",
     "keybpm": "Key & BPM Finder",
     "keybpmDesc": "Detect musical key, tempo and Camelot code",
+    "tempoTools": "Tap Tempo & Metronome",
+    "tempoToolsDesc": "Tap tempo, metronome and BPM/delay calculator",
     "toolkit": "Toolkit",
     "shop": "Shop",
     "shopSoon": "soon",
@@ -924,6 +926,10 @@
     "keybpm": {
       "title": "Free Online Key & BPM Finder | Tempo and Musical Key Detector",
       "description": "Detect the musical key, BPM and Camelot code of any track right in your browser. Fast, accurate and 100% local — no server upload."
+    },
+    "tempoTools": {
+      "title": "Online Tap Tempo, Metronome & BPM Calculator | Global Drip",
+      "description": "Accurate tap tempo, metronome with subdivisions and BPM calculator (milliseconds for delays and reverbs). All in the browser, free, no signup."
     }
   },
   "legalPages": {
