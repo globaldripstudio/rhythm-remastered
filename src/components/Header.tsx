@@ -130,7 +130,7 @@ const Header = () => {
                   <Music4 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   <span>
                     <span className="block text-sm font-semibold text-foreground">Audio → MIDI</span>
-                    <span className="block text-xs text-muted-foreground">Conversion polyphonique locale & gratuite</span>
+                    <span className="block text-xs text-muted-foreground">Conversion polyphonique locale</span>
                   </span>
                 </a>
               </div>
