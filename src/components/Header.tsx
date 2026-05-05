@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Gauge, KeyRound, Menu, Phone, Wrench, X } from "lucide-react";
+import { ChevronDown, Drum, Gauge, KeyRound, Menu, Phone, Wrench, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const Header = () => {
@@ -100,6 +100,17 @@ const Header = () => {
                     <span className="block text-xs text-muted-foreground">{t('nav.keybpmDesc')}</span>
                   </span>
                 </a>
+                <a
+                  href="/tap-tempo-metronome"
+                  role="menuitem"
+                  className="flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-primary/10"
+                >
+                  <Drum className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">{t('nav.tempoTools')}</span>
+                    <span className="block text-xs text-muted-foreground">{t('nav.tempoToolsDesc')}</span>
+                  </span>
+                </a>
               </div>
             </div>
           </nav>
@@ -178,6 +189,10 @@ const Header = () => {
                 <a href="/key-bpm-finder" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
                   <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>{t('nav.keybpm')}</span>
+                </a>
+                <a href="/tap-tempo-metronome" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                  <Drum className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <span>{t('nav.tempoTools')}</span>
                 </a>
               </div>
               <div className="pt-4 border-t border-border">

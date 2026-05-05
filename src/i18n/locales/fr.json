@@ -10,6 +10,8 @@
     "loudnessDesc": "Mesure LUFS, true peak et dynamique",
     "keybpm": "Key & BPM Finder",
     "keybpmDesc": "Détection de tonalité, tempo et code Camelot",
+    "tempoTools": "Tap Tempo & Métronome",
+    "tempoToolsDesc": "Tap tempo, métronome et calculateur BPM/délais",
     "toolkit": "Toolkit",
     "shop": "Boutique",
     "shopSoon": "bientôt",
@@ -924,6 +926,10 @@
     "keybpm": {
       "title": "Key & BPM Finder gratuit en ligne | Détecteur de tonalité et tempo",
       "description": "Trouve la tonalité (key), le BPM et le code Camelot d'un morceau directement dans le navigateur. Analyse rapide, précise et 100% locale, sans upload serveur."
+    },
+    "tempoTools": {
+      "title": "Tap Tempo, Métronome & Calculateur BPM en ligne | Global Drip",
+      "description": "Tap tempo précis, métronome avec subdivisions et calculateur BPM (millisecondes pour delays et reverbs). Tout dans le navigateur, gratuit et sans inscription."
     }
   },
   "legalPages": {
@@ -1349,6 +1355,82 @@
         "remix": {
           "title": "Remix & sampling",
           "description": "Analyse rapidement un acapella ou un instrumental pour caler ton remix dans la bonne tonalité."
+        }
+      }
+    }
+  },
+  "tempoTools": {
+    "badge": "Tempo, métronome & calcul BPM",
+    "subtitle": "Tap tempo précis, métronome avec subdivisions et calculateur BPM (millisecondes utiles pour delays et reverbs). Trois outils complémentaires sur une seule page, dans ton navigateur.",
+    "anchorAria": "Navigation rapide entre les outils",
+    "sections": {
+      "tap": "Tap Tempo",
+      "metronome": "Métronome",
+      "calculator": "Calculateur BPM"
+    },
+    "tap": {
+      "title": "Tap Tempo",
+      "description": "Tape le rythme avec la souris ou la barre espace pour mesurer le BPM d'un morceau, d'une boucle ou d'une idée mélodique.",
+      "button": "Tape ici",
+      "spaceHint": "Astuce : utilise la barre espace",
+      "tapsCount": "{{count}} taps",
+      "reset": "Réinitialiser",
+      "sendMetronome": "Envoyer au métronome",
+      "sendCalc": "Envoyer au calculateur"
+    },
+    "metronome": {
+      "title": "Métronome en ligne",
+      "description": "Métronome précis avec subdivisions, signatures rythmiques et accent sur le premier temps. Idéal pour répéter, composer ou enregistrer.",
+      "start": "Démarrer",
+      "stop": "Arrêter",
+      "tempo": "Tempo",
+      "beatsPerBar": "Mesure",
+      "subdivision": "Subdivision",
+      "subQuarter": "Noires",
+      "subEighth": "Croches",
+      "subTriplet": "Triolets",
+      "subSixteenth": "Doubles croches",
+      "volume": "Volume"
+    },
+    "calc": {
+      "title": "Calculateur BPM → millisecondes",
+      "description": "Convertis ton BPM en durées de notes (millisecondes et Hz) pour régler delays, reverbs et arpégiateurs au tempo.",
+      "note": "Valeur",
+      "straight": "Binaire",
+      "dotted": "Pointée",
+      "triplet": "Triolet",
+      "usage": "Utilise les valeurs en ms pour caler tes delays au tempo, ou en Hz pour synchroniser un LFO."
+    },
+    "notes": {
+      "whole": "ronde",
+      "half": "blanche",
+      "quarter": "noire",
+      "eighth": "croche",
+      "sixteenth": "double croche",
+      "thirtysecond": "triple croche"
+    },
+    "seo": {
+      "title": "Tap tempo, métronome et calculateur BPM en ligne",
+      "description": "Trois outils tempo complémentaires : un tap tempo pour mesurer le BPM en quelques clics, un métronome avec subdivisions pour t'entraîner, et un calculateur BPM → millisecondes pour caler tes delays et reverbs au tempo. 100% gratuit, dans le navigateur.",
+      "howTitle": "Comment ça marche",
+      "how": {
+        "tap": "Le tap tempo calcule la moyenne des intervalles entre tes taps pour estimer le BPM en temps réel.",
+        "metronome": "Le métronome utilise le Web Audio API pour des clicks parfaitement synchrones, sans dérive temporelle.",
+        "calc": "Le calculateur convertit ton BPM en durées de notes (binaires, pointées, triolets) en ms et en Hz.",
+        "privacy": "Tout est exécuté localement, aucun tap ni audio n'est envoyé sur un serveur."
+      },
+      "topics": {
+        "musicians": {
+          "title": "Musiciens & chanteurs",
+          "description": "Mesure le tempo d'un morceau et entraîne-toi avec un métronome précis et configurable."
+        },
+        "producers": {
+          "title": "Producteurs & beatmakers",
+          "description": "Convertis ton BPM en ms pour régler tes delays, reverbs et arpégiateurs au tempo du projet."
+        },
+        "djs": {
+          "title": "DJs",
+          "description": "Trouve rapidement le BPM d'un track en tapant le rythme, et compare-le à celui de ta playlist."
         }
       }
     }

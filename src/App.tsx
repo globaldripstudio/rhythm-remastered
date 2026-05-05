@@ -21,6 +21,7 @@ import EbookLogin from "./pages/EbookLogin";
 import EbookReader from "./pages/EbookReader";
 import Loudness from "./pages/Loudness";
 import KeyBpmFinder from "./pages/KeyBpmFinder";
+import TapTempoMetronome from "./pages/TapTempoMetronome";
 import Admin from "./pages/Admin";
 
 import LiveChat from "./components/LiveChat";
@@ -58,6 +59,10 @@ const App = () => (
             <Route path="/ebook/reader" element={<EbookReader />} />
             <Route path="/loudness" element={<Loudness />} />
             <Route path="/key-bpm-finder" element={<KeyBpmFinder />} />
+            <Route path="/tap-tempo-metronome" element={<TapTempoMetronome />} />
+            <Route path="/metronome" element={<Navigate to="/tap-tempo-metronome" replace />} />
+            <Route path="/tap-tempo" element={<Navigate to="/tap-tempo-metronome" replace />} />
+            <Route path="/bpm-calculator" element={<Navigate to="/tap-tempo-metronome" replace />} />
             <Route path="/bpm-finder" element={<Navigate to="/key-bpm-finder" replace />} />
             <Route path="/key-finder" element={<Navigate to="/key-bpm-finder" replace />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Download, FileAudio, Gauge, Info, KeyRound, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { Download, Drum, FileAudio, Gauge, Info, KeyRound, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import SEO from "@/components/SEO";
@@ -589,6 +589,13 @@ const Loudness = () => {
                   <KeyRound className="h-3.5 w-3.5 text-primary" />
                   <span className="hidden sm:inline">{t('nav.keybpm')}</span>
                   <span className="sm:hidden">Key/BPM</span>
+                </Button>
+              </Link>
+              <Link to="/tap-tempo-metronome">
+                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 text-muted-foreground hover:text-foreground">
+                  <Drum className="h-3.5 w-3.5 text-primary" />
+                  <span className="hidden sm:inline">{t('nav.tempoTools')}</span>
+                  <span className="sm:hidden">Tempo</span>
                 </Button>
               </Link>
             </div>
