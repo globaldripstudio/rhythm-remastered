@@ -1390,7 +1390,8 @@
       "subEighth": "Eighths",
       "subTriplet": "Triplets",
       "subSixteenth": "Sixteenths",
-      "volume": "Volume"
+      "volume": "Volume",
+      "sendCalc": "Send to calculator"
     },
     "calc": {
       "title": "BPM → milliseconds calculator",
