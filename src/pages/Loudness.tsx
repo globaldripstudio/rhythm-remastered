@@ -571,46 +571,7 @@ const Loudness = () => {
           "featureList": ["Integrated LUFS", "True Peak", "Loudness Range", "Momentary LUFS", "Short-term LUFS", "PDF report"]
         }}
       />
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 sm:gap-6">
-              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
-                <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
-              </Link>
-              <Link to="/">
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                  <span className="hidden sm:inline">← {t('nav.backHome')}</span>
-                  <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
-                </Button>
-              </Link>
-              <Link to="/key-bpm-finder">
-                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 text-muted-foreground hover:text-foreground">
-                  <KeyRound className="h-3.5 w-3.5 text-primary" />
-                  <span className="hidden sm:inline">{t('nav.keybpm')}</span>
-                  <span className="sm:hidden">Key/BPM</span>
-                </Button>
-              </Link>
-              <Link to="/tap-tempo-metronome">
-                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3 gap-1.5 text-muted-foreground hover:text-foreground">
-                  <Drum className="h-3.5 w-3.5 text-primary" />
-                  <span className="hidden sm:inline">{t('nav.tempoTools')}</span>
-                  <span className="sm:hidden">Tempo</span>
-                </Button>
-              </Link>
-            </div>
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
-              aria-label="Switch language"
-            >
-              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
-              <span className="text-muted-foreground/40">|</span>
-              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <ToolkitHeader current="loudness" />
       <main className="py-8 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
           <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8">
