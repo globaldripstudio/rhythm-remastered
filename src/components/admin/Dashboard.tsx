@@ -182,6 +182,10 @@ const Dashboard = () => {
           <TabsContent value="clients">
             <ClientsList />
           </TabsContent>
+
+          <TabsContent value="stems">
+            <StemSplitter />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
