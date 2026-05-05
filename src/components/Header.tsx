@@ -122,6 +122,17 @@ const Header = () => {
                     <span className="block text-xs text-muted-foreground">Progressions, piano & guitare interactifs</span>
                   </span>
                 </a>
+                <a
+                  href="/audio-to-midi"
+                  role="menuitem"
+                  className="flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-primary/10"
+                >
+                  <Music4 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">Audio → MIDI</span>
+                    <span className="block text-xs text-muted-foreground">Conversion polyphonique locale & gratuite</span>
+                  </span>
+                </a>
               </div>
             </div>
           </nav>
