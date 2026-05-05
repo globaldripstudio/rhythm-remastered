@@ -241,8 +241,12 @@ const AudioToMidi = () => {
               {isPlayingMidi ? <Square className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}
               {isPlayingMidi ? "Stop" : "Écouter le MIDI"}
             </Button>
-            <Button variant="outline" disabled={notes.length === 0} onClick={handleDownloadMidi}>
-              <Download className="mr-2 h-4 w-4" /> .mid
+            <Button
+              disabled={notes.length === 0}
+              onClick={handleDownloadMidi}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Download className="mr-2 h-4 w-4" /> Télécharger .mid
             </Button>
             <Button variant="outline" disabled={notes.length === 0} onClick={handleDownloadCsv}>
               <Download className="mr-2 h-4 w-4" /> .csv
@@ -260,9 +264,19 @@ const AudioToMidi = () => {
           )}
 
           {notes.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{notes.length} notes — {durationSec.toFixed(1)} s</span>
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <div className="text-sm">
+                  <span className="font-semibold text-foreground">{notes.length} notes</span>
+                  <span className="text-muted-foreground"> détectées · {durationSec.toFixed(1)} s</span>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleDownloadMidi}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  <Download className="mr-2 h-4 w-4" /> Télécharger le MIDI
+                </Button>
               </div>
               <div className="rounded-lg border border-border/60 bg-card/40 p-2">
                 <canvas ref={canvasRef} className="h-48 w-full" />
