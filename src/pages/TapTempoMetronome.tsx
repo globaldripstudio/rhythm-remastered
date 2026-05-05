@@ -245,18 +245,59 @@ const TapTempoMetronome = () => {
         path="/tap-tempo-metronome"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "Global Drip Studio Tap Tempo, Metronome & BPM Calculator",
-          applicationCategory: "MultimediaApplication",
-          operatingSystem: "Web browser",
-          url: "https://globaldripstudio.fr/tap-tempo-metronome",
-          description: t("seo.tempoTools.description"),
-          offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-          featureList: [
-            "Tap tempo BPM detection",
-            "Online metronome",
-            "BPM to milliseconds calculator",
-            "Delay and reverb time calculator",
+          "@graph": [
+            {
+              "@type": "SoftwareApplication",
+              name: "Tap Tempo, Metronome & BPM Calculator — Global Drip Studio",
+              applicationCategory: "MultimediaApplication",
+              applicationSubCategory: "Music Production Tool",
+              operatingSystem: "Web browser (Chrome, Firefox, Safari, Edge)",
+              url: "https://globaldripstudio.fr/tap-tempo-metronome",
+              description: t("seo.tempoTools.description"),
+              inLanguage: ["fr", "en"],
+              isAccessibleForFree: true,
+              browserRequirements: "Requires JavaScript and Web Audio API",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+              featureList: [
+                "Tap tempo BPM detection (spacebar or click)",
+                "Online metronome with subdivisions and time signatures",
+                "BPM to milliseconds calculator for delays and reverbs",
+                "Triplet and dotted note timings",
+                "100% in-browser, no upload, no signup",
+              ],
+              publisher: {
+                "@type": "Organization",
+                name: "Global Drip Studio",
+                url: "https://globaldripstudio.fr",
+              },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://globaldripstudio.fr/" },
+                { "@type": "ListItem", position: 2, name: "Tap Tempo, Metronome & BPM Calculator", item: "https://globaldripstudio.fr/tap-tempo-metronome" },
+              ],
+            },
+            {
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "How does tap tempo work?",
+                  acceptedAnswer: { "@type": "Answer", text: "Tap a button or press the spacebar in time with the music. We average the intervals between your taps to compute the BPM in real time." },
+                },
+                {
+                  "@type": "Question",
+                  name: "Is the metronome accurate?",
+                  acceptedAnswer: { "@type": "Answer", text: "Yes. It uses the Web Audio API with sample-accurate scheduling so clicks stay in time even if the browser tab is busy." },
+                },
+                {
+                  "@type": "Question",
+                  name: "How do I sync delays and reverbs to the BPM?",
+                  acceptedAnswer: { "@type": "Answer", text: "Enter your tempo in the BPM calculator and read the millisecond value for the note duration you need (1/4, 1/8, dotted, triplet, etc.)." },
+                },
+              ],
+            },
           ],
         }}
       />
