@@ -64,6 +64,8 @@ const App = () => (
             <Route path="/tap-tempo-metronome" element={<TapTempoMetronome />} />
             <Route path="/chord-progression" element={<ChordProgression />} />
             <Route path="/chords" element={<Navigate to="/chord-progression" replace />} />
+            <Route path="/audio-to-midi" element={<AudioToMidi />} />
+            <Route path="/audio2midi" element={<Navigate to="/audio-to-midi" replace />} />
             <Route path="/scales" element={<Navigate to="/chord-progression" replace />} />
             <Route path="/metronome" element={<Navigate to="/tap-tempo-metronome" replace />} />
             <Route path="/tap-tempo" element={<Navigate to="/tap-tempo-metronome" replace />} />
