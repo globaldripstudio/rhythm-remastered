@@ -400,8 +400,20 @@ const TapTempoMetronome = () => {
                   <div className="rounded-xl border border-border bg-background/40 p-5 sm:p-6">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</div>
-                        <div className="text-5xl sm:text-6xl font-bold text-primary tabular-nums">{metro.bpm}</div>
+                        <label htmlFor="metro-bpm-display" className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</label>
+                        <input
+                          id="metro-bpm-display"
+                          type="number"
+                          min={30}
+                          max={300}
+                          value={metro.bpm}
+                          onChange={(e) => {
+                            const n = Number(e.target.value);
+                            if (!Number.isNaN(n)) metro.setBpm(Math.min(300, Math.max(30, n)));
+                          }}
+                          aria-label={t("tempoTools.metronome.tempo")}
+                          className="w-[3.5ch] bg-transparent text-5xl sm:text-6xl font-bold text-primary tabular-nums outline-none border-b border-transparent focus:border-primary/60 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
                       </div>
                       <Button onClick={metro.toggle} size="lg" className="studio-button gap-2 min-w-[120px]">
                         {metro.isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
