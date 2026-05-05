@@ -439,12 +439,13 @@ const TapTempoMetronome = () => {
                 <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
                   {/* Visual */}
                   <div className="rounded-xl border border-border bg-background/40 p-5 sm:p-6">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
                       <div>
                         <label htmlFor="metro-bpm-display" className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</label>
                         <input
                           id="metro-bpm-display"
                           type="number"
+                          inputMode="numeric"
                           min={30}
                           max={300}
                           value={metro.bpm}
@@ -453,10 +454,10 @@ const TapTempoMetronome = () => {
                             if (!Number.isNaN(n)) metro.setBpm(Math.min(300, Math.max(30, n)));
                           }}
                           aria-label={t("tempoTools.metronome.tempo")}
-                          className="w-[3.5ch] bg-transparent text-5xl sm:text-6xl font-bold text-primary tabular-nums outline-none border-b border-transparent focus:border-primary/60 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-[3.5ch] bg-transparent text-4xl sm:text-6xl font-bold text-primary tabular-nums outline-none border-b border-transparent focus:border-primary/60 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
-                      <Button onClick={metro.toggle} size="lg" className="studio-button gap-2 min-w-[120px]">
+                      <Button onClick={metro.toggle} size="lg" className="studio-button gap-2 min-w-[110px]">
                         {metro.isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                         {metro.isPlaying ? t("tempoTools.metronome.stop") : t("tempoTools.metronome.start")}
                       </Button>
