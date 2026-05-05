@@ -188,9 +188,6 @@ const Dashboard = () => {
             <StemSplitter />
           </TabsContent>
 
-          <TabsContent value="audio2midi">
-            <AudioToMidi />
-          </TabsContent>
         </Tabs>
       </main>
     </div>
