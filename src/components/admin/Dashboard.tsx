@@ -26,6 +26,7 @@ import PerformanceMetrics from './PerformanceMetrics';
 import QuickActions from './QuickActions';
 import SiteAnalytics from './SiteAnalytics';
 import EbookManager from './EbookManager';
+import StemSplitter from './StemSplitter';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
