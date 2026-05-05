@@ -23,6 +23,7 @@ import Loudness from "./pages/Loudness";
 import KeyBpmFinder from "./pages/KeyBpmFinder";
 import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
+import AudioToMidi from "./pages/AudioToMidi";
 import Admin from "./pages/Admin";
 
 import LiveChat from "./components/LiveChat";
