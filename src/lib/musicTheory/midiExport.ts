@@ -14,7 +14,7 @@ export function chordsToMidiBlob(chords: Chord[], bpm = 90, beatsPerChord = 4): 
     });
     t += dur;
   });
-  return new Blob([midi.toArray()], { type: "audio/midi" });
+  return new Blob([midi.toArray().buffer as ArrayBuffer], { type: "audio/midi" });
 }
 
 export interface NoteEvent {
@@ -36,7 +36,7 @@ export function notesToMidiBlob(notes: NoteEvent[], bpm = 120): Blob {
       velocity: Math.max(0.05, Math.min(1, n.velocity)),
     });
   });
-  return new Blob([midi.toArray()], { type: "audio/midi" });
+  return new Blob([midi.toArray().buffer as ArrayBuffer], { type: "audio/midi" });
 }
 
 export function downloadBlob(blob: Blob, filename: string) {
