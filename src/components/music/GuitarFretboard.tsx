@@ -20,7 +20,7 @@ export function GuitarFretboard({
   scalePcs,
   tonic,
   highlightPcs,
-  frets = 15,
+  frets = 24,
 }: GuitarFretboardProps) {
   const tonicPc = tonicIndex(tonic);
 
