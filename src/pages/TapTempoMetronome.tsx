@@ -41,7 +41,7 @@ const useTapTempo = () => {
         const intervals: number[] = [];
         for (let i = 1; i < next.length; i += 1) intervals.push(next[i] - next[i - 1]);
         const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-        setBpm(Math.round((60000 / avg) * 10) / 10);
+        setBpm(Math.round(60000 / avg));
       }
       return next;
     });
@@ -245,18 +245,59 @@ const TapTempoMetronome = () => {
         path="/tap-tempo-metronome"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "Global Drip Studio Tap Tempo, Metronome & BPM Calculator",
-          applicationCategory: "MultimediaApplication",
-          operatingSystem: "Web browser",
-          url: "https://globaldripstudio.fr/tap-tempo-metronome",
-          description: t("seo.tempoTools.description"),
-          offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-          featureList: [
-            "Tap tempo BPM detection",
-            "Online metronome",
-            "BPM to milliseconds calculator",
-            "Delay and reverb time calculator",
+          "@graph": [
+            {
+              "@type": "SoftwareApplication",
+              name: "Tap Tempo, Metronome & BPM Calculator — Global Drip Studio",
+              applicationCategory: "MultimediaApplication",
+              applicationSubCategory: "Music Production Tool",
+              operatingSystem: "Web browser (Chrome, Firefox, Safari, Edge)",
+              url: "https://globaldripstudio.fr/tap-tempo-metronome",
+              description: t("seo.tempoTools.description"),
+              inLanguage: ["fr", "en"],
+              isAccessibleForFree: true,
+              browserRequirements: "Requires JavaScript and Web Audio API",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+              featureList: [
+                "Tap tempo BPM detection (spacebar or click)",
+                "Online metronome with subdivisions and time signatures",
+                "BPM to milliseconds calculator for delays and reverbs",
+                "Triplet and dotted note timings",
+                "100% in-browser, no upload, no signup",
+              ],
+              publisher: {
+                "@type": "Organization",
+                name: "Global Drip Studio",
+                url: "https://globaldripstudio.fr",
+              },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://globaldripstudio.fr/" },
+                { "@type": "ListItem", position: 2, name: "Tap Tempo, Metronome & BPM Calculator", item: "https://globaldripstudio.fr/tap-tempo-metronome" },
+              ],
+            },
+            {
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "How does tap tempo work?",
+                  acceptedAnswer: { "@type": "Answer", text: "Tap a button or press the spacebar in time with the music. We average the intervals between your taps to compute the BPM in real time." },
+                },
+                {
+                  "@type": "Question",
+                  name: "Is the metronome accurate?",
+                  acceptedAnswer: { "@type": "Answer", text: "Yes. It uses the Web Audio API with sample-accurate scheduling so clicks stay in time even if the browser tab is busy." },
+                },
+                {
+                  "@type": "Question",
+                  name: "How do I sync delays and reverbs to the BPM?",
+                  acceptedAnswer: { "@type": "Answer", text: "Enter your tempo in the BPM calculator and read the millisecond value for the note duration you need (1/4, 1/8, dotted, triplet, etc.)." },
+                },
+              ],
+            },
           ],
         }}
       />
@@ -363,7 +404,7 @@ const TapTempoMetronome = () => {
                   <div className="rounded-xl border border-border bg-background/40 p-5 sm:p-6">
                     <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</div>
                     <div className="mt-2 text-6xl sm:text-7xl font-bold text-primary tabular-nums">
-                      {tap.bpm ? tap.bpm.toFixed(1) : "—"}
+                      {tap.bpm ?? "—"}
                     </div>
                     <div className="mt-2 text-sm text-muted-foreground">
                       {t("tempoTools.tap.tapsCount", { count: tap.tapsCount })}
@@ -400,8 +441,20 @@ const TapTempoMetronome = () => {
                   <div className="rounded-xl border border-border bg-background/40 p-5 sm:p-6">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</div>
-                        <div className="text-5xl sm:text-6xl font-bold text-primary tabular-nums">{metro.bpm}</div>
+                        <label htmlFor="metro-bpm-display" className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</label>
+                        <input
+                          id="metro-bpm-display"
+                          type="number"
+                          min={30}
+                          max={300}
+                          value={metro.bpm}
+                          onChange={(e) => {
+                            const n = Number(e.target.value);
+                            if (!Number.isNaN(n)) metro.setBpm(Math.min(300, Math.max(30, n)));
+                          }}
+                          aria-label={t("tempoTools.metronome.tempo")}
+                          className="w-[3.5ch] bg-transparent text-5xl sm:text-6xl font-bold text-primary tabular-nums outline-none border-b border-transparent focus:border-primary/60 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
                       </div>
                       <Button onClick={metro.toggle} size="lg" className="studio-button gap-2 min-w-[120px]">
                         {metro.isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
@@ -608,7 +661,7 @@ const TapTempoMetronome = () => {
               </div>
             </div>
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
-              <h2 className="text-base font-bold text-foreground sm:text-lg">{t("tempoTools.seo.howTitle")}</h2>
+              <h3 className="text-base font-bold text-foreground sm:text-lg">{t("tempoTools.seo.howTitle")}</h3>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
                 {(["tap", "metronome", "calc", "privacy"] as const).map((k) => (
                   <li key={k}>• {t(`tempoTools.seo.how.${k}`)}</li>
