@@ -1390,7 +1390,8 @@
       "subEighth": "Croches",
       "subTriplet": "Triolets",
       "subSixteenth": "Doubles croches",
-      "volume": "Volume"
+      "volume": "Volume",
+      "sendCalc": "Envoyer au calculateur"
     },
     "calc": {
       "title": "Calculateur BPM → millisecondes",
