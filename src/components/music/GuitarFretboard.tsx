@@ -32,7 +32,7 @@ export function GuitarFretboard({
 
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-border/60 bg-card/40 p-3">
-      <div className="min-w-[760px]">
+      <div className="min-w-[1100px]">
         {/* Fret numbers */}
         <div className="mb-1 grid items-center text-[10px] text-muted-foreground sm:text-xs" style={{ gridTemplateColumns: gridTemplate }}>
           <div />
