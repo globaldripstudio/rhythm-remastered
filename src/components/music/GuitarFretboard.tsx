@@ -20,19 +20,19 @@ export function GuitarFretboard({
   scalePcs,
   tonic,
   highlightPcs,
-  frets = 15,
+  frets = 24,
 }: GuitarFretboardProps) {
   const tonicPc = tonicIndex(tonic);
 
   const stringsOrdered = useMemo(() => [...TUNING_MIDI].reverse(), []);
   const labelsOrdered = useMemo(() => [...STRING_LABELS].reverse(), []);
 
-  const cellW = `minmax(36px, 1fr)`;
+  const cellW = `minmax(32px, 1fr)`;
   const gridTemplate = `48px repeat(${frets}, ${cellW})`;
 
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-border/60 bg-card/40 p-3">
-      <div className="min-w-[760px]">
+      <div className="min-w-[1100px]">
         {/* Fret numbers */}
         <div className="mb-1 grid items-center text-[10px] text-muted-foreground sm:text-xs" style={{ gridTemplateColumns: gridTemplate }}>
           <div />

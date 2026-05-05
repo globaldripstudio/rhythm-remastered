@@ -23,6 +23,7 @@ import Loudness from "./pages/Loudness";
 import KeyBpmFinder from "./pages/KeyBpmFinder";
 import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
+import AudioToMidi from "./pages/AudioToMidi";
 import Admin from "./pages/Admin";
 
 import LiveChat from "./components/LiveChat";
@@ -63,6 +64,8 @@ const App = () => (
             <Route path="/tap-tempo-metronome" element={<TapTempoMetronome />} />
             <Route path="/chord-progression" element={<ChordProgression />} />
             <Route path="/chords" element={<Navigate to="/chord-progression" replace />} />
+            <Route path="/audio-to-midi" element={<AudioToMidi />} />
+            <Route path="/audio2midi" element={<Navigate to="/audio-to-midi" replace />} />
             <Route path="/scales" element={<Navigate to="/chord-progression" replace />} />
             <Route path="/metronome" element={<Navigate to="/tap-tempo-metronome" replace />} />
             <Route path="/tap-tempo" element={<Navigate to="/tap-tempo-metronome" replace />} />
