@@ -661,7 +661,7 @@ const TapTempoMetronome = () => {
               </div>
             </div>
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
-              <h2 className="text-base font-bold text-foreground sm:text-lg">{t("tempoTools.seo.howTitle")}</h2>
+              <h3 className="text-base font-bold text-foreground sm:text-lg">{t("tempoTools.seo.howTitle")}</h3>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
                 {(["tap", "metronome", "calc", "privacy"] as const).map((k) => (
                   <li key={k}>• {t(`tempoTools.seo.how.${k}`)}</li>
