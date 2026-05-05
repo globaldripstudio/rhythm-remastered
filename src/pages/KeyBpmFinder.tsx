@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { FileAudio, Gauge, KeyRound, Loader2, Music2, Upload, Activity, Disc3, Info } from "lucide-react";
+import { Drum, FileAudio, Gauge, KeyRound, Loader2, Music2, Upload, Activity, Disc3, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
