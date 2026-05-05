@@ -173,7 +173,7 @@ const AudioToMidi = () => {
           <div className="flex items-center gap-2">
             <Music4 className="h-5 w-5 text-primary" />
             <CardTitle>Audio → MIDI</CardTitle>
-            <Badge variant="outline" className="ml-2 border-primary/40 text-primary">Admin · 100% local</Badge>
+            <Badge variant="outline" className="ml-2 border-primary/40 text-primary">100% local · gratuit</Badge>
           </div>
           <CardDescription>
             Conversion polyphonique audio vers MIDI via le modèle open source Spotify Basic Pitch. Le fichier ne quitte
