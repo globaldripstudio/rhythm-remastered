@@ -1358,5 +1358,83 @@
         }
       }
     }
+  },
+  "tempoTools": {
+    "badge": "Tempo, metronome & BPM calc",
+    "subtitle": "Accurate tap tempo, metronome with subdivisions and BPM calculator (milliseconds useful for delays and reverbs). Three complementary tools on a single page, in your browser.",
+    "anchorAria": "Quick navigation between tools",
+    "sections": {
+      "tap": "Tap Tempo",
+      "metronome": "Metronome",
+      "calculator": "BPM Calculator"
+    },
+    "tap": {
+      "title": "Tap Tempo",
+      "description": "Tap the rhythm with your mouse or the space bar to measure the BPM of a track, a loop or a melodic idea.",
+      "button": "Tap here",
+      "spaceHint": "Tip: use the space bar",
+      "tapsCount": "{{count}} taps",
+      "reset": "Reset",
+      "sendMetronome": "Send to metronome",
+      "sendCalc": "Send to calculator"
+    },
+    "metronome": {
+      "title": "Online metronome",
+      "description": "Accurate metronome with subdivisions, time signatures and an accent on beat one. Perfect for practice, composing or recording.",
+      "start": "Start",
+      "stop": "Stop",
+      "tempo": "Tempo",
+      "beatsPerBar": "Time signature",
+      "subdivision": "Subdivision",
+      "subQuarter": "Quarters",
+      "subEighth": "Eighths",
+      "subTriplet": "Triplets",
+      "subSixteenth": "Sixteenths",
+      "volume": "Volume"
+    },
+    "calc": {
+      "title": "BPM → milliseconds calculator",
+      "description": "Convert your BPM into note durations (milliseconds and Hz) to set delays, reverbs and arpeggiators in time with your project.",
+      "note": "Value",
+      "straight": "Straight",
+      "dotted": "Dotted",
+      "triplet": "Triplet",
+      "usage": "Use ms values to time your delays, or Hz to sync an LFO."
+    },
+    "notes": {
+      "whole": "whole",
+      "half": "half",
+      "quarter": "quarter",
+      "eighth": "eighth",
+      "sixteenth": "sixteenth",
+      "thirtysecond": "thirty-second"
+    },
+    "seo": {
+      "title": "Online tap tempo, metronome and BPM calculator",
+      "description": "Three complementary tempo tools: a tap tempo to measure BPM in a few clicks, a metronome with subdivisions to practice, and a BPM → milliseconds calculator to time delays and reverbs to the beat. 100% free, in your browser.",
+      "howTitle": "How it works",
+      "how": {
+        "tap": "Tap tempo averages the intervals between your taps to estimate the BPM in real time.",
+        "metronome": "The metronome uses the Web Audio API for perfectly synchronous clicks with no time drift.",
+        "calc": "The calculator converts your BPM into note durations (straight, dotted, triplet) in ms and Hz.",
+        "privacy": "Everything runs locally — no taps or audio are sent to any server."
+      },
+      "topics": {
+        "musicians": {
+          "title": "Musicians & singers",
+          "description": "Measure the tempo of any track and practice with a precise, configurable metronome."
+        },
+        "producers": {
+          "title": "Producers & beatmakers",
+          "description": "Convert your BPM into ms to set delays, reverbs and arpeggiators in time with your project."
+        },
+        "djs": {
+          "title": "DJs",
+          "description": "Quickly find the BPM of a track by tapping along, and compare it to your playlist."
+        }
+      }
+    }
+  }
+}
   }
 }
