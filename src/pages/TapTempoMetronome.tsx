@@ -363,7 +363,7 @@ const TapTempoMetronome = () => {
                   <div className="rounded-xl border border-border bg-background/40 p-5 sm:p-6">
                     <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">BPM</div>
                     <div className="mt-2 text-6xl sm:text-7xl font-bold text-primary tabular-nums">
-                      {tap.bpm ? tap.bpm.toFixed(1) : "—"}
+                      {tap.bpm ?? "—"}
                     </div>
                     <div className="mt-2 text-sm text-muted-foreground">
                       {t("tempoTools.tap.tapsCount", { count: tap.tapsCount })}
