@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Download, FileAudio, Gauge, Info, KeyRound, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { Download, Drum, FileAudio, Gauge, Info, KeyRound, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import SEO from "@/components/SEO";
