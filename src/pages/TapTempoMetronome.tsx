@@ -41,7 +41,7 @@ const useTapTempo = () => {
         const intervals: number[] = [];
         for (let i = 1; i < next.length; i += 1) intervals.push(next[i] - next[i - 1]);
         const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-        setBpm(Math.round((60000 / avg) * 10) / 10);
+        setBpm(Math.round(60000 / avg));
       }
       return next;
     });
