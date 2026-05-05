@@ -239,27 +239,25 @@ const ChordProgression = () => {
         }}
       />
 
-      <div className="container mx-auto max-w-6xl px-4 py-8 sm:py-12">
-        <div className="mb-6 flex items-center justify-between gap-3">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-4 w-4" /> Accueil
-          </Link>
-          <Badge variant="outline" className="border-primary/40 text-primary">
-            Toolkit
-          </Badge>
-        </div>
+      <ToolkitHeader current="chords" />
 
-        <header className="mb-8 space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            <Music2 className="h-3.5 w-3.5" /> Générateur d'accords
+      <main className="py-8 sm:py-16">
+        <section className="container mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="max-w-3xl space-y-4 animate-fade-in sm:space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
+              <Music2 className="w-4 h-4 text-primary" />
+              Générateur d'accords & gammes
+            </div>
+            <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
+              Progressions, gammes & <span className="hero-text">modes</span>
+            </h1>
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
+              Choisis une tonalité, un mode et une progression. Visualise les notes sur le piano et le manche
+              de guitare, joue chaque touche, écoute ta progression et exporte-la en MIDI. 100% navigateur,
+              sans inscription.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold sm:text-4xl">Progressions, gammes & modes — piano et guitare</h1>
-          <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
-            Choisis une tonalité et un mode, sélectionne une progression ou crée la tienne. Visualise les
-            notes sur le piano et le manche de guitare, joue chaque touche, écoute la progression et exporte-la
-            en MIDI. Tout fonctionne dans ton navigateur, sans inscription.
-          </p>
-        </header>
+
 
         {/* Key + mode + view controls */}
         <Card className="mb-6 border-border/60">
