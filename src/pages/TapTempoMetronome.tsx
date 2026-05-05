@@ -18,6 +18,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
+import ToolkitHeader from "@/components/tools/ToolkitHeader";
 
 /* ------------------------------------------------------------------ */
 /* Tap Tempo                                                          */
