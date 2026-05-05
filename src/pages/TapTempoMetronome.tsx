@@ -462,6 +462,16 @@ const TapTempoMetronome = () => {
                         {metro.isPlaying ? t("tempoTools.metronome.stop") : t("tempoTools.metronome.start")}
                       </Button>
                     </div>
+                    <div className="mt-4">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setCalcBpm(Math.round(Math.min(300, Math.max(30, metro.bpm))))}
+                        className="gap-2 w-full sm:w-auto"
+                      >
+                        <Calculator className="h-3.5 w-3.5" /> {t("tempoTools.metronome.sendCalc")}
+                      </Button>
+                    </div>
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       {Array.from({ length: metro.beatsPerBar }).map((_, i) => {
