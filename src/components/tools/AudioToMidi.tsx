@@ -241,8 +241,12 @@ const AudioToMidi = () => {
               {isPlayingMidi ? <Square className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}
               {isPlayingMidi ? "Stop" : "Écouter le MIDI"}
             </Button>
-            <Button variant="outline" disabled={notes.length === 0} onClick={handleDownloadMidi}>
-              <Download className="mr-2 h-4 w-4" /> .mid
+            <Button
+              disabled={notes.length === 0}
+              onClick={handleDownloadMidi}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Download className="mr-2 h-4 w-4" /> Télécharger .mid
             </Button>
             <Button variant="outline" disabled={notes.length === 0} onClick={handleDownloadCsv}>
               <Download className="mr-2 h-4 w-4" /> .csv
