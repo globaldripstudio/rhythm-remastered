@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import {
-  ChevronLeft,
   Copy,
   Dice5,
   Download,
@@ -11,7 +9,6 @@ import {
   Pause,
   Piano,
   Play,
-  Shuffle,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -25,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+
 import { useToast } from "@/hooks/use-toast";
 import {
   MODES,
@@ -45,6 +42,7 @@ import { playChord, getAudioContext } from "@/lib/musicTheory/audio";
 import { chordsToMidiBlob, downloadBlob } from "@/lib/musicTheory/midiExport";
 import { PianoKeyboard } from "@/components/music/PianoKeyboard";
 import { GuitarFretboard } from "@/components/music/GuitarFretboard";
+import ToolkitHeader from "@/components/tools/ToolkitHeader";
 
 type ViewMode = "both" | "piano" | "guitar";
 type Timbre = "piano" | "guitar";
@@ -239,27 +237,25 @@ const ChordProgression = () => {
         }}
       />
 
-      <div className="container mx-auto max-w-6xl px-4 py-8 sm:py-12">
-        <div className="mb-6 flex items-center justify-between gap-3">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-4 w-4" /> Accueil
-          </Link>
-          <Badge variant="outline" className="border-primary/40 text-primary">
-            Toolkit
-          </Badge>
-        </div>
+      <ToolkitHeader current="chords" />
 
-        <header className="mb-8 space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            <Music2 className="h-3.5 w-3.5" /> Générateur d'accords
+      <main className="py-8 sm:py-16">
+        <section className="container mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="max-w-3xl space-y-4 animate-fade-in sm:space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
+              <Music2 className="w-4 h-4 text-primary" />
+              Générateur d'accords & gammes
+            </div>
+            <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
+              Progressions, gammes & <span className="hero-text">modes</span>
+            </h1>
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
+              Choisis une tonalité, un mode et une progression. Visualise les notes sur le piano et le manche
+              de guitare, joue chaque touche, écoute ta progression et exporte-la en MIDI. 100% navigateur,
+              sans inscription.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold sm:text-4xl">Progressions, gammes & modes — piano et guitare</h1>
-          <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
-            Choisis une tonalité et un mode, sélectionne une progression ou crée la tienne. Visualise les
-            notes sur le piano et le manche de guitare, joue chaque touche, écoute la progression et exporte-la
-            en MIDI. Tout fonctionne dans ton navigateur, sans inscription.
-          </p>
-        </header>
+
 
         {/* Key + mode + view controls */}
         <Card className="mb-6 border-border/60">
@@ -448,8 +444,56 @@ const ChordProgression = () => {
               </CardContent>
             </Card>
           )}
-        </div>
-      </div>
+          </div>
+
+          {/* Bottom info boxes — user-friendly */}
+          <section
+            className="mt-8 grid gap-4 md:grid-cols-[1.1fr_0.9fr]"
+            aria-labelledby="chords-seo-title"
+          >
+            <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+              <h2 id="chords-seo-title" className="text-xl font-bold sm:text-2xl">
+                Comprendre les progressions d'accords
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Une progression, ce sont les accords qui s'enchaînent et donnent la couleur d'un morceau.
+                Les degrés romains (I, IV, V…) décrivent la position de chaque accord dans la gamme : ça te
+                permet de transposer ta progression dans n'importe quelle tonalité en un clic.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-md bg-muted/25 p-3">
+                  <h3 className="text-sm font-semibold text-foreground">Tonalité</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    Choisis la note de référence du morceau (ex. C, A, F#).
+                  </p>
+                </div>
+                <div className="rounded-md bg-muted/25 p-3">
+                  <h3 className="text-sm font-semibold text-foreground">Mode</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    L'ambiance : majeur lumineux, mineur mélancolique, dorien jazzy…
+                  </p>
+                </div>
+                <div className="rounded-md bg-muted/25 p-3">
+                  <h3 className="text-sm font-semibold text-foreground">Preset</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    Des progressions toutes prêtes par genre : pop, jazz, RnB, rap…
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+              <h2 className="text-base font-bold text-foreground sm:text-lg">Comment l'utiliser</h2>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
+                <li>• Choisis une <strong className="text-foreground">tonalité</strong> et un <strong className="text-foreground">mode</strong>.</li>
+                <li>• Pioche une <strong className="text-foreground">progression preset</strong> ou édite les degrés.</li>
+                <li>• Clique sur <strong className="text-foreground">Lire</strong> pour écouter ou sur une touche pour jouer.</li>
+                <li>• Bascule entre <strong className="text-foreground">piano</strong>, <strong className="text-foreground">guitare</strong> ou les deux.</li>
+                <li>• Exporte ta progression en <strong className="text-foreground">MIDI</strong> pour ta DAW.</li>
+              </ul>
+            </div>
+          </section>
+        </section>
+      </main>
     </div>
   );
 };
