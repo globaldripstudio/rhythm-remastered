@@ -1,4 +1,3 @@
-import * as tf from "@tensorflow/tfjs";
 import {
   BasicPitch,
   noteFramesToTime,
@@ -26,7 +25,7 @@ let basicPitchInstance: BasicPitch | null = null;
 
 function getBasicPitch(): BasicPitch {
   if (!basicPitchInstance) {
-    basicPitchInstance = new BasicPitch(tf.loadGraphModel(MODEL_URL));
+    basicPitchInstance = new BasicPitch(MODEL_URL);
   }
   return basicPitchInstance;
 }
