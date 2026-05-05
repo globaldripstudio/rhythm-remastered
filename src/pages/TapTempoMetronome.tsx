@@ -470,7 +470,7 @@ const TapTempoMetronome = () => {
                         return (
                           <div
                             key={i}
-                            className={`h-12 w-12 rounded-full border-2 transition-all duration-100 ${
+                            className={`h-9 w-9 sm:h-12 sm:w-12 rounded-full border-2 transition-all duration-100 ${
                               active
                                 ? accent
                                   ? "border-primary bg-primary scale-110 shadow-[0_0_24px_hsl(var(--primary)/0.6)]"
