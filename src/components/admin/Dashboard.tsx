@@ -27,7 +27,7 @@ import QuickActions from './QuickActions';
 import SiteAnalytics from './SiteAnalytics';
 import EbookManager from './EbookManager';
 import StemSplitter from './StemSplitter';
-import AudioToMidi from './AudioToMidi';
+
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
