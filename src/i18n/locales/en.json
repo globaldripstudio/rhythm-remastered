@@ -962,9 +962,9 @@
       "title": "Free Online LUFS Analyzer | True Peak & LRA",
       "description": "Analyze audio online: integrated LUFS, true peak dBTP, LRA, momentary/short-term loudness and PDF report, with no server upload."
     },
-    "loudnessArticle": {
-      "title": "Online LUFS analysis: check a master | Global Drip",
-      "description": "Introducing our online LUFS analyzer: true peak, LRA, integrated loudness, curve and PDF report to prepare your masters."
+    "toolkitArticle": {
+      "title": "Free online audio toolkit: 5 pro tools | Global Drip",
+      "description": "LUFS loudness, Key & BPM finder, tap tempo, interactive chords and Audio → MIDI: 5 free tools, no signup, 100% in your browser."
     },
     "keybpm": {
       "title": "Free Online Key & BPM Finder | Tempo and Musical Key Detector",
