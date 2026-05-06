@@ -833,6 +833,8 @@ const Loudness = () => {
               </div>
             </section>
           )}
+
+          <ToolResources current="loudness" />
         </section>
       </main>
     </div>
