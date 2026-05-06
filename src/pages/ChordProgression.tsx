@@ -234,7 +234,7 @@ const ChordProgression = () => {
     setTokens(next);
     setPresetId("custom");
     try {
-      const c = chordFromRoman(deg, tonic, modeId, 4);
+      const c = chordFromRoman(deg, tonic, effectiveModeId, 4);
       stopAllNotes();
       playChord(c.midi, timbre, { durationMs: 900, velocity: 0.75 });
     } catch { /* noop */ }
