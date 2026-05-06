@@ -962,9 +962,9 @@
       "title": "Analyse LUFS en ligne gratuite | True Peak & LRA",
       "description": "Analysez un fichier audio en ligne : LUFS intégré, true peak dBTP, LRA, momentary/short-term et rapport PDF, sans upload serveur."
     },
-    "loudnessArticle": {
-      "title": "Analyse LUFS en ligne : contrôler un master | Global Drip",
-      "description": "Présentation de notre analyseur LUFS en ligne : true peak, LRA, loudness intégrée, courbe et rapport PDF pour préparer vos masters."
+    "toolkitArticle": {
+      "title": "Toolkit audio gratuit en ligne : 5 outils pros | Global Drip",
+      "description": "Loudness LUFS, Key & BPM finder, tap tempo, accords interactifs et conversion Audio → MIDI : 5 outils gratuits, sans inscription, 100 % dans le navigateur."
     },
     "keybpm": {
       "title": "Key & BPM Finder gratuit en ligne | Détecteur de tonalité et tempo",
