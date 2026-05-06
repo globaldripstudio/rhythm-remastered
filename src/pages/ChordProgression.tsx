@@ -223,8 +223,8 @@ const ChordProgression = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Générateur d'accords & gammes — piano et guitare interactifs | Global Drip Studio"
-        description="Générez des progressions d'accords par tonalité et mode, écoutez-les, exportez en MIDI. Piano et manche de guitare interactifs et jouables. 100% gratuit, dans le navigateur."
+        title={t("chordTools.seo.title")}
+        description={t("chordTools.seo.description")}
         path="/chord-progression"
         jsonLd={{
           "@context": "https://schema.org",
@@ -244,15 +244,13 @@ const ChordProgression = () => {
           <div className="max-w-3xl space-y-4 animate-fade-in sm:space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
               <Music2 className="w-4 h-4 text-primary" />
-              Générateur d'accords & gammes
+              {t("chordTools.badge")}
             </div>
             <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
-              Progressions, gammes & <span className="hero-text">modes</span>
+              {t("chordTools.titleStart")}<span className="hero-text">{t("chordTools.titleAccent")}</span>
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
-              Choisis une tonalité, un mode et une progression. Visualise les notes sur le piano et le manche
-              de guitare, joue chaque touche, écoute ta progression et exporte-la en MIDI. 100% navigateur,
-              sans inscription.
+              {t("chordTools.subtitle")}
             </p>
           </div>
 
