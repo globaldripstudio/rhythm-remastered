@@ -242,7 +242,7 @@ const ChordProgression = () => {
     setTokens(next);
     setPresetId("custom");
     try {
-      const c = chordFromRoman(deg, tonic, effectiveModeId, 4);
+      const c = chordFromRoman(deg, effectiveTonic, effectiveModeId, 4);
       stopAllNotes();
       playChord(c.midi, timbre, { durationMs: 900, velocity: 0.75 });
     } catch { /* noop */ }
@@ -264,7 +264,7 @@ const ChordProgression = () => {
 
   const handleExport = () => {
     const blob = chordsToMidiBlob(chords, bpm, beatsPerChord);
-    downloadBlob(blob, `progression-${tonic}-${effectiveModeId}.mid`);
+    downloadBlob(blob, `progression-${effectiveTonic}-${effectiveModeId}.mid`);
   };
 
   const handleEditToken = (idx: number, value: string) => {
@@ -541,9 +541,9 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Piano className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic: effectiveTonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
                 </div>
-                <PianoKeyboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
+                <PianoKeyboard scalePcs={scalePcs} tonic={effectiveTonic} highlightPcs={highlightPcs} />
                 <p className="text-xs text-muted-foreground">{t("chordTools.viz.pianoHint")}</p>
               </CardContent>
             </Card>
@@ -553,9 +553,9 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Guitar className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic: effectiveTonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
                 </div>
-                <GuitarFretboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
+                <GuitarFretboard scalePcs={scalePcs} tonic={effectiveTonic} highlightPcs={highlightPcs} />
                 <p className="text-xs text-muted-foreground">{t("chordTools.viz.guitarHint")}</p>
               </CardContent>
             </Card>
