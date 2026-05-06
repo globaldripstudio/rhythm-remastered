@@ -449,7 +449,7 @@ const AudioToMidi = ({
           <CardContent className="space-y-3 p-3 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
               <div className="text-sm">
-                <span className="font-semibold text-foreground">{notes.length} notes</span>
+                <span className="font-semibold text-foreground">{notes.length} {t("audio2midi.results.notes")}</span>
                 <span className="text-muted-foreground">
                   {" "}· {fmtTime(playheadSec)} / {fmtTime(durationSec)}
                 </span>
@@ -458,11 +458,11 @@ const AudioToMidi = ({
                 <Button variant="outline" size="sm" onClick={handleTogglePlay}>
                   {isPlaying ? (
                     <>
-                      <Pause className="mr-2 h-4 w-4" /> Pause
+                      <Pause className="mr-2 h-4 w-4" /> {t("audio2midi.results.pause")}
                     </>
                   ) : (
                     <>
-                      <Play className="mr-2 h-4 w-4" /> Lecture
+                      <Play className="mr-2 h-4 w-4" /> {t("audio2midi.results.play")}
                     </>
                   )}
                 </Button>
@@ -471,7 +471,7 @@ const AudioToMidi = ({
                   onClick={handleDownloadMidi}
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  <Music4 className="mr-2 h-4 w-4" /> Télécharger le MIDI
+                  <Music4 className="mr-2 h-4 w-4" /> {t("audio2midi.results.download")}
                 </Button>
               </div>
             </div>
