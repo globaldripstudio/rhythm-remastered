@@ -438,7 +438,6 @@ const AudioToMidi = ({
             )}
           </CardContent>
         </Card>
-        {infoSlot}
       </div>
 
       {notes.length > 0 && (
