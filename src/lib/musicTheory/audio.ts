@@ -55,31 +55,43 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
   const velocity = opts.velocity ?? 0.85;
 
   const gain = c.createGain();
-  gain.gain.setValueAtTime(0.0001, start);
+  // Start fully silent — use linear ramp from 0 to avoid clicks ("pocs")
+  gain.gain.setValueAtTime(0, start);
   const oscs: OscillatorNode[] = [];
+
+  // Release tail to prevent abrupt cutoff clicks
+  const releaseSec = 0.08;
+  const stopAt = start + duration + releaseSec + 0.02;
 
   if (timbre === "piano") {
     // Triangle + sine harmonic + soft envelope
     const o1 = c.createOscillator();
     o1.type = "triangle";
     o1.frequency.setValueAtTime(freq, start);
+    // Tiny phase offset to avoid coherent stacking when multiple notes start together
+    o1.detune.setValueAtTime((Math.random() - 0.5) * 4, start);
     const o2 = c.createOscillator();
     o2.type = "sine";
     o2.frequency.setValueAtTime(freq * 2, start);
+    o2.detune.setValueAtTime((Math.random() - 0.5) * 4, start);
     const h2g = c.createGain();
     h2g.gain.value = 0.18;
     o1.connect(gain);
     o2.connect(h2g).connect(gain);
 
     const peak = 0.55 * velocity;
-    gain.gain.exponentialRampToValueAtTime(peak, start + 0.005);
-    gain.gain.exponentialRampToValueAtTime(peak * 0.5, start + 0.18);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    const attack = 0.012;
+    const sustainTime = Math.max(start + attack + 0.02, start + duration - releaseSec);
+    // Linear attack from 0 → no click
+    gain.gain.linearRampToValueAtTime(peak, start + attack);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, peak * 0.5), start + Math.min(0.18, duration * 0.6));
+    gain.gain.setTargetAtTime(0.0001, sustainTime, releaseSec / 3);
+    gain.gain.linearRampToValueAtTime(0, stopAt);
 
     o1.start(start);
     o2.start(start);
-    o1.stop(start + duration + 0.05);
-    o2.stop(start + duration + 0.05);
+    o1.stop(stopAt);
+    o2.stop(stopAt);
     oscs.push(o1, o2);
   } else {
     // Guitar: sawtooth + lowpass + pluck noise
@@ -105,11 +117,13 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
     noise.start(start);
 
     const peak = 0.5 * velocity;
-    gain.gain.exponentialRampToValueAtTime(peak, start + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    const attack = 0.014;
+    gain.gain.linearRampToValueAtTime(peak, start + attack);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.001), start + duration);
+    gain.gain.linearRampToValueAtTime(0, stopAt);
 
     o.start(start);
-    o.stop(start + duration + 0.05);
+    o.stop(stopAt);
     oscs.push(o);
   }
 
@@ -117,13 +131,15 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
   return {
     stop: (when?: number) => {
       const w = when ?? c.currentTime;
+      const rel = 0.06;
       try {
+        const cur = Math.max(0.0001, gain.gain.value);
         gain.gain.cancelScheduledValues(w);
-        gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), w);
-        gain.gain.exponentialRampToValueAtTime(0.0001, w + 0.04);
+        gain.gain.setValueAtTime(cur, w);
+        gain.gain.linearRampToValueAtTime(0, w + rel);
       } catch { /* noop */ }
       oscs.forEach((o) => {
-        try { o.stop(w + 0.05); } catch { /* noop */ }
+        try { o.stop(w + rel + 0.02); } catch { /* noop */ }
       });
     },
   };

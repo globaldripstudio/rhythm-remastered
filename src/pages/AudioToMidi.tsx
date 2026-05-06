@@ -40,22 +40,24 @@ const AudioToMidiPage = () => {
                 importer dans ta DAW. Polyphonique, 100% local, sans inscription.
               </p>
             </div>
-            <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-3 sm:gap-3">
-              <div className="rounded-md border border-border bg-background/40 p-3">
-                <p className="font-semibold text-foreground">Polyphonique</p>
-                <p className="mt-1 leading-relaxed">Détecte plusieurs notes simultanées (accords, arpèges).</p>
-              </div>
-              <div className="rounded-md border border-border bg-background/40 p-3">
-                <p className="font-semibold text-foreground">100% local</p>
-                <p className="mt-1 leading-relaxed">Aucun upload : tout tourne dans ton navigateur.</p>
-              </div>
-              <div className="rounded-md border border-border bg-background/40 p-3">
-                <p className="font-semibold text-foreground">Export MIDI</p>
-                <p className="mt-1 leading-relaxed">Téléchargement direct au format .mid standard.</p>
-              </div>
-            </div>
-
-            <AudioToMidiTool />
+            <AudioToMidiTool
+              infoSlot={
+                <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3 lg:grid-cols-1">
+                  <div className="rounded-md border border-border bg-background/40 p-3">
+                    <p className="font-semibold text-foreground">Polyphonique</p>
+                    <p className="mt-1 leading-relaxed">Détecte plusieurs notes simultanées (accords, arpèges).</p>
+                  </div>
+                  <div className="rounded-md border border-border bg-background/40 p-3">
+                    <p className="font-semibold text-foreground">100% local</p>
+                    <p className="mt-1 leading-relaxed">Aucun upload : tout tourne dans ton navigateur.</p>
+                  </div>
+                  <div className="rounded-md border border-border bg-background/40 p-3">
+                    <p className="font-semibold text-foreground">Export MIDI</p>
+                    <p className="mt-1 leading-relaxed">Téléchargement direct au format .mid standard.</p>
+                  </div>
+                </div>
+              }
+            />
           </div>
 
           {/* Bottom info boxes — user-friendly */}
