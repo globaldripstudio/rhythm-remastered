@@ -146,15 +146,25 @@ const BlogArticle = () => {
         description={t(`seo.${seoKey}.description`)}
         path={`/blog/${slug}`}
         type="article"
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          "headline": article.title,
-          "author": { "@type": "Organization", "name": "Global Drip Studio" },
-          "datePublished": article.date,
-          "image": slug === "venin-le-premier-sang" ? "https://globaldripstudio.fr/lovable-uploads/venin-album-cover.jpg" : "https://globaldripstudio.fr/lovable-uploads/Image-23.jpg",
-          "publisher": { "@type": "Organization", "name": "Global Drip Studio", "logo": { "@type": "ImageObject", "url": "https://globaldripstudio.fr/lovable-uploads/logo-blanc-sans-fond.png" } }
-        }}
+        publishedTime={article.date}
+        modifiedTime={article.date}
+        jsonLd={[
+          articleSchema({
+            title: article.title,
+            description: t(`seo.${seoKey}.description`),
+            path: `/blog/${slug}`,
+            image:
+              slug === "venin-le-premier-sang"
+                ? "/lovable-uploads/venin-album-cover.jpg"
+                : "/lovable-uploads/Image-23.jpg",
+            datePublished: article.date,
+            section: article.category,
+          }),
+          breadcrumbSchema([
+            { name: "Blog", path: "/blog" },
+            { name: article.title, path: `/blog/${slug}` },
+          ]),
+        ]}
       />
       <BlogArticleHeader />
 
