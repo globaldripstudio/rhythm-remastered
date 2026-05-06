@@ -45,6 +45,7 @@ import { chordsToMidiBlob, downloadBlob } from "@/lib/musicTheory/midiExport";
 import { PianoKeyboard } from "@/components/music/PianoKeyboard";
 import { GuitarFretboard } from "@/components/music/GuitarFretboard";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
+import { BuilderTree } from "@/components/music/BuilderTree";
 
 type ViewMode = "both" | "piano" | "guitar";
 type Timbre = "piano" | "guitar";
