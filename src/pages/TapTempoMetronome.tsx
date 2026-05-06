@@ -310,6 +310,7 @@ const TapTempoMetronome = () => {
 
       <main className="py-8 sm:py-16">
         <section className="container mx-auto px-4 sm:px-6">
+          <Breadcrumbs items={[{ name: "Toolkit", path: "/loudness" }, { name: "Tap Tempo & Métronome", path: "/tap-tempo-metronome" }]} className="mb-6" />
           {/* Hero */}
           <div className="max-w-3xl space-y-4 animate-fade-in sm:space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
@@ -645,6 +646,8 @@ const TapTempoMetronome = () => {
               </ul>
             </div>
           </section>
+
+          <ToolResources current="tempo" />
         </section>
       </main>
 
