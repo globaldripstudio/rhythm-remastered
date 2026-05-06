@@ -417,13 +417,10 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Piano className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">Piano — {tonic} {MODES[modeId].label}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic, mode: MODES[modeId].label })}</h3>
                 </div>
                 <PianoKeyboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
-                <p className="text-xs text-muted-foreground">
-                  Clique ou tape sur n'importe quelle touche pour la jouer. Les notes de la gamme sont surlignées,
-                  la tonique encadrée. L'accord en cours de lecture apparaît en orange/teal.
-                </p>
+                <p className="text-xs text-muted-foreground">{t("chordTools.viz.pianoHint")}</p>
               </CardContent>
             </Card>
           )}
@@ -432,13 +429,10 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Guitar className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">Guitare (accordage standard) — {tonic} {MODES[modeId].label}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic, mode: MODES[modeId].label })}</h3>
                 </div>
                 <GuitarFretboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
-                <p className="text-xs text-muted-foreground">
-                  Clique sur une pastille pour entendre la note. Les positions de la gamme sont marquées sur tout le manche,
-                  la tonique en orange.
-                </p>
+                <p className="text-xs text-muted-foreground">{t("chordTools.viz.guitarHint")}</p>
               </CardContent>
             </Card>
           )}
