@@ -310,33 +310,33 @@ const ChordProgression = () => {
           <CardContent className="space-y-4 p-4 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
-                <h2 className="text-lg font-semibold">Progression</h2>
-                <p className="text-xs text-muted-foreground">Sélectionne un preset ou modifie librement les degrés (I, ii, V7, bVII…).</p>
+                <h2 className="text-lg font-semibold">{t("chordTools.progression.title")}</h2>
+                <p className="text-xs text-muted-foreground">{t("chordTools.progression.subtitle")}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={handleRandomize}>
-                  <Dice5 className="mr-1.5 h-4 w-4" /> Aléatoire
+                  <Dice5 className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.random")}
                 </Button>
                 <Button size="sm" variant="outline" onClick={handleCopy}>
-                  <Copy className="mr-1.5 h-4 w-4" /> Copier
+                  <Copy className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.copy")}
                 </Button>
                 <Button size="sm" variant="outline" onClick={handleExport}>
-                  <Download className="mr-1.5 h-4 w-4" /> MIDI
+                  <Download className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.midi")}
                 </Button>
                 <Button size="sm" onClick={handlePlayProgression}>
                   {isPlaying ? <Pause className="mr-1.5 h-4 w-4" /> : <Play className="mr-1.5 h-4 w-4" />}
-                  {isPlaying ? "Stop" : "Lire"}
+                  {isPlaying ? t("chordTools.progression.stop") : t("chordTools.progression.play")}
                 </Button>
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Preset</Label>
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.preset")}</Label>
                 <Select value={presetId} onValueChange={handleApplyPreset}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent className="max-h-72">
-                    {presetId === "custom" && <SelectItem value="custom">Personnalisé</SelectItem>}
+                    {presetId === "custom" && <SelectItem value="custom">{t("chordTools.progression.custom")}</SelectItem>}
                     {groupedPresets.map(([genre, presets]) => (
                       <div key={genre}>
                         <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{genre}</div>
@@ -350,11 +350,11 @@ const ChordProgression = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tempo {bpm} BPM</Label>
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.tempo", { bpm })}</Label>
                   <Slider value={[bpm]} min={40} max={200} step={1} onValueChange={(v) => setBpm(v[0])} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Temps / accord</Label>
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.beats")}</Label>
                   <Slider value={[beatsPerChord]} min={1} max={8} step={1} onValueChange={(v) => setBeatsPerChord(v[0])} />
                 </div>
               </div>
