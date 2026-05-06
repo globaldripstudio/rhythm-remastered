@@ -72,8 +72,8 @@ const AudioToMidi = ({
       if (!f) return;
       if (!f.type.startsWith("audio/")) {
         toast({
-          title: "Fichier invalide",
-          description: "Charge un fichier audio (WAV, MP3, FLAC…)",
+          title: t("audio2midi.toasts.invalidTitle"),
+          description: t("audio2midi.toasts.invalidDesc"),
           variant: "destructive",
         });
         return;
