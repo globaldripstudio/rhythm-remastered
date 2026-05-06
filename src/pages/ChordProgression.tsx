@@ -45,6 +45,7 @@ import { chordsToMidiBlob, downloadBlob } from "@/lib/musicTheory/midiExport";
 import { PianoKeyboard } from "@/components/music/PianoKeyboard";
 import { GuitarFretboard } from "@/components/music/GuitarFretboard";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
+import { BuilderTree } from "@/components/music/BuilderTree";
 
 type ViewMode = "both" | "piano" | "guitar";
 type Timbre = "piano" | "guitar";
@@ -99,6 +100,10 @@ const ChordProgression = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [progMode, setProgMode] = useState<"preset" | "builder">("preset");
+  // Builder maintient ses propres tokens, indépendants du preset en cours
+  const [builderTokens, setBuilderTokens] = useState<string[]>([]);
+  const [presetTokensBackup, setPresetTokensBackup] = useState<string[]>([]);
+  const [presetIdBackup, setPresetIdBackup] = useState<string>(initial.presetId);
   const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
   const moodFromMode: "major" | "minor" =
@@ -189,18 +194,36 @@ const ChordProgression = () => {
   };
 
   // ===== Builder guidé (arborescence) =====
+  // Suggestions niveau N+1 (depuis le dernier accord posé)
   const builderSuggestions = useMemo(() => {
-    if (tokens.length === 0) {
-      return suggestNextDegrees("I", moodFromMode);
+    const last = builderTokens.length === 0 ? null : builderTokens[builderTokens.length - 1];
+    return suggestNextDegrees(last, moodFromMode);
+  }, [builderTokens, moodFromMode]);
+
+  // Switch entre les modes Preset / Builder en sauvegardant l'état
+  const handleSwitchProgMode = (mode: "preset" | "builder") => {
+    if (mode === progMode) return;
+    if (mode === "builder") {
+      // Sauvegarde l'état preset courant et démarre vierge
+      setPresetTokensBackup(tokens);
+      setPresetIdBackup(presetId);
+      setTokens([]);
+      setBuilderTokens([]);
+      setPresetId("custom");
+    } else {
+      // Sauvegarde le builder en cours et restaure le preset
+      setBuilderTokens(tokens);
+      setTokens(presetTokensBackup.length > 0 ? presetTokensBackup : (PROGRESSION_PRESETS.find((p) => p.id === presetIdBackup)?.tokens ?? PROGRESSION_PRESETS[0].tokens));
+      setPresetId(presetIdBackup);
     }
-    return suggestNextDegrees(tokens[tokens.length - 1], moodFromMode);
-  }, [tokens, moodFromMode]);
+    setProgMode(mode);
+  };
 
   const handleBuilderPick = (deg: string) => {
-    const next = [...tokens, deg];
+    const next = [...builderTokens, deg];
+    setBuilderTokens(next);
     setTokens(next);
     setPresetId("custom");
-    // Pré-écoute de l'accord choisi
     try {
       const c = chordFromRoman(deg, tonic, modeId, 4);
       stopAllNotes();
@@ -209,13 +232,16 @@ const ChordProgression = () => {
   };
 
   const handleBuilderReset = () => {
+    setBuilderTokens([]);
     setTokens([]);
     setPresetId("custom");
   };
 
   const handleBuilderUndo = () => {
-    if (tokens.length === 0) return;
-    setTokens(tokens.slice(0, -1));
+    if (builderTokens.length === 0) return;
+    const next = builderTokens.slice(0, -1);
+    setBuilderTokens(next);
+    setTokens(next);
     setPresetId("custom");
   };
 
@@ -228,17 +254,21 @@ const ChordProgression = () => {
     const next = [...tokens];
     next[idx] = value;
     setTokens(next);
+    if (progMode === "builder") setBuilderTokens(next);
     setPresetId("custom");
   };
 
   const handleAddBar = () => {
-    setTokens([...tokens, "I"]);
+    const next = [...tokens, moodFromMode === "minor" ? "i" : "I"];
+    setTokens(next);
+    if (progMode === "builder") setBuilderTokens(next);
     setPresetId("custom");
   };
 
   const handleRemoveBar = (idx: number) => {
-    if (tokens.length <= 1) return;
-    setTokens(tokens.filter((_, i) => i !== idx));
+    const next = tokens.filter((_, i) => i !== idx);
+    setTokens(next);
+    if (progMode === "builder") setBuilderTokens(next);
     setPresetId("custom");
   };
 
@@ -355,7 +385,7 @@ const ChordProgression = () => {
                     size="sm"
                     variant={progMode === "preset" ? "default" : "ghost"}
                     className="h-7 px-2.5 text-xs"
-                    onClick={() => setProgMode("preset")}
+                    onClick={() => handleSwitchProgMode("preset")}
                   >
                     {t("chordTools.progression.modePreset")}
                   </Button>
@@ -363,7 +393,7 @@ const ChordProgression = () => {
                     size="sm"
                     variant={progMode === "builder" ? "default" : "ghost"}
                     className="h-7 px-2.5 text-xs"
-                    onClick={() => setProgMode("builder")}
+                    onClick={() => handleSwitchProgMode("builder")}
                   >
                     {t("chordTools.progression.modeBuilder")}
                   </Button>
@@ -474,37 +504,13 @@ const ChordProgression = () => {
               )}
             </div>
 
-            {/* Builder palette */}
+            {/* Builder palette — vue arborescente */}
             {progMode === "builder" && (
-              <div className="rounded-lg border border-border/60 bg-card/30 p-3 sm:p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {t("chordTools.progression.builderNext")}
-                  </Label>
-                  {tokens.length === 0 && (
-                    <span className="text-xs text-muted-foreground">{t("chordTools.progression.builderEmpty")}</span>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {builderSuggestions.all.map((deg) => {
-                    const isGood = builderSuggestions.good.has(deg);
-                    return (
-                      <button
-                        key={deg}
-                        onClick={() => handleBuilderPick(deg)}
-                        disabled={!isGood}
-                        className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-all ${
-                          isGood
-                            ? "border-primary/40 bg-primary/10 text-foreground hover:bg-primary/20 hover:border-primary"
-                            : "cursor-not-allowed border-border/40 bg-muted/20 text-muted-foreground/40 line-through"
-                        }`}
-                      >
-                        {deg}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <BuilderTree
+                tokens={builderTokens}
+                mood={moodFromMode}
+                onPick={handleBuilderPick}
+              />
             )}
           </CardContent>
         </Card>

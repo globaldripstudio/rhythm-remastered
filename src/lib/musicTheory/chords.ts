@@ -178,42 +178,97 @@ export const PROGRESSION_PRESETS: ProgressionPreset[] = [
  * Anything outside the set is rendered as "discouraged" (greyed) in the builder.
  */
 const MAJOR_TRANSITIONS: Record<string, string[]> = {
-  I: ["ii", "iii", "IV", "V", "vi", "vii°", "Imaj7", "ii7", "V7", "vi7", "IV"],
-  ii: ["V", "V7", "vii°", "iii", "IV"],
-  iii: ["vi", "IV", "ii", "vi7"],
-  IV: ["V", "I", "ii", "vii°", "Imaj7", "vi"],
-  V: ["I", "vi", "Imaj7", "vi7"],
-  vi: ["ii", "IV", "V", "ii7", "V7", "iii"],
-  "vii°": ["I", "Imaj7", "iii"],
+  I: ["I", "ii", "iii", "IV", "V", "vi", "vii°"],
+  ii: ["V", "vii°", "iii", "IV"],
+  iii: ["vi", "IV", "ii"],
+  IV: ["V", "I", "ii", "vii°", "vi"],
+  V: ["I", "vi", "iii"],
+  vi: ["ii", "IV", "V", "iii"],
+  "vii°": ["I", "iii"],
 };
 
 const MINOR_TRANSITIONS: Record<string, string[]> = {
-  i: ["iv", "v", "V", "bVI", "bVII", "bIII", "ii°", "V7"],
-  "ii°": ["V", "V7", "i"],
+  i: ["i", "iv", "v", "V", "bVI", "bVII", "bIII", "ii°"],
+  "ii°": ["V", "i"],
   bIII: ["bVI", "iv", "bVII", "i"],
   iv: ["V", "v", "i", "bVII", "bVI"],
   v: ["i", "bVII"],
   V: ["i", "bVI"],
-  bVI: ["bVII", "iv", "V", "bIII"],
+  bVI: ["bVII", "iv", "bIII"],
   bVII: ["bIII", "iv", "i", "bVI"],
 };
 
+/** Functional role for each degree (T=Tonic, S=Subdominant, D=Dominant) */
+export type HarmonicFunction = "T" | "S" | "D";
+
+const FN_MAJOR: Record<string, HarmonicFunction> = {
+  I: "T", iii: "T", vi: "T", IV: "S", ii: "S", V: "D", "vii°": "D",
+};
+const FN_MINOR: Record<string, HarmonicFunction> = {
+  i: "T", bIII: "T", bVI: "T", iv: "S", "ii°": "S", bVII: "S", v: "D", V: "D",
+};
+
+const FN_LABEL: Record<HarmonicFunction, string> = {
+  T: "Tonique",
+  S: "Sous-dominante",
+  D: "Dominante",
+};
+
 function normalizeDegree(token: string): string {
-  // Strip 7/maj7 etc for transition lookup but keep accidentals/case
   return token.replace(/maj7|m7b5|7|sus2|sus4|dim7|dim/gi, "").trim() || token;
 }
 
-export function suggestNextDegrees(currentToken: string, mood: "major" | "minor"): {
+export interface NextSuggestion {
+  /** Set of degrees that work as a next chord */
   good: Set<string>;
+  /** All possible degrees of the current mode */
   all: string[];
-} {
+  /** Per-degree explanation (FR) */
+  reasons: Record<string, string>;
+}
+
+export function suggestNextDegrees(currentToken: string | null, mood: "major" | "minor"): NextSuggestion {
   const table = mood === "major" ? MAJOR_TRANSITIONS : MINOR_TRANSITIONS;
+  const fnMap = mood === "major" ? FN_MAJOR : FN_MINOR;
   const allDegrees = mood === "major"
     ? ["I", "ii", "iii", "IV", "V", "vi", "vii°"]
     : ["i", "ii°", "bIII", "iv", "v", "V", "bVI", "bVII"];
+
+  // Premier accord : tout est permis (mais on suggère T en priorité visuelle)
+  if (!currentToken) {
+    const reasons: Record<string, string> = {};
+    allDegrees.forEach((d) => {
+      const fn = fnMap[d];
+      reasons[d] = `Premier accord — fonction ${FN_LABEL[fn] ?? "—"}. La majorité des morceaux démarrent sur la tonique (${mood === "major" ? "I" : "i"}).`;
+    });
+    return { good: new Set(allDegrees), all: allDegrees, reasons };
+  }
+
   const key = normalizeDegree(currentToken);
   const good = new Set<string>(table[key] ?? allDegrees);
-  return { good, all: allDegrees };
+  const prevFn = fnMap[key];
+  const reasons: Record<string, string> = {};
+  allDegrees.forEach((d) => {
+    const nextFn = fnMap[d];
+    const arrow = `${FN_LABEL[prevFn] ?? "—"} → ${FN_LABEL[nextFn] ?? "—"}`;
+    if (good.has(d)) {
+      if (prevFn === "D" && nextFn === "T") reasons[d] = `Résolution classique (${arrow}).`;
+      else if (prevFn === "S" && nextFn === "D") reasons[d] = `Cadence parfaite en préparation (${arrow}).`;
+      else if (prevFn === "T" && nextFn === "S") reasons[d] = `Ouverture naturelle (${arrow}).`;
+      else if (prevFn === "T" && nextFn === "D") reasons[d] = `Tension directe (${arrow}).`;
+      else reasons[d] = `Enchaînement fluide (${arrow}).`;
+    } else {
+      if (prevFn === "D" && nextFn === "S") reasons[d] = `Régression D → S : casse la résolution attendue (${arrow}).`;
+      else if (prevFn === "T" && nextFn === "T") reasons[d] = `Tonique → Tonique : statique, manque de mouvement.`;
+      else reasons[d] = `Transition peu naturelle dans la grammaire fonctionnelle (${arrow}).`;
+    }
+  });
+  return { good, all: allDegrees, reasons };
+}
+
+export function functionOf(token: string, mood: "major" | "minor"): HarmonicFunction | undefined {
+  const map = mood === "major" ? FN_MAJOR : FN_MINOR;
+  return map[normalizeDegree(token)];
 }
 
 export function randomProgression(modeMood: "major" | "minor"): string[] {
