@@ -5,6 +5,7 @@ export type Timbre = "piano" | "guitar";
 
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
+const activeHandles = new Set<NoteHandle>();
 
 function ensureContext(): AudioContext {
   if (!ctx) {
@@ -37,6 +38,15 @@ interface PlayOpts {
 
 export interface NoteHandle {
   stop: (when?: number) => void;
+}
+
+/** Stop every currently sounding note immediately (with short release). */
+export function stopAllNotes() {
+  const c = ensureContext();
+  activeHandles.forEach((h) => {
+    try { h.stop(c.currentTime); } catch { /* noop */ }
+  });
+  activeHandles.clear();
 }
 
 /** Play one MIDI note with the given timbre. Returns end time. */
@@ -128,7 +138,7 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
   }
 
   gain.connect(out);
-  return {
+  const handle: NoteHandle = {
     stop: (when?: number) => {
       const w = when ?? c.currentTime;
       const rel = 0.06;
@@ -141,8 +151,13 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
       oscs.forEach((o) => {
         try { o.stop(w + rel + 0.02); } catch { /* noop */ }
       });
+      activeHandles.delete(handle);
     },
   };
+  activeHandles.add(handle);
+  // Auto-cleanup after natural end
+  window.setTimeout(() => activeHandles.delete(handle), Math.max(0, (stopAt - c.currentTime) * 1000) + 50);
+  return handle;
 }
 
 export function playChord(

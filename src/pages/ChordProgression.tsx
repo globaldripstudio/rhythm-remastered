@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Copy,
   Dice5,
   Download,
   Guitar,
@@ -9,6 +8,8 @@ import {
   Pause,
   Piano,
   Play,
+  RotateCcw,
+  Undo2,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useToast } from "@/hooks/use-toast";
+
 import {
   MODES,
   NOTE_NAMES,
@@ -36,9 +37,10 @@ import {
   chordFromRoman,
   progressionFromRomans,
   randomProgression,
+  suggestNextDegrees,
   type Chord,
 } from "@/lib/musicTheory/chords";
-import { playChord, getAudioContext } from "@/lib/musicTheory/audio";
+import { playChord, getAudioContext, stopAllNotes } from "@/lib/musicTheory/audio";
 import { chordsToMidiBlob, downloadBlob } from "@/lib/musicTheory/midiExport";
 import { PianoKeyboard } from "@/components/music/PianoKeyboard";
 import { GuitarFretboard } from "@/components/music/GuitarFretboard";
@@ -81,7 +83,7 @@ function loadSettings(): PersistedSettings {
 
 const ChordProgression = () => {
   const { t } = useTranslation();
-  const { toast } = useToast();
+  
 
   const initial = useMemo(loadSettings, []);
   const [tonic, setTonic] = useState<NoteName>(initial.tonic);
@@ -96,7 +98,11 @@ const ChordProgression = () => {
   const [presetId, setPresetId] = useState<string>(initial.presetId);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [progMode, setProgMode] = useState<"preset" | "builder">("preset");
   const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
+
+  const moodFromMode: "major" | "minor" =
+    MODES[modeId].diatonicQualities?.[0] === "min" ? "minor" : "major";
 
   // Persist
   useEffect(() => {
@@ -138,10 +144,13 @@ const ChordProgression = () => {
   const handlePlayProgression = async () => {
     if (isPlaying) {
       stopRef.current.cancelled = true;
+      stopAllNotes();
       setIsPlaying(false);
       setActiveIndex(null);
       return;
     }
+    // Couper toute lecture en cours pour éviter la cacophonie
+    stopAllNotes();
     const ctx = getAudioContext();
     setIsPlaying(true);
     stopRef.current.cancelled = false;
@@ -168,23 +177,46 @@ const ChordProgression = () => {
   const handlePlayChord = (idx: number) => {
     const c = chords[idx];
     if (!c) return;
+    stopAllNotes();
     setActiveIndex(idx);
     playChord(c.midi, timbre, { durationMs: 1400, velocity: 0.8 });
     window.setTimeout(() => setActiveIndex((cur) => (cur === idx ? null : cur)), 1300);
   };
 
   const handleRandomize = () => {
-    const mood = (MODES[modeId].diatonicQualities?.[0] === "min" ? "minor" : "major") as
-      | "minor"
-      | "major";
-    setTokens(randomProgression(mood));
+    setTokens(randomProgression(moodFromMode));
     setPresetId("custom");
   };
 
-  const handleCopy = () => {
-    const text = chords.map((c) => c.symbol).join(" – ");
-    navigator.clipboard.writeText(text);
-    toast({ title: t("chordTools.progression.copiedTitle"), description: text });
+  // ===== Builder guidé (arborescence) =====
+  const builderSuggestions = useMemo(() => {
+    if (tokens.length === 0) {
+      return suggestNextDegrees("I", moodFromMode);
+    }
+    return suggestNextDegrees(tokens[tokens.length - 1], moodFromMode);
+  }, [tokens, moodFromMode]);
+
+  const handleBuilderPick = (deg: string) => {
+    const next = [...tokens, deg];
+    setTokens(next);
+    setPresetId("custom");
+    // Pré-écoute de l'accord choisi
+    try {
+      const c = chordFromRoman(deg, tonic, modeId, 4);
+      stopAllNotes();
+      playChord(c.midi, timbre, { durationMs: 900, velocity: 0.75 });
+    } catch { /* noop */ }
+  };
+
+  const handleBuilderReset = () => {
+    setTokens([]);
+    setPresetId("custom");
+  };
+
+  const handleBuilderUndo = () => {
+    if (tokens.length === 0) return;
+    setTokens(tokens.slice(0, -1));
+    setPresetId("custom");
   };
 
   const handleExport = () => {
@@ -256,7 +288,7 @@ const ChordProgression = () => {
 
 
         {/* Key + mode + view controls */}
-        <Card className="mb-6 border-border/60">
+        <Card className="mb-6 mt-10 border-border/60 sm:mt-12">
           <CardContent className="grid gap-4 p-4 sm:p-6 md:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.tonic")}</Label>
@@ -311,15 +343,36 @@ const ChordProgression = () => {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
                 <h2 className="text-lg font-semibold">{t("chordTools.progression.title")}</h2>
-                <p className="text-xs text-muted-foreground">{t("chordTools.progression.subtitle")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {progMode === "preset"
+                    ? t("chordTools.progression.subtitle")
+                    : t("chordTools.progression.builderHint")}
+                </p>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={handleRandomize}>
-                  <Dice5 className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.random")}
-                </Button>
-                <Button size="sm" variant="outline" onClick={handleCopy}>
-                  <Copy className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.copy")}
-                </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex rounded-md border border-border/60 p-0.5">
+                  <Button
+                    size="sm"
+                    variant={progMode === "preset" ? "default" : "ghost"}
+                    className="h-7 px-2.5 text-xs"
+                    onClick={() => setProgMode("preset")}
+                  >
+                    {t("chordTools.progression.modePreset")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={progMode === "builder" ? "default" : "ghost"}
+                    className="h-7 px-2.5 text-xs"
+                    onClick={() => setProgMode("builder")}
+                  >
+                    {t("chordTools.progression.modeBuilder")}
+                  </Button>
+                </div>
+                {progMode === "preset" && (
+                  <Button size="sm" variant="outline" onClick={handleRandomize}>
+                    <Dice5 className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.random")}
+                  </Button>
+                )}
                 <Button size="sm" variant="outline" onClick={handleExport}>
                   <Download className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.midi")}
                 </Button>
@@ -331,23 +384,34 @@ const ChordProgression = () => {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.preset")}</Label>
-                <Select value={presetId} onValueChange={handleApplyPreset}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent className="max-h-72">
-                    {presetId === "custom" && <SelectItem value="custom">{t("chordTools.progression.custom")}</SelectItem>}
-                    {groupedPresets.map(([genre, presets]) => (
-                      <div key={genre}>
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{genre}</div>
-                        {presets.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>
-                        ))}
-                      </div>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {progMode === "preset" ? (
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.preset")}</Label>
+                  <Select value={presetId} onValueChange={handleApplyPreset}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {presetId === "custom" && <SelectItem value="custom">{t("chordTools.progression.custom")}</SelectItem>}
+                      {groupedPresets.map(([genre, presets]) => (
+                        <div key={genre}>
+                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{genre}</div>
+                          {presets.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>
+                          ))}
+                        </div>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="flex items-end gap-2">
+                  <Button size="sm" variant="outline" onClick={handleBuilderUndo} disabled={tokens.length === 0}>
+                    <Undo2 className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.builderUndo")}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleBuilderReset} disabled={tokens.length === 0}>
+                    <RotateCcw className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.builderReset")}
+                  </Button>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.tempo", { bpm })}</Label>
@@ -400,15 +464,51 @@ const ChordProgression = () => {
                   </div>
                 </div>
               ))}
-              <button
-                onClick={handleAddBar}
-                className="flex min-h-[88px] items-center justify-center rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
-              >
-                {t("chordTools.progression.add")}
-              </button>
+              {progMode === "preset" && (
+                <button
+                  onClick={handleAddBar}
+                  className="flex min-h-[88px] items-center justify-center rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+                >
+                  {t("chordTools.progression.add")}
+                </button>
+              )}
             </div>
+
+            {/* Builder palette */}
+            {progMode === "builder" && (
+              <div className="rounded-lg border border-border/60 bg-card/30 p-3 sm:p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {t("chordTools.progression.builderNext")}
+                  </Label>
+                  {tokens.length === 0 && (
+                    <span className="text-xs text-muted-foreground">{t("chordTools.progression.builderEmpty")}</span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {builderSuggestions.all.map((deg) => {
+                    const isGood = builderSuggestions.good.has(deg);
+                    return (
+                      <button
+                        key={deg}
+                        onClick={() => handleBuilderPick(deg)}
+                        disabled={!isGood}
+                        className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-all ${
+                          isGood
+                            ? "border-primary/40 bg-primary/10 text-foreground hover:bg-primary/20 hover:border-primary"
+                            : "cursor-not-allowed border-border/40 bg-muted/20 text-muted-foreground/40 line-through"
+                        }`}
+                      >
+                        {deg}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
+
 
         {/* Visualizers */}
         <div className="space-y-6">

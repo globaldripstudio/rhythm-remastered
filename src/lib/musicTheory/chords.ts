@@ -131,21 +131,90 @@ export const PROGRESSION_PRESETS: ProgressionPreset[] = [
   { id: "pop-axis", label: "Axis (I–V–vi–IV)", genre: "Pop", tokens: ["I", "V", "vi", "IV"], mood: "major" },
   { id: "pop-456", label: "Sensitive (vi–IV–I–V)", genre: "Pop", tokens: ["vi", "IV", "I", "V"], mood: "major" },
   { id: "pop-50s", label: "50s (I–vi–IV–V)", genre: "Pop", tokens: ["I", "vi", "IV", "V"], mood: "major" },
+  { id: "pop-canon", label: "Canon (I–V–vi–iii–IV–I–IV–V)", genre: "Pop", tokens: ["I", "V", "vi", "iii", "IV", "I", "IV", "V"], mood: "major" },
+  { id: "pop-ballad", label: "Ballad (I–iii–IV–V)", genre: "Pop", tokens: ["I", "iii", "IV", "V"], mood: "major" },
   // RnB / Soul
   { id: "rnb-251", label: "ii–V–I", genre: "RnB / Soul", tokens: ["ii7", "V7", "Imaj7"], mood: "major" },
   { id: "rnb-neo", label: "Neo Soul (Imaj7–iii7–vi7–IV)", genre: "RnB / Soul", tokens: ["Imaj7", "iii7", "vi7", "IV"], mood: "major" },
   { id: "rnb-modal", label: "Modal (i–iv–bVII–bIII)", genre: "RnB / Soul", tokens: ["i", "iv", "bVII", "bIII"], mood: "minor" },
+  { id: "rnb-quiet", label: "Quiet Storm (Imaj7–vi7–ii7–V7)", genre: "RnB / Soul", tokens: ["Imaj7", "vi7", "ii7", "V7"], mood: "major" },
+  // PluggnB
+  { id: "plug-1", label: "Dreamy (Imaj7–iii7–vi7–IV)", genre: "PluggnB", tokens: ["Imaj7", "iii7", "vi7", "IV"], mood: "major" },
+  { id: "plug-2", label: "Floating (vi7–Imaj7–iii7–IV)", genre: "PluggnB", tokens: ["vi7", "Imaj7", "iii7", "IV"], mood: "major" },
+  { id: "plug-3", label: "Hazy (Imaj7–IVmaj7–iii7–vi7)", genre: "PluggnB", tokens: ["Imaj7", "IV", "iii7", "vi7"], mood: "major" },
   // Trap / Drill
   { id: "trap-1", label: "Dark Drill (i–bVI–bIII–bVII)", genre: "Trap / Drill", tokens: ["i", "bVI", "bIII", "bVII"], mood: "minor" },
   { id: "trap-2", label: "Tension (i–iv–bVI–V)", genre: "Trap / Drill", tokens: ["i", "iv", "bVI", "V"], mood: "minor" },
   { id: "trap-3", label: "Cinematic (i–bVII–bVI–V)", genre: "Trap / Drill", tokens: ["i", "bVII", "bVI", "V"], mood: "minor" },
+  { id: "trap-4", label: "Memphis (i–bII–i–bVII)", genre: "Trap / Drill", tokens: ["i", "bII", "i", "bVII"], mood: "minor" },
+  // Rage
+  { id: "rage-1", label: "Aggressive (i–bII–bVII–bVI)", genre: "Rage", tokens: ["i", "bII", "bVII", "bVI"], mood: "minor" },
+  { id: "rage-2", label: "Distorted (i–bVI–bII–V)", genre: "Rage", tokens: ["i", "bVI", "bII", "V"], mood: "minor" },
+  { id: "rage-3", label: "Hyper (i–bVII–bVI–bV)", genre: "Rage", tokens: ["i", "bVII", "bVI", "bV"], mood: "minor" },
+  // Hyperpop / Phonk
+  { id: "phonk-1", label: "Phonk (i–bVI–iv–V)", genre: "Hyperpop / Phonk", tokens: ["i", "bVI", "iv", "V"], mood: "minor" },
+  { id: "hyper-1", label: "Hyperpop (I–bVII–IV–I)", genre: "Hyperpop / Phonk", tokens: ["I", "bVII", "IV", "I"], mood: "major" },
   // Lo-fi / Jazz
   { id: "jazz-251", label: "ii7–V7–Imaj7", genre: "Lo-fi / Jazz", tokens: ["ii7", "V7", "Imaj7"], mood: "major" },
   { id: "jazz-1625", label: "Rhythm Changes (Imaj7–vi7–ii7–V7)", genre: "Lo-fi / Jazz", tokens: ["Imaj7", "vi7", "ii7", "V7"], mood: "major" },
+  { id: "lofi-1", label: "Lo-fi (Imaj7–iii7–IVmaj7–iv)", genre: "Lo-fi / Jazz", tokens: ["Imaj7", "iii7", "IV", "iv"], mood: "major" },
+  { id: "lofi-2", label: "Bossa (ii7–V7–Imaj7–vi7)", genre: "Lo-fi / Jazz", tokens: ["ii7", "V7", "Imaj7", "vi7"], mood: "major" },
+  // House / Deep
+  { id: "house-1", label: "Deep House (i–bVII–bVI–bVII)", genre: "House / Deep", tokens: ["i", "bVII", "bVI", "bVII"], mood: "minor" },
+  { id: "house-2", label: "Garage (Imaj7–IV–vi7–V)", genre: "House / Deep", tokens: ["Imaj7", "IV", "vi7", "V"], mood: "major" },
+  // Rock / Indie
+  { id: "rock-1", label: "Power (I–IV–V)", genre: "Rock / Indie", tokens: ["I", "IV", "V"], mood: "major" },
+  { id: "rock-2", label: "Indie (I–iii–IV–vi)", genre: "Rock / Indie", tokens: ["I", "iii", "IV", "vi"], mood: "major" },
+  { id: "rock-3", label: "Grunge (i–bIII–bVII–IV)", genre: "Rock / Indie", tokens: ["i", "bIII", "bVII", "IV"], mood: "minor" },
   // Sad / Cinematic
   { id: "cine-1", label: "Andalusian (i–bVII–bVI–V)", genre: "Cinématique", tokens: ["i", "bVII", "bVI", "V"], mood: "minor" },
   { id: "cine-2", label: "Lament (i–bVII–bVI–bVII)", genre: "Cinématique", tokens: ["i", "bVII", "bVI", "bVII"], mood: "minor" },
+  { id: "cine-3", label: "Epic (i–bVI–bIII–bVII)", genre: "Cinématique", tokens: ["i", "bVI", "bIII", "bVII"], mood: "minor" },
 ];
+
+/**
+ * Functional harmony "next chord" suggestions.
+ * Maps a normalized degree to the set of degrees that classically sound good after.
+ * Anything outside the set is rendered as "discouraged" (greyed) in the builder.
+ */
+const MAJOR_TRANSITIONS: Record<string, string[]> = {
+  I: ["ii", "iii", "IV", "V", "vi", "vii°", "Imaj7", "ii7", "V7", "vi7", "IV"],
+  ii: ["V", "V7", "vii°", "iii", "IV"],
+  iii: ["vi", "IV", "ii", "vi7"],
+  IV: ["V", "I", "ii", "vii°", "Imaj7", "vi"],
+  V: ["I", "vi", "Imaj7", "vi7"],
+  vi: ["ii", "IV", "V", "ii7", "V7", "iii"],
+  "vii°": ["I", "Imaj7", "iii"],
+};
+
+const MINOR_TRANSITIONS: Record<string, string[]> = {
+  i: ["iv", "v", "V", "bVI", "bVII", "bIII", "ii°", "V7"],
+  "ii°": ["V", "V7", "i"],
+  bIII: ["bVI", "iv", "bVII", "i"],
+  iv: ["V", "v", "i", "bVII", "bVI"],
+  v: ["i", "bVII"],
+  V: ["i", "bVI"],
+  bVI: ["bVII", "iv", "V", "bIII"],
+  bVII: ["bIII", "iv", "i", "bVI"],
+};
+
+function normalizeDegree(token: string): string {
+  // Strip 7/maj7 etc for transition lookup but keep accidentals/case
+  return token.replace(/maj7|m7b5|7|sus2|sus4|dim7|dim/gi, "").trim() || token;
+}
+
+export function suggestNextDegrees(currentToken: string, mood: "major" | "minor"): {
+  good: Set<string>;
+  all: string[];
+} {
+  const table = mood === "major" ? MAJOR_TRANSITIONS : MINOR_TRANSITIONS;
+  const allDegrees = mood === "major"
+    ? ["I", "ii", "iii", "IV", "V", "vi", "vii°"]
+    : ["i", "ii°", "bIII", "iv", "v", "V", "bVI", "bVII"];
+  const key = normalizeDegree(currentToken);
+  const good = new Set<string>(table[key] ?? allDegrees);
+  return { good, all: allDegrees };
+}
 
 export function randomProgression(modeMood: "major" | "minor"): string[] {
   const pool = PROGRESSION_PRESETS.filter((p) => p.mood === modeMood);
