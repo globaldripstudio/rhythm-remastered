@@ -87,7 +87,7 @@ const ChordProgression = () => {
   
 
   const initial = useMemo(loadSettings, []);
-  const [tonic, setTonic] = useState<NoteName>(initial.tonic);
+  const [tonic, setTonic] = useState<NoteName | "none">(initial.tonic);
   const [modeId, setModeId] = useState<ModeId | "none">(initial.modeId);
   const [view, setView] = useState<ViewMode>(initial.view);
   const [bpm, setBpm] = useState(initial.bpm);
@@ -105,12 +105,19 @@ const ChordProgression = () => {
   const [presetIdBackup, setPresetIdBackup] = useState<string>(initial.presetId);
   const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
-  // Mode effectif pour le calcul des accords (fallback ionian si "Aucun")
   const effectiveModeId: ModeId = modeId === "none" ? "ionian" : modeId;
+
+  // Tonique effective : si "Aucun", on utilise la tonique d'origine du preset (sinon C)
+  const currentPreset = useMemo(
+    () => PROGRESSION_PRESETS.find((p) => p.id === presetId),
+    [presetId],
+  );
+  const effectiveTonic: NoteName =
+    tonic === "none" ? (currentPreset?.defaultTonic ?? "C") : tonic;
 
   const moodFromMode: "major" | "minor" =
     modeId === "none"
-      ? "major"
+      ? (currentPreset?.mood ?? "major")
       : MODES[modeId as ModeId].diatonicQualities?.[0] === "min"
       ? "minor"
       : "major";
@@ -118,21 +125,21 @@ const ChordProgression = () => {
   // Persist
   useEffect(() => {
     try {
-      const data: PersistedSettings = { tonic, modeId: effectiveModeId, view, bpm, beatsPerChord, timbre, presetId };
+      const data: PersistedSettings = { tonic, modeId, view, bpm, beatsPerChord, timbre, presetId };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {
       /* ignore */
     }
-  }, [tonic, modeId, view, bpm, beatsPerChord, timbre, presetId, effectiveModeId]);
+  }, [tonic, modeId, view, bpm, beatsPerChord, timbre, presetId]);
 
   const scalePcs = useMemo(
-    () => (modeId === "none" ? new Set<number>() : scalePitchClasses(tonic, modeId)),
-    [tonic, modeId],
+    () => (modeId === "none" ? new Set<number>() : scalePitchClasses(effectiveTonic, modeId)),
+    [effectiveTonic, modeId],
   );
 
   const chords: Chord[] = useMemo(
-    () => progressionFromRomans(tokens, tonic, effectiveModeId, 4),
-    [tokens, tonic, effectiveModeId],
+    () => progressionFromRomans(tokens, effectiveTonic, effectiveModeId, 4),
+    [tokens, effectiveTonic, effectiveModeId],
   );
 
   const highlightPcs = useMemo(() => {
@@ -147,11 +154,12 @@ const ChordProgression = () => {
     if (!preset) return;
     setPresetId(id);
     setTokens([...preset.tokens]);
-    // Auto-switch tonic family if needed
-    if (preset.mood === "minor" && (modeId === "ionian" || modeId === "lydian")) {
-      setModeId("aeolian");
-    } else if (preset.mood === "major" && (modeId === "aeolian" || modeId === "phrygian")) {
-      setModeId("ionian");
+    if (modeId !== "none") {
+      if (preset.mood === "minor" && (modeId === "ionian" || modeId === "lydian")) {
+        setModeId("aeolian");
+      } else if (preset.mood === "major" && (modeId === "aeolian" || modeId === "phrygian")) {
+        setModeId("ionian");
+      }
     }
   };
 
