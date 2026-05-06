@@ -379,7 +379,7 @@ const ChordProgression = () => {
                     <button
                       onClick={() => handleRemoveBar(idx)}
                       className="text-xs text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
-                      aria-label="Supprimer"
+                      aria-label={t("chordTools.progression.removeAria")}
                     >
                       ✕
                     </button>
@@ -392,7 +392,7 @@ const ChordProgression = () => {
                       value={tokens[idx]}
                       onChange={(e) => handleEditToken(idx, e.target.value)}
                       className="w-20 rounded border border-border/60 bg-background px-2 py-1 text-xs"
-                      aria-label="Degré romain"
+                      aria-label={t("chordTools.progression.romanAria")}
                     />
                     <Button size="sm" variant="ghost" onClick={() => handlePlayChord(idx)} className="ml-auto">
                       <Play className="h-3.5 w-3.5" />
