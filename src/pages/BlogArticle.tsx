@@ -9,6 +9,7 @@ import LoudnessArticle from "./BlogArticles/LoudnessArticle";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import ShareButtons from "@/components/blog/ShareButtons";
 import SEO from "@/components/SEO";
+import { articleSchema, breadcrumbSchema } from "@/lib/seo/schemas";
 
 const BlogArticle = () => {
   const { slug } = useParams();
