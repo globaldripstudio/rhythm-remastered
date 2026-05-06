@@ -99,6 +99,10 @@ const ChordProgression = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [progMode, setProgMode] = useState<"preset" | "builder">("preset");
+  // Builder maintient ses propres tokens, indépendants du preset en cours
+  const [builderTokens, setBuilderTokens] = useState<string[]>([]);
+  const [presetTokensBackup, setPresetTokensBackup] = useState<string[]>([]);
+  const [presetIdBackup, setPresetIdBackup] = useState<string>(initial.presetId);
   const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
   const moodFromMode: "major" | "minor" =
