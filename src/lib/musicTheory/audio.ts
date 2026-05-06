@@ -35,8 +35,18 @@ interface PlayOpts {
   startAt?: number; // absolute audioCtx time
 }
 
+export interface NoteHandle {
+  stop: (when?: number) => void;
+}
+
 /** Play one MIDI note with the given timbre. Returns end time. */
 export function playNote(midi: number, timbre: Timbre = "piano", opts: PlayOpts = {}): number {
+  playNoteHandle(midi, timbre, opts);
+  return (opts.startAt ?? getAudioContext().currentTime) + (opts.durationMs ?? 600) / 1000;
+}
+
+/** Play one MIDI note and return a handle to stop it early. */
+export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: PlayOpts = {}): NoteHandle {
   const c = ensureContext();
   const out = masterGain!;
   const freq = midiToFreq(midi);
@@ -46,6 +56,7 @@ export function playNote(midi: number, timbre: Timbre = "piano", opts: PlayOpts 
 
   const gain = c.createGain();
   gain.gain.setValueAtTime(0.0001, start);
+  const oscs: OscillatorNode[] = [];
 
   if (timbre === "piano") {
     // Triangle + sine harmonic + soft envelope
@@ -69,6 +80,7 @@ export function playNote(midi: number, timbre: Timbre = "piano", opts: PlayOpts 
     o2.start(start);
     o1.stop(start + duration + 0.05);
     o2.stop(start + duration + 0.05);
+    oscs.push(o1, o2);
   } else {
     // Guitar: sawtooth + lowpass + pluck noise
     const o = c.createOscillator();
@@ -98,10 +110,23 @@ export function playNote(midi: number, timbre: Timbre = "piano", opts: PlayOpts 
 
     o.start(start);
     o.stop(start + duration + 0.05);
+    oscs.push(o);
   }
 
   gain.connect(out);
-  return start + duration;
+  return {
+    stop: (when?: number) => {
+      const w = when ?? c.currentTime;
+      try {
+        gain.gain.cancelScheduledValues(w);
+        gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), w);
+        gain.gain.exponentialRampToValueAtTime(0.0001, w + 0.04);
+      } catch { /* noop */ }
+      oscs.forEach((o) => {
+        try { o.stop(w + 0.05); } catch { /* noop */ }
+      });
+    },
+  };
 }
 
 export function playChord(

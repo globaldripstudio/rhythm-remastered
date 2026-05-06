@@ -26,38 +26,32 @@ const AudioToMidiPage = () => {
 
       <main className="py-8 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
-          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8">
-            <div className="space-y-4 animate-fade-in sm:space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
-                <Music4 className="w-4 h-4 text-primary" />
-                Convertisseur Audio → MIDI
+          <div className="space-y-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
+              <Music4 className="w-4 h-4 text-primary" />
+              Convertisseur Audio → MIDI
+            </div>
+            <div className="space-y-3 sm:space-y-4">
+              <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
+                Audio vers <span className="hero-text">MIDI</span>
+              </h1>
+              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
+                Glisse une voix, un instrument ou une mélodie : on extrait les notes en MIDI prêt à
+                importer dans ta DAW. Polyphonique, 100% local, sans inscription.
+              </p>
+            </div>
+            <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-3 sm:gap-3">
+              <div className="rounded-md border border-border bg-background/40 p-3">
+                <p className="font-semibold text-foreground">Polyphonique</p>
+                <p className="mt-1 leading-relaxed">Détecte plusieurs notes simultanées (accords, arpèges).</p>
               </div>
-              <div className="space-y-3 sm:space-y-4">
-                <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
-                  Audio vers <span className="hero-text">MIDI</span>
-                </h1>
-                <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-xl">
-                  Glisse une voix, un instrument ou une mélodie : on extrait les notes en MIDI prêt à
-                  importer dans ta DAW. Polyphonique, 100% local, sans inscription.
-                </p>
+              <div className="rounded-md border border-border bg-background/40 p-3">
+                <p className="font-semibold text-foreground">100% local</p>
+                <p className="mt-1 leading-relaxed">Aucun upload : tout tourne dans ton navigateur.</p>
               </div>
-              <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-3 sm:gap-3">
-                <div className="rounded-md border border-border bg-background/40 p-3">
-                  <p className="font-semibold text-foreground">Polyphonique</p>
-                  <p className="mt-1 leading-relaxed">Détecte plusieurs notes simultanées (accords, arpèges).</p>
-                </div>
-                <div className="rounded-md border border-border bg-background/40 p-3">
-                  <p className="font-semibold text-foreground">100% local</p>
-                  <p className="mt-1 leading-relaxed">Aucun upload : tout tourne dans ton navigateur.</p>
-                </div>
-                <div className="rounded-md border border-border bg-background/40 p-3">
-                  <p className="font-semibold text-foreground">Export MIDI</p>
-                  <p className="mt-1 leading-relaxed">Téléchargement direct au format .mid standard.</p>
-                </div>
-              </div>
-              <div className="rounded-md border border-border bg-background/40 p-3 text-sm leading-relaxed text-muted-foreground sm:p-4">
-                Modèle open source <strong className="text-foreground">Spotify Basic Pitch</strong> (TensorFlow.js).
-                Réglages calibrés pour offrir le meilleur compromis sur la majorité des sources.
+              <div className="rounded-md border border-border bg-background/40 p-3">
+                <p className="font-semibold text-foreground">Export MIDI</p>
+                <p className="mt-1 leading-relaxed">Téléchargement direct au format .mid standard.</p>
               </div>
             </div>
 

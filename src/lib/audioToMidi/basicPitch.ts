@@ -60,9 +60,9 @@ export async function audioToMidiNotes(
   onProgress?: (p: AudioToMidiProgress) => void,
 ): Promise<{ notes: NoteEvent[]; durationSec: number }> {
   const opts = {
-    onsetThreshold: 0.5,
-    frameThreshold: 0.3,
-    minNoteDurationMs: 60,
+    onsetThreshold: 0.7,
+    frameThreshold: 0.45,
+    minNoteDurationMs: 120,
     inferOnsets: true,
     includePitchBends: false,
     ...options,
@@ -110,12 +110,48 @@ export async function audioToMidiNotes(
 
   const notesTime = noteFramesToTime(polyNotes);
 
-  const notes: NoteEvent[] = notesTime.map((n) => ({
+  const rawNotes: NoteEvent[] = notesTime.map((n) => ({
     midi: n.pitchMidi,
     startSec: n.startTimeSeconds,
     durationSec: n.durationSeconds,
     velocity: Math.max(0.1, Math.min(1, n.amplitude)),
   }));
+
+  // Dedupe: merge same-pitch notes that overlap or are <120ms apart
+  const byPitch = new Map<number, NoteEvent[]>();
+  rawNotes.forEach((n) => {
+    const arr = byPitch.get(n.midi) ?? [];
+    arr.push(n);
+    byPitch.set(n.midi, arr);
+  });
+  const merged: NoteEvent[] = [];
+  byPitch.forEach((arr) => {
+    arr.sort((a, b) => a.startSec - b.startSec);
+    let cur: NoteEvent | null = null;
+    for (const n of arr) {
+      if (!cur) {
+        cur = { ...n };
+        continue;
+      }
+      const curEnd = cur.startSec + cur.durationSec;
+      const gap = n.startSec - curEnd;
+      if (gap < 0.12) {
+        const newEnd = Math.max(curEnd, n.startSec + n.durationSec);
+        cur.durationSec = newEnd - cur.startSec;
+        cur.velocity = Math.max(cur.velocity, n.velocity);
+      } else {
+        merged.push(cur);
+        cur = { ...n };
+      }
+    }
+    if (cur) merged.push(cur);
+  });
+  // Drop notes shorter than minNoteDurationMs after merge
+  const minSec = opts.minNoteDurationMs / 1000;
+  const notes = merged
+    .filter((n) => n.durationSec >= minSec)
+    .sort((a, b) => a.startSec - b.startSec);
+
 
   onProgress?.({ stage: "done", percent: 100 });
   return { notes, durationSec };
