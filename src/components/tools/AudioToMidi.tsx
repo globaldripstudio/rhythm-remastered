@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { audioToMidiNotes, type AudioToMidiProgress } from "@/lib/audioToMidi/basicPitch";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
-import { playNote, getAudioContext } from "@/lib/musicTheory/audio";
+import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
 
 
 const STAGE_LABEL: Record<AudioToMidiProgress["stage"], string> = {
