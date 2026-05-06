@@ -404,7 +404,7 @@ const ChordProgression = () => {
                 onClick={handleAddBar}
                 className="flex min-h-[88px] items-center justify-center rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
               >
-                + Ajouter
+                {t("chordTools.progression.add")}
               </button>
             </div>
           </CardContent>
