@@ -9,9 +9,10 @@ interface ContactCTAProps {
 }
 
 /**
- * Bicolor "Demander un devis" call-to-action box. Mirrors the Header's
- * behavior: scrolls smoothly to #contact when on the homepage, otherwise
- * navigates back to "/" then scrolls. Always triggers the phone highlight.
+ * Bicolor "Demander un devis" call-to-action box. Always scrolls to the
+ * #contact section (never #services). When called from another route, navigates
+ * home and polls for the section to appear before scrolling, so the page never
+ * "lands" on Services first.
  */
 const ContactCTA = ({
   className = "",
@@ -24,10 +25,21 @@ const ContactCTA = ({
 
   const scrollToContact = () => {
     const target = document.getElementById("contact");
-    if (!target) return;
+    if (!target) return false;
     const y = target.getBoundingClientRect().top + window.pageYOffset - 100;
     window.scrollTo({ top: y, behavior: "smooth" });
     setTimeout(() => window.dispatchEvent(new CustomEvent("highlight-phone")), 800);
+    return true;
+  };
+
+  const waitAndScroll = () => {
+    const start = Date.now();
+    const tick = () => {
+      if (scrollToContact()) return;
+      if (Date.now() - start > 1500) return;
+      requestAnimationFrame(tick);
+    };
+    tick();
   };
 
   const handleClick = () => {
@@ -35,7 +47,7 @@ const ContactCTA = ({
       scrollToContact();
     } else {
       navigate("/");
-      setTimeout(scrollToContact, 500);
+      waitAndScroll();
     }
   };
 
