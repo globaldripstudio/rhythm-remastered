@@ -339,9 +339,10 @@ const ChordProgression = () => {
           <CardContent className="grid gap-4 p-4 sm:p-6 md:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.tonic")}</Label>
-              <Select value={tonic} onValueChange={(v) => setTonic(v as NoteName)}>
+              <Select value={tonic} onValueChange={(v) => setTonic(v as NoteName | "none")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="none">Aucune (auto preset)</SelectItem>
                   {NOTE_NAMES.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
                 </SelectContent>
               </Select>
