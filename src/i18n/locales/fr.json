@@ -1552,7 +1552,7 @@
     "badge": "Générateur d'accords & gammes",
     "titleStart": "Progressions, gammes & ",
     "titleAccent": "modes",
-    "subtitle": "Choisis une tonalité, un mode et une progression. Visualise les notes sur le piano et le manche de guitare, joue chaque touche, écoute ta progression et exporte-la en MIDI. 100% navigateur, sans inscription.",
+    "subtitle": "Choisis une tonalité, un mode et une progression. Visualise les notes sur le piano et le manche de guitare, joue chaque touche, écoute ta progression et exporte-la en MIDI.",
     "controls": {
       "tonic": "Tonique",
       "mode": "Mode / gamme",
@@ -1577,7 +1577,14 @@
       "add": "+ Ajouter",
       "removeAria": "Supprimer",
       "romanAria": "Degré romain",
-      "copiedTitle": "Copié"
+      "copiedTitle": "Copié",
+      "modePreset": "Presets",
+      "modeBuilder": "Builder guidé",
+      "builderHint": "Construis ta progression accord par accord. Les choix qui s'enchaînent bien restent en couleur, les choix risqués sont grisés.",
+      "builderReset": "Recommencer",
+      "builderUndo": "Retirer le dernier",
+      "builderEmpty": "Choisis un premier accord pour commencer.",
+      "builderNext": "Accord suivant"
     },
     "viz": {
       "pianoTitle": "Piano — {{tonic}} {{mode}}",

@@ -1552,7 +1552,7 @@
     "badge": "Chord & scale generator",
     "titleStart": "Progressions, scales & ",
     "titleAccent": "modes",
-    "subtitle": "Pick a key, a mode and a progression. See the notes on the piano and the guitar fretboard, play any key, listen to your progression and export it as MIDI. 100% in-browser, no signup.",
+    "subtitle": "Pick a key, a mode and a progression. See the notes on the piano and the guitar fretboard, play any key, listen to your progression and export it as MIDI.",
     "controls": {
       "tonic": "Tonic",
       "mode": "Mode / scale",
@@ -1577,7 +1577,14 @@
       "add": "+ Add",
       "removeAria": "Remove",
       "romanAria": "Roman degree",
-      "copiedTitle": "Copied"
+      "copiedTitle": "Copied",
+      "modePreset": "Presets",
+      "modeBuilder": "Guided builder",
+      "builderHint": "Build your progression chord by chord. Smooth choices stay coloured, risky ones are greyed out.",
+      "builderReset": "Reset",
+      "builderUndo": "Remove last",
+      "builderEmpty": "Pick a first chord to get started.",
+      "builderNext": "Next chord"
     },
     "viz": {
       "pianoTitle": "Piano — {{tonic}} {{mode}}",
