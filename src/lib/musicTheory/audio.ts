@@ -108,10 +108,23 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
 
     o.start(start);
     o.stop(start + duration + 0.05);
+    oscs.push(o);
   }
 
   gain.connect(out);
-  return start + duration;
+  return {
+    stop: (when?: number) => {
+      const w = when ?? c.currentTime;
+      try {
+        gain.gain.cancelScheduledValues(w);
+        gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), w);
+        gain.gain.exponentialRampToValueAtTime(0.0001, w + 0.04);
+      } catch { /* noop */ }
+      oscs.forEach((o) => {
+        try { o.stop(w + 0.05); } catch { /* noop */ }
+      });
+    },
+  };
 }
 
 export function playChord(
