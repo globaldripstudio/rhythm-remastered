@@ -1435,5 +1435,189 @@
         }
       }
     }
+  },
+  "toolkit": {
+    "backHome": "Retour à l'accueil",
+    "tools": {
+      "loudness": {
+        "long": "Loudness",
+        "short": "LUFS"
+      },
+      "keybpm": {
+        "long": "Tonalité & BPM",
+        "short": "Tonalité/BPM"
+      },
+      "tempo": {
+        "long": "Tap Tempo",
+        "short": "Tempo"
+      },
+      "chords": {
+        "long": "Accords & gammes",
+        "short": "Accords"
+      },
+      "audio2midi": {
+        "long": "Audio → MIDI",
+        "short": "MIDI"
+      }
+    }
+  },
+  "audio2midi": {
+    "badge": "Convertisseur Audio → MIDI",
+    "titleStart": "Audio vers ",
+    "titleAccent": "MIDI",
+    "subtitle": "Glisse une voix, un instrument ou une mélodie : on extrait les notes en MIDI prêt à importer dans ta DAW. Polyphonique, 100% local, sans inscription.",
+    "intro": "Détection polyphonique 100% locale via le modèle open-source Spotify Basic Pitch. Ton fichier ne quitte jamais le navigateur — aucun upload, aucun compte requis.",
+    "presentation": {
+      "polyphonic": {
+        "title": "Polyphonique",
+        "description": "Détecte plusieurs notes simultanées (accords, arpèges)."
+      },
+      "local": {
+        "title": "100% local",
+        "description": "Aucun upload : tout tourne dans ton navigateur."
+      },
+      "export": {
+        "title": "Export MIDI",
+        "description": "Téléchargement direct au format .mid standard."
+      }
+    },
+    "upload": {
+      "title": "Glisse ton fichier audio",
+      "analyzing": "Conversion en cours…",
+      "description": "WAV, MP3, FLAC, OGG, M4A — le fichier ne quitte jamais ton navigateur."
+    },
+    "stages": {
+      "decoding": "Décodage de l'audio…",
+      "loading-model": "Chargement du modèle…",
+      "running": "Détection des notes…",
+      "post": "Post-traitement…",
+      "done": "Terminé"
+    },
+    "results": {
+      "notes": "notes",
+      "play": "Lecture",
+      "pause": "Pause",
+      "download": "Télécharger le MIDI",
+      "scrubHint": "Clique sur la timeline pour te déplacer · le repère pointillé montre où la lecture reprendra."
+    },
+    "toasts": {
+      "doneTitle": "Conversion terminée",
+      "doneDesc": "{{count}} notes détectées",
+      "errorTitle": "Erreur",
+      "invalidTitle": "Fichier invalide",
+      "invalidDesc": "Charge un fichier audio (WAV, MP3, FLAC…)"
+    },
+    "seoBlock": {
+      "title": "À quoi sert l'Audio → MIDI ?",
+      "description": "Transforme une mélodie sifflée, une ligne de piano, une voix ou un instrument acoustique en notes MIDI éditables. Idéal pour reprendre un riff dans ta DAW, transposer, doubler avec un synthé ou ré-orchestrer une idée.",
+      "topics": {
+        "beatmaking": {
+          "title": "Beatmaking",
+          "description": "Récupère la mélodie d'un sample pour la reproduire avec tes propres sons."
+        },
+        "compo": {
+          "title": "Compo",
+          "description": "Capture une idée chantée et édite-la note par note dans ton piano roll."
+        },
+        "reorchestration": {
+          "title": "Réorchestration",
+          "description": "Convertis une partie acoustique pour la jouer sur un autre instrument virtuel."
+        }
+      },
+      "tipsTitle": "Conseils pour un meilleur résultat",
+      "tips": {
+        "clean": "Source <strong>propre et isolée</strong> (pas de batterie ni de mix complet).",
+        "mono": "Une seule voix / un seul instrument à la fois donne les meilleurs résultats.",
+        "wav": "Préfère un fichier <strong>WAV</strong> non compressé si possible.",
+        "trim": "Coupe le silence en début/fin pour accélérer le traitement.",
+        "private": "Le fichier ne quitte jamais ton navigateur — totalement privé."
+      }
+    },
+    "guarantees": {
+      "privacy": {
+        "title": "Confidentialité totale",
+        "description": "Tout est traité côté navigateur. Aucun fichier n'est envoyé sur un serveur."
+      },
+      "polyphony": {
+        "title": "Détection polyphonique",
+        "description": "Reconnaît plusieurs notes simultanées : accords, harmonies, arpèges."
+      },
+      "free": {
+        "title": "Gratuit & illimité",
+        "description": "Pas de quota, pas d'inscription. Utilise-le autant que tu veux."
+      }
+    }
+  },
+  "chordTools": {
+    "badge": "Générateur d'accords & gammes",
+    "titleStart": "Progressions, gammes & ",
+    "titleAccent": "modes",
+    "subtitle": "Choisis une tonalité, un mode et une progression. Visualise les notes sur le piano et le manche de guitare, joue chaque touche, écoute ta progression et exporte-la en MIDI. 100% navigateur, sans inscription.",
+    "controls": {
+      "tonic": "Tonique",
+      "mode": "Mode / gamme",
+      "view": "Affichage",
+      "timbre": "Timbre de lecture",
+      "piano": "Piano",
+      "guitar": "Guitare",
+      "both": "Les deux"
+    },
+    "progression": {
+      "title": "Progression",
+      "subtitle": "Sélectionne un preset ou modifie librement les degrés (I, ii, V7, bVII…).",
+      "random": "Aléatoire",
+      "copy": "Copier",
+      "midi": "MIDI",
+      "play": "Lire",
+      "stop": "Stop",
+      "preset": "Preset",
+      "custom": "Personnalisé",
+      "tempo": "Tempo {{bpm}} BPM",
+      "beats": "Temps / accord",
+      "add": "+ Ajouter",
+      "removeAria": "Supprimer",
+      "romanAria": "Degré romain",
+      "copiedTitle": "Copié"
+    },
+    "viz": {
+      "pianoTitle": "Piano — {{tonic}} {{mode}}",
+      "pianoHint": "Clique ou tape sur n'importe quelle touche pour la jouer. Les notes de la gamme sont surlignées, la tonique encadrée. L'accord en cours de lecture apparaît en orange/teal.",
+      "guitarTitle": "Guitare (accordage standard) — {{tonic}} {{mode}}",
+      "guitarHint": "Clique sur une pastille pour entendre la note. Les positions de la gamme sont marquées sur tout le manche, la tonique en orange."
+    },
+    "seoBlock": {
+      "title": "Comprendre les progressions d'accords",
+      "description": "Une progression, ce sont les accords qui s'enchaînent et donnent la couleur d'un morceau. Les degrés romains (I, IV, V…) décrivent la position de chaque accord dans la gamme : ça te permet de transposer ta progression dans n'importe quelle tonalité en un clic.",
+      "topics": {
+        "key": {
+          "title": "Tonalité",
+          "description": "Choisis la note de référence du morceau (ex. C, A, F#)."
+        },
+        "mode": {
+          "title": "Mode",
+          "description": "L'ambiance : majeur lumineux, mineur mélancolique, dorien jazzy…"
+        },
+        "preset": {
+          "title": "Preset",
+          "description": "Des progressions toutes prêtes par genre : pop, jazz, RnB, rap…"
+        }
+      },
+      "howTitle": "Comment l'utiliser",
+      "how": {
+        "key": "Choisis une <strong>tonalité</strong> et un <strong>mode</strong>.",
+        "preset": "Pioche une <strong>progression preset</strong> ou édite les degrés.",
+        "play": "Clique sur <strong>Lire</strong> pour écouter ou sur une touche pour jouer.",
+        "view": "Bascule entre <strong>piano</strong>, <strong>guitare</strong> ou les deux.",
+        "export": "Exporte ta progression en <strong>MIDI</strong> pour ta DAW."
+      }
+    },
+    "seo": {
+      "title": "Générateur d'accords & gammes — piano et guitare interactifs | Global Drip Studio",
+      "description": "Générez des progressions d'accords par tonalité et mode, écoutez-les, exportez en MIDI. Piano et manche de guitare interactifs et jouables. 100% gratuit, dans le navigateur."
+    },
+    "seoAudio2midi": {
+      "title": "Audio → MIDI gratuit & local — convertisseur polyphonique | Global Drip Studio",
+      "description": "Convertis n'importe quel fichier audio (WAV, MP3, FLAC) en MIDI directement dans ton navigateur. Détection polyphonique via Spotify Basic Pitch. 100% gratuit et privé."
+    }
   }
 }
