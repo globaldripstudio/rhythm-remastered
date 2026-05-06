@@ -23,7 +23,7 @@ const Blog = () => {
     {
       id: 5, titleKey: "blog.cards.toolkit.title", excerptKey: "blog.cards.toolkit.excerpt",
       categoryKey: "blog.cards.toolkit.category", author: "Global Drip Studio", date: "2026-05-06",
-      readTime: "5 min", image: "/lovable-uploads/loudness-tool-card.png", slug: "toolkit-audio-gratuit-en-ligne", comingSoon: false
+      readTime: "5 min", image: "/lovable-uploads/toolkit-article-cover.jpg", slug: "toolkit-audio-gratuit-en-ligne", comingSoon: false
     },
     {
       id: 1, titleKey: "blog.cards.venin.title", excerptKey: "blog.cards.venin.excerpt",
