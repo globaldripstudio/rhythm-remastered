@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { audioToMidiNotes, type AudioToMidiProgress } from "@/lib/audioToMidi/basicPitch";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNote, getAudioContext } from "@/lib/musicTheory/audio";
-import { midiToName } from "@/lib/musicTheory/scales";
+
 
 const STAGE_LABEL: Record<AudioToMidiProgress["stage"], string> = {
   decoding: "Décodage de l'audio…",
