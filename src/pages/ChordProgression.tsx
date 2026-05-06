@@ -144,10 +144,13 @@ const ChordProgression = () => {
   const handlePlayProgression = async () => {
     if (isPlaying) {
       stopRef.current.cancelled = true;
+      stopAllNotes();
       setIsPlaying(false);
       setActiveIndex(null);
       return;
     }
+    // Couper toute lecture en cours pour éviter la cacophonie
+    stopAllNotes();
     const ctx = getAudioContext();
     setIsPlaying(true);
     stopRef.current.cancelled = false;
