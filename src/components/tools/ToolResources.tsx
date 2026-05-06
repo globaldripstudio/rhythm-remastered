@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
-import { ArrowRight, Drum, Gauge, KeyRound, Music2, Music4 } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Drum, Gauge, KeyRound, Music2, Music4 } from "lucide-react";
+import ContactCTA from "@/components/ContactCTA";
 
 type ToolKey = "loudness" | "keybpm" | "tempo" | "chords" | "audio2midi";
 
@@ -48,30 +49,42 @@ interface ToolResourcesProps {
  */
 const ToolResources = ({ current, title = "Continuer avec le toolkit" }: ToolResourcesProps) => {
   const others = (Object.keys(ALL_TOOLS) as ToolKey[]).filter((k) => k !== current);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const goToServices = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const scroll = () => {
+      const target = document.getElementById("services");
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    if (location.pathname === "/") scroll();
+    else {
+      navigate("/");
+      setTimeout(scroll, 500);
+    }
+  };
+
   return (
     <section
       aria-labelledby="tool-resources-title"
       className="mt-10 rounded-md border border-border bg-background/40 p-4 sm:p-6"
     >
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 id="tool-resources-title" className="text-xl font-bold sm:text-2xl">
-            {title}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Tous les outils sont gratuits, fonctionnent dans le navigateur et complètent les{" "}
-            <Link to="/services" className="text-primary underline-offset-4 hover:underline">
-              services studio Global Drip
-            </Link>{" "}
-            (mixage, mastering, sound design).
-          </p>
-        </div>
-        <Link
-          to="/#contact"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20 sm:text-sm"
-        >
-          Demander un devis <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+      <div>
+        <h2 id="tool-resources-title" className="text-xl font-bold sm:text-2xl">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Tous les outils sont gratuits, fonctionnent dans le navigateur et complètent les{" "}
+          <a
+            href="/#services"
+            onClick={goToServices}
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            services studio Global Drip
+          </a>{" "}
+          (mixage, mastering, sound design).
+        </p>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {others.map((key) => {
@@ -94,6 +107,7 @@ const ToolResources = ({ current, title = "Continuer avec le toolkit" }: ToolRes
           );
         })}
       </div>
+      <ContactCTA className="mt-6" />
     </section>
   );
 };
