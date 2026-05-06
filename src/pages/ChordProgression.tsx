@@ -503,37 +503,13 @@ const ChordProgression = () => {
               )}
             </div>
 
-            {/* Builder palette */}
+            {/* Builder palette — vue arborescente */}
             {progMode === "builder" && (
-              <div className="rounded-lg border border-border/60 bg-card/30 p-3 sm:p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {t("chordTools.progression.builderNext")}
-                  </Label>
-                  {tokens.length === 0 && (
-                    <span className="text-xs text-muted-foreground">{t("chordTools.progression.builderEmpty")}</span>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {builderSuggestions.all.map((deg) => {
-                    const isGood = builderSuggestions.good.has(deg);
-                    return (
-                      <button
-                        key={deg}
-                        onClick={() => handleBuilderPick(deg)}
-                        disabled={!isGood}
-                        className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-all ${
-                          isGood
-                            ? "border-primary/40 bg-primary/10 text-foreground hover:bg-primary/20 hover:border-primary"
-                            : "cursor-not-allowed border-border/40 bg-muted/20 text-muted-foreground/40 line-through"
-                        }`}
-                      >
-                        {deg}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <BuilderTree
+                tokens={builderTokens}
+                mood={moodFromMode}
+                onPick={handleBuilderPick}
+              />
             )}
           </CardContent>
         </Card>
