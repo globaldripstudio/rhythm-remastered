@@ -42,6 +42,11 @@ export const trackCTAClick = (ctaName: string) => {
   trackEvent('cta_click', window.location.pathname, ctaName);
 };
 
+export const trackFormSubmit = (formName: string, detail?: string | null) => {
+  const label = detail ? `${formName}:${detail}` : formName;
+  trackEvent('form_submit', window.location.pathname, label);
+};
+
 export const usePageTracking = () => {
   const location = useLocation();
   const lastTracked = useRef('');
