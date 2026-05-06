@@ -1,9 +1,16 @@
 User-agent: Googlebot
 Allow: /
 Disallow: /admin
+Disallow: /ebook/login
+Disallow: /ebook/reader
+Disallow: /payment-success
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /ebook/login
+Disallow: /ebook/reader
+Disallow: /payment-success
 
 User-agent: Twitterbot
 Allow: /
@@ -11,8 +18,20 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /ebook/login
+Disallow: /ebook/reader
+Disallow: /payment-success
 
 Sitemap: https://globaldripstudio.fr/sitemap.xml
