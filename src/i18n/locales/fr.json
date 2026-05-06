@@ -418,10 +418,10 @@
         "excerpt": "Explorez les techniques avancées de création sonore : field recording, granular synthesis, convolution reverb et manipulation spectrale pour des univers sonores immersifs.",
         "category": "Sound Design"
       },
-      "loudness": {
-        "title": "Analyse LUFS en ligne : notre nouvel outil pour contrôler vos masters",
-        "excerpt": "Découvrez l’analyseur LUFS Global Drip Studio : loudness intégrée, true peak, dynamique, courbe et rapport PDF directement dans le navigateur.",
-        "category": "Mastering"
+      "toolkit": {
+        "title": "Le toolkit Global Drip : 5 outils audio gratuits en ligne",
+        "excerpt": "Loudness LUFS, Key & BPM finder, tap tempo, accords interactifs et conversion Audio → MIDI : tour d'horizon de notre toolkit, gratuit et 100 % dans le navigateur.",
+        "category": "Toolkit"
       }
     },
     "articles": {

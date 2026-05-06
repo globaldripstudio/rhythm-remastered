@@ -5,7 +5,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { trackBlogView } from "@/hooks/useBlogViews";
 import { useTranslation } from "react-i18next";
 import ComprendreCompression from "./BlogArticles/ComprendreCompression";
-import LoudnessArticle from "./BlogArticles/LoudnessArticle";
+import ToolkitArticle from "./BlogArticles/ToolkitArticle";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import ShareButtons from "@/components/blog/ShareButtons";
 import SEO from "@/components/SEO";
@@ -121,8 +121,8 @@ const BlogArticle = () => {
     return <ComprendreCompression />;
   }
 
-  if (slug === "analyse-lufs-en-ligne-controle-master") {
-    return <LoudnessArticle />;
+  if (slug === "toolkit-audio-gratuit-en-ligne") {
+    return <ToolkitArticle />;
   }
 
   const article = getArticle();
