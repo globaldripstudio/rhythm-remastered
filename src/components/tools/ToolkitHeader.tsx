@@ -45,22 +45,24 @@ const ToolkitHeader = ({ current }: ToolkitHeaderProps) => {
               </Button>
             </Link>
             <div className="mx-1 hidden h-6 w-px shrink-0 bg-border/60 sm:block" />
-            {TOOLS.filter((tool) => tool.key !== current).map((tool) => {
-              const Icon = tool.icon;
-              return (
-                <Link key={tool.key} to={tool.to} className="shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground sm:px-3 sm:text-sm"
-                  >
-                    <Icon className="h-3.5 w-3.5 text-primary" />
-                    <span className="hidden sm:inline">{t(`toolkit.tools.${tool.key}.long`)}</span>
-                    <span className="sm:hidden">{t(`toolkit.tools.${tool.key}.short`)}</span>
-                  </Button>
-                </Link>
-              );
-            })}
+            <nav className="flex flex-1 items-center justify-around gap-2 sm:gap-4">
+              {TOOLS.filter((tool) => tool.key !== current).map((tool) => {
+                const Icon = tool.icon;
+                return (
+                  <Link key={tool.key} to={tool.to} className="shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground sm:px-3 sm:text-sm"
+                    >
+                      <Icon className="h-3.5 w-3.5 text-primary" />
+                      <span className="hidden sm:inline">{t(`toolkit.tools.${tool.key}.long`)}</span>
+                      <span className="sm:hidden">{t(`toolkit.tools.${tool.key}.short`)}</span>
+                    </Button>
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
           <button
             onClick={toggleLanguage}
