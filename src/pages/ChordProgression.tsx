@@ -445,42 +445,26 @@ const ChordProgression = () => {
           >
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
               <h2 id="chords-seo-title" className="text-xl font-bold sm:text-2xl">
-                Comprendre les progressions d'accords
+                {t("chordTools.seoBlock.title")}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Une progression, ce sont les accords qui s'enchaînent et donnent la couleur d'un morceau.
-                Les degrés romains (I, IV, V…) décrivent la position de chaque accord dans la gamme : ça te
-                permet de transposer ta progression dans n'importe quelle tonalité en un clic.
+                {t("chordTools.seoBlock.description")}
               </p>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-md bg-muted/25 p-3">
-                  <h3 className="text-sm font-semibold text-foreground">Tonalité</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Choisis la note de référence du morceau (ex. C, A, F#).
-                  </p>
-                </div>
-                <div className="rounded-md bg-muted/25 p-3">
-                  <h3 className="text-sm font-semibold text-foreground">Mode</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    L'ambiance : majeur lumineux, mineur mélancolique, dorien jazzy…
-                  </p>
-                </div>
-                <div className="rounded-md bg-muted/25 p-3">
-                  <h3 className="text-sm font-semibold text-foreground">Preset</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Des progressions toutes prêtes par genre : pop, jazz, RnB, rap…
-                  </p>
-                </div>
+                {(["key", "mode", "preset"] as const).map((item) => (
+                  <div key={item} className="rounded-md bg-muted/25 p-3">
+                    <h3 className="text-sm font-semibold text-foreground">{t(`chordTools.seoBlock.topics.${item}.title`)}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t(`chordTools.seoBlock.topics.${item}.description`)}</p>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
-              <h2 className="text-base font-bold text-foreground sm:text-lg">Comment l'utiliser</h2>
+              <h2 className="text-base font-bold text-foreground sm:text-lg">{t("chordTools.seoBlock.howTitle")}</h2>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
-                <li>• Choisis une <strong className="text-foreground">tonalité</strong> et un <strong className="text-foreground">mode</strong>.</li>
-                <li>• Pioche une <strong className="text-foreground">progression preset</strong> ou édite les degrés.</li>
-                <li>• Clique sur <strong className="text-foreground">Lire</strong> pour écouter ou sur une touche pour jouer.</li>
-                <li>• Bascule entre <strong className="text-foreground">piano</strong>, <strong className="text-foreground">guitare</strong> ou les deux.</li>
-                <li>• Exporte ta progression en <strong className="text-foreground">MIDI</strong> pour ta DAW.</li>
+                {(["key", "preset", "play", "view", "export"] as const).map((item) => (
+                  <li key={item}>• <span dangerouslySetInnerHTML={{ __html: t(`chordTools.seoBlock.how.${item}`) }} /></li>
+                ))}
               </ul>
             </div>
           </section>
