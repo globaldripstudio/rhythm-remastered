@@ -18,14 +18,6 @@ import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
 
 
-const STAGE_LABEL: Record<AudioToMidiProgress["stage"], string> = {
-  decoding: "Décodage de l'audio…",
-  "loading-model": "Chargement du modèle…",
-  running: "Détection des notes…",
-  post: "Post-traitement…",
-  done: "Terminé",
-};
-
 interface AudioToMidiProps {
   uploadTitle?: string;
   uploadAnalyzingTitle?: string;
@@ -33,10 +25,21 @@ interface AudioToMidiProps {
 }
 
 const AudioToMidi = ({
-  uploadTitle = "Glisse ton fichier audio",
-  uploadAnalyzingTitle = "Conversion en cours…",
-  uploadDescription = "WAV, MP3, FLAC, OGG, M4A — le fichier ne quitte jamais ton navigateur.",
+  uploadTitle,
+  uploadAnalyzingTitle,
+  uploadDescription,
 }: AudioToMidiProps) => {
+  const { t } = useTranslation();
+  const STAGE_LABEL: Record<AudioToMidiProgress["stage"], string> = {
+    decoding: t("audio2midi.stages.decoding"),
+    "loading-model": t("audio2midi.stages.loading-model"),
+    running: t("audio2midi.stages.running"),
+    post: t("audio2midi.stages.post"),
+    done: t("audio2midi.stages.done"),
+  };
+  const _uploadTitle = uploadTitle ?? t("audio2midi.upload.title");
+  const _uploadAnalyzing = uploadAnalyzingTitle ?? t("audio2midi.upload.analyzing");
+  const _uploadDescription = uploadDescription ?? t("audio2midi.upload.description");
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
