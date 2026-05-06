@@ -29,14 +29,12 @@ interface AudioToMidiProps {
   uploadTitle?: string;
   uploadAnalyzingTitle?: string;
   uploadDescription?: string;
-  infoSlot?: React.ReactNode;
 }
 
 const AudioToMidi = ({
   uploadTitle = "Glisse ton fichier audio",
   uploadAnalyzingTitle = "Conversion en cours…",
   uploadDescription = "WAV, MP3, FLAC, OGG, M4A — le fichier ne quitte jamais ton navigateur.",
-  infoSlot,
 }: AudioToMidiProps) => {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
