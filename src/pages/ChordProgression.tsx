@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useToast } from "@/hooks/use-toast";
+
 import {
   MODES,
   NOTE_NAMES,
@@ -83,7 +83,7 @@ function loadSettings(): PersistedSettings {
 
 const ChordProgression = () => {
   const { t } = useTranslation();
-  const { toast } = useToast();
+  
 
   const initial = useMemo(loadSettings, []);
   const [tonic, setTonic] = useState<NoteName>(initial.tonic);
