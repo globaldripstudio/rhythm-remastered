@@ -264,7 +264,7 @@ const AudioToMidi = ({
     } catch (err) {
       console.error(err);
       toast({
-        title: "Erreur",
+        title: t("audio2midi.toasts.errorTitle"),
         description: String((err as Error).message ?? err),
         variant: "destructive",
       });
