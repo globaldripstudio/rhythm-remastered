@@ -184,7 +184,7 @@ const ChordProgression = () => {
   const handleCopy = () => {
     const text = chords.map((c) => c.symbol).join(" – ");
     navigator.clipboard.writeText(text);
-    toast({ title: "Copié", description: text });
+    toast({ title: t("chordTools.progression.copiedTitle"), description: text });
   };
 
   const handleExport = () => {
@@ -223,8 +223,8 @@ const ChordProgression = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Générateur d'accords & gammes — piano et guitare interactifs | Global Drip Studio"
-        description="Générez des progressions d'accords par tonalité et mode, écoutez-les, exportez en MIDI. Piano et manche de guitare interactifs et jouables. 100% gratuit, dans le navigateur."
+        title={t("chordTools.seo.title")}
+        description={t("chordTools.seo.description")}
         path="/chord-progression"
         jsonLd={{
           "@context": "https://schema.org",
@@ -244,15 +244,13 @@ const ChordProgression = () => {
           <div className="max-w-3xl space-y-4 animate-fade-in sm:space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
               <Music2 className="w-4 h-4 text-primary" />
-              Générateur d'accords & gammes
+              {t("chordTools.badge")}
             </div>
             <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
-              Progressions, gammes & <span className="hero-text">modes</span>
+              {t("chordTools.titleStart")}<span className="hero-text">{t("chordTools.titleAccent")}</span>
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-xl">
-              Choisis une tonalité, un mode et une progression. Visualise les notes sur le piano et le manche
-              de guitare, joue chaque touche, écoute ta progression et exporte-la en MIDI. 100% navigateur,
-              sans inscription.
+              {t("chordTools.subtitle")}
             </p>
           </div>
 
@@ -261,7 +259,7 @@ const ChordProgression = () => {
         <Card className="mb-6 border-border/60">
           <CardContent className="grid gap-4 p-4 sm:p-6 md:grid-cols-4">
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tonique</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.tonic")}</Label>
               <Select value={tonic} onValueChange={(v) => setTonic(v as NoteName)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -270,7 +268,7 @@ const ChordProgression = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Mode / gamme</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.mode")}</Label>
               <Select value={modeId} onValueChange={(v) => setModeId(v as ModeId)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -281,26 +279,26 @@ const ChordProgression = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Affichage</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.view")}</Label>
               <div className="flex flex-wrap gap-1.5">
                 <Button size="sm" variant={view === "piano" ? "default" : "outline"} onClick={() => setView("piano")}>
-                  <Piano className="mr-1.5 h-4 w-4" /> Piano
+                  <Piano className="mr-1.5 h-4 w-4" /> {t("chordTools.controls.piano")}
                 </Button>
                 <Button size="sm" variant={view === "guitar" ? "default" : "outline"} onClick={() => setView("guitar")}>
-                  <Guitar className="mr-1.5 h-4 w-4" /> Guitare
+                  <Guitar className="mr-1.5 h-4 w-4" /> {t("chordTools.controls.guitar")}
                 </Button>
                 <Button size="sm" variant={view === "both" ? "default" : "outline"} onClick={() => setView("both")}>
-                  Les deux
+                  {t("chordTools.controls.both")}
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Timbre de lecture</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.timbre")}</Label>
               <Select value={timbre} onValueChange={(v) => setTimbre(v as Timbre)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="piano">Piano</SelectItem>
-                  <SelectItem value="guitar">Guitare</SelectItem>
+                  <SelectItem value="piano">{t("chordTools.controls.piano")}</SelectItem>
+                  <SelectItem value="guitar">{t("chordTools.controls.guitar")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -312,33 +310,33 @@ const ChordProgression = () => {
           <CardContent className="space-y-4 p-4 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
-                <h2 className="text-lg font-semibold">Progression</h2>
-                <p className="text-xs text-muted-foreground">Sélectionne un preset ou modifie librement les degrés (I, ii, V7, bVII…).</p>
+                <h2 className="text-lg font-semibold">{t("chordTools.progression.title")}</h2>
+                <p className="text-xs text-muted-foreground">{t("chordTools.progression.subtitle")}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={handleRandomize}>
-                  <Dice5 className="mr-1.5 h-4 w-4" /> Aléatoire
+                  <Dice5 className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.random")}
                 </Button>
                 <Button size="sm" variant="outline" onClick={handleCopy}>
-                  <Copy className="mr-1.5 h-4 w-4" /> Copier
+                  <Copy className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.copy")}
                 </Button>
                 <Button size="sm" variant="outline" onClick={handleExport}>
-                  <Download className="mr-1.5 h-4 w-4" /> MIDI
+                  <Download className="mr-1.5 h-4 w-4" /> {t("chordTools.progression.midi")}
                 </Button>
                 <Button size="sm" onClick={handlePlayProgression}>
                   {isPlaying ? <Pause className="mr-1.5 h-4 w-4" /> : <Play className="mr-1.5 h-4 w-4" />}
-                  {isPlaying ? "Stop" : "Lire"}
+                  {isPlaying ? t("chordTools.progression.stop") : t("chordTools.progression.play")}
                 </Button>
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Preset</Label>
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.preset")}</Label>
                 <Select value={presetId} onValueChange={handleApplyPreset}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent className="max-h-72">
-                    {presetId === "custom" && <SelectItem value="custom">Personnalisé</SelectItem>}
+                    {presetId === "custom" && <SelectItem value="custom">{t("chordTools.progression.custom")}</SelectItem>}
                     {groupedPresets.map(([genre, presets]) => (
                       <div key={genre}>
                         <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{genre}</div>
@@ -352,11 +350,11 @@ const ChordProgression = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tempo {bpm} BPM</Label>
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.tempo", { bpm })}</Label>
                   <Slider value={[bpm]} min={40} max={200} step={1} onValueChange={(v) => setBpm(v[0])} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Temps / accord</Label>
+                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.progression.beats")}</Label>
                   <Slider value={[beatsPerChord]} min={1} max={8} step={1} onValueChange={(v) => setBeatsPerChord(v[0])} />
                 </div>
               </div>
@@ -381,7 +379,7 @@ const ChordProgression = () => {
                     <button
                       onClick={() => handleRemoveBar(idx)}
                       className="text-xs text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
-                      aria-label="Supprimer"
+                      aria-label={t("chordTools.progression.removeAria")}
                     >
                       ✕
                     </button>
@@ -394,7 +392,7 @@ const ChordProgression = () => {
                       value={tokens[idx]}
                       onChange={(e) => handleEditToken(idx, e.target.value)}
                       className="w-20 rounded border border-border/60 bg-background px-2 py-1 text-xs"
-                      aria-label="Degré romain"
+                      aria-label={t("chordTools.progression.romanAria")}
                     />
                     <Button size="sm" variant="ghost" onClick={() => handlePlayChord(idx)} className="ml-auto">
                       <Play className="h-3.5 w-3.5" />
@@ -406,7 +404,7 @@ const ChordProgression = () => {
                 onClick={handleAddBar}
                 className="flex min-h-[88px] items-center justify-center rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
               >
-                + Ajouter
+                {t("chordTools.progression.add")}
               </button>
             </div>
           </CardContent>
@@ -419,13 +417,10 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Piano className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">Piano — {tonic} {MODES[modeId].label}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic, mode: MODES[modeId].label })}</h3>
                 </div>
                 <PianoKeyboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
-                <p className="text-xs text-muted-foreground">
-                  Clique ou tape sur n'importe quelle touche pour la jouer. Les notes de la gamme sont surlignées,
-                  la tonique encadrée. L'accord en cours de lecture apparaît en orange/teal.
-                </p>
+                <p className="text-xs text-muted-foreground">{t("chordTools.viz.pianoHint")}</p>
               </CardContent>
             </Card>
           )}
@@ -434,13 +429,10 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Guitar className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">Guitare (accordage standard) — {tonic} {MODES[modeId].label}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic, mode: MODES[modeId].label })}</h3>
                 </div>
                 <GuitarFretboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
-                <p className="text-xs text-muted-foreground">
-                  Clique sur une pastille pour entendre la note. Les positions de la gamme sont marquées sur tout le manche,
-                  la tonique en orange.
-                </p>
+                <p className="text-xs text-muted-foreground">{t("chordTools.viz.guitarHint")}</p>
               </CardContent>
             </Card>
           )}
@@ -453,42 +445,26 @@ const ChordProgression = () => {
           >
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
               <h2 id="chords-seo-title" className="text-xl font-bold sm:text-2xl">
-                Comprendre les progressions d'accords
+                {t("chordTools.seoBlock.title")}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Une progression, ce sont les accords qui s'enchaînent et donnent la couleur d'un morceau.
-                Les degrés romains (I, IV, V…) décrivent la position de chaque accord dans la gamme : ça te
-                permet de transposer ta progression dans n'importe quelle tonalité en un clic.
+                {t("chordTools.seoBlock.description")}
               </p>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-md bg-muted/25 p-3">
-                  <h3 className="text-sm font-semibold text-foreground">Tonalité</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Choisis la note de référence du morceau (ex. C, A, F#).
-                  </p>
-                </div>
-                <div className="rounded-md bg-muted/25 p-3">
-                  <h3 className="text-sm font-semibold text-foreground">Mode</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    L'ambiance : majeur lumineux, mineur mélancolique, dorien jazzy…
-                  </p>
-                </div>
-                <div className="rounded-md bg-muted/25 p-3">
-                  <h3 className="text-sm font-semibold text-foreground">Preset</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Des progressions toutes prêtes par genre : pop, jazz, RnB, rap…
-                  </p>
-                </div>
+                {(["key", "mode", "preset"] as const).map((item) => (
+                  <div key={item} className="rounded-md bg-muted/25 p-3">
+                    <h3 className="text-sm font-semibold text-foreground">{t(`chordTools.seoBlock.topics.${item}.title`)}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t(`chordTools.seoBlock.topics.${item}.description`)}</p>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
-              <h2 className="text-base font-bold text-foreground sm:text-lg">Comment l'utiliser</h2>
+              <h2 className="text-base font-bold text-foreground sm:text-lg">{t("chordTools.seoBlock.howTitle")}</h2>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
-                <li>• Choisis une <strong className="text-foreground">tonalité</strong> et un <strong className="text-foreground">mode</strong>.</li>
-                <li>• Pioche une <strong className="text-foreground">progression preset</strong> ou édite les degrés.</li>
-                <li>• Clique sur <strong className="text-foreground">Lire</strong> pour écouter ou sur une touche pour jouer.</li>
-                <li>• Bascule entre <strong className="text-foreground">piano</strong>, <strong className="text-foreground">guitare</strong> ou les deux.</li>
-                <li>• Exporte ta progression en <strong className="text-foreground">MIDI</strong> pour ta DAW.</li>
+                {(["key", "preset", "play", "view", "export"] as const).map((item) => (
+                  <li key={item}>• <span dangerouslySetInnerHTML={{ __html: t(`chordTools.seoBlock.how.${item}`) }} /></li>
+                ))}
               </ul>
             </div>
           </section>

@@ -1435,5 +1435,189 @@
         }
       }
     }
+  },
+  "toolkit": {
+    "backHome": "Back to home",
+    "tools": {
+      "loudness": {
+        "long": "Loudness",
+        "short": "LUFS"
+      },
+      "keybpm": {
+        "long": "Key & BPM",
+        "short": "Key/BPM"
+      },
+      "tempo": {
+        "long": "Tap Tempo",
+        "short": "Tempo"
+      },
+      "chords": {
+        "long": "Chords & scales",
+        "short": "Chords"
+      },
+      "audio2midi": {
+        "long": "Audio → MIDI",
+        "short": "MIDI"
+      }
+    }
+  },
+  "audio2midi": {
+    "badge": "Audio → MIDI converter",
+    "titleStart": "Audio to ",
+    "titleAccent": "MIDI",
+    "subtitle": "Drop a vocal, an instrument or a melody — we extract the notes as MIDI ready to import into your DAW. Polyphonic, 100% local, no signup.",
+    "intro": "Polyphonic, fully local detection powered by Spotify's open-source Basic Pitch model. Your file never leaves the browser — no upload, no account required.",
+    "presentation": {
+      "polyphonic": {
+        "title": "Polyphonic",
+        "description": "Detects multiple simultaneous notes (chords, arpeggios)."
+      },
+      "local": {
+        "title": "100% local",
+        "description": "No upload: everything runs in your browser."
+      },
+      "export": {
+        "title": "MIDI export",
+        "description": "Direct download as a standard .mid file."
+      }
+    },
+    "upload": {
+      "title": "Drop your audio file",
+      "analyzing": "Converting…",
+      "description": "WAV, MP3, FLAC, OGG, M4A — the file never leaves your browser."
+    },
+    "stages": {
+      "decoding": "Decoding audio…",
+      "loading-model": "Loading model…",
+      "running": "Detecting notes…",
+      "post": "Post-processing…",
+      "done": "Done"
+    },
+    "results": {
+      "notes": "notes",
+      "play": "Play",
+      "pause": "Pause",
+      "download": "Download MIDI",
+      "scrubHint": "Click the timeline to scrub · the dashed marker shows where playback will resume."
+    },
+    "toasts": {
+      "doneTitle": "Conversion complete",
+      "doneDesc": "{{count}} notes detected",
+      "errorTitle": "Error",
+      "invalidTitle": "Invalid file",
+      "invalidDesc": "Please load an audio file (WAV, MP3, FLAC…)"
+    },
+    "seoBlock": {
+      "title": "What is Audio → MIDI for?",
+      "description": "Turn a whistled melody, a piano line, a vocal or an acoustic instrument into editable MIDI notes. Perfect for grabbing a riff into your DAW, transposing, doubling with a synth or re-orchestrating an idea.",
+      "topics": {
+        "beatmaking": {
+          "title": "Beatmaking",
+          "description": "Capture a sample's melody and rebuild it with your own sounds."
+        },
+        "compo": {
+          "title": "Songwriting",
+          "description": "Capture a sung idea and edit it note by note in your piano roll."
+        },
+        "reorchestration": {
+          "title": "Re-orchestration",
+          "description": "Convert an acoustic part to play it back with another virtual instrument."
+        }
+      },
+      "tipsTitle": "Tips for better results",
+      "tips": {
+        "clean": "Use a <strong>clean, isolated</strong> source (no drums or full mix).",
+        "mono": "One voice / one instrument at a time gives the best results.",
+        "wav": "Prefer an uncompressed <strong>WAV</strong> file when possible.",
+        "trim": "Trim leading/trailing silence to speed up processing.",
+        "private": "The file never leaves your browser — fully private."
+      }
+    },
+    "guarantees": {
+      "privacy": {
+        "title": "Total privacy",
+        "description": "Everything is processed in the browser. No file is sent to a server."
+      },
+      "polyphony": {
+        "title": "Polyphonic detection",
+        "description": "Recognises multiple simultaneous notes: chords, harmonies, arpeggios."
+      },
+      "free": {
+        "title": "Free & unlimited",
+        "description": "No quota, no signup. Use it as much as you want."
+      }
+    }
+  },
+  "chordTools": {
+    "badge": "Chord & scale generator",
+    "titleStart": "Progressions, scales & ",
+    "titleAccent": "modes",
+    "subtitle": "Pick a key, a mode and a progression. See the notes on the piano and the guitar fretboard, play any key, listen to your progression and export it as MIDI. 100% in-browser, no signup.",
+    "controls": {
+      "tonic": "Tonic",
+      "mode": "Mode / scale",
+      "view": "View",
+      "timbre": "Playback timbre",
+      "piano": "Piano",
+      "guitar": "Guitar",
+      "both": "Both"
+    },
+    "progression": {
+      "title": "Progression",
+      "subtitle": "Pick a preset or freely edit the degrees (I, ii, V7, bVII…).",
+      "random": "Random",
+      "copy": "Copy",
+      "midi": "MIDI",
+      "play": "Play",
+      "stop": "Stop",
+      "preset": "Preset",
+      "custom": "Custom",
+      "tempo": "Tempo {{bpm}} BPM",
+      "beats": "Beats / chord",
+      "add": "+ Add",
+      "removeAria": "Remove",
+      "romanAria": "Roman degree",
+      "copiedTitle": "Copied"
+    },
+    "viz": {
+      "pianoTitle": "Piano — {{tonic}} {{mode}}",
+      "pianoHint": "Click or tap any key to play it. Scale notes are highlighted, the tonic is outlined. The chord currently playing appears in orange/teal.",
+      "guitarTitle": "Guitar (standard tuning) — {{tonic}} {{mode}}",
+      "guitarHint": "Click a dot to hear the note. Scale positions are marked across the whole neck, the tonic in orange."
+    },
+    "seoBlock": {
+      "title": "Understanding chord progressions",
+      "description": "A progression is the sequence of chords that gives a song its colour. Roman numerals (I, IV, V…) describe each chord's position in the scale: this lets you transpose your progression to any key in a click.",
+      "topics": {
+        "key": {
+          "title": "Key",
+          "description": "Pick the song's reference note (e.g. C, A, F#)."
+        },
+        "mode": {
+          "title": "Mode",
+          "description": "The mood: bright major, melancholic minor, jazzy dorian…"
+        },
+        "preset": {
+          "title": "Preset",
+          "description": "Ready-made progressions by genre: pop, jazz, R&B, rap…"
+        }
+      },
+      "howTitle": "How to use it",
+      "how": {
+        "key": "Pick a <strong>key</strong> and a <strong>mode</strong>.",
+        "preset": "Grab a <strong>preset progression</strong> or edit the degrees.",
+        "play": "Hit <strong>Play</strong> to listen, or click a key to play it.",
+        "view": "Switch between <strong>piano</strong>, <strong>guitar</strong> or both.",
+        "export": "Export your progression as <strong>MIDI</strong> for your DAW."
+      }
+    },
+    "seo": {
+      "title": "Chord & scale generator — interactive piano and guitar | Global Drip Studio",
+      "description": "Generate chord progressions by key and mode, listen to them, export to MIDI. Interactive playable piano and guitar fretboard. 100% free, in your browser."
+    },
+    "seoAudio2midi": {
+      "title": "Free local Audio → MIDI converter — polyphonic | Global Drip Studio",
+      "description": "Convert any audio file (WAV, MP3, FLAC) to MIDI right in your browser. Polyphonic detection via Spotify Basic Pitch. 100% free and private."
+    }
   }
 }

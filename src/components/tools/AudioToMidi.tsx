@@ -11,19 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { audioToMidiNotes, type AudioToMidiProgress } from "@/lib/audioToMidi/basicPitch";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
 
-
-const STAGE_LABEL: Record<AudioToMidiProgress["stage"], string> = {
-  decoding: "Décodage de l'audio…",
-  "loading-model": "Chargement du modèle…",
-  running: "Détection des notes…",
-  post: "Post-traitement…",
-  done: "Terminé",
-};
 
 interface AudioToMidiProps {
   uploadTitle?: string;
@@ -32,10 +25,21 @@ interface AudioToMidiProps {
 }
 
 const AudioToMidi = ({
-  uploadTitle = "Glisse ton fichier audio",
-  uploadAnalyzingTitle = "Conversion en cours…",
-  uploadDescription = "WAV, MP3, FLAC, OGG, M4A — le fichier ne quitte jamais ton navigateur.",
+  uploadTitle,
+  uploadAnalyzingTitle,
+  uploadDescription,
 }: AudioToMidiProps) => {
+  const { t } = useTranslation();
+  const STAGE_LABEL: Record<AudioToMidiProgress["stage"], string> = {
+    decoding: t("audio2midi.stages.decoding"),
+    "loading-model": t("audio2midi.stages.loading-model"),
+    running: t("audio2midi.stages.running"),
+    post: t("audio2midi.stages.post"),
+    done: t("audio2midi.stages.done"),
+  };
+  const _uploadTitle = uploadTitle ?? t("audio2midi.upload.title");
+  const _uploadAnalyzing = uploadAnalyzingTitle ?? t("audio2midi.upload.analyzing");
+  const _uploadDescription = uploadDescription ?? t("audio2midi.upload.description");
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -68,8 +72,8 @@ const AudioToMidi = ({
       if (!f) return;
       if (!f.type.startsWith("audio/")) {
         toast({
-          title: "Fichier invalide",
-          description: "Charge un fichier audio (WAV, MP3, FLAC…)",
+          title: t("audio2midi.toasts.invalidTitle"),
+          description: t("audio2midi.toasts.invalidDesc"),
           variant: "destructive",
         });
         return;
@@ -77,7 +81,7 @@ const AudioToMidi = ({
       setFile(f);
       setNotes([]);
     },
-    [toast],
+    [toast, t],
   );
 
   // ---- Piano roll drawing ----
@@ -256,11 +260,11 @@ const AudioToMidi = ({
       setNotes(result.notes);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
-      toast({ title: "Conversion terminée", description: `${result.notes.length} notes détectées` });
+      toast({ title: t("audio2midi.toasts.doneTitle"), description: t("audio2midi.toasts.doneDesc", { count: result.notes.length }) });
     } catch (err) {
       console.error(err);
       toast({
-        title: "Erreur",
+        title: t("audio2midi.toasts.errorTitle"),
         description: String((err as Error).message ?? err),
         variant: "destructive",
       });
@@ -370,7 +374,7 @@ const AudioToMidi = ({
     downloadBlob(blob, `${name}.mid`);
   };
 
-  const stageLabel = useMemo(() => STAGE_LABEL[progress.stage], [progress.stage]);
+  const stageLabel = STAGE_LABEL[progress.stage];
 
   const fmtTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -416,9 +420,9 @@ const AudioToMidi = ({
                 )}
               </div>
               <h2 className="mb-2 text-xl font-bold sm:mb-3 sm:text-2xl">
-                {isProcessing ? uploadAnalyzingTitle : uploadTitle}
+                {isProcessing ? _uploadAnalyzing : _uploadTitle}
               </h2>
-              <p className="max-w-md text-sm text-muted-foreground">{uploadDescription}</p>
+              <p className="max-w-md text-sm text-muted-foreground">{_uploadDescription}</p>
               {file && !isProcessing && (
                 <p className="mt-4 text-xs text-muted-foreground">
                   <FileAudio className="mr-1 inline h-3.5 w-3.5" />
@@ -445,7 +449,7 @@ const AudioToMidi = ({
           <CardContent className="space-y-3 p-3 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
               <div className="text-sm">
-                <span className="font-semibold text-foreground">{notes.length} notes</span>
+                <span className="font-semibold text-foreground">{notes.length} {t("audio2midi.results.notes")}</span>
                 <span className="text-muted-foreground">
                   {" "}· {fmtTime(playheadSec)} / {fmtTime(durationSec)}
                 </span>
@@ -454,11 +458,11 @@ const AudioToMidi = ({
                 <Button variant="outline" size="sm" onClick={handleTogglePlay}>
                   {isPlaying ? (
                     <>
-                      <Pause className="mr-2 h-4 w-4" /> Pause
+                      <Pause className="mr-2 h-4 w-4" /> {t("audio2midi.results.pause")}
                     </>
                   ) : (
                     <>
-                      <Play className="mr-2 h-4 w-4" /> Lecture
+                      <Play className="mr-2 h-4 w-4" /> {t("audio2midi.results.play")}
                     </>
                   )}
                 </Button>
@@ -467,7 +471,7 @@ const AudioToMidi = ({
                   onClick={handleDownloadMidi}
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  <Music4 className="mr-2 h-4 w-4" /> Télécharger le MIDI
+                  <Music4 className="mr-2 h-4 w-4" /> {t("audio2midi.results.download")}
                 </Button>
               </div>
             </div>
@@ -492,7 +496,7 @@ const AudioToMidi = ({
                 className="h-72 w-full cursor-pointer sm:h-[28rem]"
               />
               <p className="mt-1 px-1 text-[11px] text-muted-foreground">
-                Clique sur la timeline pour te déplacer · le repère pointillé montre où la lecture reprendra.
+                {t("audio2midi.results.scrubHint")}
               </p>
             </div>
           </CardContent>

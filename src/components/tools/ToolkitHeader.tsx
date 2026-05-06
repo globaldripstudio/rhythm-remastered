@@ -5,18 +5,12 @@ import { Button } from "@/components/ui/button";
 
 type ToolKey = "loudness" | "keybpm" | "tempo" | "chords" | "audio2midi";
 
-const TOOLS: Array<{
-  key: ToolKey;
-  to: string;
-  icon: typeof Gauge;
-  longLabel: string;
-  shortLabel: string;
-}> = [
-  { key: "loudness", to: "/loudness", icon: Gauge, longLabel: "Loudness", shortLabel: "LUFS" },
-  { key: "keybpm", to: "/key-bpm-finder", icon: KeyRound, longLabel: "Key & BPM", shortLabel: "Key/BPM" },
-  { key: "tempo", to: "/tap-tempo-metronome", icon: Drum, longLabel: "Tap Tempo", shortLabel: "Tempo" },
-  { key: "chords", to: "/chord-progression", icon: Music2, longLabel: "Accords & gammes", shortLabel: "Accords" },
-  { key: "audio2midi", to: "/audio-to-midi", icon: Music4, longLabel: "Audio → MIDI", shortLabel: "MIDI" },
+const TOOLS: Array<{ key: ToolKey; to: string; icon: typeof Gauge }> = [
+  { key: "loudness", to: "/loudness", icon: Gauge },
+  { key: "keybpm", to: "/key-bpm-finder", icon: KeyRound },
+  { key: "tempo", to: "/tap-tempo-metronome", icon: Drum },
+  { key: "chords", to: "/chord-progression", icon: Music2 },
+  { key: "audio2midi", to: "/audio-to-midi", icon: Music4 },
 ];
 
 interface ToolkitHeaderProps {
@@ -46,7 +40,7 @@ const ToolkitHeader = ({ current }: ToolkitHeaderProps) => {
             </Link>
             <Link to="/" className="shrink-0">
               <Button variant="outline" size="sm" className="h-8 px-2 text-xs sm:px-4 sm:text-sm">
-                <span className="hidden sm:inline">← {t("nav.backHome")}</span>
+                <span className="hidden sm:inline">← {t("toolkit.backHome")}</span>
                 <span className="sm:hidden">←</span>
               </Button>
             </Link>
@@ -61,8 +55,8 @@ const ToolkitHeader = ({ current }: ToolkitHeaderProps) => {
                     className="h-8 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground sm:px-3 sm:text-sm"
                   >
                     <Icon className="h-3.5 w-3.5 text-primary" />
-                    <span className="hidden sm:inline">{tool.longLabel}</span>
-                    <span className="sm:hidden">{tool.shortLabel}</span>
+                    <span className="hidden sm:inline">{t(`toolkit.tools.${tool.key}.long`)}</span>
+                    <span className="sm:hidden">{t(`toolkit.tools.${tool.key}.short`)}</span>
                   </Button>
                 </Link>
               );
