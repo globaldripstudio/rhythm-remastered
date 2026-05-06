@@ -53,8 +53,8 @@ type Timbre = "piano" | "guitar";
 const STORAGE_KEY = "chord-progression:settings";
 
 interface PersistedSettings {
-  tonic: NoteName;
-  modeId: ModeId;
+  tonic: NoteName | "none";
+  modeId: ModeId | "none";
   view: ViewMode;
   bpm: number;
   beatsPerChord: number;
@@ -63,8 +63,8 @@ interface PersistedSettings {
 }
 
 const DEFAULTS: PersistedSettings = {
-  tonic: "C",
-  modeId: "ionian",
+  tonic: "none",
+  modeId: "none",
   view: "both",
   bpm: 90,
   beatsPerChord: 4,
@@ -87,7 +87,7 @@ const ChordProgression = () => {
   
 
   const initial = useMemo(loadSettings, []);
-  const [tonic, setTonic] = useState<NoteName>(initial.tonic);
+  const [tonic, setTonic] = useState<NoteName | "none">(initial.tonic);
   const [modeId, setModeId] = useState<ModeId | "none">(initial.modeId);
   const [view, setView] = useState<ViewMode>(initial.view);
   const [bpm, setBpm] = useState(initial.bpm);
@@ -105,12 +105,19 @@ const ChordProgression = () => {
   const [presetIdBackup, setPresetIdBackup] = useState<string>(initial.presetId);
   const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
-  // Mode effectif pour le calcul des accords (fallback ionian si "Aucun")
   const effectiveModeId: ModeId = modeId === "none" ? "ionian" : modeId;
+
+  // Tonique effective : si "Aucun", on utilise la tonique d'origine du preset (sinon C)
+  const currentPreset = useMemo(
+    () => PROGRESSION_PRESETS.find((p) => p.id === presetId),
+    [presetId],
+  );
+  const effectiveTonic: NoteName =
+    tonic === "none" ? (currentPreset?.defaultTonic ?? "C") : tonic;
 
   const moodFromMode: "major" | "minor" =
     modeId === "none"
-      ? "major"
+      ? (currentPreset?.mood ?? "major")
       : MODES[modeId as ModeId].diatonicQualities?.[0] === "min"
       ? "minor"
       : "major";
@@ -118,21 +125,21 @@ const ChordProgression = () => {
   // Persist
   useEffect(() => {
     try {
-      const data: PersistedSettings = { tonic, modeId: effectiveModeId, view, bpm, beatsPerChord, timbre, presetId };
+      const data: PersistedSettings = { tonic, modeId, view, bpm, beatsPerChord, timbre, presetId };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {
       /* ignore */
     }
-  }, [tonic, modeId, view, bpm, beatsPerChord, timbre, presetId, effectiveModeId]);
+  }, [tonic, modeId, view, bpm, beatsPerChord, timbre, presetId]);
 
   const scalePcs = useMemo(
-    () => (modeId === "none" ? new Set<number>() : scalePitchClasses(tonic, modeId)),
-    [tonic, modeId],
+    () => (modeId === "none" ? new Set<number>() : scalePitchClasses(effectiveTonic, modeId)),
+    [effectiveTonic, modeId],
   );
 
   const chords: Chord[] = useMemo(
-    () => progressionFromRomans(tokens, tonic, effectiveModeId, 4),
-    [tokens, tonic, effectiveModeId],
+    () => progressionFromRomans(tokens, effectiveTonic, effectiveModeId, 4),
+    [tokens, effectiveTonic, effectiveModeId],
   );
 
   const highlightPcs = useMemo(() => {
@@ -147,11 +154,12 @@ const ChordProgression = () => {
     if (!preset) return;
     setPresetId(id);
     setTokens([...preset.tokens]);
-    // Auto-switch tonic family if needed
-    if (preset.mood === "minor" && (modeId === "ionian" || modeId === "lydian")) {
-      setModeId("aeolian");
-    } else if (preset.mood === "major" && (modeId === "aeolian" || modeId === "phrygian")) {
-      setModeId("ionian");
+    if (modeId !== "none") {
+      if (preset.mood === "minor" && (modeId === "ionian" || modeId === "lydian")) {
+        setModeId("aeolian");
+      } else if (preset.mood === "major" && (modeId === "aeolian" || modeId === "phrygian")) {
+        setModeId("ionian");
+      }
     }
   };
 
@@ -234,7 +242,7 @@ const ChordProgression = () => {
     setTokens(next);
     setPresetId("custom");
     try {
-      const c = chordFromRoman(deg, tonic, effectiveModeId, 4);
+      const c = chordFromRoman(deg, effectiveTonic, effectiveModeId, 4);
       stopAllNotes();
       playChord(c.midi, timbre, { durationMs: 900, velocity: 0.75 });
     } catch { /* noop */ }
@@ -256,7 +264,7 @@ const ChordProgression = () => {
 
   const handleExport = () => {
     const blob = chordsToMidiBlob(chords, bpm, beatsPerChord);
-    downloadBlob(blob, `progression-${tonic}-${effectiveModeId}.mid`);
+    downloadBlob(blob, `progression-${effectiveTonic}-${effectiveModeId}.mid`);
   };
 
   const handleEditToken = (idx: number, value: string) => {
@@ -331,9 +339,10 @@ const ChordProgression = () => {
           <CardContent className="grid gap-4 p-4 sm:p-6 md:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.tonic")}</Label>
-              <Select value={tonic} onValueChange={(v) => setTonic(v as NoteName)}>
+              <Select value={tonic} onValueChange={(v) => setTonic(v as NoteName | "none")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="none">Aucune (auto preset)</SelectItem>
                   {NOTE_NAMES.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -533,9 +542,9 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Piano className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic: effectiveTonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
                 </div>
-                <PianoKeyboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
+                <PianoKeyboard scalePcs={scalePcs} tonic={effectiveTonic} highlightPcs={highlightPcs} />
                 <p className="text-xs text-muted-foreground">{t("chordTools.viz.pianoHint")}</p>
               </CardContent>
             </Card>
@@ -545,9 +554,9 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Guitar className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic: effectiveTonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
                 </div>
-                <GuitarFretboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
+                <GuitarFretboard scalePcs={scalePcs} tonic={effectiveTonic} highlightPcs={highlightPcs} />
                 <p className="text-xs text-muted-foreground">{t("chordTools.viz.guitarHint")}</p>
               </CardContent>
             </Card>
