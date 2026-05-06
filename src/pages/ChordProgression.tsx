@@ -340,9 +340,10 @@ const ChordProgression = () => {
             </div>
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.mode")}</Label>
-              <Select value={modeId} onValueChange={(v) => setModeId(v as ModeId)}>
+              <Select value={modeId} onValueChange={(v) => setModeId(v as ModeId | "none")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="none">Aucun (libre)</SelectItem>
                   {Object.values(MODES).map((m) => (
                     <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
                   ))}
