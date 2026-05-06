@@ -258,7 +258,7 @@ const ChordProgression = () => {
 
 
         {/* Key + mode + view controls */}
-        <Card className="mb-6 border-border/60">
+        <Card className="mb-6 mt-10 border-border/60 sm:mt-12">
           <CardContent className="grid gap-4 p-4 sm:p-6 md:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.tonic")}</Label>
