@@ -81,7 +81,7 @@ const AudioToMidi = ({
       setFile(f);
       setNotes([]);
     },
-    [toast],
+    [toast, t],
   );
 
   // ---- Piano roll drawing ----
