@@ -44,6 +44,7 @@ const ContactCTA = ({
   };
 
   const handleClick = () => {
+    trackCTAClick(`devis_box:${location.pathname}`);
     if (location.pathname === "/") {
       scrollToContact();
     } else {
