@@ -53,8 +53,8 @@ type Timbre = "piano" | "guitar";
 const STORAGE_KEY = "chord-progression:settings";
 
 interface PersistedSettings {
-  tonic: NoteName;
-  modeId: ModeId;
+  tonic: NoteName | "none";
+  modeId: ModeId | "none";
   view: ViewMode;
   bpm: number;
   beatsPerChord: number;
@@ -63,8 +63,8 @@ interface PersistedSettings {
 }
 
 const DEFAULTS: PersistedSettings = {
-  tonic: "C",
-  modeId: "ionian",
+  tonic: "none",
+  modeId: "none",
   view: "both",
   bpm: 90,
   beatsPerChord: 4,
