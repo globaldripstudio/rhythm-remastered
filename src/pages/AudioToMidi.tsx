@@ -42,6 +42,7 @@ const AudioToMidiPage = () => {
 
       <main className="py-8 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
+          <Breadcrumbs items={crumbs} className="mb-6" />
           <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-end lg:gap-8">
             <div className="space-y-4 animate-fade-in sm:space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
@@ -123,6 +124,8 @@ const AudioToMidiPage = () => {
               </Card>
             ))}
           </section>
+
+          <ToolResources current="audio2midi" />
         </section>
       </main>
     </div>
