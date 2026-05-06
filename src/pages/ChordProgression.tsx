@@ -98,7 +98,11 @@ const ChordProgression = () => {
   const [presetId, setPresetId] = useState<string>(initial.presetId);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [progMode, setProgMode] = useState<"preset" | "builder">("preset");
   const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
+
+  const moodFromMode: "major" | "minor" =
+    MODES[modeId].diatonicQualities?.[0] === "min" ? "minor" : "major";
 
   // Persist
   useEffect(() => {
