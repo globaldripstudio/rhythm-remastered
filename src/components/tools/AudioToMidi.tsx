@@ -29,14 +29,12 @@ interface AudioToMidiProps {
   uploadTitle?: string;
   uploadAnalyzingTitle?: string;
   uploadDescription?: string;
-  infoSlot?: React.ReactNode;
 }
 
 const AudioToMidi = ({
   uploadTitle = "Glisse ton fichier audio",
   uploadAnalyzingTitle = "Conversion en cours…",
   uploadDescription = "WAV, MP3, FLAC, OGG, M4A — le fichier ne quitte jamais ton navigateur.",
-  infoSlot,
 }: AudioToMidiProps) => {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
@@ -382,7 +380,7 @@ const AudioToMidi = ({
 
   return (
     <div className="space-y-4">
-      <div className={infoSlot ? "grid gap-4 lg:grid-cols-[1.05fr_0.95fr]" : ""}>
+      <div>
         <Card className="equipment-card overflow-hidden border-border/80">
           <CardContent className="space-y-4 p-3 sm:p-6">
             <label
@@ -440,7 +438,6 @@ const AudioToMidi = ({
             )}
           </CardContent>
         </Card>
-        {infoSlot}
       </div>
 
       {notes.length > 0 && (
