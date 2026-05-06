@@ -260,7 +260,7 @@ const AudioToMidi = ({
       setNotes(result.notes);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
-      toast({ title: "Conversion terminée", description: `${result.notes.length} notes détectées` });
+      toast({ title: t("audio2midi.toasts.doneTitle"), description: t("audio2midi.toasts.doneDesc", { count: result.notes.length }) });
     } catch (err) {
       console.error(err);
       toast({
