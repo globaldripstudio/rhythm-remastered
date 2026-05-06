@@ -64,7 +64,7 @@ const ToolkitArticle = () => {
             title,
             description: "Présentation complète du toolkit audio gratuit Global Drip Studio : 5 outils en ligne pour analyser, composer et préparer ses productions.",
             path: `/blog/${slug}`,
-            image: "/lovable-uploads/loudness-tool-card.png",
+            image: "/lovable-uploads/toolkit-article-cover.jpg",
             datePublished: "2026-05-06",
             section: "Toolkit",
           }),
@@ -149,12 +149,12 @@ const ToolkitArticle = () => {
 
             <Card className="mb-8 bg-gradient-to-r from-primary/10 to-secondary/10 border-secondary/20">
               <CardContent className="p-6 sm:p-8">
-                <h2 className="text-xl sm:text-2xl font-bold mb-4">Comment on construit ces outils</h2>
+                <h2 className="text-xl sm:text-2xl font-bold mb-4">Une philosophie : faire simple, faire utile</h2>
                 <p className="text-muted-foreground mb-3">
-                  Chaque outil est codé en TypeScript et tourne dans le navigateur grâce à la <strong>Web Audio API</strong> et, pour la conversion audio→MIDI, à un modèle <strong>Basic Pitch</strong> exécuté en local via TensorFlow.js. Aucun fichier n'est envoyé sur un serveur : tout reste dans votre onglet.
+                  Pas de plugin à installer, pas de compte à créer, pas de file d'attente. <strong>Aucun fichier n'est envoyé sur un serveur : tout reste dans votre onglet.</strong> C'est un parti pris : votre projet ne nous appartient pas, et il n'a aucune raison de transiter ailleurs que sur votre machine.
                 </p>
                 <p className="text-muted-foreground">
-                  Côté UX, on essaie de garder une interface dense mais lisible, avec des résultats interprétables sans formation technique. Le but : qu'un beatmaker débutant comme un ingé son confirmé y trouve son compte en moins de trente secondes.
+                  Côté ergonomie, on a passé un temps fou à dégraisser. Chaque outil est pensé comme un instrument de précision : juste ce qu'il faut d'options, des résultats lisibles, et <strong>des résultats interprétables sans formation technique. Le but : qu'un beatmaker débutant comme un ingé son confirmé y trouve son compte en moins de trente secondes.</strong>
                 </p>
               </CardContent>
             </Card>
