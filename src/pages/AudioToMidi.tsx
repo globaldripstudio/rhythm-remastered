@@ -4,30 +4,45 @@ import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
 import AudioToMidiTool from "@/components/tools/AudioToMidi";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ToolResources from "@/components/tools/ToolResources";
+import { breadcrumbSchema, softwareAppSchema } from "@/lib/seo/schemas";
 
 const AudioToMidiPage = () => {
   const { t } = useTranslation();
+  const crumbs = [
+    { name: "Toolkit", path: "/loudness" },
+    { name: "Audio → MIDI", path: "/audio-to-midi" },
+  ];
   return (
     <div className="min-h-screen bg-background">
       <SEO
         title={t("chordTools.seoAudio2midi.title")}
         description={t("chordTools.seoAudio2midi.description")}
         path="/audio-to-midi"
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "Audio to MIDI Converter — Global Drip Studio",
-          applicationCategory: "MultimediaApplication",
-          operatingSystem: "Web",
-          isAccessibleForFree: true,
-          offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-        }}
+        jsonLd={[
+          softwareAppSchema({
+            name: "Audio to MIDI Converter — Global Drip Studio",
+            path: "/audio-to-midi",
+            description: t("chordTools.seoAudio2midi.description"),
+            features: [
+              "Conversion polyphonique audio vers MIDI",
+              "Détection multi-notes (accords, arpèges, mélodies)",
+              "100% local dans le navigateur, aucune upload",
+              "Export .mid standard prêt pour DAW",
+              "Modèle Basic Pitch open source de Spotify",
+            ],
+          }),
+          breadcrumbSchema(crumbs),
+        ]}
       />
+
 
       <ToolkitHeader current="audio2midi" />
 
       <main className="py-8 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
+          <Breadcrumbs items={crumbs} className="mb-6" />
           <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-end lg:gap-8">
             <div className="space-y-4 animate-fade-in sm:space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
@@ -109,6 +124,8 @@ const AudioToMidiPage = () => {
               </Card>
             ))}
           </section>
+
+          <ToolResources current="audio2midi" />
         </section>
       </main>
     </div>

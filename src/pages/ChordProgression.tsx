@@ -12,6 +12,9 @@ import {
   Undo2,
 } from "lucide-react";
 import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ToolResources from "@/components/tools/ToolResources";
+import { breadcrumbSchema, softwareAppSchema } from "@/lib/seo/schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -305,21 +308,31 @@ const ChordProgression = () => {
         title={t("chordTools.seo.title")}
         description={t("chordTools.seo.description")}
         path="/chord-progression"
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "Chord Progression Generator — Global Drip Studio",
-          applicationCategory: "MultimediaApplication",
-          operatingSystem: "Web",
-          isAccessibleForFree: true,
-          offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-        }}
+        jsonLd={[
+          softwareAppSchema({
+            name: "Générateur d'accords, gammes & modes — Global Drip Studio",
+            path: "/chord-progression",
+            description: t("chordTools.seo.description"),
+            features: [
+              "Générateur de progressions d'accords par tonalité et mode",
+              "Visualisation piano et manche de guitare interactifs",
+              "Builder guidé avec arborescence des accords possibles",
+              "Presets basés sur des morceaux célèbres",
+              "Export MIDI prêt pour DAW",
+            ],
+          }),
+          breadcrumbSchema([
+            { name: "Toolkit", path: "/loudness" },
+            { name: "Accords & gammes", path: "/chord-progression" },
+          ]),
+        ]}
       />
 
       <ToolkitHeader current="chords" />
 
       <main className="py-8 sm:py-16">
         <section className="container mx-auto max-w-6xl px-4 sm:px-6">
+          <Breadcrumbs items={[{ name: "Toolkit", path: "/loudness" }, { name: "Accords & gammes", path: "/chord-progression" }]} className="mb-6" />
           <div className="max-w-3xl space-y-4 animate-fade-in sm:space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
               <Music2 className="w-4 h-4 text-primary" />
@@ -593,6 +606,8 @@ const ChordProgression = () => {
               </ul>
             </div>
           </section>
+
+          <ToolResources current="chords" />
         </section>
       </main>
     </div>

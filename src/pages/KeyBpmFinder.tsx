@@ -2,6 +2,9 @@ import { useCallback, useState } from "react";
 import { Drum, FileAudio, Gauge, KeyRound, Loader2, Music2, Upload, Activity, Disc3, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ToolResources from "@/components/tools/ToolResources";
+import { breadcrumbSchema, softwareAppSchema } from "@/lib/seo/schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
@@ -62,22 +65,29 @@ const KeyBpmFinder = () => {
         title={t("seo.keybpm.title")}
         description={t("seo.keybpm.description")}
         path="/key-bpm-finder"
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          "name": "Global Drip Studio Key & BPM Finder",
-          "applicationCategory": "MultimediaApplication",
-          "operatingSystem": "Web browser",
-          "url": "https://globaldripstudio.fr/key-bpm-finder",
-          "description": t("seo.keybpm.description"),
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
-          "featureList": ["BPM detection", "Musical key detection", "Camelot wheel notation", "Client-side processing"],
-        }}
+        jsonLd={[
+          softwareAppSchema({
+            name: "Key & BPM Finder — Global Drip Studio",
+            path: "/key-bpm-finder",
+            description: t("seo.keybpm.description"),
+            features: [
+              "Détection automatique du BPM",
+              "Détection de la tonalité musicale (clé majeure/mineure)",
+              "Notation Camelot Wheel pour DJs",
+              "100% local dans le navigateur, aucune upload",
+            ],
+          }),
+          breadcrumbSchema([
+            { name: "Toolkit", path: "/loudness" },
+            { name: "Key & BPM Finder", path: "/key-bpm-finder" },
+          ]),
+        ]}
       />
       <ToolkitHeader current="keybpm" />
 
       <main className="py-8 sm:py-20">
         <section className="container mx-auto px-4 sm:px-6">
+          <Breadcrumbs items={[{ name: "Key & BPM Finder", path: "/key-bpm-finder" }]} className="mb-6" />
           <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8">
             <div className="space-y-4 animate-fade-in sm:space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground sm:px-4 sm:text-sm">
@@ -297,6 +307,8 @@ const KeyBpmFinder = () => {
               </div>
             </section>
           )}
+
+          <ToolResources current="keybpm" />
         </section>
       </main>
     </div>

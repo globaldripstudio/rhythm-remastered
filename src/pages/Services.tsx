@@ -7,6 +7,21 @@ import { ArrowLeft, Clock, Euro, Check, Star, Music, Settings, Volume2, Mic } fr
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
+import { breadcrumbSchema } from "@/lib/seo/schemas";
+
+const SERVICES_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, item: { "@type": "Service", name: "Mixage + Mastering", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Audio mixing and mastering" } },
+    { "@type": "ListItem", position: 2, item: { "@type": "Service", name: "Mastering hybride", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Hybrid analog and digital mastering" } },
+    { "@type": "ListItem", position: 3, item: { "@type": "Service", name: "Sound design", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Sound design for music, film, video games" } },
+    { "@type": "ListItem", position: 4, item: { "@type": "Service", name: "Composition / Production", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Music composition and production" } },
+    { "@type": "ListItem", position: 5, item: { "@type": "Service", name: "Captation sonore", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "City", name: "Martigues" }, serviceType: "Studio recording" } },
+    { "@type": "ListItem", position: 6, item: { "@type": "Service", name: "Direction artistique", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Artistic direction" } },
+    { "@type": "ListItem", position: 7, item: { "@type": "Service", name: "Formation production musicale", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Music production training" } },
+  ],
+};
 
 const Services = () => {
   const { t } = useTranslation();
@@ -178,7 +193,12 @@ const Services = () => {
   if (selectedService && service) {
     return (
       <div className="min-h-screen bg-background">
-        <SEO title={t('seo.services.title')} description={t('seo.services.description')} path="/services" />
+        <SEO
+          title={t('seo.services.title')}
+          description={t('seo.services.description')}
+          path="/services"
+          jsonLd={[SERVICES_JSONLD, breadcrumbSchema([{ name: "Services", path: "/services" }, { name: service.title, path: `/services#${service.id}` }])]}
+        />
         <div className="container mx-auto px-6 py-12">
           <Button 
             variant="ghost" 
@@ -412,7 +432,12 @@ const Services = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title={t('seo.services.title')} description={t('seo.services.description')} path="/services" />
+      <SEO
+        title={t('seo.services.title')}
+        description={t('seo.services.description')}
+        path="/services"
+        jsonLd={[SERVICES_JSONLD, breadcrumbSchema([{ name: "Services", path: "/services" }])]}
+      />
       <div className="container mx-auto px-6 py-12">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">

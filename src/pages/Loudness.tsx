@@ -3,6 +3,9 @@ import { Download, Drum, FileAudio, Gauge, Info, KeyRound, Loader2, Music2, Uplo
 import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ToolResources from "@/components/tools/ToolResources";
+import { breadcrumbSchema, softwareAppSchema } from "@/lib/seo/schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
@@ -830,6 +833,8 @@ const Loudness = () => {
               </div>
             </section>
           )}
+
+          <ToolResources current="loudness" />
         </section>
       </main>
     </div>

@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import ServiceModal from "@/components/ServiceModal";
 import SEO from "@/components/SEO";
 import { servicesData } from "@/components/Services";
+import { organizationSchema, websiteSchema } from "@/lib/seo/schemas";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -32,7 +33,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <SEO title={t('seo.home.title')} description={t('seo.home.description')} path="/" />
+      <SEO
+        title={t('seo.home.title')}
+        description={t('seo.home.description')}
+        path="/"
+        jsonLd={[organizationSchema(), websiteSchema()]}
+      />
       <Header />
       <main>
         <Hero />
