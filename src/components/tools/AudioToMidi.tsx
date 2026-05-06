@@ -277,15 +277,13 @@ const AudioToMidi = ({
         const startAt = startCtx + Math.max(0, offset);
         const remaining =
           offset >= 0 ? n.durationSec : Math.max(0.05, n.durationSec - (fromSec - n.startSec));
-        // We don't get a stop handle from playNote; emulate via setTimeout suspend? Simpler: rely on stopTransport via context suspend.
-        playNote(n.midi, "piano", {
+        const handle = playNoteHandle(n.midi, "piano", {
           startAt,
           durationMs: remaining * 1000,
           velocity: n.velocity,
         });
+        sources.push(handle);
       });
-      // Track end as a synthetic source
-      sources.push({ stop: () => audioCtx.suspend().then(() => audioCtx.resume()) });
       transportRef.current = { startedAtCtx: startCtx, startedAtSec: fromSec, sources };
       setIsPlaying(true);
 
