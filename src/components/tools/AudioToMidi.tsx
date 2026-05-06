@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Download,
   FileAudio,
@@ -444,64 +445,68 @@ const AudioToMidi = ({
         </Card>
       </div>
 
-      {notes.length > 0 && (
-        <Card className="equipment-card overflow-hidden border-border/80">
-          <CardContent className="space-y-3 p-3 sm:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
-              <div className="text-sm">
-                <span className="font-semibold text-foreground">{notes.length} {t("audio2midi.results.notes")}</span>
-                <span className="text-muted-foreground">
-                  {" "}· {fmtTime(playheadSec)} / {fmtTime(durationSec)}
-                </span>
+      {notes.length > 0 && (() => {
+        const slot = typeof document !== "undefined" ? document.getElementById("audio2midi-player-slot") : null;
+        const playerNode = (
+          <Card className="equipment-card overflow-hidden border-border/80">
+            <CardContent className="space-y-3 p-3 sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <div className="text-sm">
+                  <span className="font-semibold text-foreground">{notes.length} {t("audio2midi.results.notes")}</span>
+                  <span className="text-muted-foreground">
+                    {" "}· {fmtTime(playheadSec)} / {fmtTime(durationSec)}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={handleTogglePlay}>
+                    {isPlaying ? (
+                      <>
+                        <Pause className="mr-2 h-4 w-4" /> {t("audio2midi.results.pause")}
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-4 w-4" /> {t("audio2midi.results.play")}
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleDownloadMidi}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    <Music4 className="mr-2 h-4 w-4" /> {t("audio2midi.results.download")}
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={handleTogglePlay}>
-                  {isPlaying ? (
-                    <>
-                      <Pause className="mr-2 h-4 w-4" /> {t("audio2midi.results.pause")}
-                    </>
-                  ) : (
-                    <>
-                      <Play className="mr-2 h-4 w-4" /> {t("audio2midi.results.play")}
-                    </>
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleDownloadMidi}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <Music4 className="mr-2 h-4 w-4" /> {t("audio2midi.results.download")}
-                </Button>
+              <div ref={wrapRef} className="rounded-lg border border-border/60 bg-card/40 p-2">
+                <canvas
+                  ref={canvasRef}
+                  onClick={handleCanvasClick}
+                  onMouseMove={(e) => {
+                    const cv = canvasRef.current;
+                    if (!cv || durationSec === 0) return;
+                    const rect = cv.getBoundingClientRect();
+                    const labelW = 44;
+                    const usable = rect.width - labelW;
+                    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left - labelW) / usable));
+                    hoverRef.current = ratio * durationSec;
+                    drawPianoRoll();
+                  }}
+                  onMouseLeave={() => {
+                    hoverRef.current = null;
+                    drawPianoRoll();
+                  }}
+                  className="h-72 w-full cursor-pointer sm:h-[28rem]"
+                />
+                <p className="mt-1 px-1 text-[11px] text-muted-foreground">
+                  {t("audio2midi.results.scrubHint")}
+                </p>
               </div>
-            </div>
-            <div ref={wrapRef} className="rounded-lg border border-border/60 bg-card/40 p-2">
-              <canvas
-                ref={canvasRef}
-                onClick={handleCanvasClick}
-                onMouseMove={(e) => {
-                  const cv = canvasRef.current;
-                  if (!cv || durationSec === 0) return;
-                  const rect = cv.getBoundingClientRect();
-                  const labelW = 44;
-                  const usable = rect.width - labelW;
-                  const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left - labelW) / usable));
-                  hoverRef.current = ratio * durationSec;
-                  drawPianoRoll();
-                }}
-                onMouseLeave={() => {
-                  hoverRef.current = null;
-                  drawPianoRoll();
-                }}
-                className="h-72 w-full cursor-pointer sm:h-[28rem]"
-              />
-              <p className="mt-1 px-1 text-[11px] text-muted-foreground">
-                {t("audio2midi.results.scrubHint")}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        );
+        return slot ? createPortal(playerNode, slot) : playerNode;
+      })()}
     </div>
   );
 };
