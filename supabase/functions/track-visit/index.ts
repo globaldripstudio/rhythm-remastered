@@ -66,6 +66,13 @@ Deno.serve(async (req) => {
       })
     }
 
+    // Silently drop owner's own traffic (analytics exclusion)
+    if (EXCLUDED_IPS.includes(ip_address)) {
+      return new Response(JSON.stringify({ success: true, excluded: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     // Try to get geolocation from IP using HTTPS API
     let city = null
     let country = null
