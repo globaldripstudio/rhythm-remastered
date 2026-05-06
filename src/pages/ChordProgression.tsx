@@ -193,18 +193,36 @@ const ChordProgression = () => {
   };
 
   // ===== Builder guidé (arborescence) =====
+  // Suggestions niveau N+1 (depuis le dernier accord posé)
   const builderSuggestions = useMemo(() => {
-    if (tokens.length === 0) {
-      return suggestNextDegrees("I", moodFromMode);
+    const last = builderTokens.length === 0 ? null : builderTokens[builderTokens.length - 1];
+    return suggestNextDegrees(last, moodFromMode);
+  }, [builderTokens, moodFromMode]);
+
+  // Switch entre les modes Preset / Builder en sauvegardant l'état
+  const handleSwitchProgMode = (mode: "preset" | "builder") => {
+    if (mode === progMode) return;
+    if (mode === "builder") {
+      // Sauvegarde l'état preset courant et démarre vierge
+      setPresetTokensBackup(tokens);
+      setPresetIdBackup(presetId);
+      setTokens([]);
+      setBuilderTokens([]);
+      setPresetId("custom");
+    } else {
+      // Sauvegarde le builder en cours et restaure le preset
+      setBuilderTokens(tokens);
+      setTokens(presetTokensBackup.length > 0 ? presetTokensBackup : (PROGRESSION_PRESETS.find((p) => p.id === presetIdBackup)?.tokens ?? PROGRESSION_PRESETS[0].tokens));
+      setPresetId(presetIdBackup);
     }
-    return suggestNextDegrees(tokens[tokens.length - 1], moodFromMode);
-  }, [tokens, moodFromMode]);
+    setProgMode(mode);
+  };
 
   const handleBuilderPick = (deg: string) => {
-    const next = [...tokens, deg];
+    const next = [...builderTokens, deg];
+    setBuilderTokens(next);
     setTokens(next);
     setPresetId("custom");
-    // Pré-écoute de l'accord choisi
     try {
       const c = chordFromRoman(deg, tonic, modeId, 4);
       stopAllNotes();
@@ -213,13 +231,16 @@ const ChordProgression = () => {
   };
 
   const handleBuilderReset = () => {
+    setBuilderTokens([]);
     setTokens([]);
     setPresetId("custom");
   };
 
   const handleBuilderUndo = () => {
-    if (tokens.length === 0) return;
-    setTokens(tokens.slice(0, -1));
+    if (builderTokens.length === 0) return;
+    const next = builderTokens.slice(0, -1);
+    setBuilderTokens(next);
+    setTokens(next);
     setPresetId("custom");
   };
 
@@ -232,17 +253,21 @@ const ChordProgression = () => {
     const next = [...tokens];
     next[idx] = value;
     setTokens(next);
+    if (progMode === "builder") setBuilderTokens(next);
     setPresetId("custom");
   };
 
   const handleAddBar = () => {
-    setTokens([...tokens, "I"]);
+    const next = [...tokens, moodFromMode === "minor" ? "i" : "I"];
+    setTokens(next);
+    if (progMode === "builder") setBuilderTokens(next);
     setPresetId("custom");
   };
 
   const handleRemoveBar = (idx: number) => {
-    if (tokens.length <= 1) return;
-    setTokens(tokens.filter((_, i) => i !== idx));
+    const next = tokens.filter((_, i) => i !== idx);
+    setTokens(next);
+    if (progMode === "builder") setBuilderTokens(next);
     setPresetId("custom");
   };
 
