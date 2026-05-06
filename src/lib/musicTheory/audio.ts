@@ -80,6 +80,7 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
     o2.start(start);
     o1.stop(start + duration + 0.05);
     o2.stop(start + duration + 0.05);
+    oscs.push(o1, o2);
   } else {
     // Guitar: sawtooth + lowpass + pluck noise
     const o = c.createOscillator();
