@@ -381,64 +381,71 @@ const AudioToMidi = ({
   };
 
   return (
-    <Card className="equipment-card overflow-hidden border-border/80">
-      <CardContent className="space-y-4 p-3 sm:p-6">
-        <label
-          htmlFor="audio-upload-midi"
-          onDragOver={(event) => {
-            event.preventDefault();
-            setIsDragging(true);
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={(event) => {
-            event.preventDefault();
-            setIsDragging(false);
-            handleSelectAndRun(event.dataTransfer.files[0]);
-          }}
-          className={`flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed p-4 text-center transition-all duration-300 sm:min-h-[280px] sm:p-6 ${
-            isDragging
-              ? "border-primary bg-primary/10"
-              : "border-border bg-background/40 hover:border-primary hover:bg-muted/30"
-          }`}
-        >
-          <input
-            id="audio-upload-midi"
-            type="file"
-            accept="audio/*"
-            className="sr-only"
-            onChange={(event) => handleSelectAndRun(event.target.files?.[0])}
-          />
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary sm:mb-6 sm:h-20 sm:w-20">
-            {isProcessing ? (
-              <Loader2 className="h-8 w-8 animate-spin sm:h-9 sm:w-9" />
-            ) : (
-              <Upload className="h-8 w-8 sm:h-9 sm:w-9" />
+    <div className="space-y-4">
+      <div className={infoSlot ? "grid gap-4 lg:grid-cols-[1.05fr_0.95fr]" : ""}>
+        <Card className="equipment-card overflow-hidden border-border/80">
+          <CardContent className="space-y-4 p-3 sm:p-6">
+            <label
+              htmlFor="audio-upload-midi"
+              onDragOver={(event) => {
+                event.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setIsDragging(false);
+                handleSelectAndRun(event.dataTransfer.files[0]);
+              }}
+              className={`flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed p-4 text-center transition-all duration-300 sm:min-h-[280px] sm:p-6 ${
+                isDragging
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-background/40 hover:border-primary hover:bg-muted/30"
+              }`}
+            >
+              <input
+                id="audio-upload-midi"
+                type="file"
+                accept="audio/*"
+                className="sr-only"
+                onChange={(event) => handleSelectAndRun(event.target.files?.[0])}
+              />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary sm:mb-6 sm:h-20 sm:w-20">
+                {isProcessing ? (
+                  <Loader2 className="h-8 w-8 animate-spin sm:h-9 sm:w-9" />
+                ) : (
+                  <Upload className="h-8 w-8 sm:h-9 sm:w-9" />
+                )}
+              </div>
+              <h2 className="mb-2 text-xl font-bold sm:mb-3 sm:text-2xl">
+                {isProcessing ? uploadAnalyzingTitle : uploadTitle}
+              </h2>
+              <p className="max-w-md text-sm text-muted-foreground">{uploadDescription}</p>
+              {file && !isProcessing && (
+                <p className="mt-4 text-xs text-muted-foreground">
+                  <FileAudio className="mr-1 inline h-3.5 w-3.5" />
+                  {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
+                </p>
+              )}
+            </label>
+
+            {isProcessing && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{stageLabel}</span>
+                  <span>{displayPercent.toFixed(0)} %</span>
+                </div>
+                <Progress value={displayPercent} />
+              </div>
             )}
-          </div>
-          <h2 className="mb-2 text-xl font-bold sm:mb-3 sm:text-2xl">
-            {isProcessing ? uploadAnalyzingTitle : uploadTitle}
-          </h2>
-          <p className="max-w-md text-sm text-muted-foreground">{uploadDescription}</p>
-          {file && !isProcessing && (
-            <p className="mt-4 text-xs text-muted-foreground">
-              <FileAudio className="mr-1 inline h-3.5 w-3.5" />
-              {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
-            </p>
-          )}
-        </label>
+          </CardContent>
+        </Card>
+        {infoSlot}
+      </div>
 
-        {isProcessing && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{stageLabel}</span>
-              <span>{displayPercent.toFixed(0)} %</span>
-            </div>
-            <Progress value={displayPercent} />
-          </div>
-        )}
-
-        {notes.length > 0 && (
-          <div className="space-y-3">
+      {notes.length > 0 && (
+        <Card className="equipment-card overflow-hidden border-border/80">
+          <CardContent className="space-y-3 p-3 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
               <div className="text-sm">
                 <span className="font-semibold text-foreground">{notes.length} notes</span>
@@ -485,16 +492,16 @@ const AudioToMidi = ({
                   hoverRef.current = null;
                   drawPianoRoll();
                 }}
-                className="h-72 w-full cursor-pointer sm:h-96"
+                className="h-72 w-full cursor-pointer sm:h-[28rem]"
               />
               <p className="mt-1 px-1 text-[11px] text-muted-foreground">
-                Clique sur la timeline pour te déplacer dans le morceau.
+                Clique sur la timeline pour te déplacer · le repère pointillé montre où la lecture reprendra.
               </p>
             </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };
 
