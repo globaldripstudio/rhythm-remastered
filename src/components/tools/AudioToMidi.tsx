@@ -169,6 +169,32 @@ const AudioToMidi = ({
     ctx.moveTo(phX, 0);
     ctx.lineTo(phX, h);
     ctx.stroke();
+
+    // ghost playhead (where the user would seek on click)
+    if (hoverRef.current !== null) {
+      const ghostX = labelW + (hoverRef.current / total) * w;
+      ctx.save();
+      ctx.strokeStyle = "hsla(180, 90%, 60%, 0.55)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(ghostX, 0);
+      ctx.lineTo(ghostX, h);
+      ctx.stroke();
+      ctx.restore();
+      // small time tag
+      const label = `${Math.floor(hoverRef.current / 60)}:${Math.floor(hoverRef.current % 60).toString().padStart(2, "0")}`;
+      ctx.font = "10px ui-sans-serif, system-ui";
+      const padX = 4;
+      const tagW = ctx.measureText(label).width + padX * 2;
+      const tagH = 14;
+      const tagX = Math.min(cssW - tagW - 2, Math.max(labelW + 2, ghostX + 4));
+      ctx.fillStyle = "hsla(180, 90%, 60%, 0.85)";
+      ctx.fillRect(tagX, 2, tagW, tagH);
+      ctx.fillStyle = "hsl(220, 25%, 10%)";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, tagX + padX, 2 + tagH / 2);
+    }
   }, [notes, durationSec, noteRange]);
 
   // Redraw on data change & on resize
