@@ -374,7 +374,7 @@ const AudioToMidi = ({
     downloadBlob(blob, `${name}.mid`);
   };
 
-  const stageLabel = useMemo(() => STAGE_LABEL[progress.stage], [progress.stage]);
+  const stageLabel = STAGE_LABEL[progress.stage];
 
   const fmtTime = (s: number) => {
     const m = Math.floor(s / 60);
