@@ -380,7 +380,7 @@ const AudioToMidi = ({
 
   return (
     <div className="space-y-4">
-      <div className={infoSlot ? "grid gap-4 lg:grid-cols-[1.05fr_0.95fr]" : ""}>
+      <div>
         <Card className="equipment-card overflow-hidden border-border/80">
           <CardContent className="space-y-4 p-3 sm:p-6">
             <label
