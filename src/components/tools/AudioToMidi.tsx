@@ -469,7 +469,21 @@ const AudioToMidi = ({
               <canvas
                 ref={canvasRef}
                 onClick={handleCanvasClick}
-                className="h-72 w-full cursor-pointer sm:h-80"
+                onMouseMove={(e) => {
+                  const cv = canvasRef.current;
+                  if (!cv || durationSec === 0) return;
+                  const rect = cv.getBoundingClientRect();
+                  const labelW = 44;
+                  const usable = rect.width - labelW;
+                  const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left - labelW) / usable));
+                  hoverRef.current = ratio * durationSec;
+                  drawPianoRoll();
+                }}
+                onMouseLeave={() => {
+                  hoverRef.current = null;
+                  drawPianoRoll();
+                }}
+                className="h-72 w-full cursor-pointer sm:h-96"
               />
               <p className="mt-1 px-1 text-[11px] text-muted-foreground">
                 Clique sur la timeline pour te déplacer dans le morceau.
