@@ -35,8 +35,18 @@ interface PlayOpts {
   startAt?: number; // absolute audioCtx time
 }
 
+export interface NoteHandle {
+  stop: (when?: number) => void;
+}
+
 /** Play one MIDI note with the given timbre. Returns end time. */
 export function playNote(midi: number, timbre: Timbre = "piano", opts: PlayOpts = {}): number {
+  playNoteHandle(midi, timbre, opts);
+  return (opts.startAt ?? getAudioContext().currentTime) + (opts.durationMs ?? 600) / 1000;
+}
+
+/** Play one MIDI note and return a handle to stop it early. */
+export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: PlayOpts = {}): NoteHandle {
   const c = ensureContext();
   const out = masterGain!;
   const freq = midiToFreq(midi);
