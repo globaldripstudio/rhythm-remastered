@@ -117,11 +117,13 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
     noise.start(start);
 
     const peak = 0.5 * velocity;
-    gain.gain.exponentialRampToValueAtTime(peak, start + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    const attack = 0.014;
+    gain.gain.linearRampToValueAtTime(peak, start + attack);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.001), start + duration);
+    gain.gain.linearRampToValueAtTime(0, stopAt);
 
     o.start(start);
-    o.stop(start + duration + 0.05);
+    o.stop(stopAt);
     oscs.push(o);
   }
 
