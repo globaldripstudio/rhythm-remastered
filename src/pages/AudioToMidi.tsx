@@ -58,6 +58,9 @@ const AudioToMidiPage = () => {
             <AudioToMidiTool />
           </div>
 
+          {/* Full-width MIDI player slot — populated after analysis */}
+          <div id="audio2midi-player-slot" className="mt-8 empty:hidden" />
+
           {/* Bottom info boxes — user-friendly */}
           <section
             className="mt-8 grid gap-4 md:grid-cols-[1.1fr_0.9fr]"
