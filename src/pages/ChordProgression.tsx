@@ -88,7 +88,7 @@ const ChordProgression = () => {
 
   const initial = useMemo(loadSettings, []);
   const [tonic, setTonic] = useState<NoteName>(initial.tonic);
-  const [modeId, setModeId] = useState<ModeId>(initial.modeId);
+  const [modeId, setModeId] = useState<ModeId | "none">(initial.modeId);
   const [view, setView] = useState<ViewMode>(initial.view);
   const [bpm, setBpm] = useState(initial.bpm);
   const [beatsPerChord, setBeatsPerChord] = useState(initial.beatsPerChord);
@@ -100,30 +100,39 @@ const ChordProgression = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [progMode, setProgMode] = useState<"preset" | "builder">("preset");
-  // Builder maintient ses propres tokens, indépendants du preset en cours
   const [builderTokens, setBuilderTokens] = useState<string[]>([]);
   const [presetTokensBackup, setPresetTokensBackup] = useState<string[]>([]);
   const [presetIdBackup, setPresetIdBackup] = useState<string>(initial.presetId);
   const stopRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
+  // Mode effectif pour le calcul des accords (fallback ionian si "Aucun")
+  const effectiveModeId: ModeId = modeId === "none" ? "ionian" : modeId;
+
   const moodFromMode: "major" | "minor" =
-    MODES[modeId].diatonicQualities?.[0] === "min" ? "minor" : "major";
+    modeId === "none"
+      ? "major"
+      : MODES[modeId].diatonicQualities?.[0] === "min"
+      ? "minor"
+      : "major";
 
   // Persist
   useEffect(() => {
     try {
-      const data: PersistedSettings = { tonic, modeId, view, bpm, beatsPerChord, timbre, presetId };
+      const data: PersistedSettings = { tonic, modeId: effectiveModeId, view, bpm, beatsPerChord, timbre, presetId };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {
       /* ignore */
     }
-  }, [tonic, modeId, view, bpm, beatsPerChord, timbre, presetId]);
+  }, [tonic, modeId, view, bpm, beatsPerChord, timbre, presetId, effectiveModeId]);
 
-  const scalePcs = useMemo(() => scalePitchClasses(tonic, modeId), [tonic, modeId]);
+  const scalePcs = useMemo(
+    () => (modeId === "none" ? new Set<number>() : scalePitchClasses(tonic, modeId)),
+    [tonic, modeId],
+  );
 
   const chords: Chord[] = useMemo(
-    () => progressionFromRomans(tokens, tonic, modeId, 4),
-    [tokens, tonic, modeId],
+    () => progressionFromRomans(tokens, tonic, effectiveModeId, 4),
+    [tokens, tonic, effectiveModeId],
   );
 
   const highlightPcs = useMemo(() => {
