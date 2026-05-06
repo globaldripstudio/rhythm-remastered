@@ -496,7 +496,7 @@ const AudioToMidi = ({
                 className="h-72 w-full cursor-pointer sm:h-[28rem]"
               />
               <p className="mt-1 px-1 text-[11px] text-muted-foreground">
-                Clique sur la timeline pour te déplacer · le repère pointillé montre où la lecture reprendra.
+                {t("audio2midi.results.scrubHint")}
               </p>
             </div>
           </CardContent>
