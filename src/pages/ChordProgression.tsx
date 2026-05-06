@@ -259,7 +259,7 @@ const ChordProgression = () => {
         <Card className="mb-6 border-border/60">
           <CardContent className="grid gap-4 p-4 sm:p-6 md:grid-cols-4">
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tonique</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.tonic")}</Label>
               <Select value={tonic} onValueChange={(v) => setTonic(v as NoteName)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -268,7 +268,7 @@ const ChordProgression = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Mode / gamme</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.mode")}</Label>
               <Select value={modeId} onValueChange={(v) => setModeId(v as ModeId)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -279,26 +279,26 @@ const ChordProgression = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Affichage</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.view")}</Label>
               <div className="flex flex-wrap gap-1.5">
                 <Button size="sm" variant={view === "piano" ? "default" : "outline"} onClick={() => setView("piano")}>
-                  <Piano className="mr-1.5 h-4 w-4" /> Piano
+                  <Piano className="mr-1.5 h-4 w-4" /> {t("chordTools.controls.piano")}
                 </Button>
                 <Button size="sm" variant={view === "guitar" ? "default" : "outline"} onClick={() => setView("guitar")}>
-                  <Guitar className="mr-1.5 h-4 w-4" /> Guitare
+                  <Guitar className="mr-1.5 h-4 w-4" /> {t("chordTools.controls.guitar")}
                 </Button>
                 <Button size="sm" variant={view === "both" ? "default" : "outline"} onClick={() => setView("both")}>
-                  Les deux
+                  {t("chordTools.controls.both")}
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Timbre de lecture</Label>
+              <Label className="text-xs uppercase tracking-wide text-muted-foreground">{t("chordTools.controls.timbre")}</Label>
               <Select value={timbre} onValueChange={(v) => setTimbre(v as Timbre)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="piano">Piano</SelectItem>
-                  <SelectItem value="guitar">Guitare</SelectItem>
+                  <SelectItem value="piano">{t("chordTools.controls.piano")}</SelectItem>
+                  <SelectItem value="guitar">{t("chordTools.controls.guitar")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
