@@ -11,7 +11,7 @@ import Footer from "@/components/Footer";
 import ServiceModal from "@/components/ServiceModal";
 import SEO from "@/components/SEO";
 import { servicesData } from "@/components/Services";
-import { localBusinessSchema, organizationSchema, websiteSchema } from "@/lib/seo/schemas";
+import { organizationSchema, websiteSchema } from "@/lib/seo/schemas";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -37,7 +37,7 @@ const Index = () => {
         title={t('seo.home.title')}
         description={t('seo.home.description')}
         path="/"
-        jsonLd={[organizationSchema(), websiteSchema(), localBusinessSchema()]}
+        jsonLd={[organizationSchema(), websiteSchema()]}
       />
       <Header />
       <main>
