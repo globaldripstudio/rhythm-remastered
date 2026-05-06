@@ -60,9 +60,9 @@ export async function audioToMidiNotes(
   onProgress?: (p: AudioToMidiProgress) => void,
 ): Promise<{ notes: NoteEvent[]; durationSec: number }> {
   const opts = {
-    onsetThreshold: 0.5,
-    frameThreshold: 0.3,
-    minNoteDurationMs: 60,
+    onsetThreshold: 0.7,
+    frameThreshold: 0.45,
+    minNoteDurationMs: 120,
     inferOnsets: true,
     includePitchBends: false,
     ...options,
