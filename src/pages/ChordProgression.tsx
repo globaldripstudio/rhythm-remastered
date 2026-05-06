@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Copy,
   Dice5,
   Download,
   Guitar,
@@ -9,6 +8,8 @@ import {
   Pause,
   Piano,
   Play,
+  RotateCcw,
+  Undo2,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -36,9 +37,10 @@ import {
   chordFromRoman,
   progressionFromRomans,
   randomProgression,
+  suggestNextDegrees,
   type Chord,
 } from "@/lib/musicTheory/chords";
-import { playChord, getAudioContext } from "@/lib/musicTheory/audio";
+import { playChord, getAudioContext, stopAllNotes } from "@/lib/musicTheory/audio";
 import { chordsToMidiBlob, downloadBlob } from "@/lib/musicTheory/midiExport";
 import { PianoKeyboard } from "@/components/music/PianoKeyboard";
 import { GuitarFretboard } from "@/components/music/GuitarFretboard";
