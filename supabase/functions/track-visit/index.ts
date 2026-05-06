@@ -5,7 +5,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
-const ALLOWED_EVENT_TYPES = ['page_view', 'button_click', 'cta_click']
+const ALLOWED_EVENT_TYPES = ['page_view', 'button_click', 'cta_click', 'form_submit']
+
+// Comma-separated list of IPs to exclude from analytics (owner's own visits/clicks)
+const EXCLUDED_IPS = (Deno.env.get('ANALYTICS_EXCLUDED_IPS') || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
 
 const truncate = (val: string | null | undefined, max: number): string | null => {
   if (!val) return null
