@@ -184,7 +184,7 @@ const ChordProgression = () => {
   const handleCopy = () => {
     const text = chords.map((c) => c.symbol).join(" – ");
     navigator.clipboard.writeText(text);
-    toast({ title: "Copié", description: text });
+    toast({ title: t("chordTools.progression.copiedTitle"), description: text });
   };
 
   const handleExport = () => {
