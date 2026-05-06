@@ -111,7 +111,7 @@ const ChordProgression = () => {
   const moodFromMode: "major" | "minor" =
     modeId === "none"
       ? "major"
-      : MODES[modeId].diatonicQualities?.[0] === "min"
+      : MODES[modeId as ModeId].diatonicQualities?.[0] === "min"
       ? "minor"
       : "major";
 
@@ -256,7 +256,7 @@ const ChordProgression = () => {
 
   const handleExport = () => {
     const blob = chordsToMidiBlob(chords, bpm, beatsPerChord);
-    downloadBlob(blob, `progression-${tonic}-${modeId}.mid`);
+    downloadBlob(blob, `progression-${tonic}-${effectiveModeId}.mid`);
   };
 
   const handleEditToken = (idx: number, value: string) => {
@@ -533,7 +533,7 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Piano className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic, mode: MODES[modeId].label })}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.pianoTitle", { tonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
                 </div>
                 <PianoKeyboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
                 <p className="text-xs text-muted-foreground">{t("chordTools.viz.pianoHint")}</p>
@@ -545,7 +545,7 @@ const ChordProgression = () => {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <div className="flex items-center gap-2">
                   <Guitar className="h-4 w-4 text-primary" />
-                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic, mode: MODES[modeId].label })}</h3>
+                  <h3 className="text-base font-semibold">{t("chordTools.viz.guitarTitle", { tonic, mode: (modeId === "none" ? "" : MODES[modeId].label) })}</h3>
                 </div>
                 <GuitarFretboard scalePcs={scalePcs} tonic={tonic} highlightPcs={highlightPcs} />
                 <p className="text-xs text-muted-foreground">{t("chordTools.viz.guitarHint")}</p>
