@@ -5,6 +5,7 @@ export type Timbre = "piano" | "guitar";
 
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
+const activeHandles = new Set<NoteHandle>();
 
 function ensureContext(): AudioContext {
   if (!ctx) {
@@ -37,6 +38,15 @@ interface PlayOpts {
 
 export interface NoteHandle {
   stop: (when?: number) => void;
+}
+
+/** Stop every currently sounding note immediately (with short release). */
+export function stopAllNotes() {
+  const c = ensureContext();
+  activeHandles.forEach((h) => {
+    try { h.stop(c.currentTime); } catch { /* noop */ }
+  });
+  activeHandles.clear();
 }
 
 /** Play one MIDI note with the given timbre. Returns end time. */
