@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Drum, Gauge, KeyRound, Menu, Music2, Music4, Phone, Wrench, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { trackCTAClick } from "@/hooks/usePageTracking";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,6 +17,7 @@ const Header = () => {
   };
 
   const scrollToContact = () => {
+    trackCTAClick('devis_header');
     const contactSection = document.getElementById('contact');
     if (contactSection) {
       const yOffset = -100;

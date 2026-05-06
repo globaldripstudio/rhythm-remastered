@@ -455,6 +455,49 @@
         "backToBlog": "Retourner au blog",
         "listenOnSpotify": "Écoutez Le Premier Sang sur Spotify, produit au Global Drip Studio"
       },
+      "toolkit": {
+        "badge": "Toolkit",
+        "title": "Le toolkit Global Drip : 5 outils audio gratuits en ligne",
+        "subtitle": "Cinq outils audio professionnels, gratuits et 100 % dans le navigateur, pensés pour les producteurs, DJs et ingés son.",
+        "meta": "Global Drip Studio • 6 mai 2026 • 5 min de lecture",
+        "intro": "Au fil des projets passés au studio, on a constaté qu'on tirait régulièrement les mêmes petits utilitaires : un compteur LUFS pour vérifier un master, un détecteur de tonalité pour caler un sample, un métronome rapide pour valider une grille... La plupart de ces outils existent en plugin ou en logiciel dédié, mais on voulait les rendre <strong>accessibles à tous, sans installation, sans inscription, et entièrement côté navigateur</strong>. C'est l'idée derrière le toolkit Global Drip.",
+        "whyTitle": "Pourquoi un toolkit en ligne ?",
+        "whyP1": "Trois raisons principales : la <strong>rapidité</strong> (un onglet, pas d'install), la <strong>confidentialité</strong> (les fichiers ne quittent jamais votre machine, tout est traité localement), et la <strong>simplicité</strong> (zéro courbe d'apprentissage : on ouvre, on glisse un fichier, on a la réponse).",
+        "whyP2": "Tous les outils sont conçus comme des compagnons de production : on ne remplace pas un DAW ni un plugin de mastering, on offre une vérification rapide ou un raccourci utile au quotidien.",
+        "toolsTitle": "Les 5 outils du toolkit",
+        "useCaseLabel": "Cas d'usage :",
+        "openTool": "Ouvrir l'outil →",
+        "philosophyTitle": "Une philosophie : faire simple, faire utile",
+        "philosophyP1": "Pas de plugin à installer, pas de compte à créer, pas de file d'attente. <strong>Aucun fichier n'est envoyé sur un serveur : tout reste dans votre onglet.</strong> C'est un parti pris : votre projet ne nous appartient pas, et il n'a aucune raison de transiter ailleurs que sur votre machine.",
+        "philosophyP2": "Côté ergonomie, on a passé un temps fou à dégraisser. Chaque outil est pensé comme un instrument de précision : juste ce qu'il faut d'options, des résultats lisibles, et <strong>des résultats interprétables sans formation technique. Le but : qu'un beatmaker débutant comme un ingé son confirmé y trouve son compte en moins de trente secondes.</strong>",
+        "tools": {
+          "loudness": {
+            "name": "Loudness Analyzer LUFS",
+            "short": "Mesurez la loudness intégrée, le true peak, la LRA et la dynamique de votre master directement dans le navigateur, sans upload serveur. Idéal pour vérifier qu'un mix respecte les cibles streaming (Spotify, Apple Music, YouTube) avant export final.",
+            "use": "Avant chaque livraison master, pour valider la conformité aux normes de diffusion et anticiper la normalisation des plateformes."
+          },
+          "keybpm": {
+            "name": "Key & BPM Finder",
+            "short": "Détection automatique de la tonalité, du tempo et du code Camelot d'un fichier audio. 100% local, parfait pour DJs, producteurs et beatmakers qui veulent organiser leurs samples ou préparer un set harmonique.",
+            "use": "Tri rapide d'une bibliothèque de samples, repérage de la key d'un instru avant un mix DJ, ou vérification du tempo d'une boucle."
+          },
+          "tempo": {
+            "name": "Tap Tempo, Métronome & Calculateur BPM",
+            "short": "Trois outils en un : tap tempo précis, métronome avec subdivisions, et calculateur de millisecondes pour caler delays et reverbs sur le tempo. L'arsenal incontournable du producteur en studio comme en répétition.",
+            "use": "Trouver le BPM d'un morceau au feeling, régler un delay synchronisé sans plugin, ou répéter à un tempo stable."
+          },
+          "chords": {
+            "name": "Accords, gammes & modes",
+            "short": "Générateur de progressions d'accords avec piano et manche de guitare interactifs. Presets de morceaux célèbres (Money So Big, Rage, reggae...), choix libre de la tonique, écoute des accords à la bonne octave.",
+            "use": "Composer rapidement une trame harmonique, apprendre les bases du voicing, ou décortiquer la grille d'un morceau connu."
+          },
+          "audio2midi": {
+            "name": "Audio → MIDI",
+            "short": "Conversion polyphonique audio vers MIDI 100% locale, basée sur Basic Pitch. Importez le résultat directement dans votre DAW pour réharmoniser, transposer ou repiquer une mélodie sans effort.",
+            "use": "Repiquer une ligne mélodique, transformer une voix en MIDI pour la rejouer avec un synthé, ou extraire les accords d'un sample."
+          }
+        }
+      },
       "compression": {
         "badge": "Techniques",
         "title": "Comprendre la compression en cinq minutes",
@@ -919,9 +962,9 @@
       "title": "Analyse LUFS en ligne gratuite | True Peak & LRA",
       "description": "Analysez un fichier audio en ligne : LUFS intégré, true peak dBTP, LRA, momentary/short-term et rapport PDF, sans upload serveur."
     },
-    "loudnessArticle": {
-      "title": "Analyse LUFS en ligne : contrôler un master | Global Drip",
-      "description": "Présentation de notre analyseur LUFS en ligne : true peak, LRA, loudness intégrée, courbe et rapport PDF pour préparer vos masters."
+    "toolkitArticle": {
+      "title": "Toolkit audio gratuit en ligne : 5 outils pros | Global Drip",
+      "description": "Loudness LUFS, Key & BPM finder, tap tempo, accords interactifs et conversion Audio → MIDI : 5 outils gratuits, sans inscription, 100 % dans le navigateur."
     },
     "keybpm": {
       "title": "Key & BPM Finder gratuit en ligne | Détecteur de tonalité et tempo",

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare, Loader2, Paperclip, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { trackFormSubmit } from "@/hooks/usePageTracking";
 import { useTranslation } from "react-i18next";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -94,6 +95,7 @@ const Contact = () => {
         body: { ...formData, attachmentData, attachmentName, attachmentType }
       });
       if (error) throw error;
+      trackFormSubmit('contact_form', formData.service || null);
       toast({ title: t('contact.form.success'), description: t('contact.form.successDesc') });
       setFormData({ firstName: "", lastName: "", email: "", phone: "", service: "", message: "" });
       setAttachment(null);

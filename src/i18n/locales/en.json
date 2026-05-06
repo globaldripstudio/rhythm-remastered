@@ -455,6 +455,49 @@
         "backToBlog": "Back to blog",
         "listenOnSpotify": "Listen to Le Premier Sang on Spotify, produced at Global Drip Studio"
       },
+      "toolkit": {
+        "badge": "Toolkit",
+        "title": "The Global Drip toolkit: 5 free online audio tools",
+        "subtitle": "Five professional audio tools, free and entirely in your browser, built for producers, DJs and audio engineers.",
+        "meta": "Global Drip Studio • May 6, 2026 • 5 min read",
+        "intro": "Across the projects passing through the studio, we noticed we kept reaching for the same small utilities: a LUFS meter to check a master, a key detector to fit a sample, a quick metronome to validate a chord grid... Most of these tools exist as plugins or dedicated software, but we wanted to make them <strong>accessible to everyone, with no install, no signup, and entirely in the browser</strong>. That's the idea behind the Global Drip toolkit.",
+        "whyTitle": "Why an online toolkit?",
+        "whyP1": "Three main reasons: <strong>speed</strong> (one tab, no install), <strong>privacy</strong> (files never leave your machine, everything is processed locally), and <strong>simplicity</strong> (zero learning curve: open, drop a file, get the answer).",
+        "whyP2": "Each tool is designed as a production companion: we don't replace a DAW or a mastering plugin, we offer a quick check or a handy shortcut for everyday work.",
+        "toolsTitle": "The 5 tools in the toolkit",
+        "useCaseLabel": "Use case:",
+        "openTool": "Open the tool →",
+        "philosophyTitle": "A philosophy: keep it simple, keep it useful",
+        "philosophyP1": "No plugin to install, no account to create, no queue. <strong>No file is sent to a server: everything stays in your tab.</strong> It's a deliberate choice: your project doesn't belong to us, and there's no reason for it to travel anywhere other than your own machine.",
+        "philosophyP2": "On the UX side, we spent a huge amount of time trimming the fat. Every tool is built like a precision instrument: just the right amount of options, readable outputs, and <strong>results that can be interpreted without technical training. The goal: a beginner beatmaker and a seasoned audio engineer should both find what they need in under thirty seconds.</strong>",
+        "tools": {
+          "loudness": {
+            "name": "LUFS Loudness Analyzer",
+            "short": "Measure integrated loudness, true peak, LRA and dynamics of your master directly in the browser, with no server upload. Perfect for checking that a mix meets streaming targets (Spotify, Apple Music, YouTube) before final export.",
+            "use": "Before every master delivery, to validate compliance with broadcast standards and anticipate platform normalization."
+          },
+          "keybpm": {
+            "name": "Key & BPM Finder",
+            "short": "Automatic detection of key, tempo and Camelot code from an audio file. 100% local, ideal for DJs, producers and beatmakers organizing their samples or preparing a harmonic set.",
+            "use": "Quick sorting of a sample library, spotting the key of an instrumental before a DJ mix, or verifying the tempo of a loop."
+          },
+          "tempo": {
+            "name": "Tap Tempo, Metronome & BPM Calculator",
+            "short": "Three tools in one: precise tap tempo, metronome with subdivisions, and a millisecond calculator to lock delays and reverbs to tempo. The producer's essential toolkit, in studio or in rehearsal.",
+            "use": "Find a track's BPM by feel, set a tempo-synced delay without a plugin, or rehearse to a steady click."
+          },
+          "chords": {
+            "name": "Chords, scales & modes",
+            "short": "Chord progression generator with interactive piano and guitar fretboard. Presets from famous tracks (Money So Big, Rage, reggae...), free choice of tonic, chords played at the right octave.",
+            "use": "Quickly sketch a harmonic frame, learn the basics of voicing, or break down the grid of a well-known track."
+          },
+          "audio2midi": {
+            "name": "Audio → MIDI",
+            "short": "Polyphonic audio-to-MIDI conversion, fully local, powered by Basic Pitch. Import the result straight into your DAW to reharmonize, transpose or replay a melody effortlessly.",
+            "use": "Transcribe a melodic line, turn a vocal into MIDI to replay it with a synth, or extract the chords of a sample."
+          }
+        }
+      },
       "compression": {
         "badge": "Techniques",
         "title": "Understanding compression in five minutes",
@@ -919,9 +962,9 @@
       "title": "Free Online LUFS Analyzer | True Peak & LRA",
       "description": "Analyze audio online: integrated LUFS, true peak dBTP, LRA, momentary/short-term loudness and PDF report, with no server upload."
     },
-    "loudnessArticle": {
-      "title": "Online LUFS analysis: check a master | Global Drip",
-      "description": "Introducing our online LUFS analyzer: true peak, LRA, integrated loudness, curve and PDF report to prepare your masters."
+    "toolkitArticle": {
+      "title": "Free online audio toolkit: 5 pro tools | Global Drip",
+      "description": "LUFS loudness, Key & BPM finder, tap tempo, interactive chords and Audio → MIDI: 5 free tools, no signup, 100% in your browser."
     },
     "keybpm": {
       "title": "Free Online Key & BPM Finder | Tempo and Musical Key Detector",

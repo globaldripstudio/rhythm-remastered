@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { trackCTAClick } from "@/hooks/usePageTracking";
 
 interface ContactCTAProps {
   className?: string;
@@ -43,6 +44,7 @@ const ContactCTA = ({
   };
 
   const handleClick = () => {
+    trackCTAClick(`devis_box:${location.pathname}`);
     if (location.pathname === "/") {
       scrollToContact();
     } else {

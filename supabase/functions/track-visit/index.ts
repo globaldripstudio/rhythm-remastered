@@ -5,7 +5,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
-const ALLOWED_EVENT_TYPES = ['page_view', 'button_click', 'cta_click']
+const ALLOWED_EVENT_TYPES = ['page_view', 'button_click', 'cta_click', 'form_submit']
+
+// Comma-separated list of IPs to exclude from analytics (owner's own visits/clicks)
+const EXCLUDED_IPS = (Deno.env.get('ANALYTICS_EXCLUDED_IPS') || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
 
 const truncate = (val: string | null | undefined, max: number): string | null => {
   if (!val) return null
@@ -57,6 +63,13 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Too many requests' }), {
         status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Silently drop owner's own traffic (analytics exclusion)
+    if (EXCLUDED_IPS.includes(ip_address)) {
+      return new Response(JSON.stringify({ success: true, excluded: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
