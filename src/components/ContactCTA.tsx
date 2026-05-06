@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { trackCTAClick } from "@/hooks/usePageTracking";
 
 interface ContactCTAProps {
   className?: string;
