@@ -56,6 +56,7 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
 
   const gain = c.createGain();
   gain.gain.setValueAtTime(0.0001, start);
+  const oscs: OscillatorNode[] = [];
 
   if (timbre === "piano") {
     // Triangle + sine harmonic + soft envelope
