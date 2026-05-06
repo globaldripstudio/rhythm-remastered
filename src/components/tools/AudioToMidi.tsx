@@ -47,6 +47,7 @@ const AudioToMidi = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [playheadSec, setPlayheadSec] = useState(0);
   const playheadRef = useRef(0);
+  const hoverRef = useRef<number | null>(null);
   const transportRef = useRef<{
     startedAtCtx: number;
     startedAtSec: number;
