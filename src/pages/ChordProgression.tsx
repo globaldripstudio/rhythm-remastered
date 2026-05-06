@@ -177,23 +177,46 @@ const ChordProgression = () => {
   const handlePlayChord = (idx: number) => {
     const c = chords[idx];
     if (!c) return;
+    stopAllNotes();
     setActiveIndex(idx);
     playChord(c.midi, timbre, { durationMs: 1400, velocity: 0.8 });
     window.setTimeout(() => setActiveIndex((cur) => (cur === idx ? null : cur)), 1300);
   };
 
   const handleRandomize = () => {
-    const mood = (MODES[modeId].diatonicQualities?.[0] === "min" ? "minor" : "major") as
-      | "minor"
-      | "major";
-    setTokens(randomProgression(mood));
+    setTokens(randomProgression(moodFromMode));
     setPresetId("custom");
   };
 
-  const handleCopy = () => {
-    const text = chords.map((c) => c.symbol).join(" – ");
-    navigator.clipboard.writeText(text);
-    toast({ title: t("chordTools.progression.copiedTitle"), description: text });
+  // ===== Builder guidé (arborescence) =====
+  const builderSuggestions = useMemo(() => {
+    if (tokens.length === 0) {
+      return suggestNextDegrees("I", moodFromMode);
+    }
+    return suggestNextDegrees(tokens[tokens.length - 1], moodFromMode);
+  }, [tokens, moodFromMode]);
+
+  const handleBuilderPick = (deg: string) => {
+    const next = [...tokens, deg];
+    setTokens(next);
+    setPresetId("custom");
+    // Pré-écoute de l'accord choisi
+    try {
+      const c = chordFromRoman(deg, tonic, modeId, 4);
+      stopAllNotes();
+      playChord(c.midi, timbre, { durationMs: 900, velocity: 0.75 });
+    } catch { /* noop */ }
+  };
+
+  const handleBuilderReset = () => {
+    setTokens([]);
+    setPresetId("custom");
+  };
+
+  const handleBuilderUndo = () => {
+    if (tokens.length === 0) return;
+    setTokens(tokens.slice(0, -1));
+    setPresetId("custom");
   };
 
   const handleExport = () => {
