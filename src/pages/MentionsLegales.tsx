@@ -36,8 +36,11 @@ const MentionsLegales = () => {
             <p className="text-muted-foreground">
               {t('legalPages.mentions.s3text')}<br /><br />
               <strong className="text-foreground">{t('legalPages.mentions.s3host')}</strong><br />
-              {t('legalPages.mentions.s3hostDesc')}<br />
-              {t('legalPages.mentions.s3hostContact')}
+              {t('legalPages.mentions.s3hostAddress1')}<br />
+              {t('legalPages.mentions.s3hostAddress2')}<br />
+              {t('legalPages.mentions.s3hostRcs')}<br />
+              {t('legalPages.mentions.s3hostPhone')}<br />
+              {t('legalPages.mentions.s3hostSite')}
             </p>
           </section>
 
