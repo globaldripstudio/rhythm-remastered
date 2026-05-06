@@ -420,9 +420,9 @@ const AudioToMidi = ({
                 )}
               </div>
               <h2 className="mb-2 text-xl font-bold sm:mb-3 sm:text-2xl">
-                {isProcessing ? uploadAnalyzingTitle : uploadTitle}
+                {isProcessing ? _uploadAnalyzing : _uploadTitle}
               </h2>
-              <p className="max-w-md text-sm text-muted-foreground">{uploadDescription}</p>
+              <p className="max-w-md text-sm text-muted-foreground">{_uploadDescription}</p>
               {file && !isProcessing && (
                 <p className="mt-4 text-xs text-muted-foreground">
                   <FileAudio className="mr-1 inline h-3.5 w-3.5" />
