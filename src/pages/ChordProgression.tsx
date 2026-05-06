@@ -384,7 +384,7 @@ const ChordProgression = () => {
                     size="sm"
                     variant={progMode === "preset" ? "default" : "ghost"}
                     className="h-7 px-2.5 text-xs"
-                    onClick={() => setProgMode("preset")}
+                    onClick={() => handleSwitchProgMode("preset")}
                   >
                     {t("chordTools.progression.modePreset")}
                   </Button>
@@ -392,7 +392,7 @@ const ChordProgression = () => {
                     size="sm"
                     variant={progMode === "builder" ? "default" : "ghost"}
                     className="h-7 px-2.5 text-xs"
-                    onClick={() => setProgMode("builder")}
+                    onClick={() => handleSwitchProgMode("builder")}
                   >
                     {t("chordTools.progression.modeBuilder")}
                   </Button>
