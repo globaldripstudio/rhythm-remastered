@@ -131,41 +131,65 @@ export interface ProgressionPreset {
 export const PROGRESSION_PRESETS: ProgressionPreset[] = [
   // Pop — grilles ultra-classiques avec morceaux de référence
   { id: "pop-axis", label: "Let It Be — The Beatles (I–V–vi–IV)", genre: "Pop", tokens: ["I", "V", "vi", "IV"], mood: "major", defaultTonic: "C" },
-  { id: "pop-sensitive", label: "Zombie — The Cranberries (vi–IV–I–V)", genre: "Pop", tokens: ["vi", "IV", "I", "V"], mood: "major", defaultTonic: "E" },
-  { id: "pop-50s", label: "Stand By Me (I–vi–IV–V)", genre: "Pop", tokens: ["I", "vi", "IV", "V"], mood: "major", defaultTonic: "A" },
+  // Zombie : Em–C–G–D = vi–IV–I–V dans la tonalité de Sol majeur
+  { id: "pop-zombie", label: "Zombie — The Cranberries (vi–IV–I–V)", genre: "Pop", tokens: ["vi", "IV", "I", "V"], mood: "major", defaultTonic: "G" },
+  { id: "pop-50s", label: "Stand By Me — Ben E. King (I–vi–IV–V)", genre: "Pop", tokens: ["I", "vi", "IV", "V"], mood: "major", defaultTonic: "A" },
   { id: "pop-canon", label: "Canon de Pachelbel (I–V–vi–iii–IV–I–IV–V)", genre: "Pop", tokens: ["I", "V", "vi", "iii", "IV", "I", "IV", "V"], mood: "major", defaultTonic: "D" },
   { id: "pop-someone", label: "Someone Like You — Adele (I–iii–vi–IV)", genre: "Pop", tokens: ["I", "iii", "vi", "IV"], mood: "major", defaultTonic: "A" },
+  // Don't Stop Believin' : E–B–C#m–A = I–V–vi–IV (E majeur)
+  { id: "pop-believin", label: "Don't Stop Believin' — Journey (I–V–vi–IV)", genre: "Pop", tokens: ["I", "V", "vi", "IV"], mood: "major", defaultTonic: "E" },
+  // Hallelujah : C–Am–C–Am–F–G–C–G en Do majeur
+  { id: "pop-hallelujah", label: "Hallelujah — L. Cohen (I–vi–IV–V–I)", genre: "Pop", tokens: ["I", "vi", "I", "vi", "IV", "V", "I", "V"], mood: "major", defaultTonic: "C" },
+
   // RnB / Soul
-  { id: "rnb-sunday", label: "Sunday Morning — Maroon 5 (ii7–V7–Imaj7)", genre: "RnB / Soul", tokens: ["ii7", "V7", "Imaj7"], mood: "major", defaultTonic: "C" },
-  { id: "rnb-neo", label: "Neo Soul — D'Angelo style (Imaj7–iii7–vi7–IV)", genre: "RnB / Soul", tokens: ["Imaj7", "iii7", "vi7", "IV"], mood: "major", defaultTonic: "F" },
+  // Sunday Morning : Em7–A7–Dmaj7 → ii7–V7–Imaj7 en Ré majeur
+  { id: "rnb-sunday", label: "Sunday Morning — Maroon 5 (ii7–V7–Imaj7)", genre: "RnB / Soul", tokens: ["ii7", "V7", "Imaj7"], mood: "major", defaultTonic: "D" },
+  { id: "rnb-neo", label: "Neo Soul (Imaj7–iii7–vi7–IV)", genre: "RnB / Soul", tokens: ["Imaj7", "iii7", "vi7", "IV"], mood: "major", defaultTonic: "F" },
   { id: "rnb-quiet", label: "Quiet Storm — Sade style (Imaj7–vi7–ii7–V7)", genre: "RnB / Soul", tokens: ["Imaj7", "vi7", "ii7", "V7"], mood: "major", defaultTonic: "F" },
+
   // PluggnB
   { id: "plug-dreamy", label: "Dreamy plugg (Imaj7–iii7–vi7–IV)", genre: "PluggnB", tokens: ["Imaj7", "iii7", "vi7", "IV"], mood: "major", defaultTonic: "C" },
-  { id: "plug-floating", label: "Floating plugg (vi7–Imaj7–iii7–IV)", genre: "PluggnB", tokens: ["vi7", "Imaj7", "iii7", "IV"], mood: "major", defaultTonic: "C" },
+
   // Rage — boucles mineures sombres
   { id: "yeat-getbusy", label: "Gët Busy — Yeat (i–bVI–bVII–v)", genre: "Rage", tokens: ["i", "bVI", "bVII", "v"], mood: "minor", defaultTonic: "F#" },
   { id: "yeat-richminion", label: "Rich Minion — Yeat (i–bVII–bVI–bVII)", genre: "Rage", tokens: ["i", "bVII", "bVI", "bVII"], mood: "minor", defaultTonic: "G" },
   { id: "yeat-moneysobig", label: "Money So Big — Yeat (i–bIII–bVII–iv)", genre: "Rage", tokens: ["i", "bIII", "bVII", "iv"], mood: "minor", defaultTonic: "F#" },
   { id: "yeat-money", label: "Money Twërk — Yeat (i–v–bVI–bVII)", genre: "Rage", tokens: ["i", "v", "bVI", "bVII"], mood: "minor", defaultTonic: "G" },
+
   // Trap / Drill
-  { id: "trap-maskoff", label: "Mask Off — Future (i–bVII–bVI–bVII)", genre: "Trap / Drill", tokens: ["i", "bVII", "bVI", "bVII"], mood: "minor", defaultTonic: "F" },
+  // Mask Off : Fm boucle flûte (i–bIII–iv)
+  { id: "trap-maskoff", label: "Mask Off — Future (i–bIII–iv–i)", genre: "Trap / Drill", tokens: ["i", "bIII", "iv", "i"], mood: "minor", defaultTonic: "F" },
   { id: "trap-xo", label: "XO Tour Llif3 — Lil Uzi (i–bVI–bIII–bVII)", genre: "Trap / Drill", tokens: ["i", "bVI", "bIII", "bVII"], mood: "minor", defaultTonic: "C#" },
-  { id: "trap-memphis", label: "Memphis (i–bII–i–bVII)", genre: "Trap / Drill", tokens: ["i", "bII", "i", "bVII"], mood: "minor", defaultTonic: "A" },
+  { id: "trap-memphis", label: "Memphis phrygien (i–bII–i–bVII)", genre: "Trap / Drill", tokens: ["i", "bII", "i", "bVII"], mood: "minor", defaultTonic: "A" },
+
   // Reggae — riddims classiques
+  // No Woman No Cry : C–G–Am–F = I–V–vi–IV (Do majeur)
   { id: "reggae-noooman", label: "No Woman No Cry — Bob Marley (I–V–vi–IV)", genre: "Reggae", tokens: ["I", "V", "vi", "IV"], mood: "major", defaultTonic: "C" },
   { id: "reggae-threelitle", label: "Three Little Birds — Bob Marley (I–IV–I–V)", genre: "Reggae", tokens: ["I", "IV", "I", "V"], mood: "major", defaultTonic: "A" },
-  { id: "reggae-rootsminor", label: "Roots reggae mineur (i–bVII–bVI–bVII)", genre: "Reggae", tokens: ["i", "bVII", "bVI", "bVII"], mood: "minor", defaultTonic: "A" },
+  // Get Up Stand Up : Cm groove mineur (i–bVII)
+  { id: "reggae-getupstandup", label: "Get Up Stand Up — Bob Marley (i–bVII)", genre: "Reggae", tokens: ["i", "bVII", "i", "bVII"], mood: "minor", defaultTonic: "C" },
+
   // Lo-fi / Jazz
   { id: "jazz-251", label: "ii–V–I jazz (ii7–V7–Imaj7)", genre: "Lo-fi / Jazz", tokens: ["ii7", "V7", "Imaj7"], mood: "major", defaultTonic: "C" },
-  { id: "jazz-1625", label: "Rhythm Changes (Imaj7–vi7–ii7–V7)", genre: "Lo-fi / Jazz", tokens: ["Imaj7", "vi7", "ii7", "V7"], mood: "major", defaultTonic: "C" },
+  { id: "jazz-1625", label: "Rhythm changes (Imaj7–vi7–ii7–V7)", genre: "Lo-fi / Jazz", tokens: ["Imaj7", "vi7", "ii7", "V7"], mood: "major", defaultTonic: "C" },
   { id: "lofi-1", label: "Lo-fi nostalgique (Imaj7–iii7–IVmaj7–iv)", genre: "Lo-fi / Jazz", tokens: ["Imaj7", "iii7", "IV", "iv"], mood: "major", defaultTonic: "C" },
   { id: "lofi-2", label: "Bossa nova (ii7–V7–Imaj7–vi7)", genre: "Lo-fi / Jazz", tokens: ["ii7", "V7", "Imaj7", "vi7"], mood: "major", defaultTonic: "F" },
+  // Autumn Leaves : ii7–V7–Imaj7–IVmaj7–vii(ø)–III7–vi en Sol majeur (relatif Em)
+  { id: "jazz-autumn", label: "Autumn Leaves (ii7–V7–Imaj7–IVmaj7)", genre: "Lo-fi / Jazz", tokens: ["ii7", "V7", "Imaj7", "IV"], mood: "major", defaultTonic: "G" },
+
   // House / Deep
   { id: "house-strobe", label: "Strobe — Deadmau5 (I–vi–IV–V)", genre: "House / Deep", tokens: ["I", "vi", "IV", "V"], mood: "major", defaultTonic: "B" },
+  // Levels : Bm groove (i–bVI–bIII–bVII)
+  { id: "house-levels", label: "Levels — Avicii (i–bVI–bIII–bVII)", genre: "House / Deep", tokens: ["i", "bVI", "bIII", "bVII"], mood: "minor", defaultTonic: "C#" },
+
   // Rock / Indie
+  // Wonderwall (capo 2) sonne F#m–A–E–B = i–bIII–bVII–IV (F# mineur)
   { id: "rock-wonderwall", label: "Wonderwall — Oasis (i–bIII–bVII–IV)", genre: "Rock / Indie", tokens: ["i", "bIII", "bVII", "IV"], mood: "minor", defaultTonic: "F#" },
   { id: "rock-seven", label: "Seven Nation Army — White Stripes (i–bIII–i–bVII–bVI)", genre: "Rock / Indie", tokens: ["i", "bIII", "i", "bVII", "bVI"], mood: "minor", defaultTonic: "E" },
   { id: "rock-teenspirit", label: "Smells Like Teen Spirit — Nirvana (I–IV–bIII–bVI)", genre: "Rock / Indie", tokens: ["I", "IV", "bIII", "bVI"], mood: "major", defaultTonic: "F" },
+  // Hotel California (intro) : Bm–F#–A–E–G–D–Em–F# = i–V–bVII–IV–bVI–bIII–iv–V
+  { id: "rock-hotel", label: "Hotel California — Eagles (i–V–bVII–IV–bVI–bIII–iv–V)", genre: "Rock / Indie", tokens: ["i", "V", "bVII", "IV", "bVI", "bIII", "iv", "V"], mood: "minor", defaultTonic: "B" },
+
   // Cinématique
   { id: "cine-hittheroad", label: "Hit the Road Jack — Ray Charles (i–bVII–bVI–V)", genre: "Cinématique", tokens: ["i", "bVII", "bVI", "V"], mood: "minor", defaultTonic: "A" },
 ];
