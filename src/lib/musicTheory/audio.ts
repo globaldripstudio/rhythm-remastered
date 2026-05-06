@@ -131,13 +131,15 @@ export function playNoteHandle(midi: number, timbre: Timbre = "piano", opts: Pla
   return {
     stop: (when?: number) => {
       const w = when ?? c.currentTime;
+      const rel = 0.06;
       try {
+        const cur = Math.max(0.0001, gain.gain.value);
         gain.gain.cancelScheduledValues(w);
-        gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), w);
-        gain.gain.exponentialRampToValueAtTime(0.0001, w + 0.04);
+        gain.gain.setValueAtTime(cur, w);
+        gain.gain.linearRampToValueAtTime(0, w + rel);
       } catch { /* noop */ }
       oscs.forEach((o) => {
-        try { o.stop(w + 0.05); } catch { /* noop */ }
+        try { o.stop(w + rel + 0.02); } catch { /* noop */ }
       });
     },
   };
