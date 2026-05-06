@@ -45,7 +45,7 @@ const ToolkitHeader = ({ current }: ToolkitHeaderProps) => {
               </Button>
             </Link>
             <div className="mx-1 hidden h-6 w-px shrink-0 bg-border/60 sm:block" />
-            <nav className="flex flex-1 items-center justify-around gap-2 sm:gap-4">
+            <nav className="flex flex-1 items-center justify-center gap-3 sm:gap-6">
               {TOOLS.filter((tool) => tool.key !== current).map((tool) => {
                 const Icon = tool.icon;
                 return (
