@@ -12,6 +12,9 @@ import {
   RotateCcw,
 } from "lucide-react";
 import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ToolResources from "@/components/tools/ToolResources";
+import { breadcrumbSchema, softwareAppSchema } from "@/lib/seo/schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
