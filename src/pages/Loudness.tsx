@@ -392,15 +392,27 @@ const LoudnessCurve = ({ data, focus, onFocusChange, hoveredIndex, onHoverChange
           const x = paddingLeft + (tick / timeMax) * (width - paddingLeft - paddingRight);
           return <text key={tick} x={x} y={height - 22} textAnchor="middle" className="fill-muted-foreground text-[10px]">{formatDuration(tick)}</text>;
         })}
-        {loudnessMarkers.map((marker) => {
-          const y = paddingTop + ((maxValue - marker.value) / valueRange) * (height - paddingTop - paddingBottom);
-          return y >= paddingTop && y <= height - paddingBottom ? (
-            <g key={marker.value}>
-              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} className="stroke-border/60" strokeDasharray="5 6" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-              <text x={width - paddingRight + 12} y={y + 4} textAnchor="start" className="fill-muted-foreground text-[10px]">{marker.label}</text>
-            </g>
-          ) : null;
-        })}
+        {(() => {
+          const entries = loudnessMarkers
+            .map((marker) => ({ marker, y: paddingTop + ((maxValue - marker.value) / valueRange) * (height - paddingTop - paddingBottom) }))
+            .filter((entry) => entry.y >= paddingTop && entry.y <= height - paddingBottom)
+            .sort((a, b) => a.y - b.y);
+          let lastY = -Infinity;
+          let lastCol = 1;
+          return entries.map(({ marker, y }) => {
+            const tooClose = y - lastY < 14;
+            const col = tooClose ? (lastCol === 0 ? 1 : 0) : 0;
+            lastY = y;
+            lastCol = col;
+            const labelX = width - paddingRight + 12 + col * 30;
+            return (
+              <g key={marker.value}>
+                <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} className="stroke-border/60" strokeDasharray="5 6" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                <text x={labelX} y={y + 4} textAnchor="start" className="fill-muted-foreground text-[10px]">{marker.label}</text>
+              </g>
+            );
+          });
+        })()}
         <polyline points={momentaryPath} fill="none" className="stroke-secondary" strokeWidth={focus === "momentary" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "shortTerm" ? "0.22" : "1"} />
         <polyline points={shortTermPath} fill="none" className="stroke-primary" strokeWidth={focus === "shortTerm" ? "3" : "1.7"} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={focus === "momentary" ? "0.22" : "1"} />
         {hoveredPoint && (
