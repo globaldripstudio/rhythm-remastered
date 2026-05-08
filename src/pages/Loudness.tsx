@@ -33,7 +33,7 @@ type AnalysisResult = {
 };
 
 type AnalysisMode = "stereo" | "left" | "right";
-type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
+type CurveFocus = "both" | "momentary" | "shortTerm";
 type CurveFocus = "both" | "momentary" | "shortTerm";
 const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
 
