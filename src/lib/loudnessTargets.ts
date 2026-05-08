@@ -128,9 +128,11 @@ export type LoudnessInterpretation = {
 };
 
 const fmt = (n: number) => (Number.isFinite(n) ? n.toFixed(1) : "–");
+const fmtTp = (n: number) => (Number.isFinite(n) ? n.toFixed(2) : "–");
 
 const PLR_CRITICAL = 5; // dB — below this, limiter is objectively over-pushed
 const LRA_COLLAPSE_MARGIN = 2; // LU below the genre floor
+const TP_TOLERANCE_DB = 0.1; // dB — TP measurement noise floor; below this no alert
 
 /**
  * Build a concise (1-2 lines, observational) interpretation for the given
