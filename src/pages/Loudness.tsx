@@ -111,7 +111,18 @@ const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, 
   report.setTextColor(255, 112, 54);
   report.text("Short-term", x + width - 30, y + 8);
   report.setTextColor(150, 158, 170);
-  report.text(`${formatDuration(0)}                     ${formatDuration(timeMax / 2)}                     ${formatDuration(timeMax)}`, plot.left, y + height - 4);
+  // Time axis ticks: 0:00, every full minute, and exact end time — precisely aligned to the curve x positions.
+  const ticks: number[] = [0];
+  for (let m = 60; m < timeMax - 5; m += 60) ticks.push(m);
+  if (timeMax > 1) ticks.push(timeMax);
+  report.setTextColor(150, 158, 170);
+  report.setFontSize(6.5);
+  ticks.forEach((tick) => {
+    const tx = plot.left + (tick / timeMax) * (plot.right - plot.left);
+    report.setDrawColor(80, 88, 98);
+    report.line(tx, plot.bottom, tx, plot.bottom + 1.5);
+    report.text(formatDuration(tick), tx, y + height - 4, { align: "center" });
+  });
 };
 
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
@@ -609,9 +620,6 @@ const Loudness = () => {
                           {group.subs.map((sub) => (
                             <SelectItem key={sub.id} value={sub.id}>
                               {lang === "fr" ? sub.labelFr : sub.labelEn}
-                              <span className="ml-2 text-xs text-muted-foreground">
-                                {sub.lufsMin}…{sub.lufsMax} LUFS
-                              </span>
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -770,18 +778,18 @@ const Loudness = () => {
                       </div>
                     );
                   })()}
-                  {interpretation && (
+                  {interpretation && subgenre && (
                     <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
-                      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-foreground">
                         <Gauge className="h-4 w-4 text-secondary" />
-                        {t("loudness.interpretationTitle")} · {subgenreLabel}
+                        <span>{t("loudness.interpretationTitle")} · {subgenreLabel}</span>
+                        <span className="text-xs font-normal text-muted-foreground">
+                          · {t("loudness.targetLabel")} {subgenre.lufsMin}…{subgenre.lufsMax} LUFS · TP ≤ {subgenre.truePeakMax} dBTP
+                        </span>
                       </div>
                       {interpretation.lines.map((line, i) => (
                         <p key={i} className="text-sm leading-relaxed text-muted-foreground">{line}</p>
                       ))}
-                      <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/70">
-                        {t("loudness.interpretationDisclaimer")}
-                      </p>
                     </div>
                   )}
                   {!interpretation && result && (
@@ -836,6 +844,44 @@ const Loudness = () => {
                   <h3 className="text-sm font-semibold text-muted-foreground">{t("loudness.metrics.maximums")}</h3>
                   <p className="mt-3 text-2xl font-bold sm:text-3xl">M {result.maxMomentaryLufs.toFixed(1)} · S {result.maxShortTermLufs.toFixed(1)}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t("loudness.metrics.maximumsDesc")}</p>
+                </CardContent>
+              </Card>
+              <Card className="equipment-card sm:col-span-2 lg:col-span-4">
+                <CardContent className="p-4 sm:p-6">
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">{t("loudness.platformTargets.title")}</h3>
+                  <p className="mb-4 text-xs text-muted-foreground">{t("loudness.platformTargets.subtitle")}</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[480px] text-sm">
+                      <thead>
+                        <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                          <th className="py-2 pr-4 font-medium">{t("loudness.platformTargets.headers.platform")}</th>
+                          <th className="py-2 pr-4 font-medium">{t("loudness.platformTargets.headers.target")}</th>
+                          <th className="py-2 font-medium">{t("loudness.platformTargets.headers.tp")}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-muted-foreground">
+                        {[
+                          { k: "spotify", lufs: "-14 LUFS", tp: "-1 dBTP" },
+                          { k: "apple", lufs: "-16 LUFS", tp: "-1 dBTP" },
+                          { k: "tidal", lufs: "-14 LUFS", tp: "-1 dBTP" },
+                          { k: "youtube", lufs: "-14 LUFS", tp: "-1 dBTP" },
+                          { k: "amazon", lufs: "-14 LUFS", tp: "-2 dBTP" },
+                          { k: "deezer", lufs: "-15 LUFS", tp: "-1 dBTP" },
+                          { k: "soundcloud", lufs: t("loudness.platformTargets.notNormalized"), tp: "-1 dBTP" },
+                          { k: "beatport", lufs: t("loudness.platformTargets.notNormalized"), tp: "-1 dBTP" },
+                          { k: "ebu", lufs: "-23 LUFS ±1", tp: "-1 dBTP" },
+                          { k: "netflix", lufs: "-27 LKFS ±2", tp: "-2 dBTP" },
+                        ].map((row) => (
+                          <tr key={row.k} className="border-b border-border/50 last:border-0">
+                            <td className="py-2 pr-4 text-foreground">{t(`loudness.platformTargets.rows.${row.k}`)}</td>
+                            <td className="py-2 pr-4">{row.lufs}</td>
+                            <td className="py-2">{row.tp}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t("loudness.platformTargets.note")}</p>
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2 lg:col-span-4">

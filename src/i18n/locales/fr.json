@@ -1185,7 +1185,30 @@
     "neutralProfile": "Analyse neutre",
     "pdfButton": "Rapport PDF",
     "interpretationTitle": "Interprétation",
-    "interpretationDisclaimer": "Cibles créatives 2024-2026 (mastering). Le streaming normalise séparément (Spotify/Tidal/YouTube -14, Apple -16 LUFS).",
+    "targetLabel": "cible",
+    "platformTargets": {
+      "title": "Cibles plateformes",
+      "subtitle": "Niveaux de référence pour la livraison streaming et broadcast.",
+      "notNormalized": "non normalisé",
+      "headers": {
+        "platform": "Plateforme",
+        "target": "Cible",
+        "tp": "True peak max"
+      },
+      "rows": {
+        "spotify": "Spotify",
+        "apple": "Apple Music",
+        "tidal": "Tidal",
+        "youtube": "YouTube Music",
+        "amazon": "Amazon Music",
+        "deezer": "Deezer",
+        "soundcloud": "SoundCloud",
+        "beatport": "Beatport",
+        "ebu": "Broadcast EBU R128",
+        "netflix": "Netflix (dialog)"
+      },
+      "note": "Le streaming normalise à la lecture : un master plus fort que la cible est simplement baissé sans perte de qualité."
+    },
     "selectedGenre": "Genre sélectionné",
     "noGenreHint": "Aucun genre sélectionné — interprétation désactivée. Choisis un style musical en haut pour obtenir des recommandations adaptées.",
     "genrePicker": {
