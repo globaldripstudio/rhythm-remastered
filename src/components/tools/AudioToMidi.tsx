@@ -73,7 +73,7 @@ const AudioToMidi = ({
   const handleFile = useCallback(
     (f?: File) => {
       if (!f) return;
-      if (!f.type.startsWith("audio/")) {
+      if (!isLikelyAudioFile(f)) {
         toast({
           title: t("audio2midi.toasts.invalidTitle"),
           description: t("audio2midi.toasts.invalidDesc"),
