@@ -595,6 +595,43 @@ const Loudness = () => {
 
             <Card className="equipment-card overflow-hidden border-border/80">
               <CardContent className="p-3 sm:p-6">
+                <div className="mb-4 rounded-md border border-border bg-background/40 p-3 sm:p-4">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <label htmlFor="genre-select" className="text-sm font-medium text-foreground">
+                      {t("loudness.genrePicker.label")}
+                    </label>
+                    <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      {t("loudness.genrePicker.optional")}
+                    </span>
+                  </div>
+                  <Select
+                    value={selectedSubgenre ?? "none"}
+                    onValueChange={(v) => setSelectedSubgenre(v === "none" ? null : v)}
+                  >
+                    <SelectTrigger id="genre-select" className="w-full">
+                      <SelectValue placeholder={t("loudness.genrePicker.placeholder")} />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-80">
+                      <SelectItem value="none">{t("loudness.genrePicker.none")}</SelectItem>
+                      {GENRE_GROUPS.map((group) => (
+                        <SelectGroup key={group.id}>
+                          <SelectLabel>{lang === "fr" ? group.labelFr : group.labelEn}</SelectLabel>
+                          {group.subs.map((sub) => (
+                            <SelectItem key={sub.id} value={sub.id}>
+                              {lang === "fr" ? sub.labelFr : sub.labelEn}
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                {sub.lufsMin}…{sub.lufsMax} LUFS
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                    {t("loudness.genrePicker.helper")}
+                  </p>
+                </div>
                 <div
                   role="button"
                   tabIndex={0}
