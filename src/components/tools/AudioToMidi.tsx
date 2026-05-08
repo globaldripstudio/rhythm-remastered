@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { audioToMidiNotes, type AudioToMidiProgress } from "@/lib/audioToMidi/basicPitch";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
+import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 
 
 interface AudioToMidiProps {
@@ -50,6 +51,7 @@ const AudioToMidi = ({
   const [durationSec, setDurationSec] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [playheadSec, setPlayheadSec] = useState(0);
   const playheadRef = useRef(0);
   const hoverRef = useRef<number | null>(null);
@@ -71,7 +73,7 @@ const AudioToMidi = ({
   const handleFile = useCallback(
     (f?: File) => {
       if (!f) return;
-      if (!f.type.startsWith("audio/")) {
+      if (!isLikelyAudioFile(f)) {
         toast({
           title: t("audio2midi.toasts.invalidTitle"),
           description: t("audio2midi.toasts.invalidDesc"),
@@ -388,8 +390,16 @@ const AudioToMidi = ({
       <div>
         <Card className="equipment-card overflow-hidden border-border/80">
           <CardContent className="space-y-4 p-3 sm:p-6">
-            <label
-              htmlFor="audio-upload-midi"
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
               onDragOver={(event) => {
                 event.preventDefault();
                 setIsDragging(true);
@@ -407,9 +417,10 @@ const AudioToMidi = ({
               }`}
             >
               <input
+                ref={fileInputRef}
                 id="audio-upload-midi"
                 type="file"
-                accept="audio/*"
+                accept={AUDIO_ACCEPT}
                 className="sr-only"
                 onChange={(event) => handleSelectAndRun(event.target.files?.[0])}
               />
@@ -430,7 +441,21 @@ const AudioToMidi = ({
                   {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
                 </p>
               )}
-            </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+                disabled={isProcessing}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Choisir un fichier
+              </Button>
+            </div>
 
             {isProcessing && (
               <div className="space-y-2">
