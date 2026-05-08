@@ -39,7 +39,7 @@ const KeyBpmFinder = () => {
 
   const handleFile = useCallback(async (file?: File) => {
     if (!file) return;
-    if (!file.type.startsWith("audio/")) {
+    if (!isLikelyAudioFile(file)) {
       setError(t("keybpm.errors.invalidFile"));
       return;
     }
