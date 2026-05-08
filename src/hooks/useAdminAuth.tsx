@@ -24,6 +24,10 @@ export const useAdminAuth = (): AdminAuthState => {
         return;
       }
 
+      // Reset loading state when user changes (e.g. just signed in)
+      setIsLoading(true);
+      setError(null);
+
       try {
         // CLIENT-SIDE ROLE CHECK FOR UI ONLY
         // This check controls dashboard visibility - NOT security.
