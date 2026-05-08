@@ -75,18 +75,30 @@ const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, 
   report.setDrawColor(45, 52, 60);
   report.line(plot.left, plot.bottom, plot.right, plot.bottom);
   report.line(plot.left, plot.top, plot.left, plot.bottom);
-  loudnessMarkers.forEach((marker) => {
-    const markerY = toPoint({ time: 0 }, marker.value).y;
-    if (markerY >= plot.top && markerY <= plot.bottom) {
-      report.setDrawColor(48, 56, 64);
-      report.setLineDashPattern([1.5, 2], 0);
-      report.line(plot.left, markerY, plot.right, markerY);
-      report.setLineDashPattern([], 0);
-      report.setTextColor(150, 158, 170);
-      report.setFontSize(6.5);
-      report.text(marker.label, plot.right + 3, markerY + 1.5);
-    }
+  const markerEntries = loudnessMarkers
+    .map((marker) => ({ marker, y: toPoint({ time: 0 }, marker.value).y }))
+    .filter((entry) => entry.y >= plot.top && entry.y <= plot.bottom)
+    .sort((a, b) => a.y - b.y);
+  let lastLabelY = -Infinity;
+  let lastOffsetCol = 1;
+  markerEntries.forEach(({ marker, y: markerY }) => {
+    report.setDrawColor(48, 56, 64);
+    report.setLineDashPattern([1.5, 2], 0);
+    report.line(plot.left, markerY, plot.right, markerY);
+    report.setLineDashPattern([], 0);
+    report.setTextColor(150, 158, 170);
+    report.setFontSize(6.5);
+    const tooClose = markerY - lastLabelY < 3;
+    const col = tooClose ? (lastOffsetCol === 0 ? 1 : 0) : 0;
+    const labelX = plot.right + 3 + col * 8;
+    report.text(marker.label, labelX, markerY + 1.5);
+    lastLabelY = markerY;
+    lastOffsetCol = col;
   });
+  // Single "LUFS" unit header above the marker column
+  report.setTextColor(150, 158, 170);
+  report.setFontSize(6.5);
+  report.text("LUFS", plot.right + 3, plot.top - 1);
 
   const drawSeries = (key: "momentary" | "shortTerm", color: [number, number, number]) => {
     report.setDrawColor(...color);
