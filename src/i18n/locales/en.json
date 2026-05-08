@@ -1210,7 +1210,7 @@
       "note": "Streaming normalizes at playback: a master louder than the target is simply turned down with no quality loss."
     },
     "selectedGenre": "Selected genre",
-    "noGenreHint": "No genre selected — interpretation disabled. Pick a music style above to get tailored recommendations.",
+    "noGenreHint": "Pick a music style above to get tailored recommendations.",
     "genrePicker": {
       "label": "Music style (for targeted interpretation)",
       "optional": "Optional",

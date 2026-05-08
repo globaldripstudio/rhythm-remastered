@@ -1210,7 +1210,7 @@
       "note": "Le streaming normalise à la lecture : un master plus fort que la cible est simplement baissé sans perte de qualité."
     },
     "selectedGenre": "Genre sélectionné",
-    "noGenreHint": "Aucun genre sélectionné — interprétation désactivée. Choisis un style musical en haut pour obtenir des recommandations adaptées.",
+    "noGenreHint": "Choisis un style musical en haut pour obtenir des recommandations adaptées.",
     "genrePicker": {
       "label": "Style musical (pour interprétation ciblée)",
       "optional": "Optionnel",
