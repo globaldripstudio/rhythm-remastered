@@ -793,8 +793,9 @@ const Loudness = () => {
                     </div>
                   )}
                   {!interpretation && result && (
-                    <div className="mt-5 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
-                      {t("loudness.noGenreHint")}
+                    <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground/80">
+                      <Info className="h-3.5 w-3.5 shrink-0" />
+                      <span>{t("loudness.noGenreHint")}</span>
                     </div>
                   )}
                   <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
