@@ -163,28 +163,28 @@ export const buildInterpretation = (
   if (lufs > sub.lufsMax + tolerance + 2) {
     verdict = "above";
     mainLine = lang === "fr"
-      ? "Densité au-delà des références récentes du genre."
-      : "Density beyond recent references for the genre.";
+      ? "Densité au-delà des références récentes."
+      : "Density beyond recent references.";
   } else if (lufs > sub.lufsMax + tolerance) {
     verdict = "above";
     mainLine = lang === "fr"
-      ? "Densité dans la zone haute du genre, lecture cohérente avec les références récentes."
-      : "Density in the upper zone of the genre, consistent with recent references.";
+      ? "Densité dans la zone haute, lecture cohérente avec les références récentes."
+      : "Density in the upper zone, consistent with recent references.";
   } else if (lufs < sub.lufsMin - tolerance - 2) {
     verdict = "below";
     mainLine = lang === "fr"
-      ? "Macro-dynamique nettement plus large que les références du genre."
-      : "Macro-dynamics noticeably wider than the genre's references.";
+      ? "Macro-dynamique nettement plus large que les références."
+      : "Macro-dynamics noticeably wider than the references.";
   } else if (lufs < sub.lufsMin - tolerance) {
     verdict = "below";
     mainLine = lang === "fr"
-      ? "Lecture plus aérée que les références du genre."
-      : "More open reading than the genre's references.";
+      ? "Lecture plus aérée que les références."
+      : "More open reading than the references.";
   } else {
     verdict = "in-range";
     mainLine = lang === "fr"
-      ? "Densité dans la plage du genre, dynamique macro et transitoires préservés."
-      : "Density within the genre range, macro dynamics and transients preserved.";
+      ? "Densité dans la plage attendue, dynamique macro et transitoires préservés."
+      : "Density within the expected range, macro dynamics and transients preserved.";
   }
 
   const truePeakOk = truePeakDb <= sub.truePeakMax;
@@ -198,8 +198,8 @@ export const buildInterpretation = (
       : `True peak ${fmtTp(truePeakDb)} dBTP: inter-sample clipping measured.`;
   } else if (truePeakDb > sub.truePeakMax + TP_TOLERANCE_DB) {
     alert = lang === "fr"
-      ? `True peak ${fmtTp(truePeakDb)} dBTP, légèrement au-dessus de la convention du genre (${sub.truePeakMax} dBTP) ; aucun clipping inter-sample mesuré.`
-      : `True peak ${fmtTp(truePeakDb)} dBTP, slightly above the genre convention (${sub.truePeakMax} dBTP); no inter-sample clipping measured.`;
+      ? `True peak ${fmtTp(truePeakDb)} dBTP, légèrement au-dessus de la convention (${sub.truePeakMax} dBTP) ; aucun clipping inter-sample mesuré.`
+      : `True peak ${fmtTp(truePeakDb)} dBTP, slightly above the convention (${sub.truePeakMax} dBTP); no inter-sample clipping measured.`;
   } else if (Number.isFinite(plr) && plr < PLR_CRITICAL) {
     alert = lang === "fr"
       ? `PLR ${fmt(plr)} dB : transitoires fortement écrasés, signature d'un limiteur très poussé.`
@@ -210,8 +210,8 @@ export const buildInterpretation = (
     loudnessRange < sub.lraMin - LRA_COLLAPSE_MARGIN
   ) {
     alert = lang === "fr"
-      ? `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typique : macro-dynamique très resserrée pour le genre.`
-      : `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typical: macro-dynamics very tight for the genre.`;
+      ? `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typique : macro-dynamique très resserrée.`
+      : `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typical: macro-dynamics very tight.`;
   }
 
   if (alert) lines.push(alert);
