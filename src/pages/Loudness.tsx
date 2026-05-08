@@ -543,7 +543,7 @@ const Loudness = () => {
     report.setTextColor(120, 128, 138);
     report.text(t("loudness.pdf.footer"), margin, pageHeight - 12);
     report.save(`${safeFileName(result.fileName)}-${t("loudness.pdf.fileSuffix")}.pdf`);
-  }, [inferredContext, result, t]);
+  }, [result, subgenreLabel, t]);
 
   return (
     <div className="min-h-screen bg-background">
