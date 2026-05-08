@@ -620,9 +620,6 @@ const Loudness = () => {
                           {group.subs.map((sub) => (
                             <SelectItem key={sub.id} value={sub.id}>
                               {lang === "fr" ? sub.labelFr : sub.labelEn}
-                              <span className="ml-2 text-xs text-muted-foreground">
-                                {sub.lufsMin}…{sub.lufsMax} LUFS
-                              </span>
                             </SelectItem>
                           ))}
                         </SelectGroup>
