@@ -193,56 +193,73 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div id="mobile-navigation" className="md:hidden mt-4 py-4 border-t border-border animate-fade-in" role="navigation" aria-label="Navigation mobile">
-            <nav className="flex flex-col space-y-4">
-              <a href="#accueil" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.home')}</a>
-              <a href="#services" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.services')}</a>
-              <a href="#equipement" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.equipment')}</a>
-              <a href="#contact" className="py-2 nav-link" onClick={toggleMenu}>{t('nav.contact')}</a>
-              <div className="border-t border-border my-2"></div>
-              <a href="/projets" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>{t('nav.projects')}</a>
-              <a href="/blog" className="py-2 nav-link text-muted-foreground" onClick={toggleMenu}>{t('nav.blog')}</a>
-              <span className="py-2 relative inline-flex items-center cursor-not-allowed">
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div
+          className="md:hidden fixed inset-x-0 top-[72px] bottom-0 z-40"
+          onClick={closeMenu}
+        >
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm animate-fade-in" />
+          <div
+            id="mobile-navigation"
+            role="navigation"
+            aria-label="Navigation mobile"
+            onClick={(e) => e.stopPropagation()}
+            className="relative mx-3 mt-2 max-h-[calc(100vh-100px)] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card/95 shadow-2xl backdrop-blur-lg animate-fade-in"
+          >
+            <nav className="flex flex-col p-4 space-y-1">
+              <a href="#accueil" className="py-2.5 px-2 rounded-md nav-link hover:bg-primary/10" onClick={closeMenu}>{t('nav.home')}</a>
+              <a href="#services" className="py-2.5 px-2 rounded-md nav-link hover:bg-primary/10" onClick={closeMenu}>{t('nav.services')}</a>
+              <a href="#equipement" className="py-2.5 px-2 rounded-md nav-link hover:bg-primary/10" onClick={closeMenu}>{t('nav.equipment')}</a>
+              <a href="#contact" className="py-2.5 px-2 rounded-md nav-link hover:bg-primary/10" onClick={closeMenu}>{t('nav.contact')}</a>
+
+              <div className="border-t border-border my-2" />
+
+              <a href="/projets" className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.projects')}</a>
+              <a href="/blog" className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.blog')}</a>
+              <span className="py-2.5 px-2 relative inline-flex items-center cursor-not-allowed">
                 <span className="text-muted-foreground/50">{t('nav.shop')}</span>
                 <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
                   {t('nav.shopSoon')}
                 </span>
               </span>
-              <div className="rounded-md border border-border bg-muted/10 p-2">
-                <div className="flex items-center gap-2 px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+
+              <div className="mt-2 rounded-xl border border-border bg-muted/20 p-2">
+                <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Wrench className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                   {t('nav.toolkit')}
                 </div>
-                <a href="/loudness" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                <a href="/loudness" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
                   <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>{t('nav.loudness')}</span>
                 </a>
-                <a href="/key-bpm-finder" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                <a href="/key-bpm-finder" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
                   <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>{t('nav.keybpm')}</span>
                 </a>
-                <a href="/tap-tempo-metronome" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                <a href="/tap-tempo-metronome" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
                   <Drum className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>{t('nav.tempoTools')}</span>
                 </a>
-                <a href="/chord-progression" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                <a href="/chord-progression" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
                   <Music2 className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>Accords & gammes</span>
                 </a>
-                <a href="/audio-to-midi" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={toggleMenu}>
+                <a href="/audio-to-midi" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
                   <Music4 className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>Audio → MIDI</span>
                 </a>
               </div>
-              <div className="pt-4 border-t border-border">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-3">
+
+              <div className="pt-4 mt-2 border-t border-border">
+                <a href="tel:+33659797342" className="flex items-center space-x-2 text-sm text-muted-foreground mb-3 px-2">
                   <Phone className="w-4 h-4" />
                   <span>+33 6 59 79 73 42</span>
-                </div>
-                <Button variant="default" className="studio-button w-full" onClick={() => { 
-                  toggleMenu(); 
+                </a>
+                <Button variant="default" className="studio-button w-full" onClick={() => {
+                  closeMenu();
                   scrollToContact();
                 }}>
                   {t('nav.book')}
@@ -250,8 +267,8 @@ const Header = () => {
               </div>
             </nav>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 };
