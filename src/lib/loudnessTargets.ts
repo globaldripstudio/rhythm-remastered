@@ -1,5 +1,5 @@
 /**
- * Genre / subgenre loudness targets — consolidated mastering references (2024-2026).
+ * Genre / genre loudness targets — consolidated mastering references (2024-2026).
  *
  * Implicit context: lossless production (WAV/AIFF/FLAC) destined for streaming
  * platforms and physical media. Codec-related concerns are intentionally excluded
@@ -109,7 +109,7 @@ export const GENRE_GROUPS: GenreGroup[] = [
   },
 ];
 
-/** Flat lookup of all subgenres by id */
+/** Flat lookup of all genres by id */
 export const SUBGENRE_BY_ID: Record<string, SubGenreTarget> = GENRE_GROUPS.reduce(
   (acc, g) => {
     g.subs.forEach((s) => { acc[s.id] = s; });
@@ -136,7 +136,7 @@ const TP_TOLERANCE_DB = 0.1; // dB — TP measurement noise floor; below this no
 
 /**
  * Build a concise (1-2 lines, observational) interpretation for the given
- * measurement relative to the chosen subgenre target.
+ * measurement relative to the chosen genre target.
  *
  * Implicit context: pro engineer, lossless workflow, streaming + physical
  * delivery. No codec-related warnings ever (no AAC/MP3 mentions).
@@ -163,28 +163,28 @@ export const buildInterpretation = (
   if (lufs > sub.lufsMax + tolerance + 2) {
     verdict = "above";
     mainLine = lang === "fr"
-      ? "Densité au-delà des références récentes du sous-genre."
-      : "Density beyond recent references for the subgenre.";
+      ? "Densité au-delà des références récentes du genre."
+      : "Density beyond recent references for the genre.";
   } else if (lufs > sub.lufsMax + tolerance) {
     verdict = "above";
     mainLine = lang === "fr"
-      ? "Densité dans la zone haute du sous-genre, lecture cohérente avec les références récentes."
-      : "Density in the upper zone of the subgenre, consistent with recent references.";
+      ? "Densité dans la zone haute du genre, lecture cohérente avec les références récentes."
+      : "Density in the upper zone of the genre, consistent with recent references.";
   } else if (lufs < sub.lufsMin - tolerance - 2) {
     verdict = "below";
     mainLine = lang === "fr"
-      ? "Macro-dynamique nettement plus large que les références du sous-genre."
-      : "Macro-dynamics noticeably wider than the subgenre's references.";
+      ? "Macro-dynamique nettement plus large que les références du genre."
+      : "Macro-dynamics noticeably wider than the genre's references.";
   } else if (lufs < sub.lufsMin - tolerance) {
     verdict = "below";
     mainLine = lang === "fr"
-      ? "Lecture plus aérée que les références du sous-genre."
-      : "More open reading than the subgenre's references.";
+      ? "Lecture plus aérée que les références du genre."
+      : "More open reading than the genre's references.";
   } else {
     verdict = "in-range";
     mainLine = lang === "fr"
-      ? "Densité dans la plage du sous-genre, dynamique macro et transitoires préservés."
-      : "Density within the subgenre range, macro dynamics and transients preserved.";
+      ? "Densité dans la plage du genre, dynamique macro et transitoires préservés."
+      : "Density within the genre range, macro dynamics and transients preserved.";
   }
 
   const truePeakOk = truePeakDb <= sub.truePeakMax;
@@ -198,8 +198,8 @@ export const buildInterpretation = (
       : `True peak ${fmtTp(truePeakDb)} dBTP: inter-sample clipping measured.`;
   } else if (truePeakDb > sub.truePeakMax + TP_TOLERANCE_DB) {
     alert = lang === "fr"
-      ? `True peak ${fmtTp(truePeakDb)} dBTP, légèrement au-dessus de la convention du sous-genre (${sub.truePeakMax} dBTP) ; aucun clipping inter-sample mesuré.`
-      : `True peak ${fmtTp(truePeakDb)} dBTP, slightly above the subgenre convention (${sub.truePeakMax} dBTP); no inter-sample clipping measured.`;
+      ? `True peak ${fmtTp(truePeakDb)} dBTP, légèrement au-dessus de la convention du genre (${sub.truePeakMax} dBTP) ; aucun clipping inter-sample mesuré.`
+      : `True peak ${fmtTp(truePeakDb)} dBTP, slightly above the genre convention (${sub.truePeakMax} dBTP); no inter-sample clipping measured.`;
   } else if (Number.isFinite(plr) && plr < PLR_CRITICAL) {
     alert = lang === "fr"
       ? `PLR ${fmt(plr)} dB : transitoires fortement écrasés, signature d'un limiteur très poussé.`
@@ -210,8 +210,8 @@ export const buildInterpretation = (
     loudnessRange < sub.lraMin - LRA_COLLAPSE_MARGIN
   ) {
     alert = lang === "fr"
-      ? `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typique : macro-dynamique très resserrée pour le sous-genre.`
-      : `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typical: macro-dynamics very tight for the subgenre.`;
+      ? `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typique : macro-dynamique très resserrée pour le genre.`
+      : `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typical: macro-dynamics very tight for the genre.`;
   }
 
   if (alert) lines.push(alert);
