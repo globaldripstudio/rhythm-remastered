@@ -503,7 +503,7 @@ const Loudness = () => {
       [t("loudness.metrics.truePeakEstimated"), `${result.truePeakDb.toFixed(1)} dBTP`],
       ["LRA / PLR", `${result.loudnessRange.toFixed(1)} LU / ${result.plr.toFixed(1)} dB`],
       [t("loudness.metrics.maximums"), `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
-      [t("loudness.selectedGenre"), subgenreLabel ?? t("loudness.neutralProfile")],
+      ...(subgenreLabel ? [[t("loudness.selectedGenre"), subgenreLabel] as [string, string]] : []),
     ];
     metrics.forEach(([label, value], index) => {
       const x = margin + (index % 2) * 88;
