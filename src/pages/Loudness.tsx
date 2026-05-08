@@ -778,18 +778,18 @@ const Loudness = () => {
                       </div>
                     );
                   })()}
-                  {interpretation && (
+                  {interpretation && subgenre && (
                     <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
-                      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-foreground">
                         <Gauge className="h-4 w-4 text-secondary" />
-                        {t("loudness.interpretationTitle")} · {subgenreLabel}
+                        <span>{t("loudness.interpretationTitle")} · {subgenreLabel}</span>
+                        <span className="text-xs font-normal text-muted-foreground">
+                          · {t("loudness.targetLabel")} {subgenre.lufsMin}…{subgenre.lufsMax} LUFS · TP ≤ {subgenre.truePeakMax} dBTP
+                        </span>
                       </div>
                       {interpretation.lines.map((line, i) => (
                         <p key={i} className="text-sm leading-relaxed text-muted-foreground">{line}</p>
                       ))}
-                      <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/70">
-                        {t("loudness.interpretationDisclaimer")}
-                      </p>
                     </div>
                   )}
                   {!interpretation && result && (
