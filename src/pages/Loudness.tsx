@@ -111,7 +111,18 @@ const drawPdfLoudnessCurve = (report: jsPDF, result: AnalysisResult, x: number, 
   report.setTextColor(255, 112, 54);
   report.text("Short-term", x + width - 30, y + 8);
   report.setTextColor(150, 158, 170);
-  report.text(`${formatDuration(0)}                     ${formatDuration(timeMax / 2)}                     ${formatDuration(timeMax)}`, plot.left, y + height - 4);
+  // Time axis ticks: 0:00, every full minute, and exact end time — precisely aligned to the curve x positions.
+  const ticks: number[] = [0];
+  for (let m = 60; m < timeMax - 5; m += 60) ticks.push(m);
+  if (timeMax > 1) ticks.push(timeMax);
+  report.setTextColor(150, 158, 170);
+  report.setFontSize(6.5);
+  ticks.forEach((tick) => {
+    const tx = plot.left + (tick / timeMax) * (plot.right - plot.left);
+    report.setDrawColor(80, 88, 98);
+    report.line(tx, plot.bottom, tx, plot.bottom + 1.5);
+    report.text(formatDuration(tick), tx, y + height - 4, { align: "center" });
+  });
 };
 
 const dbFromPower = (power: number) => -0.691 + 10 * Math.log10(Math.max(power, 1e-12));
