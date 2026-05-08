@@ -119,8 +119,16 @@ const KeyBpmFinder = () => {
 
             <Card className="equipment-card overflow-hidden border-border/80">
               <CardContent className="p-3 sm:p-6">
-                <label
-                  htmlFor="audio-upload-keybpm"
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
                   onDragOver={(event) => { event.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={(event) => { event.preventDefault(); setIsDragging(false); void handleFile(event.dataTransfer.files[0]); }}
@@ -129,9 +137,10 @@ const KeyBpmFinder = () => {
                   }`}
                 >
                   <input
+                    ref={fileInputRef}
                     id="audio-upload-keybpm"
                     type="file"
-                    accept="audio/*"
+                    accept={AUDIO_ACCEPT}
                     className="sr-only"
                     onChange={(event) => void handleFile(event.target.files?.[0])}
                   />
@@ -144,7 +153,21 @@ const KeyBpmFinder = () => {
                   <p className="max-w-md text-sm text-muted-foreground">
                     {t("keybpm.upload.description")}
                   </p>
-                </label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-4"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    disabled={isAnalyzing}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    {t("keybpm.upload.button", { defaultValue: "Choisir un fichier" })}
+                  </Button>
+                </div>
 
                 {error && (
                   <div className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
