@@ -743,13 +743,23 @@ const Loudness = () => {
                       </div>
                     );
                   })()}
-                  {targetHint && (
+                  {interpretation && (
                     <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
                       <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
                         <Gauge className="h-4 w-4 text-secondary" />
-                        {t("loudness.interpretationTitle")}
+                        {t("loudness.interpretationTitle")} · {subgenreLabel}
                       </div>
-                      <p className="text-sm leading-relaxed text-muted-foreground">{targetHint}</p>
+                      {interpretation.lines.map((line, i) => (
+                        <p key={i} className="text-sm leading-relaxed text-muted-foreground">{line}</p>
+                      ))}
+                      <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/70">
+                        {t("loudness.interpretationDisclaimer")}
+                      </p>
+                    </div>
+                  )}
+                  {!interpretation && result && (
+                    <div className="mt-5 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
+                      {t("loudness.noGenreHint")}
                     </div>
                   )}
                   <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
