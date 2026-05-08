@@ -43,10 +43,10 @@ const analysisModes: Array<{ value: AnalysisMode; labelKey: string }> = [
 ];
 
 const loudnessMarkers = [
-  { value: -14, label: "-14 LUFS", hintKey: "loudness.markers.dense" },
-  { value: -16, label: "-16 LUFS", hintKey: "loudness.markers.balanced" },
-  { value: -20, label: "-20 LUFS", hintKey: "loudness.markers.dynamic" },
-  { value: -23, label: "-23 LUFS", hintKey: "loudness.markers.broadcast" },
+  { value: -14, label: "-14", hintKey: "loudness.markers.dense" },
+  { value: -16, label: "-16", hintKey: "loudness.markers.balanced" },
+  { value: -20, label: "-20", hintKey: "loudness.markers.dynamic" },
+  { value: -23, label: "-23", hintKey: "loudness.markers.broadcast" },
 ];
 
 const formatDuration = (seconds: number) => {
