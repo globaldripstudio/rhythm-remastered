@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
-import { Download, Drum, FileAudio, Gauge, Info, KeyRound, Loader2, Music2, Upload, Waves } from "lucide-react";
+import { Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
 import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import SEO from "@/components/SEO";
@@ -9,8 +9,10 @@ import ToolResources from "@/components/tools/ToolResources";
 import { breadcrumbSchema, softwareAppSchema } from "@/lib/seo/schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
+import { GENRE_GROUPS, SUBGENRE_BY_ID, buildInterpretation } from "@/lib/loudnessTargets";
 
 type AnalysisResult = {
   lufs: number;
@@ -31,7 +33,6 @@ type AnalysisResult = {
 };
 
 type AnalysisMode = "stereo" | "left" | "right";
-type MusicContext = "rap" | "pop" | "electronic" | "rock" | "acoustic" | "broadcast";
 type CurveFocus = "both" | "momentary" | "shortTerm";
 const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
 
@@ -47,15 +48,6 @@ const loudnessMarkers = [
   { value: -20, label: "-20 LUFS", hintKey: "loudness.markers.dynamic" },
   { value: -23, label: "-23 LUFS", hintKey: "loudness.markers.broadcast" },
 ];
-
-const contextLabelKeys: Record<MusicContext, string> = {
-  rap: "loudness.contexts.rap",
-  pop: "loudness.contexts.pop",
-  electronic: "loudness.contexts.electronic",
-  rock: "loudness.contexts.rock",
-  acoustic: "loudness.contexts.acoustic",
-  broadcast: "loudness.contexts.broadcast",
-};
 
 const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -415,36 +407,20 @@ const Loudness = () => {
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [curveHoverIndex, setCurveHoverIndex] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedSubgenre, setSelectedSubgenre] = useState<string | null>(null);
 
-  const toggleLanguage = () => {
-    document.body.classList.add('lang-switching');
-    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
-    setTimeout(() => document.body.classList.remove('lang-switching'), 500);
-  };
+  const lang: "fr" | "en" = i18n.language === "en" ? "en" : "fr";
+  const subgenre = selectedSubgenre ? SUBGENRE_BY_ID[selectedSubgenre] ?? null : null;
+  const subgenreLabel = subgenre ? (lang === "fr" ? subgenre.labelFr : subgenre.labelEn) : null;
 
-  const inferredContext = useMemo<MusicContext | null>(() => {
-    if (!result) return null;
-    if (result.lufs > -11 && result.loudnessRange < 5) return "electronic";
-    if (result.lufs > -12.5 && result.plr < 10) return "rap";
-    if (result.lufs > -15 && result.loudnessRange < 8) return "pop";
-    if (result.loudnessRange > 12 && result.lufs < -17) return "acoustic";
-    if (result.lufs < -20) return "broadcast";
-    return "rock";
-  }, [result]);
-
-  const targetHint = useMemo(() => {
-    if (!result || !inferredContext) return null;
-    const contextAdvice: Record<MusicContext, string> = {
-      rap: result.lufs > -10.5 ? t("loudness.advice.rap.hot") : result.lufs > -14 ? t("loudness.advice.rap.solid") : t("loudness.advice.rap.dynamic"),
-      pop: result.lufs > -11 ? t("loudness.advice.pop.hot") : result.lufs > -15 ? t("loudness.advice.pop.solid") : t("loudness.advice.pop.dynamic"),
-      electronic: result.lufs > -9.5 ? t("loudness.advice.electronic.hot") : result.lufs > -13 ? t("loudness.advice.electronic.solid") : t("loudness.advice.electronic.dynamic"),
-      rock: result.lufs > -10 ? t("loudness.advice.rock.hot") : result.lufs > -14 ? t("loudness.advice.rock.solid") : t("loudness.advice.rock.dynamic"),
-      acoustic: result.lufs > -14 ? t("loudness.advice.acoustic.hot") : result.lufs > -20 ? t("loudness.advice.acoustic.solid") : t("loudness.advice.acoustic.dynamic"),
-      broadcast: result.lufs > -16 ? t("loudness.advice.broadcast.hot") : result.lufs > -21 ? t("loudness.advice.broadcast.solid") : t("loudness.advice.broadcast.dynamic"),
-    };
-    const technical = result.truePeakDb > -1 ? ` ${t("loudness.advice.truePeakHigh")}` : ` ${t("loudness.advice.truePeakHealthy")}`;
-    return `${contextAdvice[inferredContext]}${technical}`;
-  }, [inferredContext, result, t]);
+  const interpretation = useMemo(() => {
+    if (!result || !subgenre) return null;
+    return buildInterpretation(
+      { lufs: result.lufs, truePeakDb: result.truePeakDb, loudnessRange: result.loudnessRange },
+      subgenre,
+      lang,
+    );
+  }, [result, subgenre, lang]);
 
   const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
@@ -516,7 +492,7 @@ const Loudness = () => {
       [t("loudness.metrics.truePeakEstimated"), `${result.truePeakDb.toFixed(1)} dBTP`],
       ["LRA / PLR", `${result.loudnessRange.toFixed(1)} LU / ${result.plr.toFixed(1)} dB`],
       [t("loudness.metrics.maximums"), `M ${result.maxMomentaryLufs.toFixed(1)} · S ${result.maxShortTermLufs.toFixed(1)} LUFS`],
-      [t("loudness.inferredProfile"), inferredContext ? t(contextLabelKeys[inferredContext]) : t("loudness.neutralProfile")],
+      [t("loudness.selectedGenre"), subgenreLabel ?? t("loudness.neutralProfile")],
     ];
     metrics.forEach(([label, value], index) => {
       const x = margin + (index % 2) * 88;
@@ -557,7 +533,7 @@ const Loudness = () => {
     report.setTextColor(120, 128, 138);
     report.text(t("loudness.pdf.footer"), margin, pageHeight - 12);
     report.save(`${safeFileName(result.fileName)}-${t("loudness.pdf.fileSuffix")}.pdf`);
-  }, [inferredContext, result, t]);
+  }, [result, subgenreLabel, t]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -609,6 +585,43 @@ const Loudness = () => {
 
             <Card className="equipment-card overflow-hidden border-border/80">
               <CardContent className="p-3 sm:p-6">
+                <div className="mb-4 rounded-md border border-border bg-background/40 p-3 sm:p-4">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <label htmlFor="genre-select" className="text-sm font-medium text-foreground">
+                      {t("loudness.genrePicker.label")}
+                    </label>
+                    <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      {t("loudness.genrePicker.optional")}
+                    </span>
+                  </div>
+                  <Select
+                    value={selectedSubgenre ?? "none"}
+                    onValueChange={(v) => setSelectedSubgenre(v === "none" ? null : v)}
+                  >
+                    <SelectTrigger id="genre-select" className="w-full">
+                      <SelectValue placeholder={t("loudness.genrePicker.placeholder")} />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-80">
+                      <SelectItem value="none">{t("loudness.genrePicker.none")}</SelectItem>
+                      {GENRE_GROUPS.map((group) => (
+                        <SelectGroup key={group.id}>
+                          <SelectLabel>{lang === "fr" ? group.labelFr : group.labelEn}</SelectLabel>
+                          {group.subs.map((sub) => (
+                            <SelectItem key={sub.id} value={sub.id}>
+                              {lang === "fr" ? sub.labelFr : sub.labelEn}
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                {sub.lufsMin}…{sub.lufsMax} LUFS
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                    {t("loudness.genrePicker.helper")}
+                  </p>
+                </div>
                 <div
                   role="button"
                   tabIndex={0}
@@ -713,7 +726,7 @@ const Loudness = () => {
                     </span>
                   </div>
                   <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                    {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">{t("loudness.inferredProfile")}: {t(contextLabelKeys[inferredContext])}</span>}
+                    {subgenreLabel && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">{t("loudness.selectedGenre")}: {subgenreLabel}</span>}
                     <Button type="button" onClick={exportPdfReport} variant="outline" size="sm" className="w-full sm:w-auto">
                       <Download className="h-4 w-4" />
                       {t("loudness.pdfButton")}
@@ -757,13 +770,23 @@ const Loudness = () => {
                       </div>
                     );
                   })()}
-                  {targetHint && (
+                  {interpretation && (
                     <div className="mt-5 rounded-md border border-secondary/40 bg-secondary/10 p-4">
                       <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
                         <Gauge className="h-4 w-4 text-secondary" />
-                        {t("loudness.interpretationTitle")}
+                        {t("loudness.interpretationTitle")} · {subgenreLabel}
                       </div>
-                      <p className="text-sm leading-relaxed text-muted-foreground">{targetHint}</p>
+                      {interpretation.lines.map((line, i) => (
+                        <p key={i} className="text-sm leading-relaxed text-muted-foreground">{line}</p>
+                      ))}
+                      <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/70">
+                        {t("loudness.interpretationDisclaimer")}
+                      </p>
+                    </div>
+                  )}
+                  {!interpretation && result && (
+                    <div className="mt-5 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">
+                      {t("loudness.noGenreHint")}
                     </div>
                   )}
                   <div className="mt-4 rounded-md border border-border bg-background/40 p-4 text-sm text-muted-foreground">

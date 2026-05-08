@@ -1184,7 +1184,17 @@
     "inferredProfile": "Inferred profile",
     "neutralProfile": "Neutral analysis",
     "pdfButton": "PDF report",
-    "interpretationTitle": "Automatic interpretation",
+    "interpretationTitle": "Interpretation",
+    "interpretationDisclaimer": "Creative 2024-2026 mastering targets. Streaming normalizes separately (Spotify/Tidal/YouTube -14, Apple -16 LUFS).",
+    "selectedGenre": "Selected genre",
+    "noGenreHint": "No genre selected — interpretation disabled. Pick a music style above to get tailored recommendations.",
+    "genrePicker": {
+      "label": "Music style (for targeted interpretation)",
+      "optional": "Optional",
+      "placeholder": "None — neutral analysis",
+      "none": "None — neutral analysis",
+      "helper": "If set, the analysis compares measurements against the subgenre's mastering targets. Otherwise, raw measurements only."
+    },
     "referencesTitle": "BS.1770 references",
     "modes": {
       "stereo": "Stereo",
