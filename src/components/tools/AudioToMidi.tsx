@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { audioToMidiNotes, type AudioToMidiProgress } from "@/lib/audioToMidi/basicPitch";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
+import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 
 
 interface AudioToMidiProps {
