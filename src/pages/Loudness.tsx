@@ -468,13 +468,13 @@ const Loudness = () => {
 
   const handleFile = useCallback(async (file?: File) => {
     if (!file) return;
-    if (!file.type.startsWith("audio/")) {
+    if (!isLikelyAudioFile(file)) {
       setError(t("loudness.errors.invalidFile"));
       return;
     }
     setSelectedFile(file);
     await runAnalysis(file, selectedMode);
-  }, [runAnalysis, selectedMode]);
+  }, [runAnalysis, selectedMode, t]);
 
   const exportPdfReport = useCallback(() => {
     if (!result) return;
