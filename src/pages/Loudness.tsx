@@ -34,7 +34,6 @@ type AnalysisResult = {
 
 type AnalysisMode = "stereo" | "left" | "right";
 type CurveFocus = "both" | "momentary" | "shortTerm";
-type CurveFocus = "both" | "momentary" | "shortTerm";
 const professionalSettings = { windowMs: 400, hopMs: 100, gateLufs: -70, truePeak: true };
 
 const analysisModes: Array<{ value: AnalysisMode; labelKey: string }> = [
@@ -49,15 +48,6 @@ const loudnessMarkers = [
   { value: -20, label: "-20 LUFS", hintKey: "loudness.markers.dynamic" },
   { value: -23, label: "-23 LUFS", hintKey: "loudness.markers.broadcast" },
 ];
-
-const contextLabelKeys: Record<MusicContext, string> = {
-  rap: "loudness.contexts.rap",
-  pop: "loudness.contexts.pop",
-  electronic: "loudness.contexts.electronic",
-  rock: "loudness.contexts.rock",
-  acoustic: "loudness.contexts.acoustic",
-  broadcast: "loudness.contexts.broadcast",
-};
 
 const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
