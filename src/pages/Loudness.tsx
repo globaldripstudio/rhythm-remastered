@@ -699,7 +699,7 @@ const Loudness = () => {
                     </span>
                   </div>
                   <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                    {inferredContext && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">{t("loudness.inferredProfile")}: {t(contextLabelKeys[inferredContext])}</span>}
+                    {subgenreLabel && <span className="rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-xs text-foreground">{t("loudness.selectedGenre")}: {subgenreLabel}</span>}
                     <Button type="button" onClick={exportPdfReport} variant="outline" size="sm" className="w-full sm:w-auto">
                       <Download className="h-4 w-4" />
                       {t("loudness.pdfButton")}
