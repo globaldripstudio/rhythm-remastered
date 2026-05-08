@@ -407,6 +407,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange, hoveredIndex, onHoverChange
 const Loudness = () => {
   const { t, i18n } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
