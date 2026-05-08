@@ -847,6 +847,44 @@ const Loudness = () => {
                 </CardContent>
               </Card>
               <Card className="equipment-card sm:col-span-2 lg:col-span-4">
+                <CardContent className="p-4 sm:p-6">
+                  <h3 className="mb-1 text-sm font-semibold text-foreground">{t("loudness.platformTargets.title")}</h3>
+                  <p className="mb-4 text-xs text-muted-foreground">{t("loudness.platformTargets.subtitle")}</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[480px] text-sm">
+                      <thead>
+                        <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                          <th className="py-2 pr-4 font-medium">{t("loudness.platformTargets.headers.platform")}</th>
+                          <th className="py-2 pr-4 font-medium">{t("loudness.platformTargets.headers.target")}</th>
+                          <th className="py-2 font-medium">{t("loudness.platformTargets.headers.tp")}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-muted-foreground">
+                        {[
+                          { k: "spotify", lufs: "-14 LUFS", tp: "-1 dBTP" },
+                          { k: "apple", lufs: "-16 LUFS", tp: "-1 dBTP" },
+                          { k: "tidal", lufs: "-14 LUFS", tp: "-1 dBTP" },
+                          { k: "youtube", lufs: "-14 LUFS", tp: "-1 dBTP" },
+                          { k: "amazon", lufs: "-14 LUFS", tp: "-2 dBTP" },
+                          { k: "deezer", lufs: "-15 LUFS", tp: "-1 dBTP" },
+                          { k: "soundcloud", lufs: t("loudness.platformTargets.notNormalized"), tp: "-1 dBTP" },
+                          { k: "beatport", lufs: t("loudness.platformTargets.notNormalized"), tp: "-1 dBTP" },
+                          { k: "ebu", lufs: "-23 LUFS ±1", tp: "-1 dBTP" },
+                          { k: "netflix", lufs: "-27 LKFS ±2", tp: "-2 dBTP" },
+                        ].map((row) => (
+                          <tr key={row.k} className="border-b border-border/50 last:border-0">
+                            <td className="py-2 pr-4 text-foreground">{t(`loudness.platformTargets.rows.${row.k}`)}</td>
+                            <td className="py-2 pr-4">{row.lufs}</td>
+                            <td className="py-2">{row.tp}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t("loudness.platformTargets.note")}</p>
+                </CardContent>
+              </Card>
+              <Card className="equipment-card sm:col-span-2 lg:col-span-4">
                 <CardContent className="p-6 sm:p-8 text-center">
                   <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
                     {t("projects.readyToJoin")} <span className="hero-text">{t("projects.collaborationsWord")}</span> ?
