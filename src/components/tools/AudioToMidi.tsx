@@ -51,6 +51,7 @@ const AudioToMidi = ({
   const [durationSec, setDurationSec] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [playheadSec, setPlayheadSec] = useState(0);
   const playheadRef = useRef(0);
   const hoverRef = useRef<number | null>(null);
