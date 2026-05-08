@@ -1,135 +1,67 @@
-## Refonte interprétation Loudness + correctif axe temps PDF
+## Refonte de l'interprétation automatique (Loudness)
 
-### 1. Consolidation des genres (`src/lib/loudnessTargets.ts`)
+### Esprit
 
-Liste resserrée à ~15 entrées :
+Aiguillage de précision, pas verdict. On **décrit** avant de qualifier, on **contextualise** sans prescrire, on **alerte** uniquement sur faute technique objective. La récompense pour l'utilisateur est la densité d'information utile par analyse, pas un ton bienveillant.
 
-- **Hip-Hop / Urbain** : *Hip-Hop / Trap / Drill* (-8.5…-7), *Boom Bap / Lo-fi* (-13…-10).
-- **Pop** : *Pop / Dance-Pop* (-10…-7), *Indie / Synthpop* (-12…-9).
-- **R&B / Soul / Afro / Latin** : *R&B / Soul* (-13…-10), *Afrobeats / Reggaeton / Latin* (-10…-7).
-- **Électronique / Club** : *House / Tech House / Techno* (-10…-7), *EDM / Big Room / Dubstep / Bass* (-8…-5), *Drum & Bass* (-8…-6), *Trance / Progressive* (-10…-8), *Ambient / Downtempo* (-20…-14).
-- **Rock / Metal** : *Indie / Alt Rock* (-12…-10), *Hard Rock / Metal moderne* (-10…-6), *Classic Rock* (-13…-10).
-- **Acoustique / Jazz / Classique** : *Acoustique / Folk / Singer-songwriter* (-18…-12), *Jazz / Classique* (-22…-16).
-- **Cinématique** : *Score / Trailer* (-22…-10).
-- **Broadcast** : *Podcast* (-17…-15), *Broadcast EBU R128* (-24…-22), *Netflix / OTT dialog* (-28…-26).
+L'écart au LUFS cible est **déjà visible** dans l'en-tête de la box d'interprétation (`Cible : LUFS … TP ≤ X dBTP`). On ne le répète donc pas dans le texte. L'interprétation se concentre sur la **lecture qualitative** que l'utilisateur ne peut pas tirer d'un seul chiffre.
 
-True peak : -1 dBTP par défaut, **-0.5 dBTP** pour genres club denses (House/Techno, EDM/Bass, D&B, Dubstep).
+### Cadre éditorial
 
-### 2. Sélecteur de genre épuré (`src/pages/Loudness.tsx`)
+Sortie : **1 à 2 lignes adaptatives**, FR + EN, factuelle, sans qualificatifs flatteurs ni verdicts esthétiques.
 
-Supprimer l'affichage `{lufsMin}…{lufsMax} LUFS` à droite du nom dans `<SelectItem>`.
+#### Ligne 1 — Lecture contextuelle (toujours)
 
-### 3. Box d'interprétation : en-tête + ton apaisé, conscient du contexte pro
+Décrit le master en termes de densité, dynamique macro, transitoires, sans répéter les valeurs déjà affichées en en-tête. Aucune mention "+X LU au-dessus/en dessous" puisque l'écart est lisible en en-tête.
 
-**En-tête enrichi** :
+Exemples FR :
+- Dans la plage : *"Densité dans la plage du sous-genre, dynamique macro et transitoires préservés."*
+- Légèrement au-dessus (≤ +2 LU au-dessus du haut) : *"Densité dans la zone haute du sous-genre, lecture cohérente avec les références récentes."*
+- Marqué au-dessus (> +2 LU) : *"Densité au-delà des références récentes du sous-genre."*
+- Légèrement en dessous (≤ −2 LU sous le bas) : *"Lecture plus aérée que les références du sous-genre."*
+- Marqué en dessous (> −2 LU) : *"Macro-dynamique nettement plus large que les références du sous-genre."*
 
-```
-Interprétation · House / Tech House / Techno · cible -10…-7 LUFS · TP ≤ -0.5 dBTP
-```
+Tolérance ±1 LU avant qu'on parle d'écart (la phrase "dans la plage" couvre cette zone).
 
-**Refonte de `buildInterpretation`** — l'IA part du principe implicite que l'utilisateur est un pro travaillant en **format sans perte (WAV/AIFF/FLAC)** pour **plateformes streaming + supports physiques** :
+#### Ligne 2 — Point d'attention technique (uniquement si justifié)
 
-- **Une seule ligne** observationnelle, jamais prescriptive.
-- Pas de répétition de la mesure brute / delta (visibles dans le panneau LUFS).
-- **Tolérance ±1 LU** avant tout commentaire d'écart.
-- **Aucune mention codec lossy** (MP3/AAC/Opus) — hors périmètre.
-- **Aucune mention support** (CD/vinyle/streaming) dans la phrase — c'est implicite, on s'adresse à des pros.
-- TP dans la zone tolérée → **silence**.
-- TP au-dessus → mention factuelle neutre, sans injonction.
+Ajoutée seulement quand une mesure est **objectivement** problématique. Aucune mention de codecs (AAC/MP3) — focus streaming lossless + supports physiques. Une seule alerte max, par ordre de priorité :
 
-**Grille de tournures (FR)** :
+1. **TP ≥ 0 dBTP** : *"True peak {valeur} dBTP : clipping inter-sample mesuré."*
+2. **TP > cible du genre mais < 0** : *"True peak {valeur} dBTP : marge de sécurité serrée par rapport à la cible du sous-genre."*
+3. **PLR < 5 dB** : *"PLR {valeur} dB : transitoires fortement écrasés, signature d'un limiteur très poussé."*
+4. **LRA effondré (< plancher du genre − 2 LU)** : *"LRA {valeur} LU vs ≥ {plancher} LU typique : macro-dynamique très resserrée pour le sous-genre."*
 
-| Situation | Phrase |
-|---|---|
-| Dans la plage (±1 LU) | "Cohérent avec les références actuelles du genre." |
-| Légèrement au-dessus | "Densité un peu supérieure aux références récentes — choix artistique défendable." |
-| Très au-dessus (>+1.5 LU) | "Master très dense ; à comparer en A/B avec une référence avant validation." |
-| Légèrement en-dessous | "Légèrement plus aéré que les références — peut servir l'arrangement." |
-| Très en-dessous (>1.5 LU) | "Plus dynamique que les standards actuels du genre ; à valider selon l'intention." |
-| TP > tolérance | "True peak {x} dBTP : marge de sécurité serrée." |
-| LRA très resserré (>2 LU sous le typique) | "Dynamique resserrée — vérifier la lecture des transitoires." |
+Hors de ces cas : pas de ligne 2. Le PLR n'est jamais qualifié de "sain" ou "agressif" — on le mentionne seulement pour signaler la faute.
 
-Suppression du disclaimer `loudness.interpretationDisclaimer`.
+### Changements code
 
-### 4. Box "Cibles plateformes" (streaming + broadcast uniquement)
+1. **`src/lib/loudnessTargets.ts`**
+   - Étendre la signature de `buildInterpretation` pour recevoir `plr` (déjà calculé dans `Loudness.tsx`).
+   - Réécrire la sélection de `mainLine` selon les 5 cas ci-dessus (FR + EN), sans mention chiffrée d'écart LUFS.
+   - Réécrire la logique de la ligne d'alerte : priorité TP ≥ 0 > TP > cible > PLR < 5 > LRA effondré. Une seule ligne.
+   - Constantes internes : `PLR_CRITICAL = 5`, helper `lraCollapsed = lraMin && loudnessRange < lraMin - 2`.
+   - Le commentaire d'en-tête conserve la mention "lossless streaming + physical, no codec warnings ever".
 
-Placée après les 4 cartes de mesure, avant la carte CTA.
+2. **`src/pages/Loudness.tsx`** (ligne 454)
+   - Passer `plr: result.plr` dans l'objet measurement transmis à `buildInterpretation`.
+   - Aucune autre modification UI. La box des cibles affiche déjà la plage LUFS et le TP cible (ligne 811), donc l'utilisateur a le contexte nécessaire pour interpréter sans répétition dans le texte.
 
-| Plateforme | Cible | True peak max |
-|---|---|---|
-| Spotify | -14 LUFS | -1 dBTP |
-| Apple Music | -16 LUFS | -1 dBTP |
-| Tidal | -14 LUFS | -1 dBTP |
-| YouTube Music | -14 LUFS | -1 dBTP |
-| Amazon Music | -14 LUFS | -2 dBTP |
-| Deezer | -15 LUFS | -1 dBTP |
-| SoundCloud | non normalisé | -1 dBTP |
-| Beatport | non normalisé | -1 dBTP |
-| Broadcast EBU R128 | -23 LUFS ±1 | -1 dBTP |
-| Netflix (dialog) | -27 LKFS ±2 | -2 dBTP |
+3. **i18n**
+   - Aucune clé i18n à ajouter : les phrases sont construites en dur dans `buildInterpretation` selon `lang`, ce qui permet l'insertion propre des valeurs chiffrées dans la ligne 2.
 
-(**Pas** de ligne CD ni vinyle, comme demandé.)
+### Validation
 
-Note discrète sous le tableau : "Le streaming normalise à la lecture ; un master plus fort sera baissé sans perte de qualité."
+- `tsc --noEmit` doit passer.
+- Test mental sur 4 profils :
+  - Master loud "propre" du genre → 1 ligne (lecture contextuelle), pas d'alerte.
+  - Master très loud avec PLR effondré → 2 lignes (lecture + PLR).
+  - Master dans la plage avec TP +0.2 dBTP → 2 lignes (lecture + clipping).
+  - Master très dynamique sur du metal → 1 ligne (lecture aérée), pas d'alerte.
+- Vérifier que les rapports PDF reflètent les nouvelles phrases (mêmes appels à `buildInterpretation`).
 
-### 5. Correctif axe temps de la courbe LUFS du rapport PDF (`src/pages/Loudness.tsx`, fonction `drawPdfLoudnessCurve`)
+### Ce qu'on ne change PAS
 
-Actuellement (ligne 114) :
-```js
-report.text(`${formatDuration(0)}                     ${formatDuration(timeMax / 2)}                     ${formatDuration(timeMax)}`, plot.left, y + height - 4);
-```
-
-→ Trois marqueurs grossièrement espacés par des espaces, **non alignés** sur les positions x réelles de la courbe.
-
-**Nouvelle logique** :
-
-1. Construire un tableau de ticks :
-   - `0` (toujours)
-   - chaque minute pleine : `60`, `120`, `180`, … tant que `tick < timeMax - 5` (pour éviter chevauchement avec la fin)
-   - `timeMax` (toujours, formaté `M:SS` exact, ex. `4:28`)
-2. Pour chaque tick, calculer la position x exacte :
-   ```js
-   const tx = plot.left + (tick / timeMax) * (plot.right - plot.left);
-   ```
-3. Dessiner :
-   - une petite graduation verticale de 1.5 mm sous l'axe à `tx, plot.bottom`
-   - le label `formatDuration(tick)` centré sous la graduation (`textAnchor` simulé via décalage `-textWidth/2`, jsPDF supporte `align: "center"` dans `text()`)
-4. Si le morceau dure < 60 s, n'afficher que `0:00` et la durée finale.
-5. Si la durée finale est à moins de 5 s d'un tick minute (ex. 3:58 vs 3:00), supprimer ce tick minute pour éviter le chevauchement et ne garder que `0:00`, les minutes précédentes et la fin exacte.
-
-**Code prévu** :
-```js
-const buildTicks = (timeMax: number): number[] => {
-  const ticks: number[] = [0];
-  for (let m = 60; m < timeMax - 5; m += 60) ticks.push(m);
-  if (timeMax > 1) ticks.push(timeMax);
-  return ticks;
-};
-const ticks = buildTicks(timeMax);
-report.setTextColor(150, 158, 170);
-report.setFontSize(6.5);
-ticks.forEach((tick) => {
-  const tx = plot.left + (tick / timeMax) * (plot.right - plot.left);
-  report.setDrawColor(80, 88, 98);
-  report.line(tx, plot.bottom, tx, plot.bottom + 1.5);
-  report.text(formatDuration(tick), tx, y + height - 4, { align: "center" });
-});
-```
-
-Cela garantit que `0:00`, chaque `M:00` intermédiaire et la durée exacte (`4:28`, etc.) sont **précisément alignés** sur la courbe.
-
-### 6. i18n (`fr.json` + `en.json`)
-
-- Libellés des sous-genres consolidés.
-- Réécriture `loudness.interpretation.*` (formulations observationnelles, sans codec, sans support).
-- Suppression `loudness.interpretationDisclaimer`.
-- Ajout `loudness.platformTargets.title`, `loudness.platformTargets.rows.*` (label/lufs/tp), `loudness.platformTargets.note`.
-
-### Détails techniques
-
-**Fichiers modifiés** :
-- `src/lib/loudnessTargets.ts` — fusion sous-genres, TP -0.5 dBTP pour club, refonte `buildInterpretation` (1 ligne, observationnel, ±1 LU, zéro mention codec/support).
-- `src/pages/Loudness.tsx` — sélecteur épuré, en-tête interprétation enrichi, suppression disclaimer, nouvelle box "Cibles plateformes" (streaming + broadcast), **correctif `drawPdfLoudnessCurve`** : ticks temps précis (`0:00`, minutes pleines, fin exacte) alignés sur la courbe.
-- `src/i18n/locales/fr.json` + `en.json` — clés interprétation + section plateformes.
-
-**Pas de changement** : moteur d'analyse BS.1770, structure des cartes de mesures, courbe SVG à l'écran (déjà correcte ligne 368-371).
+- UI de l'analyseur, courbe LUFS, en-tête de cibles, mode neutre (sans genre).
+- Valeurs de référence par sous-genre dans `GENRE_GROUPS`.
+- i18n existante en dehors de `buildInterpretation`.

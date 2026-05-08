@@ -121,7 +121,7 @@ export const SUBGENRE_BY_ID: Record<string, SubGenreTarget> = GENRE_GROUPS.reduc
 export type LoudnessVerdict = "below" | "in-range" | "above";
 
 export type LoudnessInterpretation = {
-  /** 1 short observational line, ready to display */
+  /** 1 to 2 short observational lines, ready to display */
   lines: string[];
   verdict: LoudnessVerdict;
   truePeakOk: boolean;
@@ -129,69 +129,90 @@ export type LoudnessInterpretation = {
 
 const fmt = (n: number) => (Number.isFinite(n) ? n.toFixed(1) : "–");
 
+const PLR_CRITICAL = 5; // dB — below this, limiter is objectively over-pushed
+const LRA_COLLAPSE_MARGIN = 2; // LU below the genre floor
+
 /**
- * Build a concise (1 line, observational) interpretation for the given
+ * Build a concise (1-2 lines, observational) interpretation for the given
  * measurement relative to the chosen subgenre target.
  *
  * Implicit context: pro engineer, lossless workflow, streaming + physical
- * delivery. Tone is observational, never prescriptive; ±1 LU tolerance
- * before any out-of-range comment; no codec-related warnings ever.
+ * delivery. No codec-related warnings ever (no AAC/MP3 mentions).
+ *
+ * Editorial frame:
+ * - Line 1 (always): qualitative reading of density / macro dynamics.
+ *   The numeric LUFS gap vs target is NOT repeated here — it is already
+ *   shown in the interpretation box header.
+ * - Line 2 (only if objectively warranted): single technical alert,
+ *   priority TP ≥ 0 > TP > genre target > PLR < 5 > LRA collapsed.
+ *   PLR is never qualified ("healthy", "aggressive", etc.) outside that alert.
  */
 export const buildInterpretation = (
-  measurement: { lufs: number; truePeakDb: number; loudnessRange: number },
+  measurement: { lufs: number; truePeakDb: number; loudnessRange: number; plr: number },
   sub: SubGenreTarget,
   lang: "fr" | "en",
 ): LoudnessInterpretation => {
-  const { lufs, truePeakDb, loudnessRange } = measurement;
-  const tolerance = 1; // LU
-  const tightLra = sub.lraMin !== undefined && Number.isFinite(loudnessRange) && loudnessRange < sub.lraMin - 2;
+  const { lufs, truePeakDb, loudnessRange, plr } = measurement;
+  const tolerance = 1; // LU before we speak of an actual gap
 
   let verdict: LoudnessVerdict;
   let mainLine: string;
 
-  if (lufs > sub.lufsMax + tolerance + 0.5) {
+  if (lufs > sub.lufsMax + tolerance + 2) {
     verdict = "above";
     mainLine = lang === "fr"
-      ? "Master très dense ; à comparer en A/B avec une référence avant validation."
-      : "Very dense master; A/B against a reference before final validation.";
+      ? "Densité au-delà des références récentes du sous-genre."
+      : "Density beyond recent references for the subgenre.";
   } else if (lufs > sub.lufsMax + tolerance) {
     verdict = "above";
     mainLine = lang === "fr"
-      ? "Densité un peu supérieure aux références récentes — choix artistique défendable."
-      : "Slightly above current references — defensible artistic choice.";
-  } else if (lufs < sub.lufsMin - tolerance - 0.5) {
+      ? "Densité dans la zone haute du sous-genre, lecture cohérente avec les références récentes."
+      : "Density in the upper zone of the subgenre, consistent with recent references.";
+  } else if (lufs < sub.lufsMin - tolerance - 2) {
     verdict = "below";
     mainLine = lang === "fr"
-      ? "Plus dynamique que les standards actuels du genre ; à valider selon l'intention."
-      : "More dynamic than current genre standards; validate against intent.";
+      ? "Macro-dynamique nettement plus large que les références du sous-genre."
+      : "Macro-dynamics noticeably wider than the subgenre's references.";
   } else if (lufs < sub.lufsMin - tolerance) {
     verdict = "below";
     mainLine = lang === "fr"
-      ? "Légèrement plus aéré que les références — peut servir l'arrangement."
-      : "Slightly more open than references — may serve the arrangement.";
+      ? "Lecture plus aérée que les références du sous-genre."
+      : "More open reading than the subgenre's references.";
   } else {
     verdict = "in-range";
     mainLine = lang === "fr"
-      ? "Cohérent avec les références actuelles du genre."
-      : "Consistent with current genre references.";
+      ? "Densité dans la plage du sous-genre, dynamique macro et transitoires préservés."
+      : "Density within the subgenre range, macro dynamics and transients preserved.";
   }
 
   const truePeakOk = truePeakDb <= sub.truePeakMax;
   const lines = [mainLine];
 
-  if (!truePeakOk) {
-    lines.push(
-      lang === "fr"
-        ? `True peak ${fmt(truePeakDb)} dBTP : marge de sécurité serrée.`
-        : `True peak ${fmt(truePeakDb)} dBTP: tight safety margin.`
-    );
-  } else if (tightLra) {
-    lines.push(
-      lang === "fr"
-        ? "Dynamique resserrée — vérifier la lecture des transitoires."
-        : "Tight dynamics — check transient readability."
-    );
+  // Single technical alert by descending priority
+  let alert: string | null = null;
+  if (Number.isFinite(truePeakDb) && truePeakDb >= 0) {
+    alert = lang === "fr"
+      ? `True peak ${fmt(truePeakDb)} dBTP : clipping inter-sample mesuré.`
+      : `True peak ${fmt(truePeakDb)} dBTP: inter-sample clipping measured.`;
+  } else if (!truePeakOk) {
+    alert = lang === "fr"
+      ? `True peak ${fmt(truePeakDb)} dBTP : marge de sécurité serrée par rapport à la cible du sous-genre.`
+      : `True peak ${fmt(truePeakDb)} dBTP: tight safety margin versus the subgenre target.`;
+  } else if (Number.isFinite(plr) && plr < PLR_CRITICAL) {
+    alert = lang === "fr"
+      ? `PLR ${fmt(plr)} dB : transitoires fortement écrasés, signature d'un limiteur très poussé.`
+      : `PLR ${fmt(plr)} dB: transients heavily crushed, signature of a very pushed limiter.`;
+  } else if (
+    sub.lraMin !== undefined &&
+    Number.isFinite(loudnessRange) &&
+    loudnessRange < sub.lraMin - LRA_COLLAPSE_MARGIN
+  ) {
+    alert = lang === "fr"
+      ? `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typique : macro-dynamique très resserrée pour le sous-genre.`
+      : `LRA ${fmt(loudnessRange)} LU vs ≥ ${sub.lraMin} LU typical: macro-dynamics very tight for the subgenre.`;
   }
+
+  if (alert) lines.push(alert);
 
   return { lines, verdict, truePeakOk };
 };
