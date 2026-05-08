@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 import { Drum, FileAudio, Gauge, KeyRound, Loader2, Music2, Upload, Activity, Disc3, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
