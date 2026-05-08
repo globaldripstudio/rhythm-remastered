@@ -390,8 +390,16 @@ const AudioToMidi = ({
       <div>
         <Card className="equipment-card overflow-hidden border-border/80">
           <CardContent className="space-y-4 p-3 sm:p-6">
-            <label
-              htmlFor="audio-upload-midi"
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
               onDragOver={(event) => {
                 event.preventDefault();
                 setIsDragging(true);
@@ -409,9 +417,10 @@ const AudioToMidi = ({
               }`}
             >
               <input
+                ref={fileInputRef}
                 id="audio-upload-midi"
                 type="file"
-                accept="audio/*"
+                accept={AUDIO_ACCEPT}
                 className="sr-only"
                 onChange={(event) => handleSelectAndRun(event.target.files?.[0])}
               />
@@ -432,7 +441,21 @@ const AudioToMidi = ({
                   {file.name} — {(file.size / 1024 / 1024).toFixed(1)} MB
                 </p>
               )}
-            </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+                disabled={isProcessing}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Choisir un fichier
+              </Button>
+            </div>
 
             {isProcessing && (
               <div className="space-y-2">
