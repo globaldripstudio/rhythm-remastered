@@ -9,8 +9,10 @@ import ToolResources from "@/components/tools/ToolResources";
 import { breadcrumbSchema, softwareAppSchema } from "@/lib/seo/schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
+import { GENRE_GROUPS, SUBGENRE_BY_ID, buildInterpretation } from "@/lib/loudnessTargets";
 
 type AnalysisResult = {
   lufs: number;
