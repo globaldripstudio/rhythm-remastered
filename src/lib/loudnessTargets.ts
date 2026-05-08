@@ -128,9 +128,11 @@ export type LoudnessInterpretation = {
 };
 
 const fmt = (n: number) => (Number.isFinite(n) ? n.toFixed(1) : "–");
+const fmtTp = (n: number) => (Number.isFinite(n) ? n.toFixed(2) : "–");
 
 const PLR_CRITICAL = 5; // dB — below this, limiter is objectively over-pushed
 const LRA_COLLAPSE_MARGIN = 2; // LU below the genre floor
+const TP_TOLERANCE_DB = 0.1; // dB — TP measurement noise floor; below this no alert
 
 /**
  * Build a concise (1-2 lines, observational) interpretation for the given
@@ -192,12 +194,12 @@ export const buildInterpretation = (
   let alert: string | null = null;
   if (Number.isFinite(truePeakDb) && truePeakDb >= 0) {
     alert = lang === "fr"
-      ? `True peak ${fmt(truePeakDb)} dBTP : clipping inter-sample mesuré.`
-      : `True peak ${fmt(truePeakDb)} dBTP: inter-sample clipping measured.`;
-  } else if (!truePeakOk) {
+      ? `True peak ${fmtTp(truePeakDb)} dBTP : clipping inter-sample mesuré.`
+      : `True peak ${fmtTp(truePeakDb)} dBTP: inter-sample clipping measured.`;
+  } else if (truePeakDb > sub.truePeakMax + TP_TOLERANCE_DB) {
     alert = lang === "fr"
-      ? `True peak ${fmt(truePeakDb)} dBTP : marge de sécurité serrée par rapport à la cible du sous-genre.`
-      : `True peak ${fmt(truePeakDb)} dBTP: tight safety margin versus the subgenre target.`;
+      ? `True peak ${fmtTp(truePeakDb)} dBTP, légèrement au-dessus de la convention du sous-genre (${sub.truePeakMax} dBTP) ; aucun clipping inter-sample mesuré.`
+      : `True peak ${fmtTp(truePeakDb)} dBTP, slightly above the subgenre convention (${sub.truePeakMax} dBTP); no inter-sample clipping measured.`;
   } else if (Number.isFinite(plr) && plr < PLR_CRITICAL) {
     alert = lang === "fr"
       ? `PLR ${fmt(plr)} dB : transitoires fortement écrasés, signature d'un limiteur très poussé.`

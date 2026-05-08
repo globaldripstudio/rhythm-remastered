@@ -1,67 +1,58 @@
-## Refonte de l'interprétation automatique (Loudness)
+## Objectif
 
-### Esprit
+Fiabiliser la mesure True Peak (TP) et corriger la fausse alerte "marge de sécurité serrée" déclenchée sur des dépassements de l'ordre du centième de dB (bruit de mesure).
 
-Aiguillage de précision, pas verdict. On **décrit** avant de qualifier, on **contextualise** sans prescrire, on **alerte** uniquement sur faute technique objective. La récompense pour l'utilisateur est la densité d'information utile par analyse, pas un ton bienveillant.
+## Constat
 
-L'écart au LUFS cible est **déjà visible** dans l'en-tête de la box d'interprétation (`Cible : LUFS … TP ≤ X dBTP`). On ne le répète donc pas dans le texte. L'interprétation se concentre sur la **lecture qualitative** que l'utilisateur ne peut pas tirer d'un seul chiffre.
+- L'estimateur TP actuel (`src/pages/Loudness.tsx`, `estimateTruePeak`) fait du **suréchantillonnage ×4 par interpolation cubique Catmull-Rom**. C'est une approximation rapide mais **non conforme à ITU-R BS.1770** qui spécifie un **filtre polyphase FIR** sur ×4. L'erreur typique de la cubique peut atteindre 0.1–0.3 dB selon le matériau (sous-estimation ou sur-estimation des pics inter-sample).
+- L'alerte TP se déclenche dès que `truePeakDb > sub.truePeakMax` (comparaison stricte). Combinée à l'arrondi d'affichage à 1 décimale, on alerte sur des écarts invisibles à l'oeil (-0.47 dBTP affiché "-0.5", cible "-0.5", alerte déclenchée).
+- Formulation actuelle ("marge de sécurité serrée par rapport à la cible") sonne injonctive et peut laisser croire qu'il faut baisser le ceiling, alors que le master peut être parfaitement dans les clous.
 
-### Cadre éditorial
+## Changements
 
-Sortie : **1 à 2 lignes adaptatives**, FR + EN, factuelle, sans qualificatifs flatteurs ni verdicts esthétiques.
+### 1. Améliorer la précision de la mesure TP — `src/pages/Loudness.tsx`
 
-#### Ligne 1 — Lecture contextuelle (toujours)
+Remplacer `estimateTruePeak` par une implémentation conforme **ITU-R BS.1770-4 Annexe 2** :
 
-Décrit le master en termes de densité, dynamique macro, transitoires, sans répéter les valeurs déjà affichées en en-tête. Aucune mention "+X LU au-dessus/en dessous" puisque l'écart est lisible en en-tête.
+- Suréchantillonnage **×4** via **filtre polyphase FIR** (4 sous-filtres de ~12 taps, fenêtre Kaiser, coupure ~20 kHz à fs source).
+- Coefficients pré-calculés en constante module (4 × 12 = 48 floats).
+- Recherche du pic absolu sur le signal suréchantillonné de chaque canal.
+- Fallback : si la longueur du canal < taille filtre, on retombe sur le sample peak.
 
-Exemples FR :
-- Dans la plage : *"Densité dans la plage du sous-genre, dynamique macro et transitoires préservés."*
-- Légèrement au-dessus (≤ +2 LU au-dessus du haut) : *"Densité dans la zone haute du sous-genre, lecture cohérente avec les références récentes."*
-- Marqué au-dessus (> +2 LU) : *"Densité au-delà des références récentes du sous-genre."*
-- Légèrement en dessous (≤ −2 LU sous le bas) : *"Lecture plus aérée que les références du sous-genre."*
-- Marqué en dessous (> −2 LU) : *"Macro-dynamique nettement plus large que les références du sous-genre."*
+Précision attendue : ±0.05 dB sur les pics inter-sample, conforme à ce qu'affichent les outils pros (iZotope Insight, Youlean, Nugen MasterCheck).
 
-Tolérance ±1 LU avant qu'on parle d'écart (la phrase "dans la plage" couvre cette zone).
+### 2. Tolérance d'alerte TP — `src/lib/loudnessTargets.ts`
 
-#### Ligne 2 — Point d'attention technique (uniquement si justifié)
+Introduire `TP_TOLERANCE_DB = 0.1` :
 
-Ajoutée seulement quand une mesure est **objectivement** problématique. Aucune mention de codecs (AAC/MP3) — focus streaming lossless + supports physiques. Une seule alerte max, par ordre de priorité :
+- L'alerte "TP au-dessus de la cible du genre" ne se déclenche que si `truePeakDb > sub.truePeakMax + TP_TOLERANCE_DB`.
+- En dessous de ce seuil : pas d'alerte (on est dans le bruit de mesure résiduel).
+- L'alerte `truePeakDb >= 0` (clipping inter-sample mesuré, faute objective) **reste stricte, inchangée**.
 
-1. **TP ≥ 0 dBTP** : *"True peak {valeur} dBTP : clipping inter-sample mesuré."*
-2. **TP > cible du genre mais < 0** : *"True peak {valeur} dBTP : marge de sécurité serrée par rapport à la cible du sous-genre."*
-3. **PLR < 5 dB** : *"PLR {valeur} dB : transitoires fortement écrasés, signature d'un limiteur très poussé."*
-4. **LRA effondré (< plancher du genre − 2 LU)** : *"LRA {valeur} LU vs ≥ {plancher} LU typique : macro-dynamique très resserrée pour le sous-genre."*
+### 3. Affichage 2 décimales uniquement dans la ligne d'alerte TP — `src/lib/loudnessTargets.ts`
 
-Hors de ces cas : pas de ligne 2. Le PLR n'est jamais qualifié de "sain" ou "agressif" — on le mentionne seulement pour signaler la faute.
+- Header de l'interprétation et bloc de mesures : **inchangés** (1 décimale, `result.truePeakDb.toFixed(1)`).
+- Dans la ligne d'alerte TP (et seulement là), afficher 2 décimales pour qu'un dépassement signalé soit *visiblement* un dépassement.
+- Helper local `fmtTp(v)` → `v.toFixed(2)`.
 
-### Changements code
+### 4. Reformuler la ligne TP > cible — `src/lib/loudnessTargets.ts`
 
-1. **`src/lib/loudnessTargets.ts`**
-   - Étendre la signature de `buildInterpretation` pour recevoir `plr` (déjà calculé dans `Loudness.tsx`).
-   - Réécrire la sélection de `mainLine` selon les 5 cas ci-dessus (FR + EN), sans mention chiffrée d'écart LUFS.
-   - Réécrire la logique de la ligne d'alerte : priorité TP ≥ 0 > TP > cible > PLR < 5 > LRA effondré. Une seule ligne.
-   - Constantes internes : `PLR_CRITICAL = 5`, helper `lraCollapsed = lraMin && loudnessRange < lraMin - 2`.
-   - Le commentaire d'en-tête conserve la mention "lossless streaming + physical, no codec warnings ever".
+Remplacer la formulation actuelle ("marge de sécurité serrée par rapport à la cible du sous-genre") par une lecture **informative et non injonctive**, mentionnant la convention du sous-genre sans suggérer d'action :
 
-2. **`src/pages/Loudness.tsx`** (ligne 454)
-   - Passer `plr: result.plr` dans l'objet measurement transmis à `buildInterpretation`.
-   - Aucune autre modification UI. La box des cibles affiche déjà la plage LUFS et le TP cible (ligne 811), donc l'utilisateur a le contexte nécessaire pour interpréter sans répétition dans le texte.
+- FR : `True peak {x.xx} dBTP, légèrement au-dessus de la convention du sous-genre ({cible} dBTP) ; aucun clipping inter-sample mesuré.`
+- EN : `True peak {x.xx} dBTP, slightly above the subgenre convention ({target} dBTP); no inter-sample clipping measured.`
 
-3. **i18n**
-   - Aucune clé i18n à ajouter : les phrases sont construites en dur dans `buildInterpretation` selon `lang`, ce qui permet l'insertion propre des valeurs chiffrées dans la ligne 2.
+### 5. Ce qu'on ne touche pas
 
-### Validation
+- Mesure LUFS, LRA, PLR, courbes, en-tête de cibles, mode neutre, valeurs par sous-genre.
+- Alerte TP ≥ 0 dBTP (clipping mesuré).
+- Alertes PLR < 5 et LRA effondré.
+- UI de la page Loudness, i18n existante.
 
-- `tsc --noEmit` doit passer.
-- Test mental sur 4 profils :
-  - Master loud "propre" du genre → 1 ligne (lecture contextuelle), pas d'alerte.
-  - Master très loud avec PLR effondré → 2 lignes (lecture + PLR).
-  - Master dans la plage avec TP +0.2 dBTP → 2 lignes (lecture + clipping).
-  - Master très dynamique sur du metal → 1 ligne (lecture aérée), pas d'alerte.
-- Vérifier que les rapports PDF reflètent les nouvelles phrases (mêmes appels à `buildInterpretation`).
+## Validation
 
-### Ce qu'on ne change PAS
-
-- UI de l'analyseur, courbe LUFS, en-tête de cibles, mode neutre (sans genre).
-- Valeurs de référence par sous-genre dans `GENRE_GROUPS`.
-- i18n existante en dehors de `buildInterpretation`.
+- `tsc --noEmit` doit passer (vérification automatique du build).
+- Test mental sur le cas utilisateur : master ceilé à -0.6 dBFS, TP réel ~-0.55 dBTP, cible -0.5 → **plus d'alerte** (sous tolérance 0.1).
+- Cas TP = -0.35 dBTP, cible -0.5 → alerte affichée "-0.35 dBTP" (2 décimales), formulation neutre.
+- Cas TP = +0.2 dBTP → alerte stricte "clipping inter-sample mesuré" (inchangé).
+- Cohérence visuelle : pas de double affichage de TP avec décimales différentes dans le même bloc (header reste 1 déc., alerte 2 déc., justifié par la précision de l'événement signalé).
