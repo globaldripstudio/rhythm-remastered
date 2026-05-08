@@ -451,7 +451,7 @@ const Loudness = () => {
   const interpretation = useMemo(() => {
     if (!result || !subgenre) return null;
     return buildInterpretation(
-      { lufs: result.lufs, truePeakDb: result.truePeakDb, loudnessRange: result.loudnessRange },
+      { lufs: result.lufs, truePeakDb: result.truePeakDb, loudnessRange: result.loudnessRange, plr: result.plr },
       subgenre,
       lang,
     );
