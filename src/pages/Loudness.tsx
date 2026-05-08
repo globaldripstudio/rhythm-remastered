@@ -417,36 +417,20 @@ const Loudness = () => {
   const [curveFocus, setCurveFocus] = useState<CurveFocus>("both");
   const [curveHoverIndex, setCurveHoverIndex] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedSubgenre, setSelectedSubgenre] = useState<string | null>(null);
 
-  const toggleLanguage = () => {
-    document.body.classList.add('lang-switching');
-    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
-    setTimeout(() => document.body.classList.remove('lang-switching'), 500);
-  };
+  const lang: "fr" | "en" = i18n.language === "en" ? "en" : "fr";
+  const subgenre = selectedSubgenre ? SUBGENRE_BY_ID[selectedSubgenre] ?? null : null;
+  const subgenreLabel = subgenre ? (lang === "fr" ? subgenre.labelFr : subgenre.labelEn) : null;
 
-  const inferredContext = useMemo<MusicContext | null>(() => {
-    if (!result) return null;
-    if (result.lufs > -11 && result.loudnessRange < 5) return "electronic";
-    if (result.lufs > -12.5 && result.plr < 10) return "rap";
-    if (result.lufs > -15 && result.loudnessRange < 8) return "pop";
-    if (result.loudnessRange > 12 && result.lufs < -17) return "acoustic";
-    if (result.lufs < -20) return "broadcast";
-    return "rock";
-  }, [result]);
-
-  const targetHint = useMemo(() => {
-    if (!result || !inferredContext) return null;
-    const contextAdvice: Record<MusicContext, string> = {
-      rap: result.lufs > -10.5 ? t("loudness.advice.rap.hot") : result.lufs > -14 ? t("loudness.advice.rap.solid") : t("loudness.advice.rap.dynamic"),
-      pop: result.lufs > -11 ? t("loudness.advice.pop.hot") : result.lufs > -15 ? t("loudness.advice.pop.solid") : t("loudness.advice.pop.dynamic"),
-      electronic: result.lufs > -9.5 ? t("loudness.advice.electronic.hot") : result.lufs > -13 ? t("loudness.advice.electronic.solid") : t("loudness.advice.electronic.dynamic"),
-      rock: result.lufs > -10 ? t("loudness.advice.rock.hot") : result.lufs > -14 ? t("loudness.advice.rock.solid") : t("loudness.advice.rock.dynamic"),
-      acoustic: result.lufs > -14 ? t("loudness.advice.acoustic.hot") : result.lufs > -20 ? t("loudness.advice.acoustic.solid") : t("loudness.advice.acoustic.dynamic"),
-      broadcast: result.lufs > -16 ? t("loudness.advice.broadcast.hot") : result.lufs > -21 ? t("loudness.advice.broadcast.solid") : t("loudness.advice.broadcast.dynamic"),
-    };
-    const technical = result.truePeakDb > -1 ? ` ${t("loudness.advice.truePeakHigh")}` : ` ${t("loudness.advice.truePeakHealthy")}`;
-    return `${contextAdvice[inferredContext]}${technical}`;
-  }, [inferredContext, result, t]);
+  const interpretation = useMemo(() => {
+    if (!result || !subgenre) return null;
+    return buildInterpretation(
+      { lufs: result.lufs, truePeakDb: result.truePeakDb, loudnessRange: result.loudnessRange },
+      subgenre,
+      lang,
+    );
+  }, [result, subgenre, lang]);
 
   const runAnalysis = useCallback(async (file: File, mode: AnalysisMode) => {
     setIsAnalyzing(true);
