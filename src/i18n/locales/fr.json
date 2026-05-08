@@ -1184,7 +1184,17 @@
     "inferredProfile": "Profil déduit",
     "neutralProfile": "Analyse neutre",
     "pdfButton": "Rapport PDF",
-    "interpretationTitle": "Interprétation automatique",
+    "interpretationTitle": "Interprétation",
+    "interpretationDisclaimer": "Cibles créatives 2024-2026 (mastering). Le streaming normalise séparément (Spotify/Tidal/YouTube -14, Apple -16 LUFS).",
+    "selectedGenre": "Genre sélectionné",
+    "noGenreHint": "Aucun genre sélectionné — interprétation désactivée. Choisis un style musical en haut pour obtenir des recommandations adaptées.",
+    "genrePicker": {
+      "label": "Style musical (pour interprétation ciblée)",
+      "optional": "Optionnel",
+      "placeholder": "Aucun — analyse neutre",
+      "none": "Aucun — analyse neutre",
+      "helper": "Si renseigné, l'analyse compare les mesures aux cibles de mastering du sous-genre. Sinon, mesures brutes uniquement."
+    },
     "referencesTitle": "Repères BS.1770",
     "modes": {
       "stereo": "Stéréo",
