@@ -1,7 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Drum, Gauge, KeyRound, Music2, Music4 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+
+const LOCALIZED_ROUTES: Record<string, string> = {
+  "/loudness": "/en/loudness",
+  "/en/loudness": "/loudness",
+};
 
 type ToolKey = "loudness" | "keybpm" | "tempo" | "chords" | "audio2midi";
 
@@ -19,10 +24,17 @@ interface ToolkitHeaderProps {
 
 const ToolkitHeader = ({ current }: ToolkitHeaderProps) => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const toggleLanguage = () => {
     document.body.classList.add("lang-switching");
-    i18n.changeLanguage(i18n.language === "fr" ? "en" : "fr");
+    const target = LOCALIZED_ROUTES[pathname];
+    if (target) {
+      navigate(target);
+    } else {
+      i18n.changeLanguage(i18n.language === "fr" ? "en" : "fr");
+    }
     setTimeout(() => document.body.classList.remove("lang-switching"), 500);
   };
 
