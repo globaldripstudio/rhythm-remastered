@@ -35,7 +35,7 @@ const queryClient = new QueryClient();
 
 const ConditionalLiveChat = () => {
   const { pathname } = useLocation();
-  return pathname.startsWith("/admin") ? null : <LiveChat />;
+  return pathname.startsWith("/admin") || pathname.startsWith("/reset-password") ? null : <LiveChat />;
 };
 
 const App = () => (
