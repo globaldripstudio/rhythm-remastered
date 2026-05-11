@@ -1,58 +1,77 @@
 ## Objectif
 
-Fiabiliser la mesure True Peak (TP) et corriger la fausse alerte "marge de sécurité serrée" déclenchée sur des dépassements de l'ordre du centième de dB (bruit de mesure).
+Mettre en place un journal d'audit complet sur la base Supabase pour détecter toute action sensible (écriture, suppression, modification) sur l'ensemble du schéma `public`, avec une interface admin dédiée et une rétention de 1 an.
 
-## Constat
+## Ce qui sera créé
 
-- L'estimateur TP actuel (`src/pages/Loudness.tsx`, `estimateTruePeak`) fait du **suréchantillonnage ×4 par interpolation cubique Catmull-Rom**. C'est une approximation rapide mais **non conforme à ITU-R BS.1770** qui spécifie un **filtre polyphase FIR** sur ×4. L'erreur typique de la cubique peut atteindre 0.1–0.3 dB selon le matériau (sous-estimation ou sur-estimation des pics inter-sample).
-- L'alerte TP se déclenche dès que `truePeakDb > sub.truePeakMax` (comparaison stricte). Combinée à l'arrondi d'affichage à 1 décimale, on alerte sur des écarts invisibles à l'oeil (-0.47 dBTP affiché "-0.5", cible "-0.5", alerte déclenchée).
-- Formulation actuelle ("marge de sécurité serrée par rapport à la cible") sonne injonctive et peut laisser croire qu'il faut baisser le ceiling, alors que le master peut être parfaitement dans les clous.
+### 1. Table `audit_log` (base de données)
 
-## Changements
+Une nouvelle table pour stocker chaque action sensible :
 
-### 1. Améliorer la précision de la mesure TP — `src/pages/Loudness.tsx`
+- **table_name** — table concernée (ex: `user_roles`, `ebook_purchases`)
+- **action** — type d'opération (`INSERT`, `UPDATE`, `DELETE`)
+- **row_id** — identifiant de la ligne touchée
+- **actor_user_id** — utilisateur connecté à l'origine de l'action (peut être nul pour actions système / service role)
+- **actor_role** — rôle Postgres ayant exécuté l'action (`anon`, `authenticated`, `service_role`)
+- **old_data** / **new_data** — snapshot JSON avant/après (utile pour les UPDATE et DELETE)
+- **ip_address** / **user_agent** — quand disponibles via les en-têtes de requête
+- **created_at** — horodatage
 
-Remplacer `estimateTruePeak` par une implémentation conforme **ITU-R BS.1770-4 Annexe 2** :
+### 2. Triggers automatiques sur tout le schéma `public`
 
-- Suréchantillonnage **×4** via **filtre polyphase FIR** (4 sous-filtres de ~12 taps, fenêtre Kaiser, coupure ~20 kHz à fs source).
-- Coefficients pré-calculés en constante module (4 × 12 = 48 floats).
-- Recherche du pic absolu sur le signal suréchantillonné de chaque canal.
-- Fallback : si la longueur du canal < taille filtre, on retombe sur le sample peak.
+Une fonction générique `audit_trigger()` (en `SECURITY DEFINER`, non exposée à l'API) sera attachée à **toutes les tables existantes du schéma public** (sauf `audit_log` elle-même et `site_analytics` qui est déjà du logging) pour les événements `INSERT`, `UPDATE`, `DELETE`.
 
-Précision attendue : ±0.05 dB sur les pics inter-sample, conforme à ce qu'affichent les outils pros (iZotope Insight, Youlean, Nugen MasterCheck).
+Tables concernées : `user_roles`, `profiles`, `ebook_purchases`, `contact_leads`, `clients`, `events`, `blog_views`.
 
-### 2. Tolérance d'alerte TP — `src/lib/loudnessTargets.ts`
+Les triggers continueront automatiquement à fonctionner même si vous ajoutez des données via les Edge Functions (service role).
 
-Introduire `TP_TOLERANCE_DB = 0.1` :
+### 3. RLS stricte sur `audit_log`
 
-- L'alerte "TP au-dessus de la cible du genre" ne se déclenche que si `truePeakDb > sub.truePeakMax + TP_TOLERANCE_DB`.
-- En dessous de ce seuil : pas d'alerte (on est dans le bruit de mesure résiduel).
-- L'alerte `truePeakDb >= 0` (clipping inter-sample mesuré, faute objective) **reste stricte, inchangée**.
+- Lecture : **admin uniquement** (via `has_role`)
+- Écriture/UPDATE/DELETE : **interdit** à tout le monde (anon, authenticated). Seuls les triggers internes peuvent écrire.
 
-### 3. Affichage 2 décimales uniquement dans la ligne d'alerte TP — `src/lib/loudnessTargets.ts`
+### 4. Purge automatique (rétention 1 an)
 
-- Header de l'interprétation et bloc de mesures : **inchangés** (1 décimale, `result.truePeakDb.toFixed(1)`).
-- Dans la ligne d'alerte TP (et seulement là), afficher 2 décimales pour qu'un dépassement signalé soit *visiblement* un dépassement.
-- Helper local `fmtTp(v)` → `v.toFixed(2)`.
+- Une fonction `purge_old_audit_logs()` supprime les entrées de plus de 365 jours.
+- Déclenchée par l'extension `pg_cron` (planification quotidienne à 3h du matin).
+- Si `pg_cron` n'est pas disponible sur l'instance, fallback : la fonction reste en place et peut être appelée manuellement ; je le signalerai.
 
-### 4. Reformuler la ligne TP > cible — `src/lib/loudnessTargets.ts`
+### 5. Onglet "Audit" dans l'admin
 
-Remplacer la formulation actuelle ("marge de sécurité serrée par rapport à la cible du sous-genre") par une lecture **informative et non injonctive**, mentionnant la convention du sous-genre sans suggérer d'action :
+Nouveau composant `src/components/admin/AuditLog.tsx` ajouté au dashboard existant (`src/pages/Admin.tsx`) avec :
 
-- FR : `True peak {x.xx} dBTP, légèrement au-dessus de la convention du sous-genre ({cible} dBTP) ; aucun clipping inter-sample mesuré.`
-- EN : `True peak {x.xx} dBTP, slightly above the subgenre convention ({target} dBTP); no inter-sample clipping measured.`
+- **Filtres** : table, action (INSERT/UPDATE/DELETE), utilisateur, plage de dates
+- **Tableau paginé** : horodatage, table, action, acteur, ID de ligne, IP
+- **Détail au clic** : affichage du diff `old_data` → `new_data` formaté en JSON
+- **Compteurs en tête** : total 24h / 7j / 30j, alerte visuelle si pic anormal d'activité
 
-### 5. Ce qu'on ne touche pas
+Style cohérent avec le dashboard existant (dark, accents orange/teal).
 
-- Mesure LUFS, LRA, PLR, courbes, en-tête de cibles, mode neutre, valeurs par sous-genre.
-- Alerte TP ≥ 0 dBTP (clipping mesuré).
-- Alertes PLR < 5 et LRA effondré.
-- UI de la page Loudness, i18n existante.
+## Détails techniques
 
-## Validation
+```text
+Flux d'écriture :
+  app/edge function ──► table sensible ──► trigger AFTER ──► audit_log
+                                                ▲
+                                                │
+                              capture auth.uid(), current_user,
+                              row OLD/NEW en JSONB
+```
 
-- `tsc --noEmit` doit passer (vérification automatique du build).
-- Test mental sur le cas utilisateur : master ceilé à -0.6 dBFS, TP réel ~-0.55 dBTP, cible -0.5 → **plus d'alerte** (sous tolérance 0.1).
-- Cas TP = -0.35 dBTP, cible -0.5 → alerte affichée "-0.35 dBTP" (2 décimales), formulation neutre.
-- Cas TP = +0.2 dBTP → alerte stricte "clipping inter-sample mesuré" (inchangé).
-- Cohérence visuelle : pas de double affichage de TP avec décimales différentes dans le même bloc (header reste 1 déc., alerte 2 déc., justifié par la précision de l'événement signalé).
+- La fonction trigger utilise `current_setting('request.jwt.claims', true)` pour récupérer l'utilisateur même quand l'écriture vient d'une Edge Function avec service_role.
+- Les en-têtes IP/User-Agent sont extraits via `current_setting('request.headers', true)` quand PostgREST les transmet (sinon nuls — c'est attendu pour les triggers déclenchés par service_role).
+- Index composé sur `(created_at DESC, table_name, action)` pour des requêtes admin rapides.
+- Volume estimé : faible (< quelques milliers de lignes/mois sur ce projet), pas de risque de saturation.
+
+## Limites connues
+
+- Les **lectures** (SELECT) ne sont pas journalisables côté Postgres sans extension dédiée (pgaudit, indisponible sur Lovable Cloud). Si vous voulez tracer "qui a consulté quoi", il faudra passer par des Edge Functions instrumentées — à discuter dans un second temps si besoin.
+- Les actions effectuées **directement via le dashboard Lovable Cloud** seront aussi journalisées (acteur = `service_role`, sans user_id).
+- Les snapshots JSON peuvent contenir des données sensibles (emails, etc.) — l'accès reste strictement limité à l'admin via RLS.
+
+## Ordre d'exécution
+
+1. Migration : création de `audit_log`, fonction `audit_trigger()`, triggers sur toutes les tables, fonction de purge, RLS, planification cron.
+2. Création du composant `AuditLog.tsx` et intégration dans `Admin.tsx`.
+3. Traductions FR/EN dans `src/i18n/locales/`.
+4. Test rapide : insertion d'une ligne témoin → vérification qu'elle apparaît dans l'onglet Audit.
