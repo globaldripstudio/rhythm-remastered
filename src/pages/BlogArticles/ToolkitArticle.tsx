@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Gauge, KeyRound, Drum, Music2, Music4 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import ShareButtons from "@/components/blog/ShareButtons";
 import ContactCTA from "@/components/ContactCTA";
 import SEO from "@/components/SEO";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schemas";
+import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const TOOL_KEYS = [
   { icon: Gauge, to: "/loudness", key: "loudness" },
