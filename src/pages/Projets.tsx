@@ -196,28 +196,28 @@ const Projets = () => {
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
-              <a href="/" className="flex items-center space-x-2 sm:space-x-3">
+              <Link to={lang === 'en' ? '/en' : '/'} className="flex items-center space-x-2 sm:space-x-3">
                 <img 
                   src="/lovable-uploads/logo-blanc-sans-fond.png"
                   alt="Global Drip Studio"
                   className="h-6 sm:h-8 object-contain"
                 />
-              </a>
-              <a href="/">
+              </Link>
+              <Link to={lang === 'en' ? '/en' : '/'}>
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
                   <span className="hidden sm:inline">← {t('nav.backHome')}</span>
                   <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
                 </Button>
-              </a>
+              </Link>
             </div>
             <button
               onClick={toggleLanguage}
               className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
               aria-label="Switch language"
             >
-              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className={lang === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
               <span className="text-muted-foreground/40">|</span>
-              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+              <span className={lang === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
             </button>
           </div>
         </div>
