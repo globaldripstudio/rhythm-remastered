@@ -1235,7 +1235,7 @@
       "optional": "Optionnel",
       "placeholder": "Aucun — analyse neutre",
       "none": "Aucun — analyse neutre",
-      "helper": "Si renseigné, l'analyse compare les mesures aux cibles de mastering du sous-genre. Sinon, mesures brutes uniquement."
+      "helper": "Si renseigné, l'analyse compare les mesures aux cibles de mastering du genre. Sinon, mesures brutes uniquement."
     },
     "referencesTitle": "Repères BS.1770",
     "modes": {

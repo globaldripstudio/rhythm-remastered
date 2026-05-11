@@ -1235,7 +1235,7 @@
       "optional": "Optional",
       "placeholder": "None — neutral analysis",
       "none": "None — neutral analysis",
-      "helper": "If set, the analysis compares measurements against the subgenre's mastering targets. Otherwise, raw measurements only."
+      "helper": "If set, the analysis compares measurements against the genre's mastering targets. Otherwise, raw measurements only."
     },
     "referencesTitle": "BS.1770 references",
     "modes": {
