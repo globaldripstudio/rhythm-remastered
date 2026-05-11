@@ -195,7 +195,7 @@ const Blog = () => {
                       <span className="absolute -top-2 -right-2 bg-secondary text-secondary-foreground text-[10px] px-2 py-0.5 rounded-full font-medium">{t('blog.comingSoon')}</span>
                     </div>
                   ) : (
-                    <Link to={`/blog/${post.slug}`} className="block">
+                    <Link to={localizePath(`/blog/${post.slug}`, lang)} className="block">
                       <Button variant="outline" className="w-full">{t('blog.readArticle')}</Button>
                     </Link>
                   )}
