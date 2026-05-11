@@ -27,6 +27,7 @@ import QuickActions from './QuickActions';
 import SiteAnalytics from './SiteAnalytics';
 import EbookManager from './EbookManager';
 import StemSplitter from './StemSplitter';
+import AuditLog from './AuditLog';
 
 
 const Dashboard = () => {
