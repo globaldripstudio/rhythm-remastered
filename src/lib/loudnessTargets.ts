@@ -36,8 +36,9 @@ export const GENRE_GROUPS: GenreGroup[] = [
     labelFr: "Hip-Hop / Urbain",
     labelEn: "Hip-Hop / Urban",
     subs: [
-      { id: "hiphop-trap-drill", labelFr: "Hip-Hop / Trap / Drill", labelEn: "Hip-Hop / Trap / Drill", lufsMin: -8.5, lufsMax: -7, truePeakMax: -1, lraMin: 3, lraMax: 7 },
-      { id: "boombap-lofi", labelFr: "Boom Bap / Lo-fi", labelEn: "Boom Bap / Lo-fi", lufsMin: -13, lufsMax: -10, truePeakMax: -1, lraMin: 5, lraMax: 10 },
+      { id: "hiphop-trap", labelFr: "Trap (US / FR)", labelEn: "Trap (US / FR)", lufsMin: -9, lufsMax: -7.5, truePeakMax: -1, lraMin: 3, lraMax: 7 },
+      { id: "hiphop-drill", labelFr: "Drill (UK / NY)", labelEn: "Drill (UK / NY)", lufsMin: -10, lufsMax: -8, truePeakMax: -1, lraMin: 4, lraMax: 8 },
+      { id: "hiphop-boombap", labelFr: "Boom Bap / Lo-fi", labelEn: "Boom Bap / Lo-fi", lufsMin: -13, lufsMax: -10, truePeakMax: -1, lraMin: 5, lraMax: 10 },
     ],
   },
   {
