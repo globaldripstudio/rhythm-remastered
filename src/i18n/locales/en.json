@@ -468,6 +468,8 @@
         "useCaseLabel": "Use case:",
         "openTool": "Open the tool →",
         "philosophyTitle": "A philosophy: keep it simple, keep it useful",
+        "loudnessSpotlightTitle": "Spotlight: Loudness Analyzer & Online LUFS Meter",
+        "loudnessSpotlightP": "Among our five tools, the <a href=\"/en/loudness\" class=\"text-primary underline underline-offset-4\"><strong>Loudness Analyzer</strong></a> is the most used. Many people search for it as <a href=\"/en/loudness\" class=\"text-primary underline underline-offset-4\">online LUFS Meter</a> or <a href=\"/en/loudness\" class=\"text-primary underline underline-offset-4\">free LUFS analyzer</a> — that's exactly what it is. ITU-R BS.1770-4 / EBU R128 compliant, it computes integrated LUFS, true peak dBTP (with 4x polyphase oversampling), LRA, momentary and short-term — and offers PDF export for master delivery. No server upload, everything stays in your browser.",
         "philosophyP1": "No plugin to install, no account to create, no queue. <strong>No file is sent to a server: everything stays in your tab.</strong> It's a deliberate choice: your project doesn't belong to us, and there's no reason for it to travel anywhere other than your own machine.",
         "philosophyP2": "On the UX side, we spent a huge amount of time trimming the fat. Every tool is built like a precision instrument: just the right amount of options, readable outputs, and <strong>results that can be interpreted without technical training. The goal: a beginner beatmaker and a seasoned audio engineer should both find what they need in under thirty seconds.</strong>",
         "tools": {
