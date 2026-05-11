@@ -1,13 +1,11 @@
 User-agent: Googlebot
 Allow: /
-Disallow: /admin
 Disallow: /ebook/login
 Disallow: /ebook/reader
 Disallow: /payment-success
 
 User-agent: Bingbot
 Allow: /
-Disallow: /admin
 Disallow: /ebook/login
 Disallow: /ebook/reader
 Disallow: /payment-success
@@ -29,7 +27,6 @@ Allow: /
 
 User-agent: *
 Allow: /
-Disallow: /admin
 Disallow: /ebook/login
 Disallow: /ebook/reader
 Disallow: /payment-success
