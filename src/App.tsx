@@ -20,6 +20,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import EbookLogin from "./pages/EbookLogin";
 import EbookReader from "./pages/EbookReader";
 import Loudness from "./pages/Loudness";
+import LoudnessEn from "./pages/LoudnessEn";
 import KeyBpmFinder from "./pages/KeyBpmFinder";
 import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
