@@ -468,6 +468,8 @@
         "useCaseLabel": "Cas d'usage :",
         "openTool": "Ouvrir l'outil →",
         "philosophyTitle": "Une philosophie : faire simple, faire utile",
+        "loudnessSpotlightTitle": "Focus : Loudness Analyzer & LUFS Meter en ligne",
+        "loudnessSpotlightP": "Parmi nos cinq outils, le <a href=\"/loudness\" class=\"text-primary underline underline-offset-4\"><strong>Loudness Analyzer</strong></a> est le plus utilisé. Beaucoup le cherchent sous le nom de <a href=\"/loudness\" class=\"text-primary underline underline-offset-4\">LUFS Meter en ligne</a> ou <a href=\"/loudness\" class=\"text-primary underline underline-offset-4\">analyseur LUFS gratuit</a> : c'est exactement ce qu'il est. Conforme ITU-R BS.1770-4 / EBU R128, il calcule LUFS intégré, true peak dBTP (avec oversampling 4x polyphase), LRA, momentary et short-term — et propose un export PDF pour la livraison master. Aucun upload serveur, tout reste dans ton navigateur.",
         "philosophyP1": "Pas de plugin à installer, pas de compte à créer, pas de file d'attente. <strong>Aucun fichier n'est envoyé sur un serveur : tout reste dans votre onglet.</strong> C'est un parti pris : votre projet ne nous appartient pas, et il n'a aucune raison de transiter ailleurs que sur votre machine.",
         "philosophyP2": "Côté ergonomie, on a passé un temps fou à dégraisser. Chaque outil est pensé comme un instrument de précision : juste ce qu'il faut d'options, des résultats lisibles, et <strong>des résultats interprétables sans formation technique. Le but : qu'un beatmaker débutant comme un ingé son confirmé y trouve son compte en moins de trente secondes.</strong>",
         "tools": {
