@@ -25,6 +25,8 @@ import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
 import AudioToMidi from "./pages/AudioToMidi";
 import Admin from "./pages/Admin";
+import AdminForgotPassword from "./pages/AdminForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import LiveChat from "./components/LiveChat";
 import PageTracker from "./components/PageTracker";
