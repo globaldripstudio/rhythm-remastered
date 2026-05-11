@@ -2,11 +2,17 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Drum, Gauge, KeyRound, Menu, Music2, Music4, Phone, Wrench, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
 import { trackCTAClick } from "@/hooks/usePageTracking";
+import { getLangFromPath, localizePath, mirrorPath } from "@/lib/localizedRoutes";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const lp = (frPath: string) => localizePath(frPath, lang);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -21,7 +27,12 @@ const Header = () => {
 
   const toggleLanguage = () => {
     document.body.classList.add('lang-switching');
-    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    const target = mirrorPath(pathname);
+    if (target) {
+      navigate(target);
+    } else {
+      i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    }
     setTimeout(() => document.body.classList.remove('lang-switching'), 500);
   };
 
