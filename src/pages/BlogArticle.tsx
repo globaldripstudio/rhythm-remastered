@@ -151,21 +151,32 @@ const BlogArticle = () => {
   }
 
   const seoKey = slug === "venin-le-premier-sang" ? "venin" : "compression";
+  const shareUrl = `https://globaldripstudio.fr${canonicalPath}`;
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
         title={t(`seo.${seoKey}.title`)}
         description={t(`seo.${seoKey}.description`)}
-        path={`/blog/${slug}`}
+        path={canonicalPath}
         type="article"
+        locale={lang === "en" ? "en_US" : "fr_FR"}
         publishedTime={article.date}
         modifiedTime={article.date}
+        alternates={
+          enSlug
+            ? [
+                { hrefLang: "fr", path: frPath },
+                { hrefLang: "en", path: enPath },
+                { hrefLang: "x-default", path: frPath },
+              ]
+            : undefined
+        }
         jsonLd={[
           articleSchema({
             title: article.title,
             description: t(`seo.${seoKey}.description`),
-            path: `/blog/${slug}`,
+            path: canonicalPath,
             image:
               slug === "venin-le-premier-sang"
                 ? "/lovable-uploads/venin-album-cover.jpg"
@@ -174,8 +185,8 @@ const BlogArticle = () => {
             section: article.category,
           }),
           breadcrumbSchema([
-            { name: "Blog", path: "/blog" },
-            { name: article.title, path: `/blog/${slug}` },
+            { name: "Blog", path: lang === "en" ? "/en/blog" : "/blog" },
+            { name: article.title, path: canonicalPath },
           ]),
         ]}
       />
@@ -199,11 +210,11 @@ const BlogArticle = () => {
               <span>{article.date}</span>
               <span>{article.readTime}</span>
             </div>
-            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={shareUrl} />
           </div>
           <div className="text-foreground leading-relaxed">{article.content}</div>
           <div className="mt-10 pt-6 border-t border-border">
-            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={shareUrl} />
           </div>
         </div>
       </article>
