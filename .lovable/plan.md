@@ -1,63 +1,30 @@
-## Objectif
+## Problème
 
-Permettre à l'admin de réinitialiser son mot de passe par email depuis l'écran `/admin`, avec un flux complet et sécurisé.
+Depuis le dernier durcissement de sécurité, le droit `EXECUTE` sur la fonction `public.has_role(uuid, app_role)` a été révoqué pour les rôles `anon` et `authenticated`.
 
-## Parcours utilisateur
+Or plusieurs policies RLS l'utilisent, dont **« Admins can view all roles »** sur `user_roles`. Lorsque le client exécute `SELECT role FROM user_roles WHERE user_id=... AND role='admin'`, Postgres évalue les policies SELECT et plante avec l'erreur `permission denied for function has_role` — la requête entière échoue, même si la policy « Users can view own roles » (qui n'utilise pas `has_role`) aurait suffi à autoriser la lecture.
 
-```text
-/admin (LoginForm)
-   │
-   │ clic « Mot de passe oublié »
-   ▼
-/admin/forgot-password
-   │ saisie email → envoi du lien
-   ▼
-[Email reçu par l'utilisateur]
-   │ clic sur le lien
-   ▼
-/reset-password   (avec token de récupération dans le hash)
-   │ saisie nouveau mot de passe + confirmation
-   ▼
-Redirection /admin → connexion automatique
+→ `useAdminAuth` reçoit une erreur, l'écran admin affiche « Erreur lors de la vérification des permissions », et la connexion est impossible.
+
+Les logs Postgres confirment cette erreur répétée à chaque tentative, et les logs d'auth montrent bien des login `200 OK` immédiatement suivis d'un logout côté client.
+
+## Correction
+
+Une seule migration SQL :
+
+```sql
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role)
+  TO anon, authenticated;
 ```
 
-## Ce qui sera créé / modifié
+`has_role` est déjà `SECURITY DEFINER` avec `search_path = public` et ne fait qu'un `SELECT EXISTS` borné sur `user_roles` — accorder le droit EXECUTE est sans risque (c'est précisément son rôle, et toutes les policies l'utilisent déjà).
 
-### 1. `src/components/admin/LoginForm.tsx` — modifié
-Ajout d'un lien `Mot de passe oublié ?` discret sous le champ mot de passe, qui navigue vers `/admin/forgot-password`.
+## Vérification après migration
 
-### 2. `src/pages/AdminForgotPassword.tsx` — nouveau
-Page publique (hors `AdminContent`/`AuthProvider` admin) avec :
-- Champ email + bouton « Envoyer le lien »
-- Appel : `supabase.auth.resetPasswordForEmail(email, { redirectTo: \`${window.location.origin}/reset-password\` })`
-- Confirmation neutre quel que soit le résultat (pas d'enumeration d'emails) : « Si un compte existe avec cette adresse, vous allez recevoir un email. »
-- Lien retour vers `/admin`
+1. Retester la connexion admin avec `globaldripstudio@gmail.com` → le tableau de bord doit s'afficher.
+2. Vérifier les logs Postgres : plus aucune erreur `permission denied for function has_role`.
+3. Toutes les autres tables qui utilisent `has_role` dans leurs policies (`clients`, `events`, `profiles`, `ebook_purchases`, `audit_log`, `contact_leads`, `site_analytics`) redeviennent accessibles en lecture pour l'admin.
 
-### 3. `src/pages/ResetPassword.tsx` — nouveau
-Page publique (route `/reset-password`) avec :
-- Détection du token de récupération via `supabase.auth.onAuthStateChange` (événement `PASSWORD_RECOVERY`)
-- Si pas en mode recovery : message d'erreur + lien vers `/admin/forgot-password`
-- Champs : nouveau mot de passe + confirmation, validation basique (≥ 8 caractères, identiques)
-- `supabase.auth.updateUser({ password })` puis redirection vers `/admin` après 2 s
-- Toasts pour succès/erreur
+## Aucun changement de code applicatif
 
-### 4. `src/App.tsx` — modifié
-Ajout de deux routes publiques :
-- `/admin/forgot-password` → `AdminForgotPassword`
-- `/reset-password` → `ResetPassword`
-
-Mise à jour du test `pathname.startsWith("/admin")` pour aussi masquer le `LiveChat` sur `/reset-password`.
-
-## Détails techniques
-
-- **Sécurité** : `resetPasswordForEmail` ne révèle jamais si l'email existe (Supabase Auth retourne toujours succès côté client). Le toast de confirmation est neutre.
-- **Auth state** : sur `/reset-password`, écouter `onAuthStateChange` AVANT de tester la session (pattern Supabase obligatoire). L'événement `PASSWORD_RECOVERY` est émis automatiquement quand la page est ouverte via le lien email.
-- **Pas de nouvelle table** : le flux est 100% géré par Supabase Auth.
-- **Pas de configuration manuelle d'email** : Supabase envoie un email de récupération par défaut (template intégré). Si vous voulez un email avec votre marque (Global Drip Studio), c'est un second chantier optionnel — je peux le proposer après.
-- **i18n** : les pages affichent le contenu en français (cohérent avec le reste de l'admin qui n'est qu'en français).
-
-## Hors périmètre
-
-- Personnalisation de l'email envoyé par Supabase (template par défaut utilisé).
-- Politique de complexité avancée du mot de passe (HIBP, etc.) — dispo en option si vous voulez.
-- Limitation du nombre de demandes par IP (Supabase applique déjà un rate limit).
+Le code React (`useAdminAuth`, `LoginForm`, `Admin`) est correct — c'est uniquement le `GRANT` SQL qui manque.
