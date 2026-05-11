@@ -1,77 +1,63 @@
 ## Objectif
 
-Mettre en place un journal d'audit complet sur la base Supabase pour détecter toute action sensible (écriture, suppression, modification) sur l'ensemble du schéma `public`, avec une interface admin dédiée et une rétention de 1 an.
+Permettre à l'admin de réinitialiser son mot de passe par email depuis l'écran `/admin`, avec un flux complet et sécurisé.
 
-## Ce qui sera créé
+## Parcours utilisateur
 
-### 1. Table `audit_log` (base de données)
+```text
+/admin (LoginForm)
+   │
+   │ clic « Mot de passe oublié »
+   ▼
+/admin/forgot-password
+   │ saisie email → envoi du lien
+   ▼
+[Email reçu par l'utilisateur]
+   │ clic sur le lien
+   ▼
+/reset-password   (avec token de récupération dans le hash)
+   │ saisie nouveau mot de passe + confirmation
+   ▼
+Redirection /admin → connexion automatique
+```
 
-Une nouvelle table pour stocker chaque action sensible :
+## Ce qui sera créé / modifié
 
-- **table_name** — table concernée (ex: `user_roles`, `ebook_purchases`)
-- **action** — type d'opération (`INSERT`, `UPDATE`, `DELETE`)
-- **row_id** — identifiant de la ligne touchée
-- **actor_user_id** — utilisateur connecté à l'origine de l'action (peut être nul pour actions système / service role)
-- **actor_role** — rôle Postgres ayant exécuté l'action (`anon`, `authenticated`, `service_role`)
-- **old_data** / **new_data** — snapshot JSON avant/après (utile pour les UPDATE et DELETE)
-- **ip_address** / **user_agent** — quand disponibles via les en-têtes de requête
-- **created_at** — horodatage
+### 1. `src/components/admin/LoginForm.tsx` — modifié
+Ajout d'un lien `Mot de passe oublié ?` discret sous le champ mot de passe, qui navigue vers `/admin/forgot-password`.
 
-### 2. Triggers automatiques sur tout le schéma `public`
+### 2. `src/pages/AdminForgotPassword.tsx` — nouveau
+Page publique (hors `AdminContent`/`AuthProvider` admin) avec :
+- Champ email + bouton « Envoyer le lien »
+- Appel : `supabase.auth.resetPasswordForEmail(email, { redirectTo: \`${window.location.origin}/reset-password\` })`
+- Confirmation neutre quel que soit le résultat (pas d'enumeration d'emails) : « Si un compte existe avec cette adresse, vous allez recevoir un email. »
+- Lien retour vers `/admin`
 
-Une fonction générique `audit_trigger()` (en `SECURITY DEFINER`, non exposée à l'API) sera attachée à **toutes les tables existantes du schéma public** (sauf `audit_log` elle-même et `site_analytics` qui est déjà du logging) pour les événements `INSERT`, `UPDATE`, `DELETE`.
+### 3. `src/pages/ResetPassword.tsx` — nouveau
+Page publique (route `/reset-password`) avec :
+- Détection du token de récupération via `supabase.auth.onAuthStateChange` (événement `PASSWORD_RECOVERY`)
+- Si pas en mode recovery : message d'erreur + lien vers `/admin/forgot-password`
+- Champs : nouveau mot de passe + confirmation, validation basique (≥ 8 caractères, identiques)
+- `supabase.auth.updateUser({ password })` puis redirection vers `/admin` après 2 s
+- Toasts pour succès/erreur
 
-Tables concernées : `user_roles`, `profiles`, `ebook_purchases`, `contact_leads`, `clients`, `events`, `blog_views`.
+### 4. `src/App.tsx` — modifié
+Ajout de deux routes publiques :
+- `/admin/forgot-password` → `AdminForgotPassword`
+- `/reset-password` → `ResetPassword`
 
-Les triggers continueront automatiquement à fonctionner même si vous ajoutez des données via les Edge Functions (service role).
-
-### 3. RLS stricte sur `audit_log`
-
-- Lecture : **admin uniquement** (via `has_role`)
-- Écriture/UPDATE/DELETE : **interdit** à tout le monde (anon, authenticated). Seuls les triggers internes peuvent écrire.
-
-### 4. Purge automatique (rétention 1 an)
-
-- Une fonction `purge_old_audit_logs()` supprime les entrées de plus de 365 jours.
-- Déclenchée par l'extension `pg_cron` (planification quotidienne à 3h du matin).
-- Si `pg_cron` n'est pas disponible sur l'instance, fallback : la fonction reste en place et peut être appelée manuellement ; je le signalerai.
-
-### 5. Onglet "Audit" dans l'admin
-
-Nouveau composant `src/components/admin/AuditLog.tsx` ajouté au dashboard existant (`src/pages/Admin.tsx`) avec :
-
-- **Filtres** : table, action (INSERT/UPDATE/DELETE), utilisateur, plage de dates
-- **Tableau paginé** : horodatage, table, action, acteur, ID de ligne, IP
-- **Détail au clic** : affichage du diff `old_data` → `new_data` formaté en JSON
-- **Compteurs en tête** : total 24h / 7j / 30j, alerte visuelle si pic anormal d'activité
-
-Style cohérent avec le dashboard existant (dark, accents orange/teal).
+Mise à jour du test `pathname.startsWith("/admin")` pour aussi masquer le `LiveChat` sur `/reset-password`.
 
 ## Détails techniques
 
-```text
-Flux d'écriture :
-  app/edge function ──► table sensible ──► trigger AFTER ──► audit_log
-                                                ▲
-                                                │
-                              capture auth.uid(), current_user,
-                              row OLD/NEW en JSONB
-```
+- **Sécurité** : `resetPasswordForEmail` ne révèle jamais si l'email existe (Supabase Auth retourne toujours succès côté client). Le toast de confirmation est neutre.
+- **Auth state** : sur `/reset-password`, écouter `onAuthStateChange` AVANT de tester la session (pattern Supabase obligatoire). L'événement `PASSWORD_RECOVERY` est émis automatiquement quand la page est ouverte via le lien email.
+- **Pas de nouvelle table** : le flux est 100% géré par Supabase Auth.
+- **Pas de configuration manuelle d'email** : Supabase envoie un email de récupération par défaut (template intégré). Si vous voulez un email avec votre marque (Global Drip Studio), c'est un second chantier optionnel — je peux le proposer après.
+- **i18n** : les pages affichent le contenu en français (cohérent avec le reste de l'admin qui n'est qu'en français).
 
-- La fonction trigger utilise `current_setting('request.jwt.claims', true)` pour récupérer l'utilisateur même quand l'écriture vient d'une Edge Function avec service_role.
-- Les en-têtes IP/User-Agent sont extraits via `current_setting('request.headers', true)` quand PostgREST les transmet (sinon nuls — c'est attendu pour les triggers déclenchés par service_role).
-- Index composé sur `(created_at DESC, table_name, action)` pour des requêtes admin rapides.
-- Volume estimé : faible (< quelques milliers de lignes/mois sur ce projet), pas de risque de saturation.
+## Hors périmètre
 
-## Limites connues
-
-- Les **lectures** (SELECT) ne sont pas journalisables côté Postgres sans extension dédiée (pgaudit, indisponible sur Lovable Cloud). Si vous voulez tracer "qui a consulté quoi", il faudra passer par des Edge Functions instrumentées — à discuter dans un second temps si besoin.
-- Les actions effectuées **directement via le dashboard Lovable Cloud** seront aussi journalisées (acteur = `service_role`, sans user_id).
-- Les snapshots JSON peuvent contenir des données sensibles (emails, etc.) — l'accès reste strictement limité à l'admin via RLS.
-
-## Ordre d'exécution
-
-1. Migration : création de `audit_log`, fonction `audit_trigger()`, triggers sur toutes les tables, fonction de purge, RLS, planification cron.
-2. Création du composant `AuditLog.tsx` et intégration dans `Admin.tsx`.
-3. Traductions FR/EN dans `src/i18n/locales/`.
-4. Test rapide : insertion d'une ligne témoin → vérification qu'elle apparaît dans l'onglet Audit.
+- Personnalisation de l'email envoyé par Supabase (template par défaut utilisé).
+- Politique de complexité avancée du mot de passe (HIBP, etc.) — dispo en option si vous voulez.
+- Limitation du nombre de demandes par IP (Supabase applique déjà un rate limit).

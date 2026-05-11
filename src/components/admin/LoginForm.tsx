@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,6 +95,15 @@ const LoginForm = () => {
                 'Se connecter'
               )}
             </Button>
+
+            <div className="text-center">
+              <Link
+                to="/admin/forgot-password"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Mot de passe oublié&nbsp;?
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>
