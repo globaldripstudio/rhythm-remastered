@@ -496,8 +496,7 @@ const LoudnessCurve = ({ data, focus, onFocusChange, hoveredIndex, onHoverChange
 const Loudness = () => {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
-  const isEnRoute = pathname.startsWith("/en/");
-  const seoPath = isEnRoute ? "/en/loudness" : "/loudness";
+  const seoPath = pathname.startsWith("/en/") ? "/en/loudness" : "/loudness";
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
