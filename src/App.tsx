@@ -19,7 +19,7 @@ import Ebook from "./pages/Ebook";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import EbookLogin from "./pages/EbookLogin";
 import EbookReader from "./pages/EbookReader";
-import Loudness from "./pages/Loudness";
+import LoudnessFr from "./pages/LoudnessFr";
 import LoudnessEn from "./pages/LoudnessEn";
 import KeyBpmFinder from "./pages/KeyBpmFinder";
 import TapTempoMetronome from "./pages/TapTempoMetronome";
@@ -60,7 +60,7 @@ const App = () => (
             <Route path="/ebook" element={<Ebook />} />
             <Route path="/ebook/login" element={<EbookLogin />} />
             <Route path="/ebook/reader" element={<EbookReader />} />
-            <Route path="/loudness" element={<Loudness />} />
+            <Route path="/loudness" element={<LoudnessFr />} />
             <Route path="/en/loudness" element={<LoudnessEn />} />
             <Route path="/key-bpm-finder" element={<KeyBpmFinder />} />
             <Route path="/tap-tempo-metronome" element={<TapTempoMetronome />} />

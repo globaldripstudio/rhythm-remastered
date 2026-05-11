@@ -740,6 +740,7 @@ const Loudness = () => {
                     </span>
                   </div>
                   <Select
+                    key={lang}
                     value={selectedSubgenre ?? "none"}
                     onValueChange={(v) => setSelectedSubgenre(v === "none" ? null : v)}
                   >
