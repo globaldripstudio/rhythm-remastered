@@ -7,7 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useBlogViews } from "@/hooks/useBlogViews";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
-import { getLangFromPath, mirrorPath } from "@/lib/localizedRoutes";
+import { getLangFromPath, mirrorPath, localizePath } from "@/lib/localizedRoutes";
 
 const Blog = () => {
   const { views, isLoading } = useBlogViews();
