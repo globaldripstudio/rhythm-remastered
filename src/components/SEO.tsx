@@ -34,6 +34,7 @@ const SEO = ({
   locale = "fr_FR",
   publishedTime,
   modifiedTime,
+  alternates,
 }: SEOProps) => {
   const fullUrl = `${BASE_URL}${path}`;
   const fullImage = image.startsWith("http") ? image : `${BASE_URL}${image}`;
