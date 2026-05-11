@@ -2,9 +2,21 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://globaldripstudio.fr/</loc>
-    <lastmod>2026-05-06</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/"/>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/en</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/"/>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/services</loc>
@@ -14,9 +26,21 @@
   </url>
   <url>
     <loc>https://globaldripstudio.fr/projets</loc>
-    <lastmod>2026-05-06</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/projets"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/projects"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/projets"/>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/en/projects</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/projets"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/projects"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/projets"/>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/portfolio</loc>
@@ -26,15 +50,39 @@
   </url>
   <url>
     <loc>https://globaldripstudio.fr/blog</loc>
-    <lastmod>2026-05-06</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog"/>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/en/blog</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog"/>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/ebook</loc>
-    <lastmod>2026-05-06</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/ebook"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/ebook"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/ebook"/>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/en/ebook</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/ebook"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/ebook"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/ebook"/>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/loudness</loc>
