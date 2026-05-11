@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { trackBlogView } from "@/hooks/useBlogViews";
 import { useTranslation } from "react-i18next";
 import ComprendreCompression from "./BlogArticles/ComprendreCompression";
@@ -10,10 +10,23 @@ import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import ShareButtons from "@/components/blog/ShareButtons";
 import SEO from "@/components/SEO";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schemas";
+import {
+  articleEnSlug,
+  articleFrSlug,
+  getLangFromPath,
+} from "@/lib/localizedRoutes";
 
 const BlogArticle = () => {
-  const { slug } = useParams();
+  const { slug: rawSlug } = useParams();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  // Canonical FR slug (the rendering layer always uses FR slugs).
+  const slug = lang === "en" ? (articleFrSlug(rawSlug ?? "") ?? rawSlug) : rawSlug;
+  const enSlug = slug ? articleEnSlug(slug) : undefined;
+  const frPath = slug ? `/blog/${slug}` : "/blog";
+  const enPath = enSlug ? `/en/blog/${enSlug}` : "/en/blog";
+  const canonicalPath = lang === "en" && enSlug ? enPath : frPath;
   const [viewCount, setViewCount] = useState<number | null>(null);
   const { t } = useTranslation();
 
