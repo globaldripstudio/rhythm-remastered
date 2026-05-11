@@ -3,19 +3,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, User, Eye } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useBlogViews } from "@/hooks/useBlogViews";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
+import { getLangFromPath, mirrorPath } from "@/lib/localizedRoutes";
 
 const Blog = () => {
   const { views, isLoading } = useBlogViews();
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const homePath = lang === "en" ? "/en" : "/";
+  const seoPath = lang === "en" ? "/en/blog" : "/blog";
   const [contentLoaded, setContentLoaded] = useState(false);
 
   const toggleLanguage = () => {
     document.body.classList.add('lang-switching');
-    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    const target = mirrorPath(pathname);
+    if (target) {
+      navigate(target);
+    } else {
+      i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    }
     setTimeout(() => document.body.classList.remove('lang-switching'), 500);
   };
 
