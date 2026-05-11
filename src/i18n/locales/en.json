@@ -472,8 +472,8 @@
         "philosophyP2": "On the UX side, we spent a huge amount of time trimming the fat. Every tool is built like a precision instrument: just the right amount of options, readable outputs, and <strong>results that can be interpreted without technical training. The goal: a beginner beatmaker and a seasoned audio engineer should both find what they need in under thirty seconds.</strong>",
         "tools": {
           "loudness": {
-            "name": "LUFS Loudness Analyzer",
-            "short": "Measure integrated loudness, true peak, LRA and dynamics of your master directly in the browser, with no server upload. Perfect for checking that a mix meets streaming targets (Spotify, Apple Music, YouTube) before final export.",
+            "name": "Loudness Analyzer — Online LUFS Meter",
+            "short": "Our <strong>Loudness Analyzer</strong> (a free online <strong>LUFS Meter</strong>) measures integrated loudness, true peak dBTP, LRA and dynamics of your master directly in the browser, with no server upload. ITU-R BS.1770-4 / EBU R128 compliant LUFS analyzer, perfect to verify a mix hits streaming targets (Spotify -14, Apple Music -16, YouTube -14) before final export.",
             "use": "Before every master delivery, to validate compliance with broadcast standards and anticipate platform normalization."
           },
           "keybpm": {
