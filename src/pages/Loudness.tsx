@@ -640,7 +640,7 @@ const Loudness = () => {
       <SEO
         title={t("seo.loudness.title")}
         description={t("seo.loudness.description")}
-        path="/loudness"
+        path={seoPath}
         alternates={[
           { hrefLang: "fr", path: "/loudness" },
           { hrefLang: "en", path: "/en/loudness" },
