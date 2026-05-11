@@ -1,35 +1,47 @@
-## Objectif
+## Problème
 
-Affiner le groupe **Hip-Hop / Urbain** dans `src/lib/loudnessTargets.ts` en 3 sous-genres distincts au lieu de 2, et harmoniser les éventuelles mentions chiffrées dans le contenu SEO/FAQ de `Loudness.tsx`.
+Sur `/en/loudness`, cliquer "FR" change seulement la langue i18n mais reste sur l'URL `/en/loudness` — or `LoudnessEn.tsx` reforce immédiatement i18n en EN au montage. Résultat : le toggle ne fait rien de visible. Inversement depuis `/loudness`, cliquer "EN" devrait amener sur `/en/loudness` (URL canonique EN pour le SEO), pas seulement basculer i18n.
 
-## Modifications
+## Correctif
 
-### 1. `src/lib/loudnessTargets.ts`
+### `src/components/tools/ToolkitHeader.tsx` (seul header utilisé sur Loudness)
 
-Remplacer les 2 sous-genres actuels du groupe `hiphop` par 3 :
+Rendre `toggleLanguage` route-aware via `useNavigate` + `useLocation` :
 
-| ID | Label FR | Label EN | LUFS min | LUFS max | TP max | LRA min | LRA max |
-|---|---|---|---|---|---|---|---|
-| `hiphop-trap` | Trap (US / FR) | Trap (US / FR) | -9 | -7.5 | -1 | 3 | 7 |
-| `hiphop-drill` | Drill (UK / NY) | Drill (UK / NY) | -10 | -8 | -1 | 4 | 8 |
-| `hiphop-boombap` | Boom Bap / Lo-fi | Boom Bap / Lo-fi | -13 | -10 | -1 | 5 | 10 |
+```ts
+const navigate = useNavigate();
+const { pathname } = useLocation();
 
-Justification :
-- **Trap -9 à -7.5** : couvre la fourchette réelle des sorties commerciales (Future, 21 Savage, Ninho, Gazo, Tiakola). On ne pousse plus implicitement à -7 fixe.
-- **Drill -10 à -8** : sub-bass UK/NY drill nécessite plus d'air, mesures réelles confirment.
-- **Boom Bap / Lo-fi** : élargi pour englober Griselda, MIKE, Earl, lo-fi instrumental.
+// Mapping FR ↔ EN (extensible plus tard pour les 4 autres outils)
+const LOCALIZED_ROUTES: Record<string, string> = {
+  "/loudness": "/en/loudness",
+  "/en/loudness": "/loudness",
+};
 
-### 2. Vérifications de cohérence
+const toggleLanguage = () => {
+  document.body.classList.add("lang-switching");
+  const nextLang = i18n.language === "fr" ? "en" : "fr";
+  const target = LOCALIZED_ROUTES[pathname];
+  if (target) {
+    navigate(target);
+  } else {
+    i18n.changeLanguage(nextLang); // outils sans variante EN dédiée
+  }
+  setTimeout(() => document.body.classList.remove("lang-switching"), 500);
+};
+```
 
-- Grep `hiphop-trap-drill` dans tout `src/` (sélection par défaut, persistance localStorage, traductions). Rebrancher les usages sur `hiphop-trap`.
-- Vérifier `Loudness.tsx`, `LoudnessEn.tsx`, `i18n/locales/{fr,en}.json`.
+Pourquoi ne pas appeler `changeLanguage` quand on navigue ? Parce que `LoudnessEn.tsx` force déjà EN au montage et restaure la langue précédente au démontage — la navigation suffit, et on évite un double-flip.
 
-### 3. Mise à jour cohérence éditoriale
+### Vérifications de cheminement
 
-- Repérer dans `Loudness.tsx` (intro, FAQ, JSON-LD `HowTo`) les mentions chiffrées de cibles Trap/Drill et les aligner sur les nouvelles plages.
-- Idem pour `LoudnessEn.tsx` si du contenu textuel y est dupliqué.
+1. Depuis `/loudness` (FR) → clic "EN" → `navigate("/en/loudness")` → `LoudnessEn` monte → `i18n.changeLanguage("en")` → contenu EN, URL EN. OK.
+2. Depuis `/en/loudness` (EN forcé) → clic "FR" → `navigate("/loudness")` → `LoudnessEn` démonte → restaure `previous` (FR) → contenu FR, URL FR. OK.
+3. Sur les 4 autres outils (`/key-bpm-finder`, `/tap-tempo-metronome`, `/chord-progression`, `/audio-to-midi`) : pas de variante EN routée, donc fallback sur simple `changeLanguage`. Comportement actuel préservé.
+4. État visuel du switch (FR/EN en gras) : déjà piloté par `i18n.language`, qui sera bien à jour après navigation grâce au `useEffect` de `LoudnessEn`.
 
 ## Hors-scope
 
-- Logique `buildInterpretation` (seuils PLR/LRA/TP inchangés).
-- Aucun autre groupe de genre touché.
+- Pas de création de routes `/en/...` pour les autres outils (non demandé).
+- `Header.tsx` global non touché : il n'est pas rendu sur les pages Loudness.
+- Aucun changement de contenu, de SEO, ni de hreflang (déjà corrects).
