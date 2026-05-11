@@ -959,8 +959,8 @@
       "description": "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio."
     },
     "loudness": {
-      "title": "Analyse LUFS en ligne gratuite | True Peak & LRA",
-      "description": "Analysez un fichier audio en ligne : LUFS intégré, true peak dBTP, LRA, momentary/short-term et rapport PDF, sans upload serveur."
+      "title": "Loudness Analyzer — LUFS Meter en ligne gratuit | GDS",
+      "description": "Loudness Analyzer & LUFS Meter gratuit en ligne : LUFS intégré, true peak dBTP, LRA, momentary/short-term, rapport PDF. 100% navigateur, aucun upload."
     },
     "toolkitArticle": {
       "title": "Toolkit audio gratuit en ligne : 5 outils pros | Global Drip",
