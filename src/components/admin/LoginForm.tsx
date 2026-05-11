@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+
+const ADMIN_EMAIL = 'globaldripstudio@gmail.com';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,23 +20,27 @@ const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Server-side role validation is handled by Admin.tsx after login
-    // No client-side email check here - authorization is verified from user_roles table
-    const { error } = await signIn(email, password);
-    
+    // Seul le compte admin officiel est autorisé. Échec immédiat sinon.
+    if (email.trim().toLowerCase() !== ADMIN_EMAIL) {
+      toast({
+        title: "Erreur de connexion",
+        description: "Identifiants invalides.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { error } = await signIn(email.trim().toLowerCase(), password);
+
     if (error) {
       toast({
         title: "Erreur de connexion",
         description: error.message,
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Connexion réussie",
-        description: "Vérification des permissions...",
-      });
     }
-    
+
     setIsLoading(false);
   };
 
@@ -96,14 +101,6 @@ const LoginForm = () => {
               )}
             </Button>
 
-            <div className="text-center">
-              <Link
-                to="/admin/forgot-password"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                Mot de passe oublié&nbsp;?
-              </Link>
-            </div>
           </form>
         </CardContent>
       </Card>
