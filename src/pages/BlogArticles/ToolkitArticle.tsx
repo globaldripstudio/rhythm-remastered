@@ -129,6 +129,18 @@ const ToolkitArticle = () => {
               ))}
             </div>
 
+            <Card className="mb-8 bg-gradient-to-r from-primary/15 to-primary/5 border-primary/30">
+              <CardContent className="p-6 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4">
+                  {t("blog.articles.toolkit.loudnessSpotlightTitle")}
+                </h2>
+                <p
+                  className="text-muted-foreground"
+                  dangerouslySetInnerHTML={{ __html: t("blog.articles.toolkit.loudnessSpotlightP") }}
+                />
+              </CardContent>
+            </Card>
+
             <Card className="mb-8 bg-gradient-to-r from-primary/10 to-secondary/10 border-secondary/20">
               <CardContent className="p-6 sm:p-8">
                 <h2 className="text-xl sm:text-2xl font-bold mb-4">
