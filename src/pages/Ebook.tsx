@@ -12,6 +12,9 @@ import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const Ebook = () => {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const homePath = lang === 'en' ? '/en' : '/';
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePurchase = async () => {
@@ -34,7 +37,17 @@ const Ebook = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title={t('seo.ebook.title')} description={t('seo.ebook.description')} path="/ebook" />
+      <SEO
+        title={t('seo.ebook.title')}
+        description={t('seo.ebook.description')}
+        path={lang === 'en' ? '/en/ebook' : '/ebook'}
+        locale={lang === 'en' ? 'en_US' : 'fr_FR'}
+        alternates={[
+          { hrefLang: 'fr', path: '/ebook' },
+          { hrefLang: 'en', path: '/en/ebook' },
+          { hrefLang: 'x-default', path: '/ebook' },
+        ]}
+      />
       {/* Header - matching Projets page style */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
