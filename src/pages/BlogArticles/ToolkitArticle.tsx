@@ -106,9 +106,10 @@ const ToolkitArticle = () => {
                         </h3>
                       </div>
                     </div>
-                    <p className="text-muted-foreground mb-3">
-                      {t(`blog.articles.toolkit.tools.${key}.short`)}
-                    </p>
+                    <p
+                      className="text-muted-foreground mb-3"
+                      dangerouslySetInnerHTML={{ __html: t(`blog.articles.toolkit.tools.${key}.short`) }}
+                    />
                     <p className="text-sm text-muted-foreground/90">
                       <strong className="text-foreground">
                         {t("blog.articles.toolkit.useCaseLabel")}
