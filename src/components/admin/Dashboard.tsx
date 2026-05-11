@@ -142,6 +142,11 @@ const Dashboard = () => {
               <span className="hidden sm:inline">Stems</span>
               <span className="sm:hidden">Stems</span>
             </TabsTrigger>
+            <TabsTrigger value="audit" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
+              <ShieldAlert className="w-4 h-4" />
+              <span className="hidden sm:inline">Audit</span>
+              <span className="sm:hidden">Audit</span>
+            </TabsTrigger>
           </TabsList>
           </div>
 
