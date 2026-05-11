@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
-import { useLocation } from "react-router-dom";
 import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const Ebook = () => {
