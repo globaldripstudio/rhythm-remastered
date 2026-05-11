@@ -8,6 +8,7 @@ import { getLangFromPath, localizePath, mirrorPath } from "@/lib/localizedRoutes
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isToolkitOpen, setIsToolkitOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -86,9 +87,13 @@ const Header = () => {
             <div className="relative group">
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors group-hover:border-primary/70 group-hover:bg-primary/10 group-hover:text-foreground lg:px-2.5 lg:py-1.5"
+                className="peer inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/20 px-2 py-1 text-xs lg:text-sm font-medium text-muted-foreground transition-colors group-hover:border-primary/70 group-hover:bg-primary/10 group-hover:text-foreground focus-visible:border-primary/70 focus-visible:bg-primary/10 focus-visible:text-foreground lg:px-2.5 lg:py-1.5"
                 aria-haspopup="menu"
-                aria-expanded="false"
+                aria-expanded={isToolkitOpen}
+                onFocus={() => setIsToolkitOpen(true)}
+                onBlur={() => setIsToolkitOpen(false)}
+                onMouseEnter={() => setIsToolkitOpen(true)}
+                onMouseLeave={() => setIsToolkitOpen(false)}
               >
                 <Wrench className="h-3.5 w-3.5 lg:h-4 lg:w-4 text-primary transition-transform group-hover:rotate-12" aria-hidden="true" />
                 {t('nav.toolkit')}
