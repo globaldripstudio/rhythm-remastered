@@ -68,7 +68,7 @@ const ComprendreCompression = () => {
             <div className="flex items-center text-sm text-muted-foreground mb-6">
               <span>{t('blog.articles.compression.meta')}</span>
             </div>
-            <ShareButtons url=shareUrl />
+            <ShareButtons url={shareUrl} />
           </header>
 
           <div className="mb-8 sm:mb-12 rounded-2xl overflow-hidden">
@@ -157,7 +157,7 @@ const ComprendreCompression = () => {
             </div>
           </div>
           <div className="mt-10 pt-6 border-t border-border">
-            <ShareButtons url=shareUrl />
+            <ShareButtons url={shareUrl} />
           </div>
         </div>
       </article>
