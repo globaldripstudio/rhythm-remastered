@@ -45,6 +45,14 @@ const SEO = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={fullUrl} />
+      {alternates?.map((alt) => (
+        <link
+          key={alt.hrefLang}
+          rel="alternate"
+          hrefLang={alt.hrefLang}
+          href={`${BASE_URL}${alt.path}`}
+        />
+      ))}
       <meta
         name="robots"
         content={
