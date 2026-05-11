@@ -6,8 +6,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import SpotifyEmbed from "@/components/SpotifyEmbed";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
-import { useLocation } from "react-router-dom";
-import { getLangFromPath } from "@/lib/localizedRoutes";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { getLangFromPath, mirrorPath } from "@/lib/localizedRoutes";
 
 const Projets = () => {
   const { t, i18n } = useTranslation();
