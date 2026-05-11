@@ -1,32 +1,36 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Simple in-memory rate limiting (per IP, resets on function restart)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+// Persistent rate limiting via DB RPC.
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_S = 60 * 60;
 
-const RATE_LIMIT_MAX = 10; // Max 10 requests per window
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+async function isRateLimited(ip: string): Promise<boolean> {
+  try {
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+    const { data, error } = await admin.rpc("check_rate_limit", {
+      _key: `payment:${ip}`,
+      _max_count: RATE_LIMIT_MAX,
+      _window_seconds: RATE_LIMIT_WINDOW_S,
+    });
+    if (error) {
+      console.error("rate_limit RPC error", error);
+      return false;
+    }
+    return data === false;
+  } catch (e) {
+    console.error("rate_limit unexpected error", e);
     return false;
   }
-  
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return true;
-  }
-  
-  entry.count++;
-  return false;
 }
 
 serve(async (req) => {
@@ -42,7 +46,7 @@ serve(async (req) => {
                      "unknown";
     
     // Check rate limit
-    if (isRateLimited(clientIp)) {
+    if (await isRateLimited(clientIp)) {
       console.log(`Rate limit exceeded for IP: ${clientIp}`);
       return new Response(
         JSON.stringify({ error: "Trop de requêtes. Veuillez réessayer plus tard." }),

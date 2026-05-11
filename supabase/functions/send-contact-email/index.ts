@@ -10,11 +10,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Simple in-memory rate limiting (per IP, resets on function restart)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-const RATE_LIMIT_MAX = 3; // Max 3 contact requests per hour
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
+// Persistent rate limiting via DB RPC (shared across instances).
+const RATE_LIMIT_MAX = 3; // Max 3 contact requests per hour per IP
+const RATE_LIMIT_WINDOW_S = 60 * 60; // 1 hour
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const ALLOWED_TYPES = [
@@ -23,21 +21,26 @@ const ALLOWED_TYPES = [
   "image/gif", "application/zip", "application/x-zip-compressed"
 ];
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+async function isRateLimited(ip: string): Promise<boolean> {
+  try {
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+    const { data, error } = await admin.rpc("check_rate_limit", {
+      _key: `contact:${ip}`,
+      _max_count: RATE_LIMIT_MAX,
+      _window_seconds: RATE_LIMIT_WINDOW_S,
+    });
+    if (error) {
+      console.error("rate_limit RPC error", error);
+      return false; // fail-open to avoid locking out legitimate users on RPC failure
+    }
+    return data === false;
+  } catch (e) {
+    console.error("rate_limit unexpected error", e);
     return false;
   }
-  
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return true;
-  }
-  
-  entry.count++;
-  return false;
 }
 
 interface ContactRequest {
@@ -83,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
                      "unknown";
     
     // Check rate limit BEFORE processing any data (including file uploads)
-    if (isRateLimited(clientIp)) {
+    if (await isRateLimited(clientIp)) {
       console.log(`Rate limit exceeded for contact form from IP: ${clientIp}`);
       return new Response(
         JSON.stringify({ success: false, error: "Trop de requêtes. Veuillez réessayer plus tard." }),
