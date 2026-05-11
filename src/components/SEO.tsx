@@ -17,6 +17,8 @@ interface SEOProps {
   publishedTime?: string;
   /** ISO datetime for article:modified_time */
   modifiedTime?: string;
+  /** hreflang alternates: e.g. [{ hrefLang: "en", path: "/en/loudness" }] */
+  alternates?: Array<{ hrefLang: string; path: string }>;
 }
 
 const BASE_URL = "https://globaldripstudio.fr";
