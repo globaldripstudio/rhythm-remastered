@@ -1,47 +1,73 @@
-## Problème
+## Diagnostic
 
-Sur `/en/loudness`, cliquer "FR" change seulement la langue i18n mais reste sur l'URL `/en/loudness` — or `LoudnessEn.tsx` reforce immédiatement i18n en EN au montage. Résultat : le toggle ne fait rien de visible. Inversement depuis `/loudness`, cliquer "EN" devrait amener sur `/en/loudness` (URL canonique EN pour le SEO), pas seulement basculer i18n.
+J'ai reproduit le problème en chargeant `/en/loudness` dans la preview. Deux soucis :
+
+1. **Erreur React fatale** dans la console : `Maximum update depth exceeded` provenant du composant Radix `<Select>` (le sélecteur de genre musical) imbriqué dans `Loudness.tsx`. En dev l'erreur est récupérée par React (la page finit par s'afficher), mais en build production sans error boundary → **page blanche**. Stack : `setRef` → `dispatchSetState` dans `@radix-ui/react-select` → boucle de commit.
+
+2. **Cause de la boucle** : `LoudnessEn` force `i18n.changeLanguage("en")` dans un `useEffect` après le premier render. Conséquence :
+   - Render #1 en FR (langue par défaut/persistée) → Radix Select monte ses items FR
+   - `useEffect` change la langue → Render #2 en EN → les enfants du `Select` changent de texte mais Radix réutilise le même `Select` instance et son collection-tracker re-déclenche un setState dans le commit → boucle.
+
+3. **Effet visuel attendu manquant** : pas de transition blur (`lang-switching`) lors du switch via navigation, et un flash FR→EN visible avant stabilisation.
 
 ## Correctif
 
-### `src/components/tools/ToolkitHeader.tsx` (seul header utilisé sur Loudness)
+### 1. Synchroniser la langue AVANT le premier render (`src/pages/LoudnessEn.tsx`)
 
-Rendre `toggleLanguage` route-aware via `useNavigate` + `useLocation` :
+Remplacer le `useEffect` par un changement synchrone exécuté pendant le render (idempotent, hors cycle React) + `useLayoutEffect` pour la restauration au démontage. Cela élimine le double-render et donc la boucle Radix.
 
-```ts
-const navigate = useNavigate();
-const { pathname } = useLocation();
-
-// Mapping FR ↔ EN (extensible plus tard pour les 4 autres outils)
-const LOCALIZED_ROUTES: Record<string, string> = {
-  "/loudness": "/en/loudness",
-  "/en/loudness": "/loudness",
-};
-
-const toggleLanguage = () => {
-  document.body.classList.add("lang-switching");
-  const nextLang = i18n.language === "fr" ? "en" : "fr";
-  const target = LOCALIZED_ROUTES[pathname];
-  if (target) {
-    navigate(target);
-  } else {
-    i18n.changeLanguage(nextLang); // outils sans variante EN dédiée
+```tsx
+const LoudnessEn = () => {
+  const { i18n } = useTranslation();
+  // Force EN synchroneously, BEFORE first render of <Loudness />.
+  if (i18n.language !== "en") {
+    i18n.changeLanguage("en");
   }
-  setTimeout(() => document.body.classList.remove("lang-switching"), 500);
+  useLayoutEffect(() => {
+    // No restore on unmount: the destination route's wrapper (or the toggle)
+    // owns the next language. Restoring here causes a flash back to FR
+    // when navigating from /en/loudness → /loudness via the toggle.
+    return;
+  }, []);
+  return <Loudness />;
 };
 ```
 
-Pourquoi ne pas appeler `changeLanguage` quand on navigue ? Parce que `LoudnessEn.tsx` force déjà EN au montage et restaure la langue précédente au démontage — la navigation suffit, et on évite un double-flip.
+(On supprime la logique de "previous language" : la page de destination, ou le toggle, dicte la langue.)
 
-### Vérifications de cheminement
+### 2. Idem côté FR : créer un wrapper symétrique (`src/pages/LoudnessFr.tsx` ou inline dans la route `/loudness`)
 
-1. Depuis `/loudness` (FR) → clic "EN" → `navigate("/en/loudness")` → `LoudnessEn` monte → `i18n.changeLanguage("en")` → contenu EN, URL EN. OK.
-2. Depuis `/en/loudness` (EN forcé) → clic "FR" → `navigate("/loudness")` → `LoudnessEn` démonte → restaure `previous` (FR) → contenu FR, URL FR. OK.
-3. Sur les 4 autres outils (`/key-bpm-finder`, `/tap-tempo-metronome`, `/chord-progression`, `/audio-to-midi`) : pas de variante EN routée, donc fallback sur simple `changeLanguage`. Comportement actuel préservé.
-4. État visuel du switch (FR/EN en gras) : déjà piloté par `i18n.language`, qui sera bien à jour après navigation grâce au `useEffect` de `LoudnessEn`.
+Pour qu'arriver sur `/loudness` force aussi `i18n.changeLanguage("fr")` (sinon un user qui a EN persisté en localStorage et tape `/loudness` voit du EN). Petit composant identique mais en `"fr"`.
+
+Routes mises à jour dans `App.tsx` :
+```tsx
+<Route path="/loudness" element={<LoudnessFr />} />
+<Route path="/en/loudness" element={<LoudnessEn />} />
+```
+
+### 3. Ajouter la transition blur sur navigation (`src/components/tools/ToolkitHeader.tsx`)
+
+Déjà présent dans `toggleLanguage` (`document.body.classList.add("lang-switching")` + cleanup 500 ms). Vérifier que le timing est conservé pendant la navigation route-aware (déjà OK dans le code actuel — le `setTimeout` retire la classe 500 ms après, indépendamment de la navigation).
+
+### 4. Filet de sécurité contre la boucle Radix (défense en profondeur)
+
+Sur le `<Select>` de genre musical (ligne 742 de `Loudness.tsx`), ajouter `key={lang}` pour forcer un remount propre si la langue change en cours de session :
+```tsx
+<Select key={lang} value={selectedSubgenre ?? "none"} ...>
+```
+Coût : remise à zéro visuelle du dropdown lors d'un toggle FR↔EN sans navigation, mais sur les pages `/loudness` ↔ `/en/loudness` la navigation remonte déjà tout l'arbre, donc invisible.
+
+## Vérifications post-fix
+
+1. `/loudness` → clic "EN" : `navigate("/en/loudness")` → wrapper EN force la langue avant render → page rend directement en EN, pas de flash, pas d'erreur console. Blur visible 500 ms.
+2. `/en/loudness` → clic "FR" : `navigate("/loudness")` → wrapper FR force la langue avant render → contenu FR direct.
+3. Accès direct à `/en/loudness` (depuis Google) avec localStorage FR : page rend en EN dès la première frame.
+4. Accès direct à `/loudness` avec localStorage EN : page rend en FR dès la première frame.
+5. Aucune erreur "Maximum update depth" dans la console.
+6. Toggle FR/EN sur les 4 autres outils (`/key-bpm-finder`, etc.) : comportement actuel préservé (`i18n.changeLanguage` direct).
 
 ## Hors-scope
 
-- Pas de création de routes `/en/...` pour les autres outils (non demandé).
-- `Header.tsx` global non touché : il n'est pas rendu sur les pages Loudness.
-- Aucun changement de contenu, de SEO, ni de hreflang (déjà corrects).
+- Pas de généralisation à Landing/Blog/Projets/Boutique (ce sera le sujet du prochain plan, déjà rédigé).
+- Pas de modification du contenu, du SEO, du sitemap ou des hreflang.
+- Pas de touche à `Header.tsx` global ni à `BlogArticleHeader.tsx`.
