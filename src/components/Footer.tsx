@@ -1,5 +1,6 @@
 import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const footerServices = [
   { labelKey: "services.data.mixage-mastering.title", id: "mixage-mastering" },
@@ -91,9 +92,9 @@ const Footer = ({ onOpenService }: FooterProps) => {
               {t('footer.copyright')}
             </div>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
-              <a href="/mentions-legales" className="hover:text-primary transition-colors">{t('footer.legal')}</a>
-              <a href="/politique-confidentialite" className="hover:text-primary transition-colors">{t('footer.privacy')}</a>
-              <a href="/cgv" className="hover:text-primary transition-colors">{t('footer.terms')}</a>
+              <Link to="/mentions-legales" className="hover:text-primary transition-colors">{t('footer.legal')}</Link>
+              <Link to="/politique-confidentialite" className="hover:text-primary transition-colors">{t('footer.privacy')}</Link>
+              <Link to="/cgv" className="hover:text-primary transition-colors">{t('footer.terms')}</Link>
             </div>
           </div>
         </div>
