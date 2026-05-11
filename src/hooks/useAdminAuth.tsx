@@ -15,30 +15,42 @@ export const useAdminAuth = (): AdminAuthState => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const checkAdminRole = async () => {
       if (authLoading) return;
-      
+
       if (!user) {
-        setIsAdmin(false);
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsAdmin(false);
+          setIsLoading(false);
+          setError(null);
+        }
         return;
       }
 
-      // Reset loading state when user changes (e.g. just signed in)
       setIsLoading(true);
       setError(null);
 
-      try {
-        // CLIENT-SIDE ROLE CHECK FOR UI ONLY
-        // This check controls dashboard visibility - NOT security.
-        // All admin endpoints (e.g., get-stripe-data) MUST verify admin role server-side.
-        // RLS policies also prevent unauthorized database access.
-        const { data, error: queryError } = await supabase
+      // Petite tentative de retry pour éviter les races juste après login
+      // (le token JWT peut mettre quelques ms à être propagé au client)
+      const attemptQuery = async () => {
+        return await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .eq('role', 'admin')
           .maybeSingle();
+      };
+
+      try {
+        let { data, error: queryError } = await attemptQuery();
+        if (queryError) {
+          await new Promise((r) => setTimeout(r, 400));
+          ({ data, error: queryError } = await attemptQuery());
+        }
+
+        if (cancelled) return;
 
         if (queryError) {
           console.error('Error checking admin role:', queryError);
@@ -48,15 +60,19 @@ export const useAdminAuth = (): AdminAuthState => {
           setIsAdmin(!!data);
         }
       } catch (err) {
+        if (cancelled) return;
         console.error('Unexpected error checking admin role:', err);
         setError('Erreur inattendue');
         setIsAdmin(false);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     checkAdminRole();
+    return () => {
+      cancelled = true;
+    };
   }, [user, authLoading]);
 
   return { isAdmin, isLoading, error };
