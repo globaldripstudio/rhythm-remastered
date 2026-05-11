@@ -194,6 +194,10 @@ const Dashboard = () => {
             <StemSplitter />
           </TabsContent>
 
+          <TabsContent value="audit">
+            <AuditLog />
+          </TabsContent>
+
         </Tabs>
       </main>
     </div>
