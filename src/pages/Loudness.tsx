@@ -707,7 +707,7 @@ const Loudness = () => {
               </div>
               <div className="space-y-3 sm:space-y-4">
                 <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
-                  Loudness <span className="hero-text">LUFS</span>
+                  {t("loudness.h1Lead")} <span className="hero-text">{t("loudness.h1Tail")}</span>
                 </h1>
                 <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-xl">
                   {t("loudness.subtitle")}
