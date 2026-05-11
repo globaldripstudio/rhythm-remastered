@@ -25,8 +25,6 @@ import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
 import AudioToMidi from "./pages/AudioToMidi";
 import Admin from "./pages/Admin";
-import AdminForgotPassword from "./pages/AdminForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
 
 import LiveChat from "./components/LiveChat";
 import PageTracker from "./components/PageTracker";
@@ -35,7 +33,7 @@ const queryClient = new QueryClient();
 
 const ConditionalLiveChat = () => {
   const { pathname } = useLocation();
-  return pathname.startsWith("/admin") || pathname.startsWith("/reset-password") ? null : <LiveChat />;
+  return pathname.startsWith("/admin") ? null : <LiveChat />;
 };
 
 const App = () => (
@@ -76,8 +74,6 @@ const App = () => (
             <Route path="/key-finder" element={<Navigate to="/key-bpm-finder" replace />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Redirections anciennes URLs */}
             <Route path="/a-propos" element={<Navigate to="/" replace />} />
