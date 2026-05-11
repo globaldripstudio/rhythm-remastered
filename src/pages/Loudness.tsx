@@ -1061,6 +1061,24 @@ const Loudness = () => {
             </section>
           )}
 
+          <section className="mt-12" aria-labelledby="loudness-faq-title">
+            <h2 id="loudness-faq-title" className="text-2xl font-bold sm:text-3xl">
+              {t("loudness.faq.title")}
+            </h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <article key={i} className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+                  <h3 className="text-base font-semibold text-foreground sm:text-lg">
+                    {t(`loudness.faq.q${i}`)}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {t(`loudness.faq.a${i}`)}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <ToolResources current="loudness" />
         </section>
       </main>
