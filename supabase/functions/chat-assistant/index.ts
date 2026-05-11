@@ -229,7 +229,7 @@ serve(async (req) => {
   try {
     // Rate limiting check
     const clientIP = getClientIP(req);
-    const rateLimitResult = checkRateLimit(clientIP);
+    const rateLimitResult = await checkRateLimit(clientIP);
     
     if (!rateLimitResult.allowed) {
       console.warn(`Rate limit exceeded for IP: ${clientIP}`);
