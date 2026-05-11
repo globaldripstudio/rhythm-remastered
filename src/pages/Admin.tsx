@@ -93,6 +93,11 @@ const AdminContent = () => {
 const Admin = () => {
   return (
     <AuthProvider>
+      <Helmet>
+        <title>Admin</title>
+        <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+        <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet" />
+      </Helmet>
       <AdminContent />
     </AuthProvider>
   );
