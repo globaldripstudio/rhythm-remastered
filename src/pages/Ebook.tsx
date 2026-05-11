@@ -4,13 +4,24 @@ import { BookOpen, Check, Download, Play, FileText, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
+import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const Ebook = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const homePath = lang === 'en' ? '/en' : '/';
   const [isLoading, setIsLoading] = useState(false);
+
+  const toggleLanguage = () => {
+    document.body.classList.add('lang-switching');
+    navigate(lang === 'en' ? '/ebook' : '/en/ebook');
+    setTimeout(() => document.body.classList.remove('lang-switching'), 500);
+  };
 
   const handlePurchase = async () => {
     setIsLoading(true);
@@ -32,26 +43,45 @@ const Ebook = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title={t('seo.ebook.title')} description={t('seo.ebook.description')} path="/ebook" />
+      <SEO
+        title={t('seo.ebook.title')}
+        description={t('seo.ebook.description')}
+        path={lang === 'en' ? '/en/ebook' : '/ebook'}
+        locale={lang === 'en' ? 'en_US' : 'fr_FR'}
+        alternates={[
+          { hrefLang: 'fr', path: '/ebook' },
+          { hrefLang: 'en', path: '/en/ebook' },
+          { hrefLang: 'x-default', path: '/ebook' },
+        ]}
+      />
       {/* Header - matching Projets page style */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
-              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+              <Link to={homePath} className="flex items-center space-x-2 sm:space-x-3">
                 <img 
                   src="/lovable-uploads/logo-blanc-sans-fond.png"
                   alt="Global Drip Studio"
                   className="h-6 sm:h-8 object-contain"
                 />
               </Link>
-              <Link to="/">
+              <Link to={homePath}>
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
-                  <span className="hidden sm:inline">← Retour à l'accueil</span>
-                  <span className="sm:hidden">← Accueil</span>
+                  <span className="hidden sm:inline">← {t('nav.backHome')}</span>
+                  <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
                 </Button>
               </Link>
             </div>
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
+              aria-label="Switch language"
+            >
+              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className="text-muted-foreground/40">|</span>
+              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+            </button>
           </div>
         </div>
       </header>

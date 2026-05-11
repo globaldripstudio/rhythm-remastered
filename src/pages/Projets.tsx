@@ -6,9 +6,13 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import SpotifyEmbed from "@/components/SpotifyEmbed";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
+import { useLocation } from "react-router-dom";
+import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const Projets = () => {
   const { t, i18n } = useTranslation();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -166,7 +170,17 @@ const Projets = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title={t('seo.projets.title')} description={t('seo.projets.description')} path="/projets" />
+      <SEO
+        title={t('seo.projets.title')}
+        description={t('seo.projets.description')}
+        path={lang === 'en' ? '/en/projects' : '/projets'}
+        locale={lang === 'en' ? 'en_US' : 'fr_FR'}
+        alternates={[
+          { hrefLang: 'fr', path: '/projets' },
+          { hrefLang: 'en', path: '/en/projects' },
+          { hrefLang: 'x-default', path: '/projets' },
+        ]}
+      />
       {/* Loading Screen */}
       {!imageLoaded && (
         <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">

@@ -2,11 +2,17 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Drum, Gauge, KeyRound, Menu, Music2, Music4, Phone, Wrench, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
 import { trackCTAClick } from "@/hooks/usePageTracking";
+import { getLangFromPath, localizePath, mirrorPath } from "@/lib/localizedRoutes";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const lp = (frPath: string) => localizePath(frPath, lang);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -21,7 +27,12 @@ const Header = () => {
 
   const toggleLanguage = () => {
     document.body.classList.add('lang-switching');
-    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    const target = mirrorPath(pathname);
+    if (target) {
+      navigate(target);
+    } else {
+      i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    }
     setTimeout(() => document.body.classList.remove('lang-switching'), 500);
   };
 
@@ -62,8 +73,8 @@ const Header = () => {
             <a href="#equipement" className="nav-link text-sm lg:text-base">{t('nav.equipment')}</a>
             <a href="#contact" className="nav-link text-sm lg:text-base">{t('nav.contact')}</a>
             <span className="text-muted-foreground/50">|</span>
-            <a href="/projets" className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.projects')}</a>
-            <a href="/blog" className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.blog')}</a>
+            <a href={lp("/projets")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.projects')}</a>
+            <a href={lp("/blog")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.blog')}</a>
             <span className="relative inline-flex items-center cursor-not-allowed mr-1">
               <span className="text-muted-foreground/50 text-sm lg:text-base">{t('nav.shop')}</span>
               <span className="absolute -top-3 -right-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium leading-none text-primary-foreground whitespace-nowrap">
@@ -90,7 +101,7 @@ const Header = () => {
                 className="invisible absolute left-1/2 top-[calc(100%+0.5rem)] z-50 w-64 -translate-x-1/2 translate-y-1 rounded-xl border border-border bg-card/95 p-2 opacity-0 shadow-xl backdrop-blur-lg transition-all duration-200 ease-out group-hover:visible group-hover:translate-y-0 group-hover:opacity-100"
               >
                 <a
-                  href="/loudness"
+                  href={lp("/loudness")}
                   role="menuitem"
                   className="flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-primary/10"
                 >
@@ -217,8 +228,8 @@ const Header = () => {
 
               <div className="border-t border-border my-2" />
 
-              <a href="/projets" className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.projects')}</a>
-              <a href="/blog" className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.blog')}</a>
+              <a href={lp("/projets")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.projects')}</a>
+              <a href={lp("/blog")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.blog')}</a>
               <span className="py-2.5 px-2 relative inline-flex items-center cursor-not-allowed">
                 <span className="text-muted-foreground/50">{t('nav.shop')}</span>
                 <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
@@ -231,7 +242,7 @@ const Header = () => {
                   <Wrench className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                   {t('nav.toolkit')}
                 </div>
-                <a href="/loudness" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
+                <a href={lp("/loudness")} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
                   <Gauge className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>{t('nav.loudness')}</span>
                 </a>

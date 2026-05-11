@@ -26,6 +26,7 @@ import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
 import AudioToMidi from "./pages/AudioToMidi";
 import Admin from "./pages/Admin";
+import LangLock from "./components/LangLock";
 
 import LiveChat from "./components/LiveChat";
 import PageTracker from "./components/PageTracker";
@@ -48,16 +49,20 @@ const App = () => (
             <ConditionalLiveChat />
           <PageTracker />
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/blog" element={<Blog />} />
+            <Route path="/" element={<LangLock lang="fr"><Index /></LangLock>} />
+            <Route path="/en" element={<LangLock lang="en"><Index /></LangLock>} />
+            <Route path="/blog" element={<LangLock lang="fr"><Blog /></LangLock>} />
+            <Route path="/en/blog" element={<LangLock lang="en"><Blog /></LangLock>} />
             <Route path="/blog/:slug" element={<BlogArticle />} />
             <Route path="/services" element={<Services />} />
             <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/projets" element={<Projets />} />
+            <Route path="/projets" element={<LangLock lang="fr"><Projets /></LangLock>} />
+            <Route path="/en/projects" element={<LangLock lang="en"><Projets /></LangLock>} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
-            <Route path="/ebook" element={<Ebook />} />
+            <Route path="/ebook" element={<LangLock lang="fr"><Ebook /></LangLock>} />
+            <Route path="/en/ebook" element={<LangLock lang="en"><Ebook /></LangLock>} />
             <Route path="/ebook/login" element={<EbookLogin />} />
             <Route path="/ebook/reader" element={<EbookReader />} />
             <Route path="/loudness" element={<LoudnessFr />} />

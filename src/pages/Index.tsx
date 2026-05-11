@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Partners from "@/components/Partners";
@@ -12,9 +13,12 @@ import ServiceModal from "@/components/ServiceModal";
 import SEO from "@/components/SEO";
 import { servicesData } from "@/components/Services";
 import { organizationSchema, websiteSchema } from "@/lib/seo/schemas";
+import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const Index = () => {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
   const [footerModalService, setFooterModalService] = useState<typeof servicesData[0] | null>(null);
   const [footerModalOpen, setFooterModalOpen] = useState(false);
 
@@ -36,7 +40,13 @@ const Index = () => {
       <SEO
         title={t('seo.home.title')}
         description={t('seo.home.description')}
-        path="/"
+        path={lang === 'en' ? '/en' : '/'}
+        locale={lang === 'en' ? 'en_US' : 'fr_FR'}
+        alternates={[
+          { hrefLang: 'fr', path: '/' },
+          { hrefLang: 'en', path: '/en' },
+          { hrefLang: 'x-default', path: '/' },
+        ]}
         jsonLd={[organizationSchema(), websiteSchema()]}
       />
       <Header />
