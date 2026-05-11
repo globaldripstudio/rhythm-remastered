@@ -12,6 +12,7 @@ import { getLangFromPath, mirrorPath } from "@/lib/localizedRoutes";
 const Projets = () => {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const lang = getLangFromPath(pathname);
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -35,19 +36,6 @@ const Projets = () => {
     }, 500);
   }, []);
 
-  useEffect(() => {
-    document.title = "Nos Projets | Global Drip Studio - Collaborations Artistiques";
-    const meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      const m = document.createElement('meta');
-      m.name = 'description';
-      m.content = "Découvrez nos collaborations artistiques avec Zeu, Tany, Lil Moine, Eddy de Mart, Black Beanie Dub et plus encore. Productions, mixage et mastering professionnels.";
-      document.head.appendChild(m);
-    } else {
-      meta.setAttribute('content', "Découvrez nos collaborations artistiques avec Zeu, Tany, Lil Moine, Eddy de Mart, Black Beanie Dub et plus encore. Productions, mixage et mastering professionnels.");
-    }
-  }, []);
-
   const toggleProject = (projectId: string) => {
     setExpandedProjects(prev => {
       const next = new Set(prev);
@@ -62,7 +50,12 @@ const Projets = () => {
 
   const toggleLanguage = () => {
     document.body.classList.add('lang-switching');
-    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    const target = mirrorPath(pathname);
+    if (target) {
+      navigate(target);
+    } else {
+      i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    }
     setTimeout(() => document.body.classList.remove('lang-switching'), 500);
   };
 
