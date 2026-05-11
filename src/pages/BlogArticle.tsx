@@ -108,7 +108,7 @@ const BlogArticle = () => {
               <p className="text-muted-foreground mb-6">{t('blog.articles.venin.bringToLifeDesc')}</p>
               <div className="flex justify-center">
                 <Button className="studio-button" onClick={() => {
-                  navigate('/');
+                  navigate(lang === "en" ? "/en" : "/");
                   setTimeout(() => {
                     const contactSection = document.getElementById('contact');
                     if (contactSection) {
@@ -150,14 +150,20 @@ const BlogArticle = () => {
     );
   }
 
-  const seoKey = slug === "venin-le-premier-sang" ? "venin" : "compression";
+  const knownSeoKey = slug === "venin-le-premier-sang" ? "venin" : slug === "comprendre-la-compression" ? "compression" : null;
+  const seoTitle = knownSeoKey ? t(`seo.${knownSeoKey}.title`) : `${article.title} | Global Drip Studio`;
+  const seoDescription = knownSeoKey
+    ? t(`seo.${knownSeoKey}.description`)
+    : (lang === "en"
+        ? "Read this article on the Global Drip Studio blog: insights on production, mixing, mastering and sound design."
+        : "Lire cet article sur le blog Global Drip Studio : conseils production, mixage, mastering et sound design.");
   const shareUrl = `https://globaldripstudio.fr${canonicalPath}`;
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title={t(`seo.${seoKey}.title`)}
-        description={t(`seo.${seoKey}.description`)}
+        title={seoTitle}
+        description={seoDescription}
         path={canonicalPath}
         type="article"
         locale={lang === "en" ? "en_US" : "fr_FR"}
@@ -175,7 +181,7 @@ const BlogArticle = () => {
         jsonLd={[
           articleSchema({
             title: article.title,
-            description: t(`seo.${seoKey}.description`),
+            description: seoDescription,
             path: canonicalPath,
             image:
               slug === "venin-le-premier-sang"

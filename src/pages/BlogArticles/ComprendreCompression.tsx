@@ -192,7 +192,7 @@ const ComprendreCompression = () => {
               <button className="w-full" onClick={() => {
                 setContactModalOpen(false);
                 setTimeout(() => {
-                  navigate('/');
+                  navigate(lang === "en" ? "/en" : "/");
                   setTimeout(() => {
                     const contactSection = document.getElementById('contact');
                     if (contactSection) {

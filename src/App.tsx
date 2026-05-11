@@ -27,6 +27,7 @@ import ChordProgression from "./pages/ChordProgression";
 import AudioToMidi from "./pages/AudioToMidi";
 import Admin from "./pages/Admin";
 import LangLock from "./components/LangLock";
+import LangAwareRedirect from "./components/LangAwareRedirect";
 
 import LiveChat from "./components/LiveChat";
 import PageTracker from "./components/PageTracker";
@@ -83,13 +84,13 @@ const App = () => (
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
             
-            {/* Redirections anciennes URLs */}
-            <Route path="/a-propos" element={<Navigate to="/" replace />} />
-            <Route path="/about" element={<Navigate to="/" replace />} />
+            {/* Redirections anciennes URLs (lang-aware) */}
+            <Route path="/a-propos" element={<LangAwareRedirect to="/" enTo="/en" />} />
+            <Route path="/about" element={<LangAwareRedirect to="/" enTo="/en" />} />
             <Route path="/programmes" element={<Navigate to="/services" replace />} />
             <Route path="/programs" element={<Navigate to="/services" replace />} />
-            <Route path="/our-projects" element={<Navigate to="/projets" replace />} />
-            <Route path="/projects" element={<Navigate to="/projets" replace />} />
+            <Route path="/our-projects" element={<LangAwareRedirect to="/projets" enTo="/en/projects" />} />
+            <Route path="/projects" element={<LangAwareRedirect to="/projets" enTo="/en/projects" />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
