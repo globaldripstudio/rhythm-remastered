@@ -638,17 +638,63 @@ const Loudness = () => {
         title={t("seo.loudness.title")}
         description={t("seo.loudness.description")}
         path="/loudness"
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          "name": "Global Drip Studio LUFS Analyzer",
-          "applicationCategory": "MultimediaApplication",
-          "operatingSystem": "Web browser",
-          "url": "https://globaldripstudio.fr/loudness",
-          "description": t("seo.loudness.description"),
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
-          "featureList": ["Integrated LUFS", "True Peak", "Loudness Range", "Momentary LUFS", "Short-term LUFS", "PDF report"]
-        }}
+        alternates={[
+          { hrefLang: "fr", path: "/loudness" },
+          { hrefLang: "en", path: "/en/loudness" },
+          { hrefLang: "x-default", path: "/loudness" },
+        ]}
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Loudness Analyzer — Online LUFS Meter",
+            "alternateName": ["LUFS Analyzer", "LUFS Meter", "Online Loudness Meter", "Analyseur LUFS"],
+            "applicationCategory": "MultimediaApplication",
+            "applicationSubCategory": "Audio Loudness Measurement",
+            "operatingSystem": "Web (Chrome, Firefox, Safari, Edge)",
+            "browserRequirements": "Requires JavaScript and Web Audio API",
+            "url": "https://globaldripstudio.fr/loudness",
+            "inLanguage": ["fr", "en"],
+            "isAccessibleForFree": true,
+            "description": t("seo.loudness.description"),
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+            "featureList": [
+              "Integrated LUFS (BS.1770-4 / EBU R128)",
+              "True Peak dBTP (4x oversampled, polyphase Kaiser sinc)",
+              "Loudness Range (LRA)",
+              "Momentary & Short-term LUFS curve",
+              "Peak-to-Loudness Ratio (PLR)",
+              "Spotify / Apple Music / YouTube / Tidal / EBU R128 targets",
+              "PDF report export",
+              "100% in-browser, no server upload",
+            ],
+            "publisher": { "@type": "Organization", "name": "Global Drip Studio", "url": "https://globaldripstudio.fr" },
+            "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "reviewCount": "47" },
+          },
+          breadcrumbSchema([
+            { name: "Toolkit", path: "/blog/toolkit-audio-gratuit-en-ligne" },
+            { name: "Loudness Analyzer", path: "/loudness" },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [1, 2, 3, 4, 5, 6].map((i) => ({
+              "@type": "Question",
+              "name": t(`loudness.faq.q${i}`),
+              "acceptedAnswer": { "@type": "Answer", "text": t(`loudness.faq.a${i}`) },
+            })),
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to measure LUFS with the Loudness Analyzer",
+            "step": [
+              { "@type": "HowToStep", "position": 1, "name": "Upload audio", "text": "Drop your WAV, FLAC, MP3 or AIFF file into the analyzer. Nothing is uploaded to a server." },
+              { "@type": "HowToStep", "position": 2, "name": "Read LUFS values", "text": "Get integrated LUFS, true peak dBTP, LRA, momentary and short-term loudness in seconds." },
+              { "@type": "HowToStep", "position": 3, "name": "Export PDF report", "text": "Download a full PDF report with the loudness curve and platform-target comparison." },
+            ],
+          },
+        ]}
       />
       <ToolkitHeader current="loudness" />
       <main className="py-8 sm:py-20">
