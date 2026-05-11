@@ -197,12 +197,18 @@ const Services = () => {
           title={t('seo.services.title')}
           description={t('seo.services.description')}
           path="/services"
-          jsonLd={[SERVICES_JSONLD, breadcrumbSchema([{ name: "Services", path: "/services" }, { name: service.title, path: `/services#${service.id}` }])]}
+          jsonLd={[SERVICES_JSONLD, breadcrumbSchema([{ name: "Services", path: "/services" }, { name: service.title, path: "/services" }])]}
         />
         <div className="container mx-auto px-6 py-12">
           <Button 
             variant="ghost" 
-            onClick={() => window.location.href = '/#services'}
+            onClick={() => {
+              navigate('/');
+              setTimeout(() => {
+                const el = document.getElementById('services');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
             className="mb-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

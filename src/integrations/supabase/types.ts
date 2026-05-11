@@ -275,6 +275,27 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          count: number
+          created_at: string
+          key: string
+          window_end: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          key: string
+          window_end: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          key?: string
+          window_end?: string
+        }
+        Relationships: []
+      }
       site_analytics: {
         Row: {
           button_name: string | null
@@ -346,6 +367,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit: {
+        Args: { _key: string; _max_count: number; _window_seconds: number }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -355,6 +380,7 @@ export type Database = {
       }
       purge_old_audit_logs: { Args: never; Returns: undefined }
       purge_old_login_attempts: { Args: never; Returns: undefined }
+      purge_old_rate_limits: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

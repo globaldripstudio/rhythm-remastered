@@ -1,52 +1,39 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Rate limiting configuration
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
-const MAX_REQUESTS_PER_WINDOW = 20; // Max 20 requests per hour per IP
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+// Persistent rate limiting via DB RPC (shared across instances).
+const RATE_LIMIT_WINDOW_S = 60 * 60; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 20;
 
-// Clean up old rate limit entries periodically
-function cleanupRateLimits() {
-  const now = Date.now();
-  for (const [ip, data] of rateLimitMap.entries()) {
-    if (now > data.resetTime) {
-      rateLimitMap.delete(ip);
+async function checkRateLimit(ip: string): Promise<{ allowed: boolean; remaining: number; resetIn: number }> {
+  try {
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+    const { data, error } = await admin.rpc("check_rate_limit", {
+      _key: `chat:${ip}`,
+      _max_count: MAX_REQUESTS_PER_WINDOW,
+      _window_seconds: RATE_LIMIT_WINDOW_S,
+    });
+    if (error) {
+      console.error("rate_limit RPC error", error);
+      return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW, resetIn: RATE_LIMIT_WINDOW_S * 1000 };
     }
-  }
-}
-
-// Check rate limit for an IP
-function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
-  cleanupRateLimits();
-  
-  const now = Date.now();
-  const existing = rateLimitMap.get(ip);
-  
-  if (!existing || now > existing.resetTime) {
-    // New window
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
-    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1, resetIn: RATE_LIMIT_WINDOW_MS };
-  }
-  
-  if (existing.count >= MAX_REQUESTS_PER_WINDOW) {
-    return { 
-      allowed: false, 
-      remaining: 0, 
-      resetIn: existing.resetTime - now 
+    return {
+      allowed: data === true,
+      remaining: data === true ? MAX_REQUESTS_PER_WINDOW : 0,
+      resetIn: RATE_LIMIT_WINDOW_S * 1000,
     };
+  } catch (e) {
+    console.error("rate_limit unexpected error", e);
+    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW, resetIn: RATE_LIMIT_WINDOW_S * 1000 };
   }
-  
-  existing.count++;
-  return { 
-    allowed: true, 
-    remaining: MAX_REQUESTS_PER_WINDOW - existing.count, 
-    resetIn: existing.resetTime - now 
-  };
 }
 
 // Get client IP from request headers
@@ -242,7 +229,7 @@ serve(async (req) => {
   try {
     // Rate limiting check
     const clientIP = getClientIP(req);
-    const rateLimitResult = checkRateLimit(clientIP);
+    const rateLimitResult = await checkRateLimit(clientIP);
     
     if (!rateLimitResult.allowed) {
       console.warn(`Rate limit exceeded for IP: ${clientIP}`);

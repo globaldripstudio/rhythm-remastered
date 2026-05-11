@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, Play, ExternalLink, Calendar, Music } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const Portfolio = () => {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
@@ -90,6 +91,15 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Portfolio — Réalisations mixage, mastering & sound design | Global Drip Studio"
+        description="Découvrez nos productions récentes : rock, hip-hop, électronique, acoustique. Mixage, mastering, sound design et composition par Global Drip Studio à Martigues."
+        path="/portfolio"
+        alternates={[
+          { hrefLang: "fr", path: "/portfolio" },
+          { hrefLang: "x-default", path: "/portfolio" },
+        ]}
+      />
       <div className="container mx-auto px-6 py-12">
         {/* Header */}
         <div className="text-center mb-16">
