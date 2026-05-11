@@ -131,18 +131,54 @@
     <lastmod>2026-05-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog/toolkit-audio-gratuit-en-ligne"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog/free-online-audio-toolkit"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog/toolkit-audio-gratuit-en-ligne"/>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/en/blog/free-online-audio-toolkit</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog/toolkit-audio-gratuit-en-ligne"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog/free-online-audio-toolkit"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog/toolkit-audio-gratuit-en-ligne"/>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/blog/venin-le-premier-sang</loc>
     <lastmod>2024-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog/venin-le-premier-sang"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog/venin-the-first-blood"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog/venin-le-premier-sang"/>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/en/blog/venin-the-first-blood</loc>
+    <lastmod>2024-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog/venin-le-premier-sang"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog/venin-the-first-blood"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog/venin-le-premier-sang"/>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/blog/comprendre-la-compression</loc>
     <lastmod>2024-12-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog/comprendre-la-compression"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog/understanding-compression"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog/comprendre-la-compression"/>
+  </url>
+  <url>
+    <loc>https://globaldripstudio.fr/en/blog/understanding-compression</loc>
+    <lastmod>2024-12-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://globaldripstudio.fr/blog/comprendre-la-compression"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://globaldripstudio.fr/en/blog/understanding-compression"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://globaldripstudio.fr/blog/comprendre-la-compression"/>
   </url>
   <url>
     <loc>https://globaldripstudio.fr/mentions-legales</loc>

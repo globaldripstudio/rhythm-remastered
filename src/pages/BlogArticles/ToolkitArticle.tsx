@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Gauge, KeyRound, Drum, Music2, Music4 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import ShareButtons from "@/components/blog/ShareButtons";
 import ContactCTA from "@/components/ContactCTA";
 import SEO from "@/components/SEO";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schemas";
+import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const TOOL_KEYS = [
   { icon: Gauge, to: "/loudness", key: "loudness" },
@@ -20,6 +21,12 @@ const TOOL_KEYS = [
 const ToolkitArticle = () => {
   const { t } = useTranslation();
   const slug = "toolkit-audio-gratuit-en-ligne";
+  const enSlug = "free-online-audio-toolkit";
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const frPath = `/blog/${slug}`;
+  const enPath = `/en/blog/${enSlug}`;
+  const canonicalPath = lang === "en" ? enPath : frPath;
   const title = t("blog.articles.toolkit.title");
 
   return (
@@ -27,22 +34,28 @@ const ToolkitArticle = () => {
       <SEO
         title={t("seo.toolkitArticle.title")}
         description={t("seo.toolkitArticle.description")}
-        path={`/blog/${slug}`}
+        path={canonicalPath}
         type="article"
+        locale={lang === "en" ? "en_US" : "fr_FR"}
         publishedTime="2026-05-06"
         modifiedTime="2026-05-06"
+        alternates={[
+          { hrefLang: "fr", path: frPath },
+          { hrefLang: "en", path: enPath },
+          { hrefLang: "x-default", path: frPath },
+        ]}
         jsonLd={[
           articleSchema({
             title,
             description: t("seo.toolkitArticle.description"),
-            path: `/blog/${slug}`,
+            path: canonicalPath,
             image: "/lovable-uploads/toolkit-article-cover.jpg",
             datePublished: "2026-05-06",
             section: "Toolkit",
           }),
           breadcrumbSchema([
-            { name: "Blog", path: "/blog" },
-            { name: title, path: `/blog/${slug}` },
+            { name: "Blog", path: lang === "en" ? "/en/blog" : "/blog" },
+            { name: title, path: canonicalPath },
           ]),
         ]}
       />
@@ -64,7 +77,7 @@ const ToolkitArticle = () => {
             <div className="flex items-center text-sm text-muted-foreground mb-6">
               <span>{t("blog.articles.toolkit.meta")}</span>
             </div>
-            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={`https://globaldripstudio.fr${canonicalPath}`} />
           </header>
 
           <div className="prose prose-lg max-w-none text-foreground">
@@ -161,7 +174,7 @@ const ToolkitArticle = () => {
           </div>
 
           <div className="mt-10 pt-6 border-t border-border">
-            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={`https://globaldripstudio.fr${canonicalPath}`} />
           </div>
         </div>
       </article>

@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Zap, Phone, Mail, MapPin, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SeuilDiagram, RatioDiagram, AttackReleaseKneeDiagram } from "@/components/blog/CompressionDiagrams";
@@ -10,19 +10,32 @@ import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import ShareButtons from "@/components/blog/ShareButtons";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
+import { getLangFromPath } from "@/lib/localizedRoutes";
 
 const ComprendreCompression = () => {
   const navigate = useNavigate();
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const frPath = "/blog/comprendre-la-compression";
+  const enPath = "/en/blog/understanding-compression";
+  const canonicalPath = lang === "en" ? enPath : frPath;
+  const shareUrl = `https://globaldripstudio.fr${canonicalPath}`;
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
         title={t('seo.compression.title')}
         description={t('seo.compression.description')}
-        path="/blog/comprendre-la-compression"
+        path={canonicalPath}
         type="article"
+        locale={lang === "en" ? "en_US" : "fr_FR"}
+        alternates={[
+          { hrefLang: "fr", path: frPath },
+          { hrefLang: "en", path: enPath },
+          { hrefLang: "x-default", path: frPath },
+        ]}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "BlogPosting",
@@ -55,7 +68,7 @@ const ComprendreCompression = () => {
             <div className="flex items-center text-sm text-muted-foreground mb-6">
               <span>{t('blog.articles.compression.meta')}</span>
             </div>
-            <ShareButtons url="https://globaldripstudio.fr/blog/comprendre-la-compression" />
+            <ShareButtons url={shareUrl} />
           </header>
 
           <div className="mb-8 sm:mb-12 rounded-2xl overflow-hidden">
@@ -144,7 +157,7 @@ const ComprendreCompression = () => {
             </div>
           </div>
           <div className="mt-10 pt-6 border-t border-border">
-            <ShareButtons url="https://globaldripstudio.fr/blog/comprendre-la-compression" />
+            <ShareButtons url={shareUrl} />
           </div>
         </div>
       </article>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { trackBlogView } from "@/hooks/useBlogViews";
 import { useTranslation } from "react-i18next";
 import ComprendreCompression from "./BlogArticles/ComprendreCompression";
@@ -10,10 +10,23 @@ import BlogArticleHeader from "@/components/blog/BlogArticleHeader";
 import ShareButtons from "@/components/blog/ShareButtons";
 import SEO from "@/components/SEO";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schemas";
+import {
+  articleEnSlug,
+  articleFrSlug,
+  getLangFromPath,
+} from "@/lib/localizedRoutes";
 
 const BlogArticle = () => {
-  const { slug } = useParams();
+  const { slug: rawSlug } = useParams();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  // Canonical FR slug (the rendering layer always uses FR slugs).
+  const slug = lang === "en" ? (articleFrSlug(rawSlug ?? "") ?? rawSlug) : rawSlug;
+  const enSlug = slug ? articleEnSlug(slug) : undefined;
+  const frPath = slug ? `/blog/${slug}` : "/blog";
+  const enPath = enSlug ? `/en/blog/${enSlug}` : "/en/blog";
+  const canonicalPath = lang === "en" && enSlug ? enPath : frPath;
   const [viewCount, setViewCount] = useState<number | null>(null);
   const { t } = useTranslation();
 
@@ -131,28 +144,39 @@ const BlogArticle = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">{t('blog.articles.venin.notFound')}</h1>
-          <Link to="/blog"><Button>{t('blog.articles.venin.backToBlog')}</Button></Link>
+          <Link to={lang === "en" ? "/en/blog" : "/blog"}><Button>{t('blog.articles.venin.backToBlog')}</Button></Link>
         </div>
       </div>
     );
   }
 
   const seoKey = slug === "venin-le-premier-sang" ? "venin" : "compression";
+  const shareUrl = `https://globaldripstudio.fr${canonicalPath}`;
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
         title={t(`seo.${seoKey}.title`)}
         description={t(`seo.${seoKey}.description`)}
-        path={`/blog/${slug}`}
+        path={canonicalPath}
         type="article"
+        locale={lang === "en" ? "en_US" : "fr_FR"}
         publishedTime={article.date}
         modifiedTime={article.date}
+        alternates={
+          enSlug
+            ? [
+                { hrefLang: "fr", path: frPath },
+                { hrefLang: "en", path: enPath },
+                { hrefLang: "x-default", path: frPath },
+              ]
+            : undefined
+        }
         jsonLd={[
           articleSchema({
             title: article.title,
             description: t(`seo.${seoKey}.description`),
-            path: `/blog/${slug}`,
+            path: canonicalPath,
             image:
               slug === "venin-le-premier-sang"
                 ? "/lovable-uploads/venin-album-cover.jpg"
@@ -161,8 +185,8 @@ const BlogArticle = () => {
             section: article.category,
           }),
           breadcrumbSchema([
-            { name: "Blog", path: "/blog" },
-            { name: article.title, path: `/blog/${slug}` },
+            { name: "Blog", path: lang === "en" ? "/en/blog" : "/blog" },
+            { name: article.title, path: canonicalPath },
           ]),
         ]}
       />
@@ -186,11 +210,11 @@ const BlogArticle = () => {
               <span>{article.date}</span>
               <span>{article.readTime}</span>
             </div>
-            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={shareUrl} />
           </div>
           <div className="text-foreground leading-relaxed">{article.content}</div>
           <div className="mt-10 pt-6 border-t border-border">
-            <ShareButtons url={`https://globaldripstudio.fr/blog/${slug}`} />
+            <ShareButtons url={shareUrl} />
           </div>
         </div>
       </article>
