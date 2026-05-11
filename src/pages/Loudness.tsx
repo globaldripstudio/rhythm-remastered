@@ -656,7 +656,7 @@ const Loudness = () => {
             "applicationSubCategory": "Audio Loudness Measurement",
             "operatingSystem": "Web (Chrome, Firefox, Safari, Edge)",
             "browserRequirements": "Requires JavaScript and Web Audio API",
-            "url": "https://globaldripstudio.fr/loudness",
+            "url": `https://globaldripstudio.fr${seoPath}`,
             "inLanguage": ["fr", "en"],
             "isAccessibleForFree": true,
             "description": t("seo.loudness.description"),
