@@ -100,15 +100,25 @@ const Blog = () => {
       )}
 
 
-      <SEO title={t('seo.blog.title')} description={t('seo.blog.description')} path="/blog" />
+      <SEO
+        title={t('seo.blog.title')}
+        description={t('seo.blog.description')}
+        path={seoPath}
+        locale={lang === 'en' ? 'en_US' : 'fr_FR'}
+        alternates={[
+          { hrefLang: 'fr', path: '/blog' },
+          { hrefLang: 'en', path: '/en/blog' },
+          { hrefLang: 'x-default', path: '/blog' },
+        ]}
+      />
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
-              <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+              <Link to={homePath} className="flex items-center space-x-2 sm:space-x-3">
                 <img src="/lovable-uploads/logo-blanc-sans-fond.png" alt="Global Drip Studio" className="h-6 sm:h-8 object-contain" />
               </Link>
-              <Link to="/">
+              <Link to={homePath}>
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
                   <span className="hidden sm:inline">← {t('nav.backHome')}</span>
                   <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
