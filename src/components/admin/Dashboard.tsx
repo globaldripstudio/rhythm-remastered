@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   LogOut, Calendar, Users, Home, BarChart3, CreditCard, 
-  LayoutDashboard, Bell, ChevronDown, Globe, BookOpen, Scissors, ShieldAlert
+  LayoutDashboard, Bell, ChevronDown, Globe, BookOpen, Scissors, ShieldAlert, ShieldCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -28,6 +28,7 @@ import SiteAnalytics from './SiteAnalytics';
 import EbookManager from './EbookManager';
 import StemSplitter from './StemSplitter';
 import AuditLog from './AuditLog';
+import SecurityPanel from './SecurityPanel';
 
 
 const Dashboard = () => {
@@ -101,7 +102,7 @@ const Dashboard = () => {
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="-mx-3 mb-4 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mb-6 sm:px-0">
-          <TabsList className="inline-grid min-w-max grid-cols-9 h-auto p-1 sm:w-full">
+          <TabsList className="inline-grid min-w-max grid-cols-10 h-auto p-1 sm:w-full">
             <TabsTrigger value="overview" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <LayoutDashboard className="w-4 h-4" />
               <span className="hidden sm:inline">Vue d'ensemble</span>
@@ -146,6 +147,11 @@ const Dashboard = () => {
               <ShieldAlert className="w-4 h-4" />
               <span className="hidden sm:inline">Audit</span>
               <span className="sm:hidden">Audit</span>
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
+              <ShieldCheck className="w-4 h-4" />
+              <span className="hidden sm:inline">Sécurité</span>
+              <span className="sm:hidden">Sécu</span>
             </TabsTrigger>
           </TabsList>
           </div>
@@ -196,6 +202,10 @@ const Dashboard = () => {
 
           <TabsContent value="audit">
             <AuditLog />
+          </TabsContent>
+
+          <TabsContent value="security">
+            <SecurityPanel />
           </TabsContent>
 
         </Tabs>
