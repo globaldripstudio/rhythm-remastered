@@ -6,12 +6,13 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import SpotifyEmbed from "@/components/SpotifyEmbed";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
-import { useLocation } from "react-router-dom";
-import { getLangFromPath } from "@/lib/localizedRoutes";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { getLangFromPath, mirrorPath } from "@/lib/localizedRoutes";
 
 const Projets = () => {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const lang = getLangFromPath(pathname);
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -35,19 +36,6 @@ const Projets = () => {
     }, 500);
   }, []);
 
-  useEffect(() => {
-    document.title = "Nos Projets | Global Drip Studio - Collaborations Artistiques";
-    const meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      const m = document.createElement('meta');
-      m.name = 'description';
-      m.content = "Découvrez nos collaborations artistiques avec Zeu, Tany, Lil Moine, Eddy de Mart, Black Beanie Dub et plus encore. Productions, mixage et mastering professionnels.";
-      document.head.appendChild(m);
-    } else {
-      meta.setAttribute('content', "Découvrez nos collaborations artistiques avec Zeu, Tany, Lil Moine, Eddy de Mart, Black Beanie Dub et plus encore. Productions, mixage et mastering professionnels.");
-    }
-  }, []);
-
   const toggleProject = (projectId: string) => {
     setExpandedProjects(prev => {
       const next = new Set(prev);
@@ -62,7 +50,12 @@ const Projets = () => {
 
   const toggleLanguage = () => {
     document.body.classList.add('lang-switching');
-    i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    const target = mirrorPath(pathname);
+    if (target) {
+      navigate(target);
+    } else {
+      i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    }
     setTimeout(() => document.body.classList.remove('lang-switching'), 500);
   };
 
@@ -203,28 +196,28 @@ const Projets = () => {
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 sm:gap-6">
-              <a href="/" className="flex items-center space-x-2 sm:space-x-3">
+              <Link to={lang === 'en' ? '/en' : '/'} className="flex items-center space-x-2 sm:space-x-3">
                 <img 
                   src="/lovable-uploads/logo-blanc-sans-fond.png"
                   alt="Global Drip Studio"
                   className="h-6 sm:h-8 object-contain"
                 />
-              </a>
-              <a href="/">
+              </Link>
+              <Link to={lang === 'en' ? '/en' : '/'}>
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm px-2 sm:px-4">
                   <span className="hidden sm:inline">← {t('nav.backHome')}</span>
                   <span className="sm:hidden">← {t('nav.backHomeShort')}</span>
                 </Button>
-              </a>
+              </Link>
             </div>
             <button
               onClick={toggleLanguage}
               className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors border border-border/50 hover:border-border"
               aria-label="Switch language"
             >
-              <span className={i18n.language === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
+              <span className={lang === 'fr' ? 'text-foreground font-bold' : ''}>FR</span>
               <span className="text-muted-foreground/40">|</span>
-              <span className={i18n.language === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
+              <span className={lang === 'en' ? 'text-foreground font-bold' : ''}>EN</span>
             </button>
           </div>
         </div>

@@ -54,7 +54,7 @@ const App = () => (
             <Route path="/en" element={<LangLock lang="en"><Index /></LangLock>} />
             <Route path="/blog" element={<LangLock lang="fr"><Blog /></LangLock>} />
             <Route path="/en/blog" element={<LangLock lang="en"><Blog /></LangLock>} />
-            <Route path="/blog/:slug" element={<BlogArticle />} />
+            <Route path="/blog/:slug" element={<LangLock lang="fr"><BlogArticle /></LangLock>} />
             <Route path="/en/blog/:slug" element={<LangLock lang="en"><BlogArticle /></LangLock>} />
             <Route path="/services" element={<Services />} />
             <Route path="/portfolio" element={<Portfolio />} />
