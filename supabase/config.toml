@@ -1,1 +1,4 @@
 project_id = "pimrukdfkdscbidlynax"
+
+[functions.admin-login-guard]
+verify_jwt = false
