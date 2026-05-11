@@ -144,7 +144,7 @@ const BlogArticle = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">{t('blog.articles.venin.notFound')}</h1>
-          <Link to="/blog"><Button>{t('blog.articles.venin.backToBlog')}</Button></Link>
+          <Link to={lang === "en" ? "/en/blog" : "/blog"}><Button>{t('blog.articles.venin.backToBlog')}</Button></Link>
         </div>
       </div>
     );
