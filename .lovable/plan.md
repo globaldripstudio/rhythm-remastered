@@ -1,69 +1,89 @@
-## Audit du site — anomalies relevées
+## Plan d'exécution — Lots 1, 2, 3
 
-Aucune correction n'a été faite. Pour chaque point, on choisira ensemble (corriger / ignorer / garder pour plus tard).
-
-### A. Navigation & SPA
-
-1. **Ancres `#accueil`, `#services`, `#equipement`, `#contact` du Header ne fonctionnent pas hors de la home.**
-   Sur `/blog`, `/projets`, `/ebook`, `/loudness`, `/en/...`, cliquer ne fait rien (pas de section ciblée sur la page courante).
-
-2. **Tous les liens de nav du Header et du Footer utilisent `<a href>` au lieu de `<Link>`.**
-   Conséquence : rechargement complet de la page → perte d'état React, ré-exécution de tous les chargements, animations relancées. Concerne : `/projets`, `/blog`, `/loudness`, `/key-bpm-finder`, `/tap-tempo-metronome`, `/chord-progression`, `/audio-to-midi`, `/mentions-legales`, `/politique-confidentialite`, `/cgv`.
-
-3. **Bouton "Retour" sur la page `/services` détaillée fait `window.location.href = '/#services'`**, donc rechargement complet au lieu d'un `navigate()`.
-
-4. **Articles "comingSoon"** (`/blog/bien-mixer-une-voix`, `/blog/10-techniques-sound-design`) : URL directe → page 404, alors que la liste les présente comme "à venir". Aucune redirection vers `/blog`.
-
-5. **Redirections legacy `/projects` et `/our-projects`** envoient vers `/projets` (FR) même si l'utilisateur est en EN. Devraient pointer vers `/en/projects` quand `i18n.language === 'en'`.
-
-### B. Internationalisation
-
-6. **Outils `/key-bpm-finder`, `/tap-tempo-metronome`, `/chord-progression`, `/audio-to-midi` ne sont pas traduits** : pas d'`useTranslation()`, contenu en français en dur. Pourtant le toggle FR/EN reste affiché (via `ToolkitHeader`) et change `i18n.language` sans effet visible.
-
-7. **Aucune route `/en/...` pour ces 4 outils** → toggle EN ne navigue nulle part de cohérent (et casse `mirrorPath`, qui ne trouve pas de pendant et tombe sur `i18n.changeLanguage` muet).
-
-8. **Page `/portfolio` entièrement en français en dur** (textes, descriptions). Aucun `t()`. Présente dans le sitemap mais jamais linkée depuis le site.
-
-9. **Pages légales (`/mentions-legales`, `/politique-confidentialite`, `/cgv`) en FR uniquement** : pas de version EN, pas d'`alternates hreflang`. Liens du footer pointent vers ces URLs FR depuis les pages EN.
-
-10. **`NotFound` (404) en FR uniquement.** Pas de version EN, pas de `alternates`.
-
-11. **Liens internes des articles EN** (CTA "Devis" Venin, etc.) : `navigate('/')` force le retour en FR depuis `/en/blog/venin-the-first-blood`.
-
-### C. SEO
-
-12. **`/portfolio` n'a pas de balise `<SEO>`** (pas de title/description spécifique, pas de canonical). Page indexable sans métadonnées.
-
-13. **`/services` (route séparée)** : breadcrumb utilise `/services#${service.id}` comme path, ce qui produit un schema.org breadcrumb avec ancre — non standard.
-
-14. **Articles non publiés (comingSoon)** : `BlogArticle.seoKey` retombe par défaut sur `"compression"` si le slug n'est ni Venin ni compression → mauvais titre/description si on accède à un slug coming-soon.
-
-15. **Toggle FR/EN sur les pages outils non bilingues** (`/services`, `/portfolio`, `/key-bpm-finder`, …) est visible mais inerte côté URL. Mauvais signal UX et potentiel duplicate content si Google suit le `?lang=` interne.
-
-### D. Sécurité
-
-16. **Toutes les edge functions ont `Access-Control-Allow-Origin: "*"`** alors que le site est servi depuis un domaine connu. Devrait être restreint à `globaldripstudio.fr`, `globaldripstudio.lovable.app` et l'origine preview.
-
-17. **Rate-limiting en mémoire** dans `chat-assistant`, `create-payment`, `send-contact-email` : reset à chaque cold-start, et non partagé entre instances. Contourné facilement en pratique (Cloud Functions Supabase scalent).
-
-18. **`get-stripe-data`** : à confirmer que l'appel est gardé par un check de rôle admin côté serveur (pas seulement par auth).
-
-### E. Code / qualité
-
-19. **`LangLock` appelle `i18n.changeLanguage()` pendant le render** (side effect en cycle React). Fonctionne aujourd'hui mais peut générer un warning React 18 strict. Pourrait être passé dans un `useLayoutEffect`.
-
-20. **`Header` toolkit dropdown** : `aria-haspopup="menu" aria-expanded="false"` est statique → accessibilité dégradée (le menu s'ouvre au hover sans mise à jour de l'état ARIA).
-
-21. **`Loudness` est wrappé par `LoudnessFr` et `LoudnessEn`** : pattern dupliqué qu'on pourrait remplacer par `<LangLock lang="fr"><Loudness /></LangLock>` pour rester cohérent avec le reste de l'App.
+Ordre d'application : **Lot 1 → Lot 2 → Lot 3**, livrés en messages séparés. Je consulte avant tout point sensible.
 
 ---
 
-### Comment procéder
+### 🟢 Lot 1 — Impact direct
 
-Plutôt que de tout corriger en bloc, je propose qu'on traite par lot. Mes recommandations de priorité :
+**#2 — Navigation fluide (sans rechargement)**
+Remplacer tous les `<a href="...">` internes du Header et du Footer par `<Link to="...">`. Plus de rechargement complet, plus de clignotement, animations préservées.
+*Périmètre :* `Header.tsx`, `Footer.tsx`, et autres composants de nav qui pointent vers des routes internes.
 
-- **À corriger en priorité (impact UX/SEO immédiat)** : 1, 2, 4, 6/7 (outils non traduits + routes EN), 12, 16.
-- **À corriger ensuite (cohérence i18n/SEO)** : 5, 8, 9, 10, 11, 14, 15.
-- **À nettoyer plus tard (dette)** : 3, 13, 17, 18, 19, 20, 21.
+**#12 — SEO de la page Portfolio**
+Ajouter une balise `<SEO>` (titre + description + canonical + hreflang) sur `/portfolio` pour qu'elle apparaisse correctement dans Google.
 
-Dis-moi quelles anomalies tu veux qu'on traite (numéros), et dans quel ordre, ou si tu veux qu'on parte sur un des trois lots ci-dessus.
+**#16 — Sécurité CORS des fonctions backend (vérification)**
+Tu as raison : les emails partent vers ta boîte uniquement, Stripe est verrouillé côté API. Je vais quand même **auditer** les 6 edge functions (`send-contact-email`, `create-payment`, `chat-assistant`, `serve-ebook`, `track-blog-view`, `track-visit`) pour confirmer qu'aucune ne peut être détournée pour un autre usage (spam, abus quota IA). Si tout est OK, je le confirme sans rien modifier. Sinon, je restreins l'origine.
+
+> **Points 1, 4, 6, 7 : ignorés** comme demandé (comportement volontaire / déjà OK).
+
+---
+
+### 🟡 Lot 2 — Cohérence i18n
+
+**#5 — Redirections legacy lang-aware**
+Quand un visiteur anglophone tombe sur une vieille URL `/projects` (depuis Google), l'envoyer sur `/en/projects` au lieu de `/projets`. Idem pour `/our-projects`, `/about`, `/programs`.
+
+**#10 — Page 404 bilingue**
+Détecter la langue (URL `/en/...` ou préférence i18n) et afficher la 404 en anglais le cas échéant.
+
+**#11 — CTA des articles EN restent en EN**
+Les boutons "Devis" / liens internes des articles anglais utiliseront `localizePath` au lieu de `navigate('/')` pour rester sur la version anglaise du site.
+
+**#14 — Titre Google par défaut propre**
+Si jamais quelqu'un accède à un slug d'article inconnu, fournir un titre/description génériques propres au lieu de retomber sur ceux de l'article "compression".
+
+> **Points 8, 9, 15 : ignorés** comme demandé.
+
+---
+
+### 🔵 Lot 3 — Nettoyage technique
+
+**#3** — Bouton "Retour" sur `/services` → `navigate()` au lieu de `window.location.href`.
+**#13** — Breadcrumb services : retirer l'ancre `#service-id` du schema.org breadcrumb (garder un path propre).
+**#17 — Rate-limit persistant et "smart"**
+Remplacer le compteur en mémoire par un **stockage persistant en base** (table `rate_limits` avec `key`, `count`, `window_start`) + nettoyage automatique des entrées expirées (archivage simplifié : suppression auto des fenêtres dépassées). Ça nécessitera une **migration DB** que je te ferai approuver.
+**#18** — Vérifier que `get-stripe-data` valide bien le rôle admin côté serveur. *(Au vu du code déjà lu : c'est OK. Je le confirme dans le rapport, sans modif.)*
+**#19** — `LangLock` : déplacer `i18n.changeLanguage()` dans un `useLayoutEffect` pour éviter le warning React 18 strict.
+**#20** — Header dropdown "Toolkit" : `aria-expanded` dynamique synchronisé avec l'état hover/focus.
+**#21 — Refacto Loudness (CONDITIONNEL)**
+⚠️ Le code actuel mentionne explicitement que le wrapper évite **une boucle infinie sur Radix Select**. Avant de toucher, je vais :
+1. Tester si remplacer `LoudnessFr/En` par `<LangLock>` reproduit le bug.
+2. Si **OUI** → on **NE TOUCHE À RIEN** (la qualité de l'analyse audio prime).
+3. Si **NON** → on simplifie.
+Je te confirme le résultat avant de pousser le changement.
+
+---
+
+### Détails techniques (pour référence)
+
+**Lot 1**
+- `Header.tsx` / `Footer.tsx` : `<a href>` → `<Link>` pour toutes les routes internes.
+- `Portfolio.tsx` : ajouter `<SEO>` avec `alternates` FR/EN.
+- Audit CORS : lecture des 6 fichiers `supabase/functions/*/index.ts`.
+
+**Lot 2**
+- `App.tsx` : convertir les `<Navigate>` en composant custom `<LangAwareRedirect to="/projets" enTo="/en/projects" />`.
+- `NotFound.tsx` : utiliser `useTranslation()` + `getLangFromPath()`.
+- `BlogArticle.tsx` (article Venin EN) : remplacer `navigate('/')` par `navigate(localizePath('/', lang))`.
+- `BlogArticle.tsx` : fallback `seoKey` → titre/description génériques.
+
+**Lot 3**
+- `Services.tsx` : `navigate('/#services')` au lieu de `window.location.href`.
+- `Services.tsx` breadcrumb : path `/services` sans ancre.
+- Migration SQL : table `rate_limits (key text, count int, window_start timestamptz)`, RLS DENY anon, fonction `check_rate_limit(key, max, window_seconds)` security definer + cron de purge quotidien.
+- `chat-assistant`, `create-payment`, `send-contact-email` : remplacer `Map` mémoire par appel RPC `check_rate_limit`.
+- `LangLock.tsx` : `useLayoutEffect`.
+- `Header.tsx` dropdown : `useState` + `aria-expanded={open}`.
+- `Loudness*` : test reproduction Radix bug → décision.
+
+---
+
+### Livraison
+
+1. Message 1 : Lot 1 (3 modifs + 1 audit).
+2. Message 2 : Lot 2 (4 modifs).
+3. Message 3 : Lot 3 (7 modifs dont 1 migration DB à approuver, 1 conditionnel).
+
+Je consulte avant : la migration `rate_limits` (Lot 3 #17) et la décision finale sur Loudness (Lot 3 #21).
