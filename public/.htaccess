@@ -1,0 +1,19 @@
+# Headers sécurité & SEO
+<IfModule mod_headers.c>
+  # Empêcher l'indexation des routes sensibles (SPA : la requête sert index.html,
+  # mais l'en-tête est lu par Googlebot avant le rendu JS).
+  SetEnvIf Request_URI "^/admin(/|$)" NOINDEX_ROUTE
+  SetEnvIf Request_URI "^/ebook/(login|reader)(/|$)" NOINDEX_ROUTE
+  SetEnvIf Request_URI "^/payment-success(/|$)" NOINDEX_ROUTE
+  Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" env=NOINDEX_ROUTE
+</IfModule>
+
+# Fallback SPA : toutes les routes inconnues servent index.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

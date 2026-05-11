@@ -6,6 +6,7 @@ import { Loader2, ShieldX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const UnauthorizedView = ({ onSignOut }: { onSignOut: () => void }) => {
   return (
@@ -92,6 +93,11 @@ const AdminContent = () => {
 const Admin = () => {
   return (
     <AuthProvider>
+      <Helmet>
+        <title>Admin</title>
+        <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+        <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet" />
+      </Helmet>
       <AdminContent />
     </AuthProvider>
   );
