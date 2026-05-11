@@ -76,6 +76,8 @@ const App = () => (
             <Route path="/key-finder" element={<Navigate to="/key-bpm-finder" replace />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Redirections anciennes URLs */}
             <Route path="/a-propos" element={<Navigate to="/" replace />} />
