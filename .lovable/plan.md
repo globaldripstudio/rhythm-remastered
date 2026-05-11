@@ -1,73 +1,69 @@
-## Diagnostic
+## Audit du site — anomalies relevées
 
-J'ai reproduit le problème en chargeant `/en/loudness` dans la preview. Deux soucis :
+Aucune correction n'a été faite. Pour chaque point, on choisira ensemble (corriger / ignorer / garder pour plus tard).
 
-1. **Erreur React fatale** dans la console : `Maximum update depth exceeded` provenant du composant Radix `<Select>` (le sélecteur de genre musical) imbriqué dans `Loudness.tsx`. En dev l'erreur est récupérée par React (la page finit par s'afficher), mais en build production sans error boundary → **page blanche**. Stack : `setRef` → `dispatchSetState` dans `@radix-ui/react-select` → boucle de commit.
+### A. Navigation & SPA
 
-2. **Cause de la boucle** : `LoudnessEn` force `i18n.changeLanguage("en")` dans un `useEffect` après le premier render. Conséquence :
-   - Render #1 en FR (langue par défaut/persistée) → Radix Select monte ses items FR
-   - `useEffect` change la langue → Render #2 en EN → les enfants du `Select` changent de texte mais Radix réutilise le même `Select` instance et son collection-tracker re-déclenche un setState dans le commit → boucle.
+1. **Ancres `#accueil`, `#services`, `#equipement`, `#contact` du Header ne fonctionnent pas hors de la home.**
+   Sur `/blog`, `/projets`, `/ebook`, `/loudness`, `/en/...`, cliquer ne fait rien (pas de section ciblée sur la page courante).
 
-3. **Effet visuel attendu manquant** : pas de transition blur (`lang-switching`) lors du switch via navigation, et un flash FR→EN visible avant stabilisation.
+2. **Tous les liens de nav du Header et du Footer utilisent `<a href>` au lieu de `<Link>`.**
+   Conséquence : rechargement complet de la page → perte d'état React, ré-exécution de tous les chargements, animations relancées. Concerne : `/projets`, `/blog`, `/loudness`, `/key-bpm-finder`, `/tap-tempo-metronome`, `/chord-progression`, `/audio-to-midi`, `/mentions-legales`, `/politique-confidentialite`, `/cgv`.
 
-## Correctif
+3. **Bouton "Retour" sur la page `/services` détaillée fait `window.location.href = '/#services'`**, donc rechargement complet au lieu d'un `navigate()`.
 
-### 1. Synchroniser la langue AVANT le premier render (`src/pages/LoudnessEn.tsx`)
+4. **Articles "comingSoon"** (`/blog/bien-mixer-une-voix`, `/blog/10-techniques-sound-design`) : URL directe → page 404, alors que la liste les présente comme "à venir". Aucune redirection vers `/blog`.
 
-Remplacer le `useEffect` par un changement synchrone exécuté pendant le render (idempotent, hors cycle React) + `useLayoutEffect` pour la restauration au démontage. Cela élimine le double-render et donc la boucle Radix.
+5. **Redirections legacy `/projects` et `/our-projects`** envoient vers `/projets` (FR) même si l'utilisateur est en EN. Devraient pointer vers `/en/projects` quand `i18n.language === 'en'`.
 
-```tsx
-const LoudnessEn = () => {
-  const { i18n } = useTranslation();
-  // Force EN synchroneously, BEFORE first render of <Loudness />.
-  if (i18n.language !== "en") {
-    i18n.changeLanguage("en");
-  }
-  useLayoutEffect(() => {
-    // No restore on unmount: the destination route's wrapper (or the toggle)
-    // owns the next language. Restoring here causes a flash back to FR
-    // when navigating from /en/loudness → /loudness via the toggle.
-    return;
-  }, []);
-  return <Loudness />;
-};
-```
+### B. Internationalisation
 
-(On supprime la logique de "previous language" : la page de destination, ou le toggle, dicte la langue.)
+6. **Outils `/key-bpm-finder`, `/tap-tempo-metronome`, `/chord-progression`, `/audio-to-midi` ne sont pas traduits** : pas d'`useTranslation()`, contenu en français en dur. Pourtant le toggle FR/EN reste affiché (via `ToolkitHeader`) et change `i18n.language` sans effet visible.
 
-### 2. Idem côté FR : créer un wrapper symétrique (`src/pages/LoudnessFr.tsx` ou inline dans la route `/loudness`)
+7. **Aucune route `/en/...` pour ces 4 outils** → toggle EN ne navigue nulle part de cohérent (et casse `mirrorPath`, qui ne trouve pas de pendant et tombe sur `i18n.changeLanguage` muet).
 
-Pour qu'arriver sur `/loudness` force aussi `i18n.changeLanguage("fr")` (sinon un user qui a EN persisté en localStorage et tape `/loudness` voit du EN). Petit composant identique mais en `"fr"`.
+8. **Page `/portfolio` entièrement en français en dur** (textes, descriptions). Aucun `t()`. Présente dans le sitemap mais jamais linkée depuis le site.
 
-Routes mises à jour dans `App.tsx` :
-```tsx
-<Route path="/loudness" element={<LoudnessFr />} />
-<Route path="/en/loudness" element={<LoudnessEn />} />
-```
+9. **Pages légales (`/mentions-legales`, `/politique-confidentialite`, `/cgv`) en FR uniquement** : pas de version EN, pas d'`alternates hreflang`. Liens du footer pointent vers ces URLs FR depuis les pages EN.
 
-### 3. Ajouter la transition blur sur navigation (`src/components/tools/ToolkitHeader.tsx`)
+10. **`NotFound` (404) en FR uniquement.** Pas de version EN, pas de `alternates`.
 
-Déjà présent dans `toggleLanguage` (`document.body.classList.add("lang-switching")` + cleanup 500 ms). Vérifier que le timing est conservé pendant la navigation route-aware (déjà OK dans le code actuel — le `setTimeout` retire la classe 500 ms après, indépendamment de la navigation).
+11. **Liens internes des articles EN** (CTA "Devis" Venin, etc.) : `navigate('/')` force le retour en FR depuis `/en/blog/venin-the-first-blood`.
 
-### 4. Filet de sécurité contre la boucle Radix (défense en profondeur)
+### C. SEO
 
-Sur le `<Select>` de genre musical (ligne 742 de `Loudness.tsx`), ajouter `key={lang}` pour forcer un remount propre si la langue change en cours de session :
-```tsx
-<Select key={lang} value={selectedSubgenre ?? "none"} ...>
-```
-Coût : remise à zéro visuelle du dropdown lors d'un toggle FR↔EN sans navigation, mais sur les pages `/loudness` ↔ `/en/loudness` la navigation remonte déjà tout l'arbre, donc invisible.
+12. **`/portfolio` n'a pas de balise `<SEO>`** (pas de title/description spécifique, pas de canonical). Page indexable sans métadonnées.
 
-## Vérifications post-fix
+13. **`/services` (route séparée)** : breadcrumb utilise `/services#${service.id}` comme path, ce qui produit un schema.org breadcrumb avec ancre — non standard.
 
-1. `/loudness` → clic "EN" : `navigate("/en/loudness")` → wrapper EN force la langue avant render → page rend directement en EN, pas de flash, pas d'erreur console. Blur visible 500 ms.
-2. `/en/loudness` → clic "FR" : `navigate("/loudness")` → wrapper FR force la langue avant render → contenu FR direct.
-3. Accès direct à `/en/loudness` (depuis Google) avec localStorage FR : page rend en EN dès la première frame.
-4. Accès direct à `/loudness` avec localStorage EN : page rend en FR dès la première frame.
-5. Aucune erreur "Maximum update depth" dans la console.
-6. Toggle FR/EN sur les 4 autres outils (`/key-bpm-finder`, etc.) : comportement actuel préservé (`i18n.changeLanguage` direct).
+14. **Articles non publiés (comingSoon)** : `BlogArticle.seoKey` retombe par défaut sur `"compression"` si le slug n'est ni Venin ni compression → mauvais titre/description si on accède à un slug coming-soon.
 
-## Hors-scope
+15. **Toggle FR/EN sur les pages outils non bilingues** (`/services`, `/portfolio`, `/key-bpm-finder`, …) est visible mais inerte côté URL. Mauvais signal UX et potentiel duplicate content si Google suit le `?lang=` interne.
 
-- Pas de généralisation à Landing/Blog/Projets/Boutique (ce sera le sujet du prochain plan, déjà rédigé).
-- Pas de modification du contenu, du SEO, du sitemap ou des hreflang.
-- Pas de touche à `Header.tsx` global ni à `BlogArticleHeader.tsx`.
+### D. Sécurité
+
+16. **Toutes les edge functions ont `Access-Control-Allow-Origin: "*"`** alors que le site est servi depuis un domaine connu. Devrait être restreint à `globaldripstudio.fr`, `globaldripstudio.lovable.app` et l'origine preview.
+
+17. **Rate-limiting en mémoire** dans `chat-assistant`, `create-payment`, `send-contact-email` : reset à chaque cold-start, et non partagé entre instances. Contourné facilement en pratique (Cloud Functions Supabase scalent).
+
+18. **`get-stripe-data`** : à confirmer que l'appel est gardé par un check de rôle admin côté serveur (pas seulement par auth).
+
+### E. Code / qualité
+
+19. **`LangLock` appelle `i18n.changeLanguage()` pendant le render** (side effect en cycle React). Fonctionne aujourd'hui mais peut générer un warning React 18 strict. Pourrait être passé dans un `useLayoutEffect`.
+
+20. **`Header` toolkit dropdown** : `aria-haspopup="menu" aria-expanded="false"` est statique → accessibilité dégradée (le menu s'ouvre au hover sans mise à jour de l'état ARIA).
+
+21. **`Loudness` est wrappé par `LoudnessFr` et `LoudnessEn`** : pattern dupliqué qu'on pourrait remplacer par `<LangLock lang="fr"><Loudness /></LangLock>` pour rester cohérent avec le reste de l'App.
+
+---
+
+### Comment procéder
+
+Plutôt que de tout corriger en bloc, je propose qu'on traite par lot. Mes recommandations de priorité :
+
+- **À corriger en priorité (impact UX/SEO immédiat)** : 1, 2, 4, 6/7 (outils non traduits + routes EN), 12, 16.
+- **À corriger ensuite (cohérence i18n/SEO)** : 5, 8, 9, 10, 11, 14, 15.
+- **À nettoyer plus tard (dette)** : 3, 13, 17, 18, 19, 20, 21.
+
+Dis-moi quelles anomalies tu veux qu'on traite (numéros), et dans quel ordre, ou si tu veux qu'on parte sur un des trois lots ci-dessus.
