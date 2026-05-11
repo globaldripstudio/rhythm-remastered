@@ -21,6 +21,12 @@ const TOOL_KEYS = [
 const ToolkitArticle = () => {
   const { t } = useTranslation();
   const slug = "toolkit-audio-gratuit-en-ligne";
+  const enSlug = "free-online-audio-toolkit";
+  const { pathname } = useLocation();
+  const lang = getLangFromPath(pathname);
+  const frPath = `/blog/${slug}`;
+  const enPath = `/en/blog/${enSlug}`;
+  const canonicalPath = lang === "en" ? enPath : frPath;
   const title = t("blog.articles.toolkit.title");
 
   return (
@@ -28,22 +34,28 @@ const ToolkitArticle = () => {
       <SEO
         title={t("seo.toolkitArticle.title")}
         description={t("seo.toolkitArticle.description")}
-        path={`/blog/${slug}`}
+        path={canonicalPath}
         type="article"
+        locale={lang === "en" ? "en_US" : "fr_FR"}
         publishedTime="2026-05-06"
         modifiedTime="2026-05-06"
+        alternates={[
+          { hrefLang: "fr", path: frPath },
+          { hrefLang: "en", path: enPath },
+          { hrefLang: "x-default", path: frPath },
+        ]}
         jsonLd={[
           articleSchema({
             title,
             description: t("seo.toolkitArticle.description"),
-            path: `/blog/${slug}`,
+            path: canonicalPath,
             image: "/lovable-uploads/toolkit-article-cover.jpg",
             datePublished: "2026-05-06",
             section: "Toolkit",
           }),
           breadcrumbSchema([
-            { name: "Blog", path: "/blog" },
-            { name: title, path: `/blog/${slug}` },
+            { name: "Blog", path: lang === "en" ? "/en/blog" : "/blog" },
+            { name: title, path: canonicalPath },
           ]),
         ]}
       />
