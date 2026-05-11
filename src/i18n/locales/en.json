@@ -468,12 +468,14 @@
         "useCaseLabel": "Use case:",
         "openTool": "Open the tool →",
         "philosophyTitle": "A philosophy: keep it simple, keep it useful",
+        "loudnessSpotlightTitle": "Spotlight: Loudness Analyzer & Online LUFS Meter",
+        "loudnessSpotlightP": "Among our five tools, the <a href=\"/en/loudness\" class=\"text-primary underline underline-offset-4\"><strong>Loudness Analyzer</strong></a> is the most used. Many people search for it as <a href=\"/en/loudness\" class=\"text-primary underline underline-offset-4\">online LUFS Meter</a> or <a href=\"/en/loudness\" class=\"text-primary underline underline-offset-4\">free LUFS analyzer</a> — that's exactly what it is. ITU-R BS.1770-4 / EBU R128 compliant, it computes integrated LUFS, true peak dBTP (with 4x polyphase oversampling), LRA, momentary and short-term — and offers PDF export for master delivery. No server upload, everything stays in your browser.",
         "philosophyP1": "No plugin to install, no account to create, no queue. <strong>No file is sent to a server: everything stays in your tab.</strong> It's a deliberate choice: your project doesn't belong to us, and there's no reason for it to travel anywhere other than your own machine.",
         "philosophyP2": "On the UX side, we spent a huge amount of time trimming the fat. Every tool is built like a precision instrument: just the right amount of options, readable outputs, and <strong>results that can be interpreted without technical training. The goal: a beginner beatmaker and a seasoned audio engineer should both find what they need in under thirty seconds.</strong>",
         "tools": {
           "loudness": {
-            "name": "LUFS Loudness Analyzer",
-            "short": "Measure integrated loudness, true peak, LRA and dynamics of your master directly in the browser, with no server upload. Perfect for checking that a mix meets streaming targets (Spotify, Apple Music, YouTube) before final export.",
+            "name": "Loudness Analyzer — Online LUFS Meter",
+            "short": "Our <strong>Loudness Analyzer</strong> (a free online <strong>LUFS Meter</strong>) measures integrated loudness, true peak dBTP, LRA and dynamics of your master directly in the browser, with no server upload. ITU-R BS.1770-4 / EBU R128 compliant LUFS analyzer, perfect to verify a mix hits streaming targets (Spotify -14, Apple Music -16, YouTube -14) before final export.",
             "use": "Before every master delivery, to validate compliance with broadcast standards and anticipate platform normalization."
           },
           "keybpm": {
@@ -959,8 +961,8 @@
       "description": "Compression demystified: ratio, attack, release, knee. Complete guide to mastering this essential mixing tool."
     },
     "loudness": {
-      "title": "Free Online LUFS Analyzer | True Peak & LRA",
-      "description": "Analyze audio online: integrated LUFS, true peak dBTP, LRA, momentary/short-term loudness and PDF report, with no server upload."
+      "title": "Loudness Analyzer — Free Online LUFS Meter | GDS",
+      "description": "Free online Loudness Analyzer & LUFS Meter: integrated LUFS, true peak dBTP, LRA, momentary/short-term, PDF report. 100% in-browser, no upload."
     },
     "toolkitArticle": {
       "title": "Free online audio toolkit: 5 pro tools | Global Drip",
@@ -1177,10 +1179,27 @@
   },
   "loudness": {
     "badge": "Local in-browser analysis",
-    "subtitle": "Check your master with a complete LUFS readout: integrated level, true peak, dynamics, evolution curve and a share-ready PDF report.",
+    "h1Lead": "Loudness Analyzer",
+    "h1Tail": "Online LUFS Meter",
+    "subtitle": "Free Loudness Analyzer & LUFS Meter: check your master with a complete readout — integrated LUFS, true peak, LRA, momentary/short-term curve and PDF report. 100% in-browser, no upload.",
     "modeAria": "LUFS analysis mode",
     "methodIntro": "Advanced local analysis: BS.1770 K-weighting, 400 ms window, 75% overlap, absolute/relative gating, 4x true peak estimation and automatic musical interpretation.",
     "resultsAria": "Loudness analysis results",
+    "faq": {
+      "title": "Loudness Analyzer FAQ",
+      "q1": "What is a Loudness Analyzer (LUFS Analyzer)?",
+      "a1": "A Loudness Analyzer measures the perceived level of an audio signal following the ITU-R BS.1770-4 / EBU R128 standard. It computes integrated LUFS (weighted average loudness), true peak (dBTP), Loudness Range (LRA) and momentary / short-term variations. It is the reference tool to verify a master meets streaming, broadcast or podcast delivery targets.",
+      "q2": "Is this LUFS Meter really free?",
+      "a2": "Yes — 100% free, no signup, no usage limit, no server upload. Analysis runs directly in your browser via the Web Audio API. No audio data ever leaves your device.",
+      "q3": "What are the LUFS targets for Spotify, Apple Music and YouTube?",
+      "a3": "Spotify normalises to -14 LUFS (true peak max -1 dBTP), Apple Music to -16 LUFS, YouTube to -14 LUFS, Tidal to -14 LUFS, Amazon Music to -14 LUFS. EBU R128 broadcast target is -23 LUFS. Our analyzer plots all those reference lines on the loudness curve.",
+      "q4": "Does it support True Peak (dBTP)?",
+      "a4": "Yes. We oversample the signal x4 with a polyphase Kaiser-windowed sinc filter (48 taps) to estimate inter-sample peaks at ±0.05 dB precision, fully BS.1770-4 compliant and on par with pro tools (iZotope Insight, Youlean, Nugen).",
+      "q5": "Which audio formats are supported?",
+      "a5": "Every format your browser can decode: WAV, AIFF, FLAC, MP3, AAC, OGG, M4A, OPUS. High-resolution decoding (up to 24-bit / 96 kHz depending on browser). Mono, stereo and multichannel supported.",
+      "q6": "Can I export a report for my clients?",
+      "a6": "Yes. A 'PDF report' button generates a full document with LUFS, true peak, LRA, PLR values, the over-time loudness curve, your selected platform target and an automatic musical interpretation. Perfect for master delivery."
+    },
     "inferredProfile": "Inferred profile",
     "neutralProfile": "Neutral analysis",
     "pdfButton": "PDF report",

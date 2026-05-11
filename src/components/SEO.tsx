@@ -17,6 +17,8 @@ interface SEOProps {
   publishedTime?: string;
   /** ISO datetime for article:modified_time */
   modifiedTime?: string;
+  /** hreflang alternates: e.g. [{ hrefLang: "en", path: "/en/loudness" }] */
+  alternates?: Array<{ hrefLang: string; path: string }>;
 }
 
 const BASE_URL = "https://globaldripstudio.fr";
@@ -32,6 +34,7 @@ const SEO = ({
   locale = "fr_FR",
   publishedTime,
   modifiedTime,
+  alternates,
 }: SEOProps) => {
   const fullUrl = `${BASE_URL}${path}`;
   const fullImage = image.startsWith("http") ? image : `${BASE_URL}${image}`;
@@ -42,6 +45,14 @@ const SEO = ({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={fullUrl} />
+      {alternates?.map((alt) => (
+        <link
+          key={alt.hrefLang}
+          rel="alternate"
+          hrefLang={alt.hrefLang}
+          href={`${BASE_URL}${alt.path}`}
+        />
+      ))}
       <meta
         name="robots"
         content={

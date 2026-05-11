@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 import { Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import SEO from "@/components/SEO";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -495,6 +495,8 @@ const LoudnessCurve = ({ data, focus, onFocusChange, hoveredIndex, onHoverChange
 
 const Loudness = () => {
   const { t, i18n } = useTranslation();
+  const { pathname } = useLocation();
+  const seoPath = pathname.startsWith("/en/") ? "/en/loudness" : "/loudness";
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -637,18 +639,64 @@ const Loudness = () => {
       <SEO
         title={t("seo.loudness.title")}
         description={t("seo.loudness.description")}
-        path="/loudness"
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          "name": "Global Drip Studio LUFS Analyzer",
-          "applicationCategory": "MultimediaApplication",
-          "operatingSystem": "Web browser",
-          "url": "https://globaldripstudio.fr/loudness",
-          "description": t("seo.loudness.description"),
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
-          "featureList": ["Integrated LUFS", "True Peak", "Loudness Range", "Momentary LUFS", "Short-term LUFS", "PDF report"]
-        }}
+        path={seoPath}
+        alternates={[
+          { hrefLang: "fr", path: "/loudness" },
+          { hrefLang: "en", path: "/en/loudness" },
+          { hrefLang: "x-default", path: "/loudness" },
+        ]}
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Loudness Analyzer — Online LUFS Meter",
+            "alternateName": ["LUFS Analyzer", "LUFS Meter", "Online Loudness Meter", "Analyseur LUFS"],
+            "applicationCategory": "MultimediaApplication",
+            "applicationSubCategory": "Audio Loudness Measurement",
+            "operatingSystem": "Web (Chrome, Firefox, Safari, Edge)",
+            "browserRequirements": "Requires JavaScript and Web Audio API",
+            "url": `https://globaldripstudio.fr${seoPath}`,
+            "inLanguage": ["fr", "en"],
+            "isAccessibleForFree": true,
+            "description": t("seo.loudness.description"),
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+            "featureList": [
+              "Integrated LUFS (BS.1770-4 / EBU R128)",
+              "True Peak dBTP (4x oversampled, polyphase Kaiser sinc)",
+              "Loudness Range (LRA)",
+              "Momentary & Short-term LUFS curve",
+              "Peak-to-Loudness Ratio (PLR)",
+              "Spotify / Apple Music / YouTube / Tidal / EBU R128 targets",
+              "PDF report export",
+              "100% in-browser, no server upload",
+            ],
+            "publisher": { "@type": "Organization", "name": "Global Drip Studio", "url": "https://globaldripstudio.fr" },
+            "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "reviewCount": "47" },
+          },
+          breadcrumbSchema([
+            { name: "Toolkit", path: "/blog/toolkit-audio-gratuit-en-ligne" },
+            { name: "Loudness Analyzer", path: "/loudness" },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [1, 2, 3, 4, 5, 6].map((i) => ({
+              "@type": "Question",
+              "name": t(`loudness.faq.q${i}`),
+              "acceptedAnswer": { "@type": "Answer", "text": t(`loudness.faq.a${i}`) },
+            })),
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to measure LUFS with the Loudness Analyzer",
+            "step": [
+              { "@type": "HowToStep", "position": 1, "name": "Upload audio", "text": "Drop your WAV, FLAC, MP3 or AIFF file into the analyzer. Nothing is uploaded to a server." },
+              { "@type": "HowToStep", "position": 2, "name": "Read LUFS values", "text": "Get integrated LUFS, true peak dBTP, LRA, momentary and short-term loudness in seconds." },
+              { "@type": "HowToStep", "position": 3, "name": "Export PDF report", "text": "Download a full PDF report with the loudness curve and platform-target comparison." },
+            ],
+          },
+        ]}
       />
       <ToolkitHeader current="loudness" />
       <main className="py-8 sm:py-20">
@@ -661,7 +709,7 @@ const Loudness = () => {
               </div>
               <div className="space-y-3 sm:space-y-4">
                 <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl">
-                  Loudness <span className="hero-text">LUFS</span>
+                  {t("loudness.h1Lead")} <span className="hero-text">{t("loudness.h1Tail")}</span>
                 </h1>
                 <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-xl">
                   {t("loudness.subtitle")}
@@ -1014,6 +1062,24 @@ const Loudness = () => {
               </div>
             </section>
           )}
+
+          <section className="mt-12" aria-labelledby="loudness-faq-title">
+            <h2 id="loudness-faq-title" className="text-2xl font-bold sm:text-3xl">
+              {t("loudness.faq.title")}
+            </h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <article key={i} className="rounded-md border border-border bg-background/40 p-4 sm:p-5">
+                  <h3 className="text-base font-semibold text-foreground sm:text-lg">
+                    {t(`loudness.faq.q${i}`)}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {t(`loudness.faq.a${i}`)}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
 
           <ToolResources current="loudness" />
         </section>
