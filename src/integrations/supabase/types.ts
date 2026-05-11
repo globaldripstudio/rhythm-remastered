@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_ip_blocklist: {
+        Row: {
+          blocked_until: string | null
+          created_at: string
+          ip_address: string
+          reason: string
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string
+          ip_address: string
+          reason: string
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string
+          ip_address?: string
+          reason?: string
+        }
+        Relationships: []
+      }
+      admin_login_attempts: {
+        Row: {
+          created_at: string
+          email_attempted: string | null
+          id: string
+          ip_address: string
+          success: boolean
+        }
+        Insert: {
+          created_at?: string
+          email_attempted?: string | null
+          id?: string
+          ip_address: string
+          success?: boolean
+        }
+        Update: {
+          created_at?: string
+          email_attempted?: string | null
+          id?: string
+          ip_address?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -309,6 +354,7 @@ export type Database = {
         Returns: boolean
       }
       purge_old_audit_logs: { Args: never; Returns: undefined }
+      purge_old_login_attempts: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
