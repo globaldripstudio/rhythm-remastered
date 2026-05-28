@@ -212,7 +212,7 @@ const Portfolio = () => {
         <div className="text-center mt-16">
           <div className="inline-flex items-center justify-center p-8 rounded-2xl bg-gradient-hero border border-border">
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">Votre projet mérite le meilleur</h3>
+              <h2 className="text-2xl font-bold mb-2">Votre projet mérite le meilleur</h2>
               <p className="text-muted-foreground mb-4">Contactez-nous pour discuter de votre vision artistique</p>
               <Button size="lg" className="studio-button">
                 <Music className="w-5 h-5 mr-2" />
