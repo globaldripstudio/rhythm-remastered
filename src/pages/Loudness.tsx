@@ -655,7 +655,7 @@ const Loudness = () => {
             "applicationSubCategory": "Audio Loudness Measurement",
             "operatingSystem": "Web (Chrome, Firefox, Safari, Edge)",
             "browserRequirements": "Requires JavaScript and Web Audio API",
-            "url": `https://globaldripstudio.fr${seoPath}`,
+            "url": `https://www.globaldripstudio.fr${seoPath}`,
             "inLanguage": ["fr", "en"],
             "isAccessibleForFree": true,
             "description": t("seo.loudness.description"),
@@ -670,7 +670,7 @@ const Loudness = () => {
               "PDF report export",
               "100% in-browser, no server upload",
             ],
-            "publisher": { "@type": "Organization", "name": "Global Drip Studio", "url": "https://globaldripstudio.fr" },
+            "publisher": { "@type": "Organization", "name": "Global Drip Studio", "url": "https://www.globaldripstudio.fr" },
             "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "reviewCount": "47" },
           },
           breadcrumbSchema([

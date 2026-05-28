@@ -256,7 +256,7 @@ const TapTempoMetronome = () => {
               applicationCategory: "MultimediaApplication",
               applicationSubCategory: "Music Production Tool",
               operatingSystem: "Web browser (Chrome, Firefox, Safari, Edge)",
-              url: "https://globaldripstudio.fr/tap-tempo-metronome",
+              url: "https://www.globaldripstudio.fr/tap-tempo-metronome",
               description: t("seo.tempoTools.description"),
               inLanguage: ["fr", "en"],
               isAccessibleForFree: true,
@@ -272,14 +272,14 @@ const TapTempoMetronome = () => {
               publisher: {
                 "@type": "Organization",
                 name: "Global Drip Studio",
-                url: "https://globaldripstudio.fr",
+                url: "https://www.globaldripstudio.fr",
               },
             },
             {
               "@type": "BreadcrumbList",
               itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://globaldripstudio.fr/" },
-                { "@type": "ListItem", position: 2, name: "Tap Tempo, Metronome & BPM Calculator", item: "https://globaldripstudio.fr/tap-tempo-metronome" },
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.globaldripstudio.fr/" },
+                { "@type": "ListItem", position: 2, name: "Tap Tempo, Metronome & BPM Calculator", item: "https://www.globaldripstudio.fr/tap-tempo-metronome" },
               ],
             },
             {

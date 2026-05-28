@@ -77,7 +77,7 @@ const ToolkitArticle = () => {
             <div className="flex items-center text-sm text-muted-foreground mb-6">
               <span>{t("blog.articles.toolkit.meta")}</span>
             </div>
-            <ShareButtons url={`https://globaldripstudio.fr${canonicalPath}`} />
+            <ShareButtons url={`https://www.globaldripstudio.fr${canonicalPath}`} />
           </header>
 
           <div className="prose prose-lg max-w-none text-foreground">
@@ -174,7 +174,7 @@ const ToolkitArticle = () => {
           </div>
 
           <div className="mt-10 pt-6 border-t border-border">
-            <ShareButtons url={`https://globaldripstudio.fr${canonicalPath}`} />
+            <ShareButtons url={`https://www.globaldripstudio.fr${canonicalPath}`} />
           </div>
         </div>
       </article>
