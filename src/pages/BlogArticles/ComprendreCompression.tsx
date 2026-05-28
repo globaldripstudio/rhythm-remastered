@@ -21,7 +21,7 @@ const ComprendreCompression = () => {
   const frPath = "/blog/comprendre-la-compression";
   const enPath = "/en/blog/understanding-compression";
   const canonicalPath = lang === "en" ? enPath : frPath;
-  const shareUrl = `https://globaldripstudio.fr${canonicalPath}`;
+  const shareUrl = `https://www.globaldripstudio.fr${canonicalPath}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,8 +42,8 @@ const ComprendreCompression = () => {
           "headline": t('blog.articles.compression.title'),
           "author": { "@type": "Organization", "name": "Global Drip Studio" },
           "datePublished": "2024-12-10",
-          "image": "https://globaldripstudio.fr/lovable-uploads/Image-23.jpg",
-          "publisher": { "@type": "Organization", "name": "Global Drip Studio", "logo": { "@type": "ImageObject", "url": "https://globaldripstudio.fr/lovable-uploads/logo-blanc-sans-fond.png" } }
+          "image": "https://www.globaldripstudio.fr/lovable-uploads/Image-23.jpg",
+          "publisher": { "@type": "Organization", "name": "Global Drip Studio", "logo": { "@type": "ImageObject", "url": "https://www.globaldripstudio.fr/lovable-uploads/logo-blanc-sans-fond.png" } }
         }}
       />
       <BlogArticleHeader />

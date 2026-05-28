@@ -31,4 +31,4 @@ Disallow: /ebook/login
 Disallow: /ebook/reader
 Disallow: /payment-success
 
-Sitemap: https://globaldripstudio.fr/sitemap.xml
+Sitemap: https://www.globaldripstudio.fr/sitemap.xml

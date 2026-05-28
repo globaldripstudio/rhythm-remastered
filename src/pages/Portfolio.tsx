@@ -92,7 +92,7 @@ const Portfolio = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Portfolio — Réalisations mixage, mastering & sound design | Global Drip Studio"
+        title="Portfolio — Mixage, Mastering & Sound Design | GDS"
         description="Découvrez nos productions récentes : rock, hip-hop, électronique, acoustique. Mixage, mastering, sound design et composition par Global Drip Studio à Martigues."
         path="/portfolio"
         alternates={[
@@ -145,7 +145,7 @@ const Portfolio = () => {
                       </div>
                     </div>
                     
-                    <h3 className="text-2xl font-bold mb-2">{project.artist}</h3>
+                    <h2 className="text-2xl font-bold mb-2">{project.artist}</h2>
                     <p className="text-lg text-primary mb-4">{project.title}</p>
                     <p className="text-muted-foreground mb-6">{project.description}</p>
                     
@@ -212,7 +212,7 @@ const Portfolio = () => {
         <div className="text-center mt-16">
           <div className="inline-flex items-center justify-center p-8 rounded-2xl bg-gradient-hero border border-border">
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">Votre projet mérite le meilleur</h3>
+              <h2 className="text-2xl font-bold mb-2">Votre projet mérite le meilleur</h2>
               <p className="text-muted-foreground mb-4">Contactez-nous pour discuter de votre vision artistique</p>
               <Button size="lg" className="studio-button">
                 <Music className="w-5 h-5 mr-2" />

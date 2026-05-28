@@ -157,7 +157,7 @@ const BlogArticle = () => {
     : (lang === "en"
         ? "Read this article on the Global Drip Studio blog: insights on production, mixing, mastering and sound design."
         : "Lire cet article sur le blog Global Drip Studio : conseils production, mixage, mastering et sound design.");
-  const shareUrl = `https://globaldripstudio.fr${canonicalPath}`;
+  const shareUrl = `https://www.globaldripstudio.fr${canonicalPath}`;
 
   return (
     <div className="min-h-screen bg-background">

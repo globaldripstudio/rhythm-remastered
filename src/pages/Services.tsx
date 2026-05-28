@@ -13,13 +13,13 @@ const SERVICES_JSONLD = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, item: { "@type": "Service", name: "Mixage + Mastering", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Audio mixing and mastering" } },
-    { "@type": "ListItem", position: 2, item: { "@type": "Service", name: "Mastering hybride", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Hybrid analog and digital mastering" } },
-    { "@type": "ListItem", position: 3, item: { "@type": "Service", name: "Sound design", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Sound design for music, film, video games" } },
-    { "@type": "ListItem", position: 4, item: { "@type": "Service", name: "Composition / Production", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Music composition and production" } },
-    { "@type": "ListItem", position: 5, item: { "@type": "Service", name: "Captation sonore", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "City", name: "Martigues" }, serviceType: "Studio recording" } },
-    { "@type": "ListItem", position: 6, item: { "@type": "Service", name: "Direction artistique", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Artistic direction" } },
-    { "@type": "ListItem", position: 7, item: { "@type": "Service", name: "Formation production musicale", provider: { "@id": "https://globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Music production training" } },
+    { "@type": "ListItem", position: 1, item: { "@type": "Service", name: "Mixage + Mastering", provider: { "@id": "https://www.globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Audio mixing and mastering" } },
+    { "@type": "ListItem", position: 2, item: { "@type": "Service", name: "Mastering hybride", provider: { "@id": "https://www.globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Hybrid analog and digital mastering" } },
+    { "@type": "ListItem", position: 3, item: { "@type": "Service", name: "Sound design", provider: { "@id": "https://www.globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Sound design for music, film, video games" } },
+    { "@type": "ListItem", position: 4, item: { "@type": "Service", name: "Composition / Production", provider: { "@id": "https://www.globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Music composition and production" } },
+    { "@type": "ListItem", position: 5, item: { "@type": "Service", name: "Captation sonore", provider: { "@id": "https://www.globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "City", name: "Martigues" }, serviceType: "Studio recording" } },
+    { "@type": "ListItem", position: 6, item: { "@type": "Service", name: "Direction artistique", provider: { "@id": "https://www.globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Artistic direction" } },
+    { "@type": "ListItem", position: 7, item: { "@type": "Service", name: "Formation production musicale", provider: { "@id": "https://www.globaldripstudio.fr/#localbusiness" }, areaServed: { "@type": "Country", name: "France" }, serviceType: "Music production training" } },
   ],
 };
 
@@ -235,7 +235,7 @@ const Services = () => {
                   <Badge variant="secondary">{service.category}</Badge>
                   {service.featured && <Badge className="bg-primary">Spécialité</Badge>}
                 </div>
-                <h1 className="text-4xl font-bold text-white mb-2">{service.title}</h1>
+                <h2 className="text-4xl font-bold text-white mb-2">{service.title}</h2>
                 <div className="flex items-center gap-4 text-white/80">
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />

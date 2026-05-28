@@ -3,7 +3,7 @@
  * All URLs are absolute as required by schema.org.
  */
 
-const SITE = "https://globaldripstudio.fr";
+const SITE = "https://www.globaldripstudio.fr";
 const ORG_NAME = "Global Drip Studio";
 const ORG_LOGO = `${SITE}/lovable-uploads/493b7d12-09ef-4eb1-a8f1-6575bee3334a.png`;
 

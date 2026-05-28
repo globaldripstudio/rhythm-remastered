@@ -21,7 +21,7 @@ interface SEOProps {
   alternates?: Array<{ hrefLang: string; path: string }>;
 }
 
-const BASE_URL = "https://globaldripstudio.fr";
+const BASE_URL = "https://www.globaldripstudio.fr";
 
 const SEO = ({
   title,

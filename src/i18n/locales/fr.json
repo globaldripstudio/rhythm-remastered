@@ -921,7 +921,7 @@
   },
   "seo": {
     "home": {
-      "title": "Global Drip Studio - Studio d'enregistrement Martigues | Mixage, Mastering & Sound Design",
+      "title": "Global Drip Studio — Mixage & Mastering Martigues",
       "description": "Studio d'enregistrement à Martigues (13500). Mixage, mastering, production musicale et sound design. 200+ projets, 50+ artistes. Réservez votre session."
     },
     "blog": {
@@ -933,7 +933,7 @@
       "description": "Découvrez les projets mixés et masterisés au Global Drip Studio : rock, hip-hop, EDM et plus. Écoutez nos réalisations."
     },
     "services": {
-      "title": "Services & Tarifs | Global Drip Studio - Mixage, Mastering, Sound Design",
+      "title": "Services & Tarifs — Mixage, Mastering | Global Drip",
       "description": "Nos services de mixage, mastering hybride, production musicale et sound design. Tarifs transparents et devis personnalisés."
     },
     "ebook": {
@@ -953,11 +953,11 @@
       "description": "Conditions générales de vente des services et prestations de Global Drip Studio."
     },
     "venin": {
-      "title": "\"Le Premier Sang\" de Venin - Mixage & Mastering | Global Drip Studio",
+      "title": "Venin « Le Premier Sang » — Mixage | Global Drip",
       "description": "Découvrez les coulisses du mixage et mastering de l'album \"Le Premier Sang\" du groupe Venin, produit au Global Drip Studio."
     },
     "compression": {
-      "title": "Comprendre la Compression Audio en 5 Minutes | Global Drip Studio",
+      "title": "Comprendre la Compression Audio | Global Drip",
       "description": "La compression démystifiée : ratio, attack, release, knee. Guide complet pour maîtriser cet outil indispensable du mixage audio."
     },
     "loudness": {
@@ -969,11 +969,11 @@
       "description": "Loudness LUFS, Key & BPM finder, tap tempo, accords interactifs et conversion Audio → MIDI : 5 outils gratuits, sans inscription, 100 % dans le navigateur."
     },
     "keybpm": {
-      "title": "Key & BPM Finder gratuit en ligne | Détecteur de tonalité et tempo",
+      "title": "Key & BPM Finder gratuit en ligne | Global Drip",
       "description": "Trouve la tonalité (key), le BPM et le code Camelot d'un morceau directement dans le navigateur. Analyse rapide, précise et 100% locale, sans upload serveur."
     },
     "tempoTools": {
-      "title": "Tap Tempo, Métronome & Calculateur BPM en ligne | Global Drip",
+      "title": "Tap Tempo, Métronome & BPM | Global Drip",
       "description": "Tap tempo précis, métronome avec subdivisions et calculateur BPM (millisecondes pour delays et reverbs). Tout dans le navigateur, gratuit et sans inscription."
     }
   },
