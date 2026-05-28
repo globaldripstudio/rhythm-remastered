@@ -92,7 +92,7 @@ const Portfolio = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Portfolio — Réalisations mixage, mastering & sound design | Global Drip Studio"
+        title="Portfolio — Mixage, Mastering & Sound Design | GDS"
         description="Découvrez nos productions récentes : rock, hip-hop, électronique, acoustique. Mixage, mastering, sound design et composition par Global Drip Studio à Martigues."
         path="/portfolio"
         alternates={[
