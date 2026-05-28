@@ -83,6 +83,7 @@ const Hero = () => {
               <span className="hero-text">{t('hero.title1')}</span>
               <br />
               <span className="text-foreground">{t('hero.title2')}</span>
+              <span className="sr-only"> — {t('hero.srDescriptor', 'Studio professionnel de mixage, mastering et sound design à Martigues')}</span>
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
               {t('hero.subtitle')}
