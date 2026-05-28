@@ -1,0 +1,30 @@
+# Global Drip Studio
+
+> Studio professionnel de mixage, mastering, production musicale et sound design basé à Martigues (France). Sessions sur place ou à distance partout dans le monde.
+
+Global Drip Studio accompagne artistes, labels, réalisateurs et studios de jeu vidéo sur leurs productions audio : mixage, mastering hybride, sound design, composition, captation et formation.
+
+## Pages
+
+- [Accueil (FR)](/): Présentation du studio, services et réalisations.
+- [Home (EN)](/en): Studio overview, services and works.
+- [Services & Tarifs](/services): Mixage, mastering, sound design, composition, captation, direction artistique, formation.
+- [Projets (FR)](/projets): Sélection de productions réalisées.
+- [Projects (EN)](/en/projects): Selected productions.
+- [Portfolio](/portfolio): Réalisations audio.
+- [Blog (FR)](/blog): Articles sur la production audio et le sound design.
+- [Blog (EN)](/en/blog): Articles on audio production and sound design.
+- [Ebook (FR)](/ebook): Formation mixage audio.
+- [Ebook (EN)](/en/ebook): Audio mixing course.
+- [Loudness Analyzer (FR)](/loudness): Analyseur LUFS / loudness gratuit en ligne.
+- [Loudness Analyzer (EN)](/en/loudness): Free online LUFS / loudness analyzer.
+- [Key & BPM Finder](/key-bpm-finder): Détection de tonalité et tempo en ligne.
+- [Tap Tempo & Métronome](/tap-tempo-metronome): Tap tempo, métronome et calculateur BPM.
+- [Chord Progression](/chord-progression): Générateur de progressions d'accords.
+- [Audio to MIDI](/audio-to-midi): Conversion audio vers MIDI.
+
+## Optional
+
+- [Mentions légales](/mentions-legales)
+- [Politique de confidentialité](/politique-confidentialite)
+- [CGV](/cgv)
