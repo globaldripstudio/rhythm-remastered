@@ -145,7 +145,7 @@ const Portfolio = () => {
                       </div>
                     </div>
                     
-                    <h3 className="text-2xl font-bold mb-2">{project.artist}</h3>
+                    <h2 className="text-2xl font-bold mb-2">{project.artist}</h2>
                     <p className="text-lg text-primary mb-4">{project.title}</p>
                     <p className="text-muted-foreground mb-6">{project.description}</p>
                     
