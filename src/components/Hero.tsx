@@ -61,6 +61,11 @@ const Hero = () => {
         <img 
           src="/lovable-uploads/0865b2b6-7a37-44f1-8209-b10fd54aa3f1.png"
           alt="Global Drip Studio - Professional Recording Studio"
+          width={1920}
+          height={1080}
+          // @ts-expect-error fetchpriority is a valid HTML attribute
+          fetchpriority="high"
+          decoding="async"
           className="w-full h-full object-cover object-center opacity-40"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background/90" />
