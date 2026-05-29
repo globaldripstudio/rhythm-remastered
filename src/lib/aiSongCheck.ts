@@ -456,17 +456,17 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const sMarkers: Marker[] = [
     // Spectral
     { v: vote(flatnessStd, 0.12, 0.025), w: 1.0 }, // low variance over time = AI
-    { v: vote(hfCutoff, 19500, 15500), w: 1.0 }, // capped around 15.5 kHz = AI
+    { v: vote(hfCutoff, 18000, 14000), w: 0.7 }, // capped around 14 kHz = AI (16 kHz is common in human masters)
     { v: vote(hfEnergyRatio, 0.04, 0.003), w: 0.6 }, // very low HF share = AI
-    { v: vote(stereoCorr, 0.7, 0.97), w: 0.9 }, // near-mono = AI
-    { v: vote(melCv, 0.9, 0.35), w: 1.0 }, // low band-level variation over time = AI
+    { v: vote(stereoCorr, 0.55, 0.98), w: 0.5 }, // truly near-mono = AI (modern productions are often quite mono-centric)
+    { v: vote(melCv, 1.0, 0.25), w: 1.0 }, // very low band-level variation over time = AI
     { v: vote(phaseCoherence, 1.6, 0.6), w: 1.1 }, // smooth phase = AI
-    { v: vote(rolloff85, 9000, 4500), w: 0.6 }, // low rolloff = bandwidth limited = AI
+    { v: vote(rolloff85, 9000, 4500), w: 0.4 }, // low rolloff = bandwidth limited = AI
   ];
   const tMarkers: Marker[] = [
     // Temporal
     { v: vote(onsetCv, 0.5, 0.12), w: 1.2 }, // metronomic = AI
-    { v: vote(rmsMicro, 7, 2.5), w: 1.1 }, // very lissé = AI
+    { v: vote(rmsMicro, 7, 2.5), w: 1.1 }, // very smoothed = AI
     { v: vote(envRepetition, 0.25, 0.75), w: 0.9 }, // looped envelope = AI
     { v: vote(noiseFloorDb, -55, -78), w: 1.0 }, // unnaturally clean floor = AI
     { v: vote(zcrCv, 0.45, 0.1), w: 0.9 }, // pitch-jitter / instability low = AI
@@ -494,20 +494,24 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const aiE = spec.ai * 0.45 + temp.ai * 0.55;
   const huE = spec.human * 0.45 + temp.human * 0.55;
 
+  // ===== Hybrid score: peaks ONLY when both sides have comparable evidence =====
+  // 2 · min(ai, hu) · (1 − |ai − hu|)² → asymmetric distributions collapse fast.
+  const hybridScore = (a: number, h: number) => {
+    const m = Math.min(a, h);
+    const diff = Math.abs(a - h);
+    return 2 * m * Math.pow(Math.max(0, 1 - diff), 2);
+  };
+
   // ===== Elimination logic =====
-  // pureHuman raw: human evidence, strongly suppressed by AI evidence
-  // pureAI raw: AI evidence, strongly suppressed by human evidence
-  // hybrid raw: peaks when both signals are non-trivial simultaneously
-  const SUPPRESS = 2.2;
+  const SUPPRESS = 1.8;
   const pureHumanRaw = Math.pow(huE, 1.1) * clamp01(1 - aiE * SUPPRESS);
   const pureAiRaw = Math.pow(aiE, 1.1) * clamp01(1 - huE * SUPPRESS);
-  // Coexistence score: high only if BOTH evidences are meaningful.
-  const coexist = 4 * Math.sqrt(Math.max(0, aiE * huE));
-  const hybridRaw = coexist * (1 - Math.abs(aiE - huE) * 0.6);
+  const hybridRaw = hybridScore(aiE, huE);
 
-  const spectral = toProbBlock(spec.human, 2 * Math.sqrt(spec.ai * spec.human), spec.ai);
-  const temporal = toProbBlock(temp.human, 2 * Math.sqrt(temp.ai * temp.human), temp.ai);
-  const overall = toProbBlock(pureHumanRaw, hybridRaw, pureAiRaw, 0.18);
+  const spectral = toProbBlock(spec.human, hybridScore(spec.ai, spec.human), spec.ai);
+  const temporal = toProbBlock(temp.human, hybridScore(temp.ai, temp.human), temp.ai);
+  const overall = toProbBlock(pureHumanRaw, hybridRaw, pureAiRaw, 0.24);
+
 
   // ===== Hybrid mix estimation =====
   // Show whenever there is meaningful evidence of BOTH worlds — not only when
