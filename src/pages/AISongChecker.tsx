@@ -285,7 +285,7 @@ const AISongChecker = () => {
 
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Beta — heuristique
+            <Sparkles className="h-3.5 w-3.5" /> Beta
           </div>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             <Bot className="mr-2 inline h-7 w-7 text-primary" />
