@@ -278,6 +278,10 @@ const Header = () => {
                   <Music4 className="h-4 w-4 text-primary" aria-hidden="true" />
                   <span>Audio → MIDI</span>
                 </Link>
+                <Link to="/ai-song-checker" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground" onClick={closeMenu}>
+                  <Bot className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <span>{t('nav.aisong')}</span>
+                </Link>
               </div>
 
               <div className="pt-4 mt-2 border-t border-border">
