@@ -5,6 +5,39 @@
 
 export type Verdict = "very_likely" | "likely" | "unlikely" | "very_unlikely";
 
+export type MarkerId =
+  | "flatnessStd"
+  | "hfCutoff"
+  | "hfEnergyRatio"
+  | "stereoCorr"
+  | "melCv"
+  | "phaseCoherence"
+  | "rolloff85"
+  | "onsetCv"
+  | "rmsMicro"
+  | "envRepetition"
+  | "noiseFloor"
+  | "zcrCv"
+  | "decayRegularity"
+  | "breathRatio";
+
+export type MarkerSide = "ai" | "human";
+
+export interface TopMarker {
+  id: MarkerId;
+  side: MarkerSide;
+  strength: number; // 0..1 normalized contribution
+}
+
+export type QualityIssue =
+  | "shortFile"
+  | "lowSampleRate"
+  | "lowBandwidth"
+  | "noisy"
+  | "monoOnly";
+
+export type Confidence = "high" | "medium" | "low";
+
 export interface ProbBlock {
   human: number;
   hybrid: number;
@@ -12,6 +45,7 @@ export interface ProbBlock {
   humanVerdict: Verdict;
   hybridVerdict: Verdict;
   aiVerdict: Verdict;
+  topMarkers: TopMarker[];
 }
 
 export interface AISongCheckResult {
@@ -20,7 +54,8 @@ export interface AISongCheckResult {
   spectral: ProbBlock;
   temporal: ProbBlock;
   overall: ProbBlock;
-  hybridMix: { aiPct: number; humanPct: number } | null;
+  confidence: Confidence;
+  qualityIssues: QualityIssue[];
   features: {
     spectralFlatnessMean: number;
     spectralFlatnessStd: number;
@@ -34,6 +69,7 @@ export interface AISongCheckResult {
     noiseFloorDb: number;
   };
 }
+
 
 // Sharper verdict bands — pushes results toward clearer language.
 const verdictFor = (p: number): Verdict => {
@@ -50,7 +86,7 @@ const softmaxT = (vals: number[], T: number): number[] => {
   return exps.map((e) => e / sum);
 };
 
-const toProbBlock = (humanRaw: number, hybridRaw: number, aiRaw: number, T = 0.22): ProbBlock => {
+const toProbBlock = (humanRaw: number, hybridRaw: number, aiRaw: number, topMarkers: TopMarker[] = [], T = 0.22): ProbBlock => {
   const [h, hy, a] = softmaxT([humanRaw, hybridRaw, aiRaw], T);
   return {
     human: h,
@@ -59,6 +95,7 @@ const toProbBlock = (humanRaw: number, hybridRaw: number, aiRaw: number, T = 0.2
     humanVerdict: verdictFor(h),
     hybridVerdict: verdictFor(hy),
     aiVerdict: verdictFor(a),
+    topMarkers,
   };
 };
 
@@ -452,26 +489,24 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
 
   // ============== SCORING ==============
   // Each marker → vote in [-1, +1]. Positive = AI-like.
-  type Marker = { v: number; w: number };
+  type Marker = { id: MarkerId; v: number; w: number };
   const sMarkers: Marker[] = [
-    // Spectral
-    { v: vote(flatnessStd, 0.12, 0.025), w: 1.0 }, // low variance over time = AI
-    { v: vote(hfCutoff, 18000, 14000), w: 0.7 }, // capped around 14 kHz = AI (16 kHz is common in human masters)
-    { v: vote(hfEnergyRatio, 0.04, 0.003), w: 0.6 }, // very low HF share = AI
-    { v: vote(stereoCorr, 0.55, 0.98), w: 0.5 }, // truly near-mono = AI (modern productions are often quite mono-centric)
-    { v: vote(melCv, 1.0, 0.25), w: 1.0 }, // very low band-level variation over time = AI
-    { v: vote(phaseCoherence, 1.6, 0.6), w: 1.1 }, // smooth phase = AI
-    { v: vote(rolloff85, 9000, 4500), w: 0.4 }, // low rolloff = bandwidth limited = AI
+    { id: "flatnessStd", v: vote(flatnessStd, 0.12, 0.025), w: 1.0 },
+    { id: "hfCutoff", v: vote(hfCutoff, 18000, 14000), w: 0.7 },
+    { id: "hfEnergyRatio", v: vote(hfEnergyRatio, 0.04, 0.003), w: 0.6 },
+    { id: "stereoCorr", v: vote(stereoCorr, 0.55, 0.98), w: 0.5 },
+    { id: "melCv", v: vote(melCv, 1.0, 0.25), w: 1.0 },
+    { id: "phaseCoherence", v: vote(phaseCoherence, 1.6, 0.6), w: 1.1 },
+    { id: "rolloff85", v: vote(rolloff85, 9000, 4500), w: 0.4 },
   ];
   const tMarkers: Marker[] = [
-    // Temporal
-    { v: vote(onsetCv, 0.5, 0.12), w: 1.2 }, // metronomic = AI
-    { v: vote(rmsMicro, 7, 2.5), w: 1.1 }, // very smoothed = AI
-    { v: vote(envRepetition, 0.25, 0.75), w: 0.9 }, // looped envelope = AI
-    { v: vote(noiseFloorDb, -55, -78), w: 1.0 }, // unnaturally clean floor = AI
-    { v: vote(zcrCv, 0.45, 0.1), w: 0.9 }, // pitch-jitter / instability low = AI
-    { v: vote(decayRegularity, 6, 1.2), w: 0.9 }, // perfect decay every time = AI
-    { v: vote(breathRatio, 1.6, 0.6), w: 0.8 }, // quiet sections lack breath/room = AI
+    { id: "onsetCv", v: vote(onsetCv, 0.5, 0.12), w: 1.2 },
+    { id: "rmsMicro", v: vote(rmsMicro, 7, 2.5), w: 1.1 },
+    { id: "envRepetition", v: vote(envRepetition, 0.25, 0.75), w: 0.9 },
+    { id: "noiseFloor", v: vote(noiseFloorDb, -55, -78), w: 1.0 },
+    { id: "zcrCv", v: vote(zcrCv, 0.45, 0.1), w: 0.9 },
+    { id: "decayRegularity", v: vote(decayRegularity, 6, 1.2), w: 0.9 },
+    { id: "breathRatio", v: vote(breathRatio, 1.6, 0.6), w: 0.8 },
   ];
 
   const evidence = (markers: Marker[]) => {
@@ -489,45 +524,50 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const spec = evidence(sMarkers);
   const temp = evidence(tMarkers);
 
-  // Aggregate global evidence (weight temporal slightly higher — onset/dynamics
-  // tend to be the most reliable "human" signature in mixed productions).
   const aiE = spec.ai * 0.45 + temp.ai * 0.55;
   const huE = spec.human * 0.45 + temp.human * 0.55;
 
-  // ===== Hybrid score: peaks ONLY when both sides have comparable evidence =====
-  // 2 · min(ai, hu) · (1 − |ai − hu|)² → asymmetric distributions collapse fast.
   const hybridScore = (a: number, h: number) => {
     const m = Math.min(a, h);
     const diff = Math.abs(a - h);
     return 2 * m * Math.pow(Math.max(0, 1 - diff), 2);
   };
 
-  // ===== Elimination logic =====
   const SUPPRESS = 1.8;
   const pureHumanRaw = Math.pow(huE, 1.1) * clamp01(1 - aiE * SUPPRESS);
   const pureAiRaw = Math.pow(aiE, 1.1) * clamp01(1 - huE * SUPPRESS);
   const hybridRaw = hybridScore(aiE, huE);
 
-  const spectral = toProbBlock(spec.human, hybridScore(spec.ai, spec.human), spec.ai);
-  const temporal = toProbBlock(temp.human, hybridScore(temp.ai, temp.human), temp.ai);
-  const overall = toProbBlock(pureHumanRaw, hybridRaw, pureAiRaw, 0.24);
+  // Top markers: rank by |vote| * weight.
+  const topFrom = (markers: Marker[], n = 3): TopMarker[] =>
+    markers
+      .map((m) => ({
+        id: m.id,
+        side: (m.v >= 0 ? "ai" : "human") as MarkerSide,
+        strength: clamp01(Math.abs(m.v) * m.w),
+      }))
+      .filter((m) => m.strength > 0.05)
+      .sort((a, b) => b.strength - a.strength)
+      .slice(0, n);
 
+  const spectral = toProbBlock(spec.human, hybridScore(spec.ai, spec.human), spec.ai, topFrom(sMarkers));
+  const temporal = toProbBlock(temp.human, hybridScore(temp.ai, temp.human), temp.ai, topFrom(tMarkers));
+  const overall = toProbBlock(pureHumanRaw, hybridRaw, pureAiRaw, topFrom([...sMarkers, ...tMarkers]), 0.24);
 
-  // ===== Hybrid mix estimation =====
-  // Show whenever there is meaningful evidence of BOTH worlds — not only when
-  // hybrid wins. Threshold tuned so that an obvious all-human or all-AI track
-  // doesn't get a misleading mix readout.
-  let hybridMix: { aiPct: number; humanPct: number } | null = null;
-  const bothMeaningful = aiE > 0.12 && huE > 0.12;
-  if (bothMeaningful || overall.hybrid >= 0.35) {
-    const total = aiE + huE;
-    if (total > 0.05) {
-      // Slight contrast bias so the dominant side is not flattened to 50/50.
-      const rawAi = aiE / total;
-      const contrasted = clamp01(0.5 + (rawAi - 0.5) * 1.15);
-      const aiPct = Math.round(contrasted * 100);
-      hybridMix = { aiPct, humanPct: 100 - aiPct };
-    }
+  // ===== Quality assessment =====
+  const qualityIssues: QualityIssue[] = [];
+  if (dur < 10) qualityIssues.push("shortFile");
+  if (sr < 32000) qualityIssues.push("lowSampleRate");
+  if (hfCutoff < 13000 && hfEnergyRatio < 0.0015) qualityIssues.push("lowBandwidth");
+  if (noiseFloorDb > -30) qualityIssues.push("noisy");
+  if (stereoCorr > 0.995) qualityIssues.push("monoOnly");
+
+  const evidenceStrength = Math.max(aiE, huE);
+  let confidence: Confidence = "high";
+  if (qualityIssues.includes("shortFile") || qualityIssues.includes("lowBandwidth") || evidenceStrength < 0.18) {
+    confidence = "low";
+  } else if (qualityIssues.length >= 1 || evidenceStrength < 0.3) {
+    confidence = "medium";
   }
 
   return {
@@ -536,7 +576,8 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     spectral,
     temporal,
     overall,
-    hybridMix,
+    confidence,
+    qualityIssues,
     features: {
       spectralFlatnessMean: flatnessMean,
       spectralFlatnessStd: flatnessStd,
