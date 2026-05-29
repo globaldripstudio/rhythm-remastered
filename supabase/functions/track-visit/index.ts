@@ -8,10 +8,14 @@ const corsHeaders = {
 const ALLOWED_EVENT_TYPES = ['page_view', 'button_click', 'cta_click', 'form_submit']
 
 // Comma-separated list of IPs to exclude from analytics (owner's own visits/clicks)
-const EXCLUDED_IPS = (Deno.env.get('ANALYTICS_EXCLUDED_IPS') || '')
-  .split(',')
-  .map((s) => s.trim())
-  .filter(Boolean)
+const DEFAULT_EXCLUDED_IPS = ['86.228.179.187']
+const EXCLUDED_IPS = [
+  ...DEFAULT_EXCLUDED_IPS,
+  ...(Deno.env.get('ANALYTICS_EXCLUDED_IPS') || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
+]
 
 const truncate = (val: string | null | undefined, max: number): string | null => {
   if (!val) return null

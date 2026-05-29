@@ -25,7 +25,9 @@ const Equipment = () => {
     ],
     daw: [
       { name: "Pro Tools", type: "DAW professionnel", status: "premium" },
-      { name: "FL Studio", type: "DAW production", status: "standard" }
+      { name: "FL Studio", type: "DAW production", status: "standard" },
+      { name: "Adobe Audition CS6", type: "Éditeur audio multipiste", status: "standard" },
+      { name: "Audacity", type: "Éditeur audio open source", status: "standard" }
     ],
     ecoutes: [
       { name: "Adam A77x", type: "Monitoring near-field", status: "premium" },
@@ -111,7 +113,7 @@ const Equipment = () => {
       { name: "Native Instruments Guitar Rig 7", type: "Amplificateur guitare", status: "standard" },
       { name: "NI Kontakt", type: "Sampler", status: "industry" },
       { name: "Xfer Serum 2", type: "Synthétiseur wavetable", status: "premium" },
-      { name: "ICEAUDIO ICE Filter", type: "Filtre créatif", status: "standard" },
+      
       { name: "Klanghelm MJUC Compressor", type: "Compresseur vintage", status: "vintage" },
       { name: "Nicky Romero Kickstart", type: "Sidechain", status: "standard" },
       { name: "Drip Plugin", type: "Effet signature", status: "creative" },
