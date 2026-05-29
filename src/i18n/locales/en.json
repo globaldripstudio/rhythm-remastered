@@ -12,6 +12,8 @@
     "keybpmDesc": "Detect musical key, tempo and Camelot code",
     "tempoTools": "Tap Tempo & Metronome",
     "tempoToolsDesc": "Tap tempo, metronome and BPM/delay calculator",
+    "aisong": "AI Song Checker",
+    "aisongDesc": "Heuristic AI vs human detection in audio"
     "toolkit": "Toolkit",
     "shop": "Shop",
     "shopSoon": "soon",
