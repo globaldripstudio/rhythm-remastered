@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity } from "lucide-react";
+import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity, HelpCircle } from "lucide-react";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 import { analyzeForAI, type AISongCheckResult, type Verdict, type ProbBlock } from "@/lib/aiSongCheck";
 import SEO from "@/components/SEO";
@@ -9,7 +9,20 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { softwareAppSchema, breadcrumbSchema } from "@/lib/seo/schemas";
+
+type FeatureKey =
+  | "spectralFlatnessMean"
+  | "spectralFlatnessStd"
+  | "hfCutoffHz"
+  | "hfEnergyRatio"
+  | "stereoCorrelation"
+  | "onsetIntervalCv"
+  | "rmsMicroDynamics"
+  | "silenceRatio"
+  | "envelopeRepetition"
+  | "noiseFloorDb";
 
 const STRINGS = {
   fr: {
@@ -31,23 +44,43 @@ const STRINGS = {
     error: "Erreur lors de l'analyse du fichier.",
     disclaimerTitle: "Méthode et limites",
     disclaimer:
-      "Cet outil applique une analyse heuristique locale : variance de planéité spectrale, coupure haute fréquence, corrélation stéréo, régularité des transitoires, micro-dynamique RMS et patterns de silence. Ces marqueurs sont fréquemment associés aux générateurs IA (Suno, Udio, MusicGen…) mais ne constituent pas un classifieur entraîné. Considérez les résultats comme indicatifs : un mastering très propre ou un morceau électronique peut produire des faux positifs.",
+      "Cet outil applique une analyse heuristique locale combinant 10 marqueurs acoustiques (planéité spectrale, énergie haute fréquence, coupure HF, corrélation stéréo, régularité des transitoires, micro-dynamique, plancher de bruit, répétition d'enveloppe…). Les scores sont contrastés par softmax pour livrer un verdict tranché, mais ce N'EST PAS un classifieur entraîné. Mastering très propre, électronique très carrée ou enregistrement en mono peuvent produire des faux positifs.",
     detailsTitle: "Mesures détaillées",
+    mixTitle: "Estimation du mix (indicatif)",
+    mixAi: "IA",
+    mixHuman: "Humain",
+    mixHelp: "Estimation indicative basée sur la divergence entre l'analyse spectrale et temporelle.",
     features: {
       spectralFlatnessMean: "Planéité spectrale moy.",
       spectralFlatnessStd: "Variance de planéité",
       hfCutoffHz: "Coupure HF (Hz)",
+      hfEnergyRatio: "Énergie >16 kHz",
       stereoCorrelation: "Corrélation stéréo",
       onsetIntervalCv: "CV inter-transitoires",
       rmsMicroDynamics: "Micro-dynamique RMS (dB)",
       silenceRatio: "Ratio de silence",
-    },
+      envelopeRepetition: "Répétition d'enveloppe",
+      noiseFloorDb: "Plancher de bruit (dB)",
+    } as Record<FeatureKey, string>,
+    featureDesc: {
+      spectralFlatnessMean: "Indique si le spectre est plutôt bruité (proche de 1) ou tonal/musical (proche de 0).",
+      spectralFlatnessStd: "Variation de la texture spectrale au fil du temps. Une variance faible (<0.04) trahit un signal uniforme typique de l'IA.",
+      hfCutoffHz: "Fréquence à laquelle l'énergie haute disparaît. Une coupure nette entre 14–17 kHz est caractéristique des générateurs IA (Suno, Udio, MusicGen).",
+      hfEnergyRatio: "Proportion d'énergie au-dessus de 16 kHz. Très faible (<0.5%) = bande passante artificiellement limitée, souvent IA.",
+      stereoCorrelation: "Similarité entre canaux gauche et droit. >0.95 = quasi-mono (fréquent en IA), 0.4–0.9 = stéréo naturelle, <0.2 = inhabituel.",
+      onsetIntervalCv: "Régularité des frappes/attaques. <0.2 = trop métronomique (souvent IA), 0.3–0.7 = jeu humain naturel.",
+      rmsMicroDynamics: "Variations de volume sur des fenêtres de 50 ms. <3 dB = signal très compressé/lissé typique de l'IA, 4–10 dB = humain.",
+      silenceRatio: "Proportion du morceau sous −60 dBFS. Des valeurs extrêmes (0% ou >40%) sont suspectes.",
+      envelopeRepetition: "Autocorrélation de l'enveloppe RMS. >0.6 = motifs très répétés/bouclés, typique des sorties IA courtes.",
+      noiseFloorDb: "Niveau du bruit de fond résiduel. <−70 dB = plancher anormalement propre (IA), bruit ambiant naturel = plus haut.",
+    } as Record<FeatureKey, string>,
     verdicts: {
       very_likely: "très probable",
       likely: "probablement",
       unlikely: "probablement pas",
       very_unlikely: "très peu probable",
     },
+    backHome: "← Retour à l'accueil",
   },
   en: {
     title: "AI Song Checker",
@@ -68,23 +101,43 @@ const STRINGS = {
     error: "Error analyzing file.",
     disclaimerTitle: "Method & limits",
     disclaimer:
-      "This tool runs a local heuristic analysis: spectral flatness variance, HF cutoff, stereo correlation, transient regularity, RMS micro-dynamics and silence patterns. These markers are commonly seen in AI generators (Suno, Udio, MusicGen…) but this is NOT a trained classifier. Treat results as indicative — a very clean master or an electronic track can produce false positives.",
+      "This tool runs a local heuristic combining 10 acoustic markers (spectral flatness, HF energy, HF cutoff, stereo correlation, transient regularity, micro-dynamics, noise floor, envelope repetition…). Scores are sharpened via softmax for a decisive verdict, but this is NOT a trained classifier. Very clean masters, rigid electronic tracks, or mono recordings can yield false positives.",
     detailsTitle: "Detailed measurements",
+    mixTitle: "Estimated mix (indicative)",
+    mixAi: "AI",
+    mixHuman: "Human",
+    mixHelp: "Indicative estimate based on the divergence between spectral and temporal analysis.",
     features: {
       spectralFlatnessMean: "Mean spectral flatness",
       spectralFlatnessStd: "Flatness variance",
       hfCutoffHz: "HF cutoff (Hz)",
+      hfEnergyRatio: "Energy >16 kHz",
       stereoCorrelation: "Stereo correlation",
       onsetIntervalCv: "Onset interval CV",
       rmsMicroDynamics: "RMS micro-dynamics (dB)",
       silenceRatio: "Silence ratio",
-    },
+      envelopeRepetition: "Envelope repetition",
+      noiseFloorDb: "Noise floor (dB)",
+    } as Record<FeatureKey, string>,
+    featureDesc: {
+      spectralFlatnessMean: "Tells whether the spectrum is noise-like (near 1) or tonal/musical (near 0).",
+      spectralFlatnessStd: "How much spectral texture varies over time. Low variance (<0.04) signals an unnaturally uniform AI output.",
+      hfCutoffHz: "Frequency where high-end energy disappears. A sharp cutoff between 14–17 kHz is typical of AI generators (Suno, Udio, MusicGen).",
+      hfEnergyRatio: "Share of energy above 16 kHz. Very low (<0.5%) = artificially limited bandwidth, often AI.",
+      stereoCorrelation: "Similarity between L/R channels. >0.95 = near-mono (common with AI), 0.4–0.9 = natural stereo, <0.2 = unusual.",
+      onsetIntervalCv: "Regularity of attacks/hits. <0.2 = overly metronomic (often AI), 0.3–0.7 = natural human playing.",
+      rmsMicroDynamics: "Volume variations over 50 ms windows. <3 dB = heavily compressed/smoothed AI signal, 4–10 dB = human.",
+      silenceRatio: "Share of the track below −60 dBFS. Extreme values (0% or >40%) are suspicious.",
+      envelopeRepetition: "Autocorrelation of the RMS envelope. >0.6 = strongly looped/repeated patterns, typical of short AI outputs.",
+      noiseFloorDb: "Residual background noise level. <−70 dB = unnaturally clean floor (AI); natural ambience sits higher.",
+    } as Record<FeatureKey, string>,
     verdicts: {
       very_likely: "very likely",
       likely: "likely",
       unlikely: "unlikely",
       very_unlikely: "very unlikely",
     },
+    backHome: "← Back home",
   },
 };
 
@@ -153,6 +206,19 @@ const Block = ({
     </CardContent>
   </Card>
 );
+
+const FEATURE_ORDER: FeatureKey[] = [
+  "spectralFlatnessMean",
+  "spectralFlatnessStd",
+  "hfCutoffHz",
+  "hfEnergyRatio",
+  "stereoCorrelation",
+  "onsetIntervalCv",
+  "rmsMicroDynamics",
+  "silenceRatio",
+  "envelopeRepetition",
+  "noiseFloorDb",
+];
 
 const AISongChecker = () => {
   const { i18n } = useTranslation();
@@ -301,20 +367,72 @@ const AISongChecker = () => {
               <Block title={L.temporal} icon={Activity} block={result.temporal} L={L} />
               <Block title={L.overall} icon={Sparkles} block={result.overall} L={L} />
 
+              {result.hybridMix && (
+                <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="p-5">
+                    <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary">
+                      <Sparkles className="h-4 w-4" /> {L.mixTitle}
+                    </div>
+                    <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted/40">
+                      <div
+                        className="h-full bg-gradient-to-r from-red-400 to-orange-400"
+                        style={{ width: `${result.hybridMix.aiPct}%` }}
+                      />
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-300"
+                        style={{ width: `${result.hybridMix.humanPct}%` }}
+                      />
+                    </div>
+                    <div className="mt-2 flex justify-between text-xs">
+                      <span className="text-orange-400">~{result.hybridMix.aiPct}% {L.mixAi}</span>
+                      <span className="text-emerald-400">~{result.hybridMix.humanPct}% {L.mixHuman}</span>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">{L.mixHelp}</p>
+                  </CardContent>
+                </Card>
+              )}
+
               <Card className="border-border/60">
                 <CardContent className="p-5">
                   <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                     <Info className="h-4 w-4 text-primary" /> {L.detailsTitle}
                   </div>
                   <div className="grid gap-2 text-sm sm:grid-cols-2">
-                    {Object.entries(result.features).map(([k, v]) => (
-                      <div key={k} className="flex items-center justify-between rounded border border-border/40 bg-muted/20 px-3 py-1.5">
-                        <span className="text-muted-foreground">{L.features[k as keyof typeof L.features]}</span>
-                        <span className="font-mono">
-                          {typeof v === "number" ? (Math.abs(v) > 1000 ? v.toFixed(0) : v.toFixed(3)) : String(v)}
-                        </span>
-                      </div>
-                    ))}
+                    {FEATURE_ORDER.map((k) => {
+                      const v = result.features[k];
+                      const display = typeof v === "number"
+                        ? Math.abs(v) >= 1000
+                          ? v.toFixed(0)
+                          : Math.abs(v) >= 10
+                          ? v.toFixed(2)
+                          : v.toFixed(3)
+                        : String(v);
+                      return (
+                        <div
+                          key={k}
+                          className="flex items-center justify-between gap-2 rounded border border-border/40 bg-muted/20 px-3 py-1.5"
+                        >
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <span>{L.features[k]}</span>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  type="button"
+                                  aria-label={L.features[k]}
+                                  className="inline-flex h-4 w-4 items-center justify-center text-muted-foreground/70 hover:text-primary"
+                                >
+                                  <HelpCircle className="h-3.5 w-3.5" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+                                {L.featureDesc[k]}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <span className="font-mono">{display}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
@@ -329,8 +447,12 @@ const AISongChecker = () => {
           )}
 
           <div className="mt-10 text-center">
-            <Link to="/" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
-              ← {i18n.language === "en" ? "Back home" : "Retour à l'accueil"}
+            <Link
+              to="/"
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior })}
+              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              {L.backHome}
             </Link>
           </div>
         </div>
