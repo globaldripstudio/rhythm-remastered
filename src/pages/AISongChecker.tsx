@@ -268,7 +268,7 @@ const AISongChecker = () => {
             description: L.tagline,
             features: [
               "Analyse spectrale et temporelle locale",
-              "Détection heuristique IA / Humain / Hybride",
+              "Détection IA / Humain / Hybride par élimination",
               "100% navigateur, aucune upload",
             ],
           }),
