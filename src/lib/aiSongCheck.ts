@@ -5,6 +5,39 @@
 
 export type Verdict = "very_likely" | "likely" | "unlikely" | "very_unlikely";
 
+export type MarkerId =
+  | "flatnessStd"
+  | "hfCutoff"
+  | "hfEnergyRatio"
+  | "stereoCorr"
+  | "melCv"
+  | "phaseCoherence"
+  | "rolloff85"
+  | "onsetCv"
+  | "rmsMicro"
+  | "envRepetition"
+  | "noiseFloor"
+  | "zcrCv"
+  | "decayRegularity"
+  | "breathRatio";
+
+export type MarkerSide = "ai" | "human";
+
+export interface TopMarker {
+  id: MarkerId;
+  side: MarkerSide;
+  strength: number; // 0..1 normalized contribution
+}
+
+export type QualityIssue =
+  | "shortFile"
+  | "lowSampleRate"
+  | "lowBandwidth"
+  | "noisy"
+  | "monoOnly";
+
+export type Confidence = "high" | "medium" | "low";
+
 export interface ProbBlock {
   human: number;
   hybrid: number;
@@ -12,6 +45,7 @@ export interface ProbBlock {
   humanVerdict: Verdict;
   hybridVerdict: Verdict;
   aiVerdict: Verdict;
+  topMarkers: TopMarker[];
 }
 
 export interface AISongCheckResult {
@@ -20,7 +54,8 @@ export interface AISongCheckResult {
   spectral: ProbBlock;
   temporal: ProbBlock;
   overall: ProbBlock;
-  hybridMix: { aiPct: number; humanPct: number } | null;
+  confidence: Confidence;
+  qualityIssues: QualityIssue[];
   features: {
     spectralFlatnessMean: number;
     spectralFlatnessStd: number;
@@ -34,6 +69,7 @@ export interface AISongCheckResult {
     noiseFloorDb: number;
   };
 }
+
 
 // Sharper verdict bands — pushes results toward clearer language.
 const verdictFor = (p: number): Verdict => {
