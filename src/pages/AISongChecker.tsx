@@ -44,7 +44,7 @@ const STRINGS = {
     error: "Erreur lors de l'analyse du fichier.",
     disclaimerTitle: "Méthode et limites",
     disclaimer:
-      "Cet outil applique une analyse heuristique locale combinant 10 marqueurs acoustiques (planéité spectrale, énergie haute fréquence, coupure HF, corrélation stéréo, régularité des transitoires, micro-dynamique, plancher de bruit, répétition d'enveloppe…). Les scores sont contrastés par softmax pour livrer un verdict tranché, mais ce N'EST PAS un classifieur entraîné. Mastering très propre, électronique très carrée ou enregistrement en mono peuvent produire des faux positifs.",
+      "L'analyse combine 16 marqueurs acoustiques (planéité spectrale, cohérence de phase, coupure HF, corrélation stéréo, variation des bandes mel, régularité des transitoires, micro-dynamique, plancher de bruit, répétition d'enveloppe, décroissance des queues, présence de respiration…). Le verdict est obtenu par élimination : si on détecte des traces évidentes d'enregistrement humain, on écarte l'option « IA pure » (et inversement). Ce n'est pas un modèle d'IA entraîné : un mastering très propre, une production électronique très carrée ou un enregistrement mono peuvent produire des faux positifs.",
     detailsTitle: "Mesures détaillées",
     mixTitle: "Estimation du mix (indicatif)",
     mixAi: "IA",
@@ -101,7 +101,7 @@ const STRINGS = {
     error: "Error analyzing file.",
     disclaimerTitle: "Method & limits",
     disclaimer:
-      "This tool runs a local heuristic combining 10 acoustic markers (spectral flatness, HF energy, HF cutoff, stereo correlation, transient regularity, micro-dynamics, noise floor, envelope repetition…). Scores are sharpened via softmax for a decisive verdict, but this is NOT a trained classifier. Very clean masters, rigid electronic tracks, or mono recordings can yield false positives.",
+      "Analysis combines 16 acoustic markers (spectral flatness, phase coherence, HF cutoff, stereo correlation, mel-band variation, transient regularity, micro-dynamics, noise floor, envelope repetition, decay tails, breath presence…). The verdict is reached by elimination: if obvious traces of real recording are detected, the « pure AI » option is ruled out (and vice-versa). This is NOT a trained AI model: very clean masters, rigid electronic productions or mono recordings can produce false positives.",
     detailsTitle: "Detailed measurements",
     mixTitle: "Estimated mix (indicative)",
     mixAi: "AI",
@@ -268,7 +268,7 @@ const AISongChecker = () => {
             description: L.tagline,
             features: [
               "Analyse spectrale et temporelle locale",
-              "Détection heuristique IA / Humain / Hybride",
+              "Détection IA / Humain / Hybride par élimination",
               "100% navigateur, aucune upload",
             ],
           }),
@@ -285,7 +285,7 @@ const AISongChecker = () => {
 
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Beta — heuristique
+            <Sparkles className="h-3.5 w-3.5" /> Beta
           </div>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             <Bot className="mr-2 inline h-7 w-7 text-primary" />
