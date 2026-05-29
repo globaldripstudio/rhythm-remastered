@@ -44,7 +44,7 @@ const STRINGS = {
     error: "Erreur lors de l'analyse du fichier.",
     disclaimerTitle: "Méthode et limites",
     disclaimer:
-      "Cet outil applique une analyse heuristique locale combinant 10 marqueurs acoustiques (planéité spectrale, énergie haute fréquence, coupure HF, corrélation stéréo, régularité des transitoires, micro-dynamique, plancher de bruit, répétition d'enveloppe…). Les scores sont contrastés par softmax pour livrer un verdict tranché, mais ce N'EST PAS un classifieur entraîné. Mastering très propre, électronique très carrée ou enregistrement en mono peuvent produire des faux positifs.",
+      "L'analyse combine 16 marqueurs acoustiques (planéité spectrale, cohérence de phase, coupure HF, corrélation stéréo, variation des bandes mel, régularité des transitoires, micro-dynamique, plancher de bruit, répétition d'enveloppe, décroissance des queues, présence de respiration…). Le verdict est obtenu par élimination : si on détecte des traces évidentes d'enregistrement humain, on écarte l'option « IA pure » (et inversement). Ce n'est pas un modèle d'IA entraîné : un mastering très propre, une production électronique très carrée ou un enregistrement mono peuvent produire des faux positifs.",
     detailsTitle: "Mesures détaillées",
     mixTitle: "Estimation du mix (indicatif)",
     mixAi: "IA",
