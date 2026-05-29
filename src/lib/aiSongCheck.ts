@@ -554,7 +554,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
 
   const spectral = toProbBlock(spec.human, hybridScore(spec.ai, spec.human), spec.ai, topFrom(sMarkers));
   const temporal = toProbBlock(temp.human, hybridScore(temp.ai, temp.human), temp.ai, topFrom(tMarkers));
-  const overall = toProbBlock(pureHumanRaw, hybridRaw, pureAiRaw, topFrom([...sMarkers, ...tMarkers]), 0.24);
+  const overall = toProbBlock(pureHumanRaw, hybridRaw, pureAiRaw, topFrom([...sMarkers, ...tMarkers]), 0.20);
 
   // ===== Quality assessment =====
   const qualityIssues: QualityIssue[] = [];
