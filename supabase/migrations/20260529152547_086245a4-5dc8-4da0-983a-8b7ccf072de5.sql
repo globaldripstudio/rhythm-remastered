@@ -1,0 +1,1 @@
+DELETE FROM public.site_analytics WHERE ip_address = '86.228.179.187';
