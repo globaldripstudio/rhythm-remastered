@@ -86,7 +86,7 @@ const softmaxT = (vals: number[], T: number): number[] => {
   return exps.map((e) => e / sum);
 };
 
-const toProbBlock = (humanRaw: number, hybridRaw: number, aiRaw: number, T = 0.22): ProbBlock => {
+const toProbBlock = (humanRaw: number, hybridRaw: number, aiRaw: number, topMarkers: TopMarker[] = [], T = 0.22): ProbBlock => {
   const [h, hy, a] = softmaxT([humanRaw, hybridRaw, aiRaw], T);
   return {
     human: h,
@@ -95,6 +95,7 @@ const toProbBlock = (humanRaw: number, hybridRaw: number, aiRaw: number, T = 0.2
     humanVerdict: verdictFor(h),
     hybridVerdict: verdictFor(hy),
     aiVerdict: verdictFor(a),
+    topMarkers,
   };
 };
 
