@@ -25,7 +25,9 @@ const Equipment = () => {
     ],
     daw: [
       { name: "Pro Tools", type: "DAW professionnel", status: "premium" },
-      { name: "FL Studio", type: "DAW production", status: "standard" }
+      { name: "FL Studio", type: "DAW production", status: "standard" },
+      { name: "Adobe Audition CS6", type: "Éditeur audio multipiste", status: "standard" },
+      { name: "Audacity", type: "Éditeur audio open source", status: "standard" }
     ],
     ecoutes: [
       { name: "Adam A77x", type: "Monitoring near-field", status: "premium" },
