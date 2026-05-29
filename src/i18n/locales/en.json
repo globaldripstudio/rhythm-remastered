@@ -1556,6 +1556,10 @@
       "audio2midi": {
         "long": "Audio → MIDI",
         "short": "MIDI"
+      },
+      "aisong": {
+        "long": "AI Song Checker",
+        "short": "AI Check"
       }
     }
   },
