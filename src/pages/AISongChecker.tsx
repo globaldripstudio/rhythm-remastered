@@ -46,10 +46,39 @@ const STRINGS = {
     disclaimer:
       "L'analyse combine 16 marqueurs acoustiques (planéité spectrale, cohérence de phase, coupure HF, corrélation stéréo, variation des bandes mel, régularité des transitoires, micro-dynamique, plancher de bruit, répétition d'enveloppe, décroissance des queues, présence de respiration…). Le verdict est obtenu par élimination : si on détecte des traces évidentes d'enregistrement humain, on écarte l'option « IA pure » (et inversement). Ce n'est pas un modèle d'IA entraîné : un mastering très propre, une production électronique très carrée ou un enregistrement mono peuvent produire des faux positifs.",
     detailsTitle: "Mesures détaillées",
-    mixTitle: "Estimation du mix (indicatif)",
-    mixAi: "IA",
-    mixHuman: "Humain",
-    mixHelp: "Estimation indicative basée sur la divergence entre l'analyse spectrale et temporelle.",
+    topMarkersTitle: "Indices clés",
+    sideAi: "indice IA",
+    sideHuman: "indice humain",
+    confidenceTitle: "Fiabilité de l'analyse",
+    confidence: { high: "Élevée", medium: "Moyenne", low: "Faible" } as Record<Confidence, string>,
+    confidenceHelp: {
+      high: "Le fichier offre suffisamment de matière pour un verdict solide.",
+      medium: "Quelques limitations détectées — le verdict reste indicatif.",
+      low: "Trop peu de matière exploitable — verdict à prendre avec précaution.",
+    } as Record<Confidence, string>,
+    qualityIssues: {
+      shortFile: "Fichier court (< 10 s) — peu de matière analysable.",
+      lowSampleRate: "Taux d'échantillonnage faible — bande passante limitée.",
+      lowBandwidth: "Bande passante très réduite (MP3 bas débit ?) — peut imiter une signature IA.",
+      noisy: "Plancher de bruit élevé — peut masquer les marqueurs IA.",
+      monoOnly: "Fichier mono ou stéréo factice — la corrélation stéréo n'est pas exploitable.",
+    } as Record<QualityIssue, string>,
+    markerLabels: {
+      flatnessStd: "Variance spectrale",
+      hfCutoff: "Coupure haute fréquence",
+      hfEnergyRatio: "Énergie >16 kHz",
+      stereoCorr: "Image stéréo",
+      melCv: "Variation des bandes",
+      phaseCoherence: "Cohérence de phase",
+      rolloff85: "Rolloff spectral",
+      onsetCv: "Régularité des transitoires",
+      rmsMicro: "Micro-dynamique",
+      envRepetition: "Répétition d'enveloppe",
+      noiseFloor: "Plancher de bruit",
+      zcrCv: "Stabilité de pitch",
+      decayRegularity: "Décroissance des queues",
+      breathRatio: "Respirations / ambiance",
+    } as Record<MarkerId, string>,
     features: {
       spectralFlatnessMean: "Planéité spectrale moy.",
       spectralFlatnessStd: "Variance de planéité",
@@ -103,10 +132,39 @@ const STRINGS = {
     disclaimer:
       "Analysis combines 16 acoustic markers (spectral flatness, phase coherence, HF cutoff, stereo correlation, mel-band variation, transient regularity, micro-dynamics, noise floor, envelope repetition, decay tails, breath presence…). The verdict is reached by elimination: if obvious traces of real recording are detected, the « pure AI » option is ruled out (and vice-versa). This is NOT a trained AI model: very clean masters, rigid electronic productions or mono recordings can produce false positives.",
     detailsTitle: "Detailed measurements",
-    mixTitle: "Estimated mix (indicative)",
-    mixAi: "AI",
-    mixHuman: "Human",
-    mixHelp: "Indicative estimate based on the divergence between spectral and temporal analysis.",
+    topMarkersTitle: "Key signals",
+    sideAi: "AI signal",
+    sideHuman: "human signal",
+    confidenceTitle: "Analysis reliability",
+    confidence: { high: "High", medium: "Medium", low: "Low" } as Record<Confidence, string>,
+    confidenceHelp: {
+      high: "The file provides enough material for a solid verdict.",
+      medium: "Some limitations detected — the verdict is indicative.",
+      low: "Too little usable material — treat the verdict with caution.",
+    } as Record<Confidence, string>,
+    qualityIssues: {
+      shortFile: "Short file (< 10 s) — limited analysis material.",
+      lowSampleRate: "Low sample rate — limited bandwidth.",
+      lowBandwidth: "Very narrow bandwidth (low-bitrate MP3?) — can mimic an AI signature.",
+      noisy: "High noise floor — can mask AI markers.",
+      monoOnly: "Mono or fake-stereo file — stereo correlation is not exploitable.",
+    } as Record<QualityIssue, string>,
+    markerLabels: {
+      flatnessStd: "Spectral variance",
+      hfCutoff: "High-frequency cutoff",
+      hfEnergyRatio: "Energy >16 kHz",
+      stereoCorr: "Stereo image",
+      melCv: "Mel band variation",
+      phaseCoherence: "Phase coherence",
+      rolloff85: "Spectral rolloff",
+      onsetCv: "Transient regularity",
+      rmsMicro: "Micro-dynamics",
+      envRepetition: "Envelope repetition",
+      noiseFloor: "Noise floor",
+      zcrCv: "Pitch stability",
+      decayRegularity: "Decay tails",
+      breathRatio: "Breaths / ambience",
+    } as Record<MarkerId, string>,
     features: {
       spectralFlatnessMean: "Mean spectral flatness",
       spectralFlatnessStd: "Flatness variance",
@@ -203,6 +261,29 @@ const Block = ({
         <ProbRow label={L.hybrid} pct={block.hybrid} verdict={block.hybridVerdict} verdictText={L.verdicts[block.hybridVerdict]} />
         <ProbRow label={L.ai} pct={block.ai} verdict={block.aiVerdict} verdictText={L.verdicts[block.aiVerdict]} />
       </div>
+      {block.topMarkers.length > 0 && (
+        <div className="border-t border-border/40 pt-3">
+          <p className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">{L.topMarkersTitle}</p>
+          <ul className="flex flex-wrap gap-1.5">
+            {block.topMarkers.map((m: TopMarker) => {
+              const isAi = m.side === "ai";
+              const tone = isAi
+                ? "border-orange-400/40 bg-orange-400/10 text-orange-300"
+                : "border-emerald-400/40 bg-emerald-400/10 text-emerald-300";
+              return (
+                <li
+                  key={m.id}
+                  className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs ${tone}`}
+                  title={isAi ? L.sideAi : L.sideHuman}
+                >
+                  <span aria-hidden>{isAi ? "▲" : "▼"}</span>
+                  <span>{L.markerLabels[m.id]}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </CardContent>
   </Card>
 );
@@ -367,30 +448,38 @@ const AISongChecker = () => {
               <Block title={L.temporal} icon={Activity} block={result.temporal} L={L} />
               <Block title={L.overall} icon={Sparkles} block={result.overall} L={L} />
 
-              {result.hybridMix && (
-                <Card className="border-primary/30 bg-primary/5">
-                  <CardContent className="p-5">
-                    <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary">
-                      <Sparkles className="h-4 w-4" /> {L.mixTitle}
-                    </div>
-                    <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted/40">
-                      <div
-                        className="h-full bg-gradient-to-r from-red-400 to-orange-400"
-                        style={{ width: `${result.hybridMix.aiPct}%` }}
-                      />
-                      <div
-                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-300"
-                        style={{ width: `${result.hybridMix.humanPct}%` }}
-                      />
-                    </div>
-                    <div className="mt-2 flex justify-between text-xs">
-                      <span className="text-orange-400">~{result.hybridMix.aiPct}% {L.mixAi}</span>
-                      <span className="text-emerald-400">~{result.hybridMix.humanPct}% {L.mixHuman}</span>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">{L.mixHelp}</p>
-                  </CardContent>
-                </Card>
-              )}
+              {(() => {
+                const c = result.confidence;
+                const Icon = c === "high" ? ShieldCheck : c === "medium" ? ShieldQuestion : ShieldAlert;
+                const tone =
+                  c === "high"
+                    ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-300"
+                    : c === "medium"
+                    ? "border-amber-500/30 bg-amber-500/5 text-amber-300"
+                    : "border-red-500/30 bg-red-500/5 text-red-300";
+                return (
+                  <Card className={`${tone}`}>
+                    <CardContent className="p-5">
+                      <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                        <Icon className="h-4 w-4" />
+                        {L.confidenceTitle} : {L.confidence[c]}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{L.confidenceHelp[c]}</p>
+                      {result.qualityIssues.length > 0 && (
+                        <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+                          {result.qualityIssues.map((q) => (
+                            <li key={q} className="flex items-start gap-2">
+                              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
+                              <span>{L.qualityIssues[q]}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
+
 
               <Card className="border-border/60">
                 <CardContent className="p-5">
