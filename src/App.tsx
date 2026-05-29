@@ -25,6 +25,7 @@ import KeyBpmFinder from "./pages/KeyBpmFinder";
 import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
 import AudioToMidi from "./pages/AudioToMidi";
+import AISongChecker from "./pages/AISongChecker";
 import Admin from "./pages/Admin";
 import LangLock from "./components/LangLock";
 import LangAwareRedirect from "./components/LangAwareRedirect";
