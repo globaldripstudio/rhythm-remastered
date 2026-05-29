@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Drum, Gauge, KeyRound, Menu, Music2, Music4, Phone, Wrench, X } from "lucide-react";
+import { Bot, ChevronDown, Drum, Gauge, KeyRound, Menu, Music2, Music4, Phone, Wrench, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { trackCTAClick } from "@/hooks/usePageTracking";
