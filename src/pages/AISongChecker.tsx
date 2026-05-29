@@ -261,6 +261,29 @@ const Block = ({
         <ProbRow label={L.hybrid} pct={block.hybrid} verdict={block.hybridVerdict} verdictText={L.verdicts[block.hybridVerdict]} />
         <ProbRow label={L.ai} pct={block.ai} verdict={block.aiVerdict} verdictText={L.verdicts[block.aiVerdict]} />
       </div>
+      {block.topMarkers.length > 0 && (
+        <div className="border-t border-border/40 pt-3">
+          <p className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">{L.topMarkersTitle}</p>
+          <ul className="flex flex-wrap gap-1.5">
+            {block.topMarkers.map((m: TopMarker) => {
+              const isAi = m.side === "ai";
+              const tone = isAi
+                ? "border-orange-400/40 bg-orange-400/10 text-orange-300"
+                : "border-emerald-400/40 bg-emerald-400/10 text-emerald-300";
+              return (
+                <li
+                  key={m.id}
+                  className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs ${tone}`}
+                  title={isAi ? L.sideAi : L.sideHuman}
+                >
+                  <span aria-hidden>{isAi ? "▲" : "▼"}</span>
+                  <span>{L.markerLabels[m.id]}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </CardContent>
   </Card>
 );
