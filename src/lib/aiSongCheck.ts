@@ -20,31 +20,40 @@ export interface AISongCheckResult {
   spectral: ProbBlock;
   temporal: ProbBlock;
   overall: ProbBlock;
+  // Estimated AI/Human ratio, only present when overall verdict is hybrid
+  // and the spectral/temporal blocks diverge meaningfully.
+  hybridMix: { aiPct: number; humanPct: number } | null;
   features: {
     spectralFlatnessMean: number;
     spectralFlatnessStd: number;
     hfCutoffHz: number;
+    hfEnergyRatio: number; // energy above 16kHz / total
     stereoCorrelation: number;
-    onsetIntervalCv: number; // coefficient of variation
-    rmsMicroDynamics: number; // dB std over short windows
+    onsetIntervalCv: number;
+    rmsMicroDynamics: number;
     silenceRatio: number;
+    envelopeRepetition: number; // 0..1, higher = looped/repeated
+    noiseFloorDb: number;
   };
 }
 
 const verdictFor = (p: number): Verdict => {
-  if (p >= 0.7) return "very_likely";
-  if (p >= 0.5) return "likely";
-  if (p >= 0.25) return "unlikely";
+  if (p >= 0.6) return "very_likely";
+  if (p >= 0.4) return "likely";
+  if (p >= 0.2) return "unlikely";
   return "very_unlikely";
 };
 
-const normalize3 = (a: number, b: number, c: number): [number, number, number] => {
-  const s = a + b + c || 1;
-  return [a / s, b / s, c / s];
+// Softmax with temperature — low T = decisive verdicts
+const softmaxT = (vals: number[], T = 0.4): number[] => {
+  const max = Math.max(...vals);
+  const exps = vals.map((v) => Math.exp((v - max) / T));
+  const sum = exps.reduce((a, b) => a + b, 0) || 1;
+  return exps.map((e) => e / sum);
 };
 
-const toProbBlock = (human: number, hybrid: number, ai: number): ProbBlock => {
-  const [h, hy, a] = normalize3(human, hybrid, ai);
+const toProbBlock = (humanRaw: number, hybridRaw: number, aiRaw: number): ProbBlock => {
+  const [h, hy, a] = softmaxT([humanRaw, hybridRaw, aiRaw], 0.35);
   return {
     human: h,
     hybrid: hy,
@@ -55,11 +64,6 @@ const toProbBlock = (human: number, hybrid: number, ai: number): ProbBlock => {
   };
 };
 
-// FFT-free spectral analysis using browser AnalyserNode would require
-// playback; instead we use OfflineAudioContext with a custom DFT via
-// the browser's AnalyserNode in an OfflineAudioContext is not available,
-// so we compute a windowed magnitude spectrum via radix-2 FFT.
-
 // Iterative radix-2 FFT (in-place). Length must be power of 2.
 const fftReal = (input: Float32Array): { re: Float32Array; im: Float32Array } => {
   const n = input.length;
@@ -67,7 +71,6 @@ const fftReal = (input: Float32Array): { re: Float32Array; im: Float32Array } =>
   const im = new Float32Array(n);
   re.set(input);
 
-  // bit-reversal
   let j = 0;
   for (let i = 1; i < n; i++) {
     let bit = n >> 1;
@@ -108,7 +111,6 @@ const hann = (n: number): Float32Array => {
   return w;
 };
 
-// Decode an audio file in the browser
 export const decodeAudio = async (file: File): Promise<AudioBuffer> => {
   const arr = await file.arrayBuffer();
   const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
@@ -120,7 +122,18 @@ export const decodeAudio = async (file: File): Promise<AudioBuffer> => {
   }
 };
 
-// Main analysis
+const mean = (a: number[]) => a.reduce((s, v) => s + v, 0) / (a.length || 1);
+const std = (a: number[], m?: number) => {
+  const mu = m ?? mean(a);
+  return Math.sqrt(a.reduce((s, v) => s + (v - mu) ** 2, 0) / (a.length || 1));
+};
+
+// Tent function: returns 1 at center, 0 at edges
+const tent = (x: number, center: number, halfWidth: number): number => {
+  const d = Math.abs(x - center);
+  return Math.max(0, 1 - d / halfWidth);
+};
+
 export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const buffer = await decodeAudio(file);
   const sr = buffer.sampleRate;
@@ -128,20 +141,21 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const left = buffer.getChannelData(0);
   const right = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : left;
 
-  // Downmix to mono for spectral work
   const mono = new Float32Array(left.length);
   for (let i = 0; i < left.length; i++) mono[i] = 0.5 * (left[i] + right[i]);
 
-  // --- Spectral features (windowed FFT over the track) ---
+  // --- Spectral features ---
   const FFT = 2048;
   const HOP = 1024;
   const win = hann(FFT);
   const frames = Math.max(1, Math.floor((mono.length - FFT) / HOP));
   const flatnessVals: number[] = [];
-  const centroidVals: number[] = [];
   const hfCutoffs: number[] = [];
+  let totalEnergy = 0;
+  let hfEnergy = 0;
+  const hf16Bin = Math.floor((16000 * FFT) / sr);
 
-  const maxFrames = Math.min(frames, 600); // cap for perf (~10s at 48kHz)
+  const maxFrames = Math.min(frames, 600);
   const step = Math.max(1, Math.floor(frames / maxFrames));
 
   for (let f = 0; f < frames; f += step) {
@@ -153,8 +167,6 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     let geo = 0;
     let arith = 0;
     let nz = 0;
-    let weighted = 0;
-    let sumMag = 0;
     for (let i = 1; i < FFT / 2; i++) {
       const m = Math.sqrt(re[i] * re[i] + im[i] * im[i]);
       mags[i] = m;
@@ -163,14 +175,12 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
         nz++;
       }
       arith += m;
-      weighted += i * m;
-      sumMag += m;
+      totalEnergy += m;
+      if (i >= hf16Bin) hfEnergy += m;
     }
     const flatness = nz > 0 ? Math.exp(geo / nz) / (arith / (FFT / 2)) : 0;
     flatnessVals.push(flatness);
-    centroidVals.push(sumMag > 0 ? (weighted / sumMag) * (sr / FFT) : 0);
 
-    // HF cutoff: bin where energy drops below 1% of max for the rest
     const maxM = Math.max(...mags);
     let cutoffBin = FFT / 2 - 1;
     const threshold = maxM * 0.005;
@@ -183,15 +193,10 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     hfCutoffs.push((cutoffBin * sr) / FFT);
   }
 
-  const mean = (a: number[]) => a.reduce((s, v) => s + v, 0) / (a.length || 1);
-  const std = (a: number[], m?: number) => {
-    const mu = m ?? mean(a);
-    return Math.sqrt(a.reduce((s, v) => s + (v - mu) ** 2, 0) / (a.length || 1));
-  };
-
   const flatnessMean = mean(flatnessVals);
   const flatnessStd = std(flatnessVals, flatnessMean);
   const hfCutoff = mean(hfCutoffs);
+  const hfEnergyRatio = totalEnergy > 0 ? hfEnergy / totalEnergy : 0;
 
   // Stereo correlation
   let sumLR = 0;
@@ -204,8 +209,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   }
   const stereoCorr = sumL2 > 0 && sumR2 > 0 ? sumLR / Math.sqrt(sumL2 * sumR2) : 1;
 
-  // --- Temporal features ---
-  // Onset detection via spectral flux
+  // --- Temporal: onset/flux ---
   const fluxFFT = 1024;
   const fluxHop = 512;
   const fluxFrames = Math.max(2, Math.floor((mono.length - fluxFFT) / fluxHop));
@@ -230,7 +234,6 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     flux.push(f0);
     prevMags = mags;
   }
-  // Peak picking
   const fluxMean = mean(flux);
   const fluxStd = std(flux, fluxMean);
   const peakThresh = fluxMean + 1.2 * fluxStd;
@@ -246,7 +249,6 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
       onsets.push((i * fluxHop * stepF) / sr);
     }
   }
-  // Inter-onset interval CV
   let onsetCv = 0;
   if (onsets.length > 4) {
     const iois: number[] = [];
@@ -267,68 +269,85 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     rmsDb.push(20 * Math.log10(r + 1e-9));
   }
   const rmsMicro = std(rmsDb);
-
-  // Silence ratio (frames below -60 dBFS)
   const silenceRatio = rmsDb.filter((d) => d < -60).length / (rmsDb.length || 1);
 
-  // --- Heuristic scoring ---
-  // SPECTRAL block
-  // AI signals: very low flatness variance (synthetic uniformity),
-  // HF cutoff between 14k-18k (most AI music models),
-  // stereo correlation extremely high (>0.97) or extremely low.
-  let aiSpec = 0;
-  let humanSpec = 0;
+  // Noise floor: percentile 5 of RMS dB (excluding pure silence)
+  const sortedNonSilent = rmsDb.filter((d) => d > -80).slice().sort((a, b) => a - b);
+  const noiseFloorDb = sortedNonSilent.length > 0 ? sortedNonSilent[Math.floor(sortedNonSilent.length * 0.05)] : -60;
 
-  // flatness std normalized — humans ~0.05-0.15, AI tends lower
-  const flatStdNorm = Math.min(1, flatnessStd / 0.1);
-  aiSpec += (1 - flatStdNorm) * 0.35;
-  humanSpec += flatStdNorm * 0.35;
+  // Envelope repetition via autocorrelation on RMS envelope (peak after lag 1s)
+  let envRepetition = 0;
+  if (rmsDb.length > 50) {
+    const env = rmsDb.map((d) => Math.pow(10, d / 20));
+    const envMean = mean(env);
+    const centered = env.map((v) => v - envMean);
+    const denom = centered.reduce((s, v) => s + v * v, 0) || 1;
+    const framesPerSec = 1 / 0.025;
+    const minLag = Math.max(5, Math.floor(framesPerSec * 0.8));
+    const maxLag = Math.min(centered.length - 10, Math.floor(framesPerSec * 8));
+    let maxCorr = 0;
+    for (let lag = minLag; lag < maxLag; lag++) {
+      let s = 0;
+      for (let i = 0; i + lag < centered.length; i++) s += centered[i] * centered[i + lag];
+      const c = s / denom;
+      if (c > maxCorr) maxCorr = c;
+    }
+    envRepetition = Math.max(0, Math.min(1, maxCorr));
+  }
 
-  // HF cutoff suspicion (AI cuts around 15-17kHz commonly)
-  let hfSuspicion = 0;
-  if (hfCutoff > 13500 && hfCutoff < 17500) hfSuspicion = 1 - Math.abs(hfCutoff - 15500) / 2000;
-  else hfSuspicion = 0;
-  aiSpec += hfSuspicion * 0.3;
-  humanSpec += (1 - hfSuspicion) * 0.3;
+  // ============== SCORING ==============
+  // Each marker votes [-1..+1]: positive = AI-like, negative = human-like.
 
-  // Stereo correlation — humans usually 0.4-0.9; AI often >0.95 or near mono
-  const stereoSus = stereoCorr > 0.95 ? (stereoCorr - 0.95) / 0.05 : stereoCorr < 0.2 ? (0.2 - stereoCorr) / 0.2 : 0;
-  aiSpec += stereoSus * 0.35;
-  humanSpec += (1 - stereoSus) * 0.35;
+  // Spectral markers
+  const flatStdM = flatnessStd < 0.04 ? 1 - flatnessStd / 0.04 : -Math.min(1, (flatnessStd - 0.04) / 0.1);
+  const hfCutoffM = hfCutoff > 13500 && hfCutoff < 17500
+    ? tent(hfCutoff, 15500, 2000)
+    : hfCutoff > 19000
+    ? -0.6
+    : 0;
+  const hfEnergyM = hfEnergyRatio < 0.005 ? 0.7 : hfEnergyRatio > 0.05 ? -0.5 : 0;
+  const stereoM = stereoCorr > 0.95 ? Math.min(1, (stereoCorr - 0.95) / 0.05) : stereoCorr > 0.4 && stereoCorr < 0.9 ? -0.7 : 0;
 
-  const hybridSpec = Math.max(0, 1 - Math.abs(aiSpec - humanSpec)) * 0.4 + Math.min(aiSpec, humanSpec) * 0.4;
-  const spectral = toProbBlock(humanSpec, hybridSpec, aiSpec);
+  const spectralAi = Math.max(0, flatStdM) * 0.3 + Math.max(0, hfCutoffM) * 0.3 + Math.max(0, hfEnergyM) * 0.15 + Math.max(0, stereoM) * 0.25;
+  const spectralHuman = Math.max(0, -flatStdM) * 0.3 + Math.max(0, -hfCutoffM) * 0.3 + Math.max(0, -hfEnergyM) * 0.15 + Math.max(0, -stereoM) * 0.25;
 
-  // TEMPORAL block
-  // AI signals: very regular onsets (low CV), low micro-dynamics,
-  // unnaturally consistent silence patterns.
-  let aiTemp = 0;
-  let humanTemp = 0;
+  // Temporal markers
+  const onsetM = onsets.length > 4 ? (onsetCv < 0.2 ? 1 - onsetCv / 0.2 : -Math.min(1, (onsetCv - 0.2) / 0.4)) : 0;
+  const microM = rmsMicro < 3 ? 1 - rmsMicro / 3 : -Math.min(1, (rmsMicro - 3) / 5);
+  const repM = envRepetition > 0.6 ? Math.min(1, (envRepetition - 0.6) / 0.3) : -Math.min(0.5, (0.6 - envRepetition) / 0.6);
+  const noiseM = noiseFloorDb < -70 ? Math.min(1, (-70 - noiseFloorDb) / 15) : -0.3;
 
-  // onset CV — humans ~0.3-0.7, AI often <0.2
-  const onsetNorm = Math.min(1, onsetCv / 0.5);
-  aiTemp += (1 - onsetNorm) * 0.4;
-  humanTemp += onsetNorm * 0.4;
+  const temporalAi = Math.max(0, onsetM) * 0.35 + Math.max(0, microM) * 0.3 + Math.max(0, repM) * 0.2 + Math.max(0, noiseM) * 0.15;
+  const temporalHuman = Math.max(0, -onsetM) * 0.35 + Math.max(0, -microM) * 0.3 + Math.max(0, -repM) * 0.2 + Math.max(0, -noiseM) * 0.15;
 
-  // micro-dynamics std (dB) — humans 4-10dB typical, AI often <3
-  const microNorm = Math.min(1, rmsMicro / 6);
-  aiTemp += (1 - microNorm) * 0.4;
-  humanTemp += microNorm * 0.4;
+  // Hybrid logit: peaks when spectral and temporal disagree (one says AI, the other human).
+  // Disagreement magnitude in [0..1]; we also require both signals to be non-trivial.
+  const specDelta = spectralAi - spectralHuman; // [-1..1]
+  const tempDelta = temporalAi - temporalHuman; // [-1..1]
+  const disagreement = Math.max(0, -specDelta * tempDelta); // > 0 only if opposite signs
+  const strength = (Math.abs(specDelta) + Math.abs(tempDelta)) / 2;
+  const hybridRaw = Math.min(1, disagreement * 4) * strength;
 
-  // silence ratio extremes
-  const silSus = silenceRatio < 0.005 || silenceRatio > 0.4 ? 0.6 : 0.2;
-  aiTemp += silSus * 0.2;
-  humanTemp += (1 - silSus) * 0.2;
+  // Build blocks. Hybrid inside each block is small unless both halves split.
+  const spectral = toProbBlock(spectralHuman, hybridRaw * 0.5, spectralAi);
+  const temporal = toProbBlock(temporalHuman, hybridRaw * 0.5, temporalAi);
 
-  const hybridTemp = Math.max(0, 1 - Math.abs(aiTemp - humanTemp)) * 0.4 + Math.min(aiTemp, humanTemp) * 0.4;
-  const temporal = toProbBlock(humanTemp, hybridTemp, aiTemp);
+  const overallHuman = (spectralHuman + temporalHuman) / 2;
+  const overallAi = (spectralAi + temporalAi) / 2;
+  const overall = toProbBlock(overallHuman, hybridRaw, overallAi);
 
-  // Overall blend
-  const overall = toProbBlock(
-    (spectral.human + temporal.human) / 2,
-    (spectral.hybrid + temporal.hybrid) / 2,
-    (spectral.ai + temporal.ai) / 2
-  );
+  // Hybrid mix estimation: only when hybrid is the dominant verdict
+  let hybridMix: { aiPct: number; humanPct: number } | null = null;
+  if (overall.hybrid >= 0.45 && overall.hybrid >= overall.human && overall.hybrid >= overall.ai) {
+    // Combine the two-sided AI/Human signal across both axes
+    const aiTotal = spectralAi + temporalAi;
+    const humanTotal = spectralHuman + temporalHuman;
+    const tot = aiTotal + humanTotal;
+    if (tot > 0.05) {
+      const aiPct = Math.round((aiTotal / tot) * 100);
+      hybridMix = { aiPct, humanPct: 100 - aiPct };
+    }
+  }
 
   return {
     durationSec: dur,
@@ -336,14 +355,18 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     spectral,
     temporal,
     overall,
+    hybridMix,
     features: {
       spectralFlatnessMean: flatnessMean,
       spectralFlatnessStd: flatnessStd,
       hfCutoffHz: hfCutoff,
+      hfEnergyRatio,
       stereoCorrelation: stereoCorr,
       onsetIntervalCv: onsetCv,
       rmsMicroDynamics: rmsMicro,
       silenceRatio,
+      envelopeRepetition: envRepetition,
+      noiseFloorDb,
     },
   };
 };
