@@ -32,6 +32,7 @@ import LangAwareRedirect from "./components/LangAwareRedirect";
 
 import LiveChat from "./components/LiveChat";
 import PageTracker from "./components/PageTracker";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
             <ConditionalLiveChat />
+          <ScrollToTop />
           <PageTracker />
           <Routes>
             <Route path="/" element={<LangLock lang="fr"><Index /></LangLock>} />
