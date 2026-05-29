@@ -1,65 +1,79 @@
-## Objectifs
+## Diagnostic
 
-1. **Verdicts plus tranchés** : ajuster la logique heuristique pour éviter les résultats type "46% / 29% / 24%" peu utiles.
-2. **Tooltips explicatifs** sur chaque mesure détaillée.
-3. **Retour accueil** = toujours scroll en haut, comme une 1ʳᵉ visite.
-4. **Estimation ratio IA/Humain** quand le verdict est Hybride.
+Le morceau 100% humain ressort en **79% hybride spectral** et **100% hybride global**. Trois bugs combinés dans `src/lib/aiSongCheck.ts` :
+
+**1. Formule du score hybride trop permissive**
+Actuellement :
+- Blocs spectral/temporel : `hybridRaw = 2·√(ai·human)`
+- Bloc global : `hybridRaw = 4·√(ai·human) · (1 − 0.6·|ai−human|)`
+
+Le `√` amplifie le moindre soupçon d'IA. Avec `human=0.5` et `ai=0.15`, on obtient déjà `hybrid=0.87` côté global → softmax à T=0.18 → 100% hybride. C'est cassé : un signal très asymétrique (humain >> IA) doit collapser vers « pur humain », pas vers « hybride ».
+
+**2. Marqueurs spectraux trop sensibles sur du rap/mix moderne**
+Sur un mix rap mastérisé moderne, plusieurs marqueurs « pro-IA » tirent en faux positif :
+- `stereoCorr > 0.9` (kick/basse centrés mono)
+- `hfCutoff ≈ 15–16 kHz` (limiteur de mastering)
+- `rolloff85` bas (mix bass-heavy)
+- `melCv` modérément bas (mastering serré)
+
+Cumulés, ils peuvent pousser `spec.ai` à 0.3–0.4 sur un titre humain → suffisant pour basculer hybride.
+
+**3. Softmax à T=0.18 trop tranchant**
+À cette température, dès qu'un score domine de 0.1, il rafle 95%+. Ça transforme un léger biais en verdict absolu.
 
 ---
 
-## 1. Précision des résultats — `src/lib/aiSongCheck.ts`
+## Corrections
 
-Le calcul actuel utilise une moyenne pondérée douce qui produit toujours 3 scores proches. On va le rendre plus décisif :
+### A. Nouvelle formule hybride (cœur du fix)
+Remplacer le `√` par `min` pénalisé par l'asymétrie. Hybride ne monte QUE quand les deux camps ont des preuves comparables :
 
-- **Ajouter de nouvelles features discriminantes** :
-  - Énergie au-dessus de 16 kHz (les modèles IA coupent net vers 15–17 kHz)
-  - Symétrie/régularité du spectrogramme moyen (uniformité temporelle)
-  - "Repetition score" : autocorrélation de l'enveloppe (Suno/Udio bouclent souvent des motifs trop réguliers)
-  - Détection de bruit de fond (plancher de bruit anormalement bas = IA)
-- **Pondération par "confiance"** : si plusieurs marqueurs forts pointent dans la même direction, amplifier le score (fonction sigmoïde / softmax avec température < 1) au lieu de la moyenne actuelle.
-- **Repenser le calcul du score hybride** : aujourd'hui c'est `1 - |ai - human|`, ce qui le pousse haut quand les deux sont proches → cause directe du "tout 30-40%". Le remplacer par une vraie détection : Hybride seulement quand le profil spectral est IA-like ET le profil temporel est humain-like (ou inversement). Sinon il reste bas.
-- **Normalisation finale via softmax à température basse (T ≈ 0.4)** : les 3 scores sont contrastés et un verdict ressort clairement.
-
-Résultat attendu : la majorité des morceaux retournent un score dominant > 60 %.
-
-## 2. Estimation du mix IA/Humain quand Hybride
-
-Ajouter dans `AISongCheckResult` :
-```ts
-hybridMix?: { aiPct: number; humanPct: number } | null;
+```
+hybridRaw = 2 · min(ai, human) · (1 − |ai − human|)²
 ```
 
-Calcul : uniquement si `overall.hybrid` est le score dominant (≥ 45 %) ET que les blocs spectral/temporel divergent fortement. On utilise la position relative des deux blocs (ex : spectre = 70 % IA, temporel = 65 % Humain → ratio ≈ 52 % IA / 48 % Humain). Sinon `null` et on n'affiche rien.
+Comportement :
+- `ai=0.15, hu=0.5` → `2·0.15·(0.65)² = 0.127` → faible ✓
+- `ai=0.4, hu=0.4` → `2·0.4·1 = 0.8` → fort ✓
+- `ai=0.5, hu=0.2` → `2·0.2·(0.7)² = 0.196` → faible ✓
+- `ai=0.3, hu=0.45` → `2·0.3·(0.85)² = 0.433` → modéré, OK pour vrai hybride
 
-Affichage dans le bloc "Verdict global" : petit encart `Estimation du mix : ~XX% IA / ~YY% humain` avec disclaimer "indicatif".
+Cette même formule sera utilisée dans les blocs spectral, temporel et overall (suppression de la branche spéciale `coexist`).
 
-## 3. Tooltips sur les mesures détaillées — `src/pages/AISongChecker.tsx`
+### B. Rebalance des marqueurs spectraux
+- **Poids `stereoCorr` : 0.9 → 0.5** (peu fiable sur productions modernes)
+- **Poids `hfCutoff` : 1.0 → 0.7** (le mastering coupe naturellement)
+- **Poids `rolloff85` : 0.6 → 0.4**
+- Recentrer `hfCutoff` : `vote(hfCutoff, 19500, 14500)` → `vote(hfCutoff, 18000, 14000)` (moins de pénalité à 16 kHz, qui est très courant en humain)
+- Recentrer `stereoCorr` : `vote(stereoCorr, 0.7, 0.97)` → `vote(stereoCorr, 0.55, 0.98)` (besoin d'être vraiment quasi-mono pour voter AI fort)
+- Recentrer `melCv` : `vote(melCv, 0.9, 0.35)` → `vote(melCv, 1.0, 0.25)` (un mastering serré ne suffit pas)
 
-Ajouter dans `STRINGS.fr/en` un champ `featureDescriptions` avec une phrase courte par mesure :
+### C. Suppression mutuelle plus douce dans l'élimination globale
+Constante `SUPPRESS` passée de **2.2 → 1.8** : on continue à éliminer mais on évite que `pureHuman` tombe à zéro dès qu'on voit 0.3 d'IA. Combinée à la nouvelle formule hybride asymétrique, ça suffit pour que `pureHuman` reste vainqueur sur les vrais humains.
 
-- **Planéité spectrale moy.** : à quel point le spectre est "bruité/plat" vs tonal. Élevée = bruit, basse = musical.
-- **Variance de planéité** : à quel point la texture spectrale varie au fil du temps. Faible variance = signal très uniforme (typique IA).
-- **Coupure HF** : fréquence où l'énergie haute disparaît. ~15–17 kHz = coupure typique des générateurs IA.
-- **Corrélation stéréo** : similarité gauche/droite. > 0.95 = quasi-mono (souvent IA), 0.4–0.9 = stéréo naturelle.
-- **CV inter-transitoires** : régularité des frappes/attaques. Bas = trop métronomique (IA), 0.3–0.7 = humain.
-- **Micro-dynamique RMS** : variations de volume sur 50 ms. < 3 dB = très compressé/lissé (IA).
-- **Ratio de silence** : proportion de silence dans le morceau. Valeurs extrêmes = suspect.
+### D. Softmax un peu moins agressif sur le global
+Température overall : **0.18 → 0.24**. Toujours tranché (un leader à +0.2 reste >70%) mais plus de saut binaire 0%/100%.
 
-Implémentation : un petit `<Tooltip>` (shadcn) avec icône `Info` à côté de chaque label, ou un `<HoverCard>` pour avoir plus de place sur desktop + accessibilité tactile mobile (clic ouvre/ferme).
+---
 
-## 4. Retour accueil scroll top
+## Résultat attendu
 
-Deux endroits concernés :
-- `src/pages/AISongChecker.tsx` ligne 332 : le `Link to="/"` doit déclencher `window.scrollTo(0, 0)` après navigation.
-- Plus globalement : vérifier que `App.tsx` n'a pas déjà un ScrollToTop. Si non, ajouter un composant `ScrollToTop` monté dans le Router qui fait `window.scrollTo({ top: 0, behavior: 'instant' })` à chaque changement de pathname. Cela couvre aussi tous les autres "retour accueil" du site.
+Sur le morceau « Lil Moine » 100% humain :
+- Marqueurs temporels sains (onset CV, micro-dynamique, breath ratio) → `temp.human` fort, `temp.ai` faible
+- Marqueurs spectraux mitigés (mastering) → `spec.human` modéré, `spec.ai` modéré
+- Asymétrie globale `human > ai` → hybride pénalisé par `(1 − |Δ|)²`
+- Verdict global attendu : **Humain probable / très probable (~60-75%)**, hybride < 25%, IA < 10%
+
+Sur les vrais hybrides (LofAI), le ratio `ai ≈ human` reste élevé → hybride continue de gagner, mix affiché normalement.
 
 ---
 
 ## Fichiers modifiés
-- `src/lib/aiSongCheck.ts` — refactor scoring + features
-- `src/pages/AISongChecker.tsx` — tooltips, affichage mix hybride, scroll top
-- `src/App.tsx` — composant ScrollToTop global (si absent)
-- `src/components/ui/tooltip.tsx` — déjà présent, juste à importer
 
-## Note honnête sur les limites
-L'analyse reste heuristique (pas un modèle ML entraîné). On peut rendre les verdicts plus tranchés et ajouter des features, mais aucune méthode locale gratuite n'égalera SubmitHub (qui utilise probablement un modèle entraîné). On garde le disclaimer "Beta — heuristique".
+- `src/lib/aiSongCheck.ts` — nouvelle formule hybride, poids/centres recalibrés, `SUPPRESS=1.8`, T=0.24
+
+Aucun changement UI nécessaire.
+
+## Note honnête
+
+L'analyse reste un calcul de signal sans modèle entraîné. Les ajustements ci-dessus corrigent le faux positif sur du rap mastérisé, mais un morceau électronique très carré ou un mix très limité en bande passante peut toujours flirter avec « hybride ». Le disclaimer Beta couvre déjà ce cas.
