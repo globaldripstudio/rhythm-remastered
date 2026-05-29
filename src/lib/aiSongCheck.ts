@@ -527,15 +527,17 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const aiE = spec.ai * 0.45 + temp.ai * 0.55;
   const huE = spec.human * 0.45 + temp.human * 0.55;
 
+  // Hybrid score: requires BOTH sides high AND close. Steeper diff penalty
+  // and lower multiplier so a clearly dominant side wins decisively.
   const hybridScore = (a: number, h: number) => {
     const m = Math.min(a, h);
     const diff = Math.abs(a - h);
-    return 2 * m * Math.pow(Math.max(0, 1 - diff), 2);
+    return 1.4 * m * Math.pow(Math.max(0, 1 - diff), 3);
   };
 
-  const SUPPRESS = 1.8;
-  const pureHumanRaw = Math.pow(huE, 1.1) * clamp01(1 - aiE * SUPPRESS);
-  const pureAiRaw = Math.pow(aiE, 1.1) * clamp01(1 - huE * SUPPRESS);
+  const SUPPRESS = 1.6;
+  const pureHumanRaw = Math.pow(huE, 1.05) * clamp01(1 - aiE * SUPPRESS);
+  const pureAiRaw = Math.pow(aiE, 1.05) * clamp01(1 - huE * SUPPRESS);
   const hybridRaw = hybridScore(aiE, huE);
 
   // Top markers: rank by |vote| * weight.
