@@ -425,30 +425,38 @@ const AISongChecker = () => {
               <Block title={L.temporal} icon={Activity} block={result.temporal} L={L} />
               <Block title={L.overall} icon={Sparkles} block={result.overall} L={L} />
 
-              {result.hybridMix && (
-                <Card className="border-primary/30 bg-primary/5">
-                  <CardContent className="p-5">
-                    <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary">
-                      <Sparkles className="h-4 w-4" /> {L.mixTitle}
-                    </div>
-                    <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted/40">
-                      <div
-                        className="h-full bg-gradient-to-r from-red-400 to-orange-400"
-                        style={{ width: `${result.hybridMix.aiPct}%` }}
-                      />
-                      <div
-                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-300"
-                        style={{ width: `${result.hybridMix.humanPct}%` }}
-                      />
-                    </div>
-                    <div className="mt-2 flex justify-between text-xs">
-                      <span className="text-orange-400">~{result.hybridMix.aiPct}% {L.mixAi}</span>
-                      <span className="text-emerald-400">~{result.hybridMix.humanPct}% {L.mixHuman}</span>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">{L.mixHelp}</p>
-                  </CardContent>
-                </Card>
-              )}
+              {(() => {
+                const c = result.confidence;
+                const Icon = c === "high" ? ShieldCheck : c === "medium" ? ShieldQuestion : ShieldAlert;
+                const tone =
+                  c === "high"
+                    ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-300"
+                    : c === "medium"
+                    ? "border-amber-500/30 bg-amber-500/5 text-amber-300"
+                    : "border-red-500/30 bg-red-500/5 text-red-300";
+                return (
+                  <Card className={`${tone}`}>
+                    <CardContent className="p-5">
+                      <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                        <Icon className="h-4 w-4" />
+                        {L.confidenceTitle} : {L.confidence[c]}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{L.confidenceHelp[c]}</p>
+                      {result.qualityIssues.length > 0 && (
+                        <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+                          {result.qualityIssues.map((q) => (
+                            <li key={q} className="flex items-start gap-2">
+                              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
+                              <span>{L.qualityIssues[q]}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
+
 
               <Card className="border-border/60">
                 <CardContent className="p-5">
