@@ -101,7 +101,7 @@ const STRINGS = {
     error: "Error analyzing file.",
     disclaimerTitle: "Method & limits",
     disclaimer:
-      "This tool runs a local heuristic combining 10 acoustic markers (spectral flatness, HF energy, HF cutoff, stereo correlation, transient regularity, micro-dynamics, noise floor, envelope repetition…). Scores are sharpened via softmax for a decisive verdict, but this is NOT a trained classifier. Very clean masters, rigid electronic tracks, or mono recordings can yield false positives.",
+      "Analysis combines 16 acoustic markers (spectral flatness, phase coherence, HF cutoff, stereo correlation, mel-band variation, transient regularity, micro-dynamics, noise floor, envelope repetition, decay tails, breath presence…). The verdict is reached by elimination: if obvious traces of real recording are detected, the « pure AI » option is ruled out (and vice-versa). This is NOT a trained AI model: very clean masters, rigid electronic productions or mono recordings can produce false positives.",
     detailsTitle: "Detailed measurements",
     mixTitle: "Estimated mix (indicative)",
     mixAi: "AI",
