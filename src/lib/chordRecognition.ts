@@ -525,7 +525,7 @@ const predictiveTieBreak = (
   prevDegree: string | null,
   tonicPc: number,
   mode: "major" | "minor",
-): ChordScore => {
+): ChordScore | undefined => {
   const top = candidates[0];
   if (!top || !prevDegree || candidates.length < 2) return top;
   const second = candidates[1];
@@ -730,6 +730,7 @@ export const detectChords = (
   // locking a whole bar onto a wrong chord.
   const bars: ChordHit[] = [];
   const diagnostics: ChordBarDiagnostic[] = [];
+  let prevDegree: string | null = null;
   const shouldLogDiagnostics = typeof window !== "undefined"
     && window.localStorage.getItem("chordGridDebug") === "1";
 
@@ -759,7 +760,7 @@ export const detectChords = (
       const k = `${h.root}:${triadKeyFor(h.quality)}`;
       beatVote.set(k, (beatVote.get(k) ?? 0) + 1);
     }
-    let chosen = filteredBar[0];
+    let chosen = predictiveTieBreak(filteredBar, prevDegree, tonicPc, mode);
     if (chosen && filteredBar.length > 1) {
       const top = chosen.score;
       for (let i = 1; i < Math.min(3, filteredBar.length); i += 1) {
@@ -773,6 +774,7 @@ export const detectChords = (
     if (!chosen) continue;
 
     const chosenTriad = chosen;
+    prevDegree = degreeToken(chosenTriad.template.rootPc, chosenTriad.template.quality.key, tonicPc);
     // Add 7ths only after the bar triad is chosen and only if strongly present.
     chosen = upgradeSeventh(barChroma, barBass, chosenTriad);
     const tpl = chosen.template;
