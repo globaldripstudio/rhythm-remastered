@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Music, Sparkles, ChevronsRight, Play, Pencil, Download, KeyRound } from "lucide-react";
+import { Music, Sparkles, ChevronsRight, Play, Pencil, Download, KeyRound, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import {
   buildPianoVoicing,
-  chordPitchClasses,
   symbolSuffixFor,
   type ChordGridResult,
   type ChordHit,
@@ -54,64 +53,10 @@ const confidenceDots = (conf: number) => {
   return "●○○";
 };
 
-// Inline mini-piano (2 octaves, C3..B4) highlighting the chord's pitch classes.
-const MiniPiano = ({ pcs }: { pcs: Set<number> }) => {
-  const whiteOffs = [0, 2, 4, 5, 7, 9, 11];
-  const blackOffs = [1, 3, 6, 8, 10];
-  const blackAfter = [0, 1, 3, 4, 5];
-  const octaves = 2;
-  const whiteCount = octaves * 7;
-  return (
-    <div className="relative h-10 w-full">
-      <div className="absolute inset-0 flex">
-        {Array.from({ length: whiteCount }).map((_, i) => {
-          const o = Math.floor(i / 7);
-          const idx = i % 7;
-          const pc = (whiteOffs[idx]) % 12;
-          const on = pcs.has(pc);
-          return (
-            <div
-              key={`w-${i}`}
-              className={cn(
-                "h-full flex-1 border-r border-border/60 last:border-r-0 rounded-b-sm",
-                on ? "bg-primary/60" : "bg-background",
-              )}
-              style={{ marginLeft: 0 }}
-            />
-          );
-        })}
-      </div>
-      <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: octaves }).map((_, o) =>
-          blackOffs.map((off, bi) => {
-            const pc = off % 12;
-            const on = pcs.has(pc);
-            const whiteIndex = o * 7 + blackAfter[bi];
-            const whiteWidth = 100 / whiteCount;
-            const blackWidth = whiteWidth * 0.62;
-            const left = whiteWidth * (whiteIndex + 1) - blackWidth / 2;
-            return (
-              <div
-                key={`b-${o}-${bi}`}
-                className={cn(
-                  "absolute top-0 h-[62%] rounded-b-sm border border-border/80",
-                  on ? "bg-secondary" : "bg-foreground/85",
-                )}
-                style={{ left: `${left}%`, width: `${blackWidth}%` }}
-              />
-            );
-          }),
-        )}
-      </div>
-    </div>
-  );
-};
-
 const ChordTile = ({
   chord,
   label,
   showExtensions,
-  showVoicings,
   compact,
   isPlaying,
   onPlay,
@@ -120,14 +65,12 @@ const ChordTile = ({
   chord: ChordHit;
   label?: string;
   showExtensions: boolean;
-  showVoicings: boolean;
   compact?: boolean;
   isPlaying: boolean;
   onPlay: () => void;
   onEdit?: () => void;
 }) => {
   const fnClass = chord.fn ? FN_STYLE[chord.fn] : "bg-muted/20 text-muted-foreground border-border/40";
-  const pcs = useMemo(() => chordPitchClasses(chord, showExtensions), [chord, showExtensions]);
   return (
     <button
       type="button"
@@ -173,11 +116,6 @@ const ChordTile = ({
       >
         {confidenceDots(chord.confidence)}
       </span>
-      {showVoicings && (
-        <div className="mt-1.5 w-full">
-          <MiniPiano pcs={pcs} />
-        </div>
-      )}
       <Play className={cn("absolute bottom-1 right-1 h-3 w-3 text-muted-foreground/40 group-hover:text-primary", isPlaying && "text-primary")} />
     </button>
   );
@@ -226,7 +164,6 @@ export default function ChordGrid({ data }: Props) {
   const { t } = useTranslation();
   const [resolution, setResolution] = useState<"bar" | "beat">("bar");
   const [showExtensions, setShowExtensions] = useState(false);
-  const [showVoicings, setShowVoicings] = useState(true);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [edits, setEdits] = useState<Map<number, ChordHit>>(new Map());
   const [editingBar, setEditingBar] = useState<number | null>(null);
@@ -327,10 +264,6 @@ export default function ChordGrid({ data }: Props) {
             </Button>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
-            <Switch checked={showVoicings} onCheckedChange={setShowVoicings} />
-            <span className="inline-flex items-center gap-1">Voicing piano</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
             <Switch checked={showExtensions} onCheckedChange={setShowExtensions} />
             <span className="inline-flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
@@ -363,14 +296,31 @@ export default function ChordGrid({ data }: Props) {
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-        <span className="uppercase tracking-wide">{t("keybpm.chords.legend", { defaultValue: "Fonctions" })} :</span>
+        <span className="uppercase tracking-wide">Fonctions :</span>
         <span className="inline-flex items-center gap-1"><span className="rounded border border-primary/40 bg-primary/15 px-1 text-[10px] text-primary">T</span> Tonique</span>
         <span className="inline-flex items-center gap-1"><span className="rounded border border-secondary/40 bg-secondary/20 px-1 text-[10px] text-secondary">S</span> Sous-dominante</span>
         <span className="inline-flex items-center gap-1"><span className="rounded border border-destructive/40 bg-destructive/15 px-1 text-[10px] text-destructive">D</span> Dominante</span>
         <span className="ml-auto font-mono text-[10px]">
-          {t("keybpm.chords.confLegend", { defaultValue: "Confiance" })} : ●●● {t("keybpm.confidence.high")} · ●●○ {t("keybpm.confidence.medium")} · ●○○ {t("keybpm.confidence.low")}
+          Confiance : ●●● {t("keybpm.confidence.high")} · ●●○ {t("keybpm.confidence.medium")} · ●○○ {t("keybpm.confidence.low")}
         </span>
       </div>
+
+      {/* Symbols legend */}
+      <details className="rounded-md border border-border bg-background/40 p-3 text-[11px] text-muted-foreground">
+        <summary className="cursor-pointer font-semibold text-foreground inline-flex items-center gap-1.5">
+          <Info className="h-3.5 w-3.5 text-primary" /> Que veulent dire les symboles ?
+        </summary>
+        <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
+          <div><span className="font-mono text-foreground">C</span> = accord majeur · <span className="font-mono text-foreground">Cm</span> = mineur</div>
+          <div><span className="font-mono text-foreground">Cmaj7</span> = septième majeure (couleur jazz/lounge)</div>
+          <div><span className="font-mono text-foreground">C7</span> = septième de dominante · <span className="font-mono text-foreground">Cm7</span> = mineur 7</div>
+          <div><span className="font-mono text-foreground">Csus4</span> = quarte suspendue (tension non résolue)</div>
+          <div><span className="font-mono text-foreground">C°</span> = diminué (rare hors classique/jazz)</div>
+          <div><span className="font-mono text-foreground">C°7</span> = septième diminuée (très tendu, accord de passage)</div>
+          <div><span className="font-mono text-foreground">Cø</span> = demi-diminué / m7b5 (couleur jazz, typique du <em>ii</em> en mineur)</div>
+          <div><span className="font-mono text-foreground">C/E</span> = accord de C avec E à la basse (renversement)</div>
+        </div>
+      </details>
 
       {/* Grid */}
       <div className="space-y-3">
@@ -392,7 +342,6 @@ export default function ChordGrid({ data }: Props) {
                               chord={c}
                               label={`M${barIdx + 1}`}
                               showExtensions={showExtensions}
-                              showVoicings={showVoicings}
                               isPlaying={playingKey === key}
                               onPlay={() => playChordHit(c, key)}
                               onEdit={() => setEditingBar(barIdx)}
@@ -426,7 +375,6 @@ export default function ChordGrid({ data }: Props) {
                         chord={c}
                         label={ci % data.beatsPerBar === 0 ? `M${Math.floor((ri * row.length + ci) / data.beatsPerBar) + 1}` : undefined}
                         showExtensions={showExtensions}
-                        showVoicings={false}
                         compact
                         isPlaying={playingKey === key}
                         onPlay={() => playChordHit(c, key)}

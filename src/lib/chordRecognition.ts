@@ -24,6 +24,7 @@
  */
 
 import { FFT } from "./audioAnalysis";
+import { transitionLogProb } from "./musicTheory/chords";
 
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 export type NoteName = typeof NOTE_NAMES[number];
@@ -377,6 +378,97 @@ const refineSeventh = (
   return best;
 };
 
+// ---------------- Quality filtering, diatonic prior, degree mapping ----------------
+
+const DEFAULT_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
+  "maj", "min", "maj7", "m7", "7", "sus4",
+]);
+const EXOTIC_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
+  "dim", "aug", "m7b5", "dim7",
+]);
+
+/**
+ * Hard gating to allow an exotic quality: every chord tone must be clearly
+ * present in the chroma (>= 0.7 × triad average) AND the candidate must beat
+ * the best non-exotic candidate by a margin >= 0.08.
+ */
+const exoticPasses = (
+  chroma: Float32Array,
+  tpl: ChordTemplate,
+  exoticScore: number,
+  bestNonExoticScore: number,
+): boolean => {
+  const pcs = tpl.quality.intervals.map((iv) => (tpl.rootPc + iv) % 12);
+  let avg = 0;
+  for (const pc of pcs) avg += chroma[pc];
+  avg /= pcs.length;
+  if (avg <= 0) return false;
+  for (const pc of pcs) {
+    if (chroma[pc] < 0.7 * avg) return false;
+  }
+  return exoticScore - bestNonExoticScore >= 0.08;
+};
+
+// Expected qualities per scale degree (offset in semitones from tonic).
+// sus4 is treated as neutral (no bonus / no malus).
+const DIATONIC_MAJOR: Record<number, ChordQualityKey[]> = {
+  0:  ["maj", "maj7"],
+  2:  ["min", "m7"],
+  4:  ["min", "m7"],
+  5:  ["maj", "maj7"],
+  7:  ["maj", "7"],
+  9:  ["min", "m7"],
+  11: ["dim", "m7b5"],
+};
+const DIATONIC_MINOR: Record<number, ChordQualityKey[]> = {
+  0:  ["min", "m7"],
+  2:  ["dim", "m7b5"],
+  3:  ["maj", "maj7"],
+  5:  ["min", "m7"],
+  7:  ["min", "m7", "maj", "7"], // v naturel ou V harmonique
+  8:  ["maj", "maj7"],
+  10: ["maj", "maj7"],
+};
+
+const DIATONIC_BONUS = 0.06;
+const NON_DIATONIC_EXOTIC_MALUS = 0.04;
+
+const diatonicBonus = (
+  rootPc: number,
+  quality: ChordQualityKey,
+  tonicPc: number,
+  mode: "major" | "minor",
+): number => {
+  if (quality === "sus4") return 0;
+  const offset = ((rootPc - tonicPc) % 12 + 12) % 12;
+  const expected = (mode === "major" ? DIATONIC_MAJOR : DIATONIC_MINOR)[offset];
+  if (expected && expected.includes(quality)) return DIATONIC_BONUS;
+  if (EXOTIC_QUALITIES.has(quality)) return -NON_DIATONIC_EXOTIC_MALUS;
+  return 0;
+};
+
+/** Roman-numeral token (normalisé, sans suffixe d'extension) pour le prior de transition. */
+const degreeToken = (
+  rootPc: number,
+  quality: ChordQualityKey,
+  tonicPc: number,
+  mode: "major" | "minor",
+): string => {
+  const semis = ((rootPc - tonicPc) % 12 + 12) % 12;
+  let base: string = NUMERAL_BY_SEMITONE[semis];
+  let prefix = "";
+  if (base.startsWith("b") || base.startsWith("#")) {
+    prefix = base[0];
+    base = base.slice(1);
+  }
+  const qDef = QUALITIES.find((x) => x.key === quality)!;
+  if (qDef.minorCase) base = base.toLowerCase();
+  let suffix = "";
+  if (quality === "dim" || quality === "dim7") suffix = "°";
+  return prefix + base + suffix;
+};
+
+
 // ---------------- Inversion detection ----------------
 
 const detectBass = (
@@ -479,7 +571,7 @@ export const detectChords = (
     maxBars * beatsPerBar,
   );
 
-  // First pass: per-beat ranking
+  // First pass: per-beat ranking with quality filtering + diatonic prior
   interface BeatRanked {
     chroma: Float32Array;
     bass: Float32Array;
@@ -491,31 +583,107 @@ export const detectChords = (
     const fEnd = Math.floor(((b + 1) * beatDurationSec) / hopSec);
     const chroma = sumChromas(chromas, fStart, fEnd);
     const bass = sumChromas(bassChromas, fStart, fEnd);
-    const ranking = rankTemplates(chroma, bass).slice(0, 6);
-    beatRanks.push({ chroma, bass, ranking });
+    const raw = rankTemplates(chroma, bass);
+
+    // Best non-exotic score (for exotic gating)
+    let bestNonExoticScore = -Infinity;
+    for (const r of raw) {
+      if (DEFAULT_QUALITIES.has(r.template.quality.key)) {
+        if (r.score > bestNonExoticScore) bestNonExoticScore = r.score;
+      }
+    }
+
+    // Filter exotic qualities unless they pass hard gating
+    const filtered: ChordScore[] = [];
+    for (const r of raw) {
+      const qk = r.template.quality.key;
+      if (DEFAULT_QUALITIES.has(qk)) {
+        filtered.push(r);
+      } else if (EXOTIC_QUALITIES.has(qk)) {
+        if (exoticPasses(chroma, r.template, r.score, bestNonExoticScore)) {
+          filtered.push(r);
+        }
+      }
+    }
+
+    // Apply diatonic bonus / non-diatonic exotic malus
+    for (const r of filtered) {
+      r.score += diatonicBonus(r.template.rootPc, r.template.quality.key, tonicPc, mode);
+    }
+    filtered.sort((a, b2) => b2.score - a.score);
+
+    beatRanks.push({ chroma, bass, ranking: filtered.slice(0, 6) });
   }
 
-  // Viterbi-lite: transition penalty discourages random chord flicker.
-  const TRANS_PENALTY = 0.08;
+  // Viterbi (1st order) over top-K candidates per beat, combining:
+  //  - acoustic score (already includes diatonic bonus)
+  //  - functional transition log-prob (Markov prior — same grammar as the guided builder)
+  //  - small penalty for changing chord (smoothness)
+  // The transition weight γ is attenuated when acoustic confidence is high.
+  const TRANS_PENALTY = 0.12;
+  const GAMMA_BASE = 0.5;
   const winners: ChordScore[] = [];
-  for (let b = 0; b < beatRanks.length; b += 1) {
-    const cand = beatRanks[b].ranking;
-    let pick = cand[0];
-    if (b > 0) {
-      const prevSym = `${winners[b - 1].template.rootPc}:${winners[b - 1].template.quality.key}`;
-      let bestAdj = -Infinity;
-      let bestIdx = 0;
-      cand.forEach((c, i) => {
-        const sym = `${c.template.rootPc}:${c.template.quality.key}`;
-        const adj = c.score - (sym === prevSym ? 0 : TRANS_PENALTY);
-        if (adj > bestAdj) { bestAdj = adj; bestIdx = i; }
-      });
-      pick = cand[bestIdx];
+  if (beatRanks.length > 0) {
+    const K = beatRanks[0].ranking.length;
+    // dp[b][i] = best cumulative score ending at beat b on candidate i
+    const dp: number[][] = [];
+    const bp: number[][] = []; // back-pointer
+    // Initialise beat 0
+    dp.push(beatRanks[0].ranking.map((c) => c.score));
+    bp.push(beatRanks[0].ranking.map(() => -1));
+
+    for (let b = 1; b < beatRanks.length; b += 1) {
+      const cur = beatRanks[b].ranking;
+      const prev = beatRanks[b - 1].ranking;
+      // Acoustic margin estimate from previous beat — used to soften γ when signal is clean
+      const prevBest = Math.max(0, prev[0]?.score ?? 0);
+      const prevSecond = Math.max(0, prev[1]?.score ?? 0);
+      const marginPrev = prevBest > 0 ? (prevBest - prevSecond) / (prevBest + 1e-3) : 0;
+      const gamma = GAMMA_BASE * (1 - Math.min(1, Math.max(0, marginPrev)));
+
+      const row: number[] = new Array(cur.length).fill(-Infinity);
+      const back: number[] = new Array(cur.length).fill(0);
+      for (let i = 0; i < cur.length; i += 1) {
+        const ci = cur[i];
+        const nextTok = degreeToken(ci.template.rootPc, ci.template.quality.key, tonicPc, mode);
+        let bestVal = -Infinity;
+        let bestJ = 0;
+        for (let j = 0; j < prev.length; j += 1) {
+          const pj = prev[j];
+          const prevTok = degreeToken(pj.template.rootPc, pj.template.quality.key, tonicPc, mode);
+          const same = pj.template.rootPc === ci.template.rootPc
+            && pj.template.quality.key === ci.template.quality.key;
+          const trans = same ? 0 : -TRANS_PENALTY;
+          const prior = gamma * transitionLogProb(prevTok, nextTok, mode);
+          const v = dp[b - 1][j] + ci.score + trans + prior;
+          if (v > bestVal) { bestVal = v; bestJ = j; }
+        }
+        row[i] = bestVal;
+        back[i] = bestJ;
+      }
+      dp.push(row);
+      bp.push(back);
     }
-    // Stricter 7th gating
-    pick = refineSeventh(beatRanks[b].chroma, beatRanks[b].bass, pick);
-    winners.push(pick);
+
+    // Backtrack
+    let lastIdx = 0;
+    let lastBest = -Infinity;
+    const lastRow = dp[dp.length - 1];
+    for (let i = 0; i < lastRow.length; i += 1) {
+      if (lastRow[i] > lastBest) { lastBest = lastRow[i]; lastIdx = i; }
+    }
+    const path: number[] = new Array(beatRanks.length).fill(0);
+    path[path.length - 1] = lastIdx;
+    for (let b = beatRanks.length - 1; b > 0; b -= 1) {
+      path[b - 1] = bp[b][path[b]];
+    }
+    for (let b = 0; b < beatRanks.length; b += 1) {
+      let pick = beatRanks[b].ranking[path[b]];
+      pick = refineSeventh(beatRanks[b].chroma, beatRanks[b].bass, pick);
+      winners.push(pick);
+    }
   }
+
 
   const beats: ChordHit[] = winners.map((w, b) => {
     const { chroma, bass, ranking } = beatRanks[b];
