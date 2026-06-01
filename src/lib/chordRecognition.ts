@@ -617,72 +617,17 @@ export const detectChords = (
     beatRanks.push({ chroma, bass, ranking: filtered.slice(0, 6) });
   }
 
-  // Viterbi (1st order) — smoothing only, never chord-locking.
-  //  - Transition penalty is tiny.
-  //  - Markov prior γ is small AND gated: only kicks in when the acoustic margin
-  //    is very small (ambiguous beat). On clear beats acoustics decide alone.
-  //  - The prior contribution is clamped so it can never override a clearly better candidate.
-  const TRANS_PENALTY = 0.02;
-  const GAMMA_MAX = 0.15;
+  // Beats: no Viterbi, no Markov prior, no transition penalty.
+  // Each beat is scored independently from its own chroma. Beats are used
+  // only for display / confirmation — bars (below) decide the actual grid.
   const winners: ChordScore[] = [];
-  if (beatRanks.length > 0) {
-    const dp: number[][] = [];
-    const bp: number[][] = [];
-    dp.push(beatRanks[0].ranking.map((c) => c.score));
-    bp.push(beatRanks[0].ranking.map(() => -1));
-
-    for (let b = 1; b < beatRanks.length; b += 1) {
-      const cur = beatRanks[b].ranking;
-      const prev = beatRanks[b - 1].ranking;
-      // Acoustic margin for CURRENT beat: small margin => more weight to prior.
-      const curBest = Math.max(0, cur[0]?.score ?? 0);
-      const curSecond = Math.max(0, cur[1]?.score ?? 0);
-      const marginCur = curBest > 0 ? (curBest - curSecond) / (curBest + 1e-3) : 0;
-      const gamma = GAMMA_MAX * Math.max(0, 1 - marginCur / 0.15);
-
-      const row: number[] = new Array(cur.length).fill(-Infinity);
-      const back: number[] = new Array(cur.length).fill(0);
-      for (let i = 0; i < cur.length; i += 1) {
-        const ci = cur[i];
-        const nextTok = degreeToken(ci.template.rootPc, ci.template.quality.key, tonicPc, mode);
-        let bestVal = -Infinity;
-        let bestJ = 0;
-        for (let j = 0; j < prev.length; j += 1) {
-          const pj = prev[j];
-          const prevTok = degreeToken(pj.template.rootPc, pj.template.quality.key, tonicPc, mode);
-          const same = pj.template.rootPc === ci.template.rootPc
-            && pj.template.quality.key === ci.template.quality.key;
-          const trans = same ? 0 : -TRANS_PENALTY;
-          // Bounded prior contribution.
-          const rawPrior = transitionLogProb(prevTok, nextTok, mode);
-          const prior = gamma * Math.max(-2, Math.min(0, rawPrior));
-          const v = dp[b - 1][j] + ci.score + trans + prior;
-          if (v > bestVal) { bestVal = v; bestJ = j; }
-        }
-        row[i] = bestVal;
-        back[i] = bestJ;
-      }
-      dp.push(row);
-      bp.push(back);
-    }
-
-    let lastIdx = 0;
-    let lastBest = -Infinity;
-    const lastRow = dp[dp.length - 1];
-    for (let i = 0; i < lastRow.length; i += 1) {
-      if (lastRow[i] > lastBest) { lastBest = lastRow[i]; lastIdx = i; }
-    }
-    const path: number[] = new Array(beatRanks.length).fill(0);
-    path[path.length - 1] = lastIdx;
-    for (let b = beatRanks.length - 1; b > 0; b -= 1) {
-      path[b - 1] = bp[b][path[b]];
-    }
-    for (let b = 0; b < beatRanks.length; b += 1) {
-      let pick = beatRanks[b].ranking[path[b]];
-      pick = refineSeventh(beatRanks[b].chroma, beatRanks[b].bass, pick);
-      winners.push(pick);
-    }
+  for (let b = 0; b < beatRanks.length; b += 1) {
+    const top = beatRanks[b].ranking[0];
+    if (!top) continue;
+    const refined = refineSeventh(beatRanks[b].chroma, beatRanks[b].bass, top);
+    winners.push(refined);
   }
+
 
 
   const beats: ChordHit[] = winners.map((w, b) => {
