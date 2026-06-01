@@ -377,6 +377,31 @@ const detectExtensions = (
   return out;
 };
 
+// ---------------- Tunable thresholds (kept in one place on purpose) ----------------
+// All thresholds the engine relies on. Tweak here, not deep inside loops.
+const TH = {
+  /** Bar acoustic margin below this → confidence capped low, bar flagged ambiguous. */
+  ambiguousMargin: 0.04,
+  /** Bar acoustic margin below this → confidence capped to medium. */
+  lowConfidenceMargin: 0.06,
+  /** Predictive prior only fires when the acoustic margin is under this. */
+  predictiveMargin: 0.08,
+  /** Weight of the predictive prior in the tie-break (intentionally tiny). */
+  predictivePriorWeight: 0.025,
+  /** Minor-7th gating ratio on a triad-classified MAJ chord (dominant 7). */
+  seventhOnMajThresh: 0.92,
+  /** Minor-7th gating ratio on a triad-classified MIN chord. */
+  seventhOnMinThresh: 0.82,
+  /** Major-7th gating ratio on a triad-classified MAJ chord. */
+  maj7Thresh: 0.88,
+  /** Minimum confidence to allow fusing two consecutive bars into one segment. */
+  mergeMinConfidence: 0.45,
+  /** Beats vote agreement below this → bar flagged ambiguous. */
+  ambiguousAgreement: 0.4,
+  /** Distinct triads across beats of one bar above this → bar flagged unstable. */
+  unstableTriadCount: 2,
+} as const;
+
 // ---------------- Stricter 7th gating ----------------
 
 const tplFor = (rootPc: number, key: ChordQualityKey): ChordTemplate => {
