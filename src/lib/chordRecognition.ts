@@ -21,6 +21,7 @@
  */
 
 import { FFT } from "./audioAnalysis";
+import { transitionLogProb } from "./musicTheory/chords";
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 export type NoteName = typeof NOTE_NAMES[number];
 
@@ -499,6 +500,52 @@ const diatonicBonus = (
   if (expected && expected.includes(quality)) return DIATONIC_BONUS;
   if (EXOTIC_QUALITIES.has(quality)) return -NON_DIATONIC_EXOTIC_MALUS;
   return 0;
+};
+
+const degreeToken = (
+  rootPc: number,
+  quality: ChordQualityKey,
+  tonicPc: number,
+): string => {
+  const semis = ((rootPc - tonicPc) % 12 + 12) % 12;
+  let base: string = NUMERAL_BY_SEMITONE[semis];
+  let prefix = "";
+  if (base.startsWith("b") || base.startsWith("#")) {
+    prefix = base[0];
+    base = base.slice(1);
+  }
+  const qDef = QUALITIES.find((x) => x.key === quality)!;
+  if (qDef.minorCase) base = base.toLowerCase();
+  if (quality === "dim" || quality === "dim7") return `${prefix}${base}°`;
+  return prefix + base;
+};
+
+const predictiveTieBreak = (
+  candidates: ChordScore[],
+  prevDegree: string | null,
+  tonicPc: number,
+  mode: "major" | "minor",
+): ChordScore => {
+  const top = candidates[0];
+  if (!top || !prevDegree || candidates.length < 2) return top;
+  const second = candidates[1];
+  const topAbs = Math.abs(top.score) + 1e-3;
+  const margin = (top.score - second.score) / topAbs;
+  if (margin > 0.08) return top;
+
+  const plausible = candidates.slice(0, 5).filter((cand) => (top.score - cand.score) / topAbs <= 0.08);
+  let chosen = top;
+  let best = -Infinity;
+  for (const cand of plausible) {
+    const deg = degreeToken(cand.template.rootPc, cand.template.quality.key, tonicPc);
+    const prior = Math.max(-1.2, Math.min(0, transitionLogProb(prevDegree, deg, mode)));
+    const score = cand.score + 0.025 * prior;
+    if (score > best) {
+      best = score;
+      chosen = cand;
+    }
+  }
+  return chosen;
 };
 
 // ---------------- Inversion detection ----------------
