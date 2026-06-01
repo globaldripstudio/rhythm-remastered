@@ -369,7 +369,9 @@ const refineSeventh = (
   for (const pc of triadPcs) triadAvg += chroma[pc];
   triadAvg /= triadPcs.length;
   const seventhEnergy = chroma[seventhPc];
-  if (seventhEnergy < 0.5 * triadAvg) {
+  // Stricter gate on dominant 7 (most over-detected): need a clearly present b7.
+  const thresh = q.key === "7" ? 0.7 : 0.5;
+  if (seventhEnergy < thresh * triadAvg) {
     const fallback = TRIAD_FALLBACK[q.key];
     const tpl = tplFor(best.template.rootPc, fallback);
     const score = scoreTemplate(chroma, bass, tpl);
@@ -615,31 +617,28 @@ export const detectChords = (
     beatRanks.push({ chroma, bass, ranking: filtered.slice(0, 6) });
   }
 
-  // Viterbi (1st order) over top-K candidates per beat, combining:
-  //  - acoustic score (already includes diatonic bonus)
-  //  - functional transition log-prob (Markov prior — same grammar as the guided builder)
-  //  - small penalty for changing chord (smoothness)
-  // The transition weight γ is attenuated when acoustic confidence is high.
-  const TRANS_PENALTY = 0.12;
-  const GAMMA_BASE = 0.5;
+  // Viterbi (1st order) — smoothing only, never chord-locking.
+  //  - Transition penalty is tiny.
+  //  - Markov prior γ is small AND gated: only kicks in when the acoustic margin
+  //    is very small (ambiguous beat). On clear beats acoustics decide alone.
+  //  - The prior contribution is clamped so it can never override a clearly better candidate.
+  const TRANS_PENALTY = 0.02;
+  const GAMMA_MAX = 0.15;
   const winners: ChordScore[] = [];
   if (beatRanks.length > 0) {
-    const K = beatRanks[0].ranking.length;
-    // dp[b][i] = best cumulative score ending at beat b on candidate i
     const dp: number[][] = [];
-    const bp: number[][] = []; // back-pointer
-    // Initialise beat 0
+    const bp: number[][] = [];
     dp.push(beatRanks[0].ranking.map((c) => c.score));
     bp.push(beatRanks[0].ranking.map(() => -1));
 
     for (let b = 1; b < beatRanks.length; b += 1) {
       const cur = beatRanks[b].ranking;
       const prev = beatRanks[b - 1].ranking;
-      // Acoustic margin estimate from previous beat — used to soften γ when signal is clean
-      const prevBest = Math.max(0, prev[0]?.score ?? 0);
-      const prevSecond = Math.max(0, prev[1]?.score ?? 0);
-      const marginPrev = prevBest > 0 ? (prevBest - prevSecond) / (prevBest + 1e-3) : 0;
-      const gamma = GAMMA_BASE * (1 - Math.min(1, Math.max(0, marginPrev)));
+      // Acoustic margin for CURRENT beat: small margin => more weight to prior.
+      const curBest = Math.max(0, cur[0]?.score ?? 0);
+      const curSecond = Math.max(0, cur[1]?.score ?? 0);
+      const marginCur = curBest > 0 ? (curBest - curSecond) / (curBest + 1e-3) : 0;
+      const gamma = GAMMA_MAX * Math.max(0, 1 - marginCur / 0.15);
 
       const row: number[] = new Array(cur.length).fill(-Infinity);
       const back: number[] = new Array(cur.length).fill(0);
@@ -654,7 +653,9 @@ export const detectChords = (
           const same = pj.template.rootPc === ci.template.rootPc
             && pj.template.quality.key === ci.template.quality.key;
           const trans = same ? 0 : -TRANS_PENALTY;
-          const prior = gamma * transitionLogProb(prevTok, nextTok, mode);
+          // Bounded prior contribution.
+          const rawPrior = transitionLogProb(prevTok, nextTok, mode);
+          const prior = gamma * Math.max(-2, Math.min(0, rawPrior));
           const v = dp[b - 1][j] + ci.score + trans + prior;
           if (v > bestVal) { bestVal = v; bestJ = j; }
         }
@@ -665,7 +666,6 @@ export const detectChords = (
       bp.push(back);
     }
 
-    // Backtrack
     let lastIdx = 0;
     let lastBest = -Infinity;
     const lastRow = dp[dp.length - 1];
