@@ -7,14 +7,11 @@
  *  3. Per-frame chroma over [65 Hz, 2000 Hz] with low-mid emphasis.
  *  4. Bass chroma over [65 Hz, 250 Hz] (used for inversion detection).
  *  5. Temporal median filter over chromas (3 frames) to smooth transients.
- *  6. Per-beat aggregation + template matching with:
- *     - Templates weighted by overtone series (1 / 0.5 / 0.33 / 0.25)
- *     - Non-chord-tone penalty (λ ≈ 0.3 of out-of-template energy)
- *     - Bass-match bonus (+0.2 when bass PC == root PC)
- *  7. Beat-to-beat transition penalty (small cost to change chord) — Viterbi-lite.
- *  8. Bar = majority vote of beat winners, confidence re-calibrated from bar chroma.
- *  9. Stricter 7th: a 7th flavour is only kept if the 7th pitch class is strong
- *     (>= 0.5 × triad-tone average), otherwise the triad version wins.
+ *  6. Triad-first scoring: stable maj/min/sus4 templates are ranked from the
+ *     signal before any musical prior or extension is allowed to intervene.
+ *  7. Bar = primary recognition unit; beats only confirm / lower confidence.
+ *  8. 7ths are added only in post-processing when the seventh pitch class is
+ *     clearly present on the whole beat/bar chroma.
  * 10. Inversion: if a non-root chord tone dominates the bass chroma → "slash" bass.
  * 11. Modulation: sliding window of 8 bars; if the best-fit key changes vs the
  *     reference, mark a modulation event.
@@ -25,7 +22,6 @@
 
 import { FFT } from "./audioAnalysis";
 import { transitionLogProb } from "./musicTheory/chords";
-
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 export type NoteName = typeof NOTE_NAMES[number];
 
@@ -211,32 +207,54 @@ const computeFrameChromas = (samples: Float32Array, sampleRate: number): FrameCh
 
 // ---------------- Scoring ----------------
 
-const dot = (a: Float32Array, b: Float32Array): number => {
-  let s = 0;
-  for (let i = 0; i < 12; i += 1) s += a[i] * b[i];
-  return s;
-};
+const hasPc = (pcs: number[], pc: number): boolean => pcs.includes(pc);
 
-/** Score = dot(chroma, template) − λ × out-of-template energy + bass bonus. */
+/**
+ * Acoustic score only. The score favours complete triads, penalises strong
+ * non-chord tones, and treats bass as evidence — never as a hard lock.
+ */
 const scoreTemplate = (
   chroma: Float32Array,
   bassChroma: Float32Array | null,
   tpl: ChordTemplate,
 ): number => {
-  const lambda = 0.3;
-  let inT = 0;
-  let outT = 0;
-  for (let i = 0; i < 12; i += 1) {
-    if (tpl.vector[i] > 0.01) inT += chroma[i] * tpl.vector[i];
-    else outT += chroma[i];
+  const pcs = tpl.quality.intervals.map((iv) => (tpl.rootPc + iv) % 12);
+  let chordSum = 0;
+  let chordMin = Infinity;
+  for (const pc of pcs) {
+    const weight = pc === tpl.rootPc ? 1.12 : 1;
+    const energy = chroma[pc] * weight;
+    chordSum += energy;
+    if (energy < chordMin) chordMin = energy;
   }
-  let score = inT - lambda * outT;
+
+  let outSum = 0;
+  let outMax = 0;
+  for (let pc = 0; pc < 12; pc += 1) {
+    if (!hasPc(pcs, pc)) {
+      outSum += chroma[pc];
+      if (chroma[pc] > outMax) outMax = chroma[pc];
+    }
+  }
+
+  const chordAvg = chordSum / pcs.length;
+  const outAvg = outSum / Math.max(1, 12 - pcs.length);
+  let score = 1.2 * chordAvg + 0.45 * chordMin - 0.72 * outAvg - 0.32 * outMax;
+
   if (bassChroma) {
-    // Bonus when the bass clearly outlines the chord root.
-    const bassRoot = bassChroma[tpl.rootPc];
+    let bassPc = 0;
     let bassMax = 0;
-    for (let i = 0; i < 12; i += 1) if (bassChroma[i] > bassMax) bassMax = bassChroma[i];
-    if (bassMax > 0 && bassRoot / bassMax > 0.7) score += 0.2 * bassRoot;
+    for (let pc = 0; pc < 12; pc += 1) {
+      if (bassChroma[pc] > bassMax) {
+        bassMax = bassChroma[pc];
+        bassPc = pc;
+      }
+    }
+    if (bassMax > 0) {
+      if (bassPc === tpl.rootPc) score += 0.12 * bassMax;
+      else if (hasPc(pcs, bassPc)) score += 0.04 * bassMax;
+      else score -= 0.16 * bassMax;
+    }
   }
   return score;
 };
@@ -246,9 +264,17 @@ interface ChordScore {
   score: number;
 }
 
-const rankTemplates = (chroma: Float32Array, bass: Float32Array | null): ChordScore[] => {
+const rankTemplates = (
+  chroma: Float32Array,
+  bass: Float32Array | null,
+  allowedQualities?: ReadonlySet<ChordQualityKey>,
+): ChordScore[] => {
   const out: ChordScore[] = [];
-  for (const t of TEMPLATES) out.push({ template: t, score: scoreTemplate(chroma, bass, t) });
+  for (const t of TEMPLATES) {
+    if (!allowedQualities || allowedQualities.has(t.quality.key)) {
+      out.push({ template: t, score: scoreTemplate(chroma, bass, t) });
+    }
+  }
   out.sort((a, b) => b.score - a.score);
   return out;
 };
@@ -351,6 +377,17 @@ const tplFor = (rootPc: number, key: ChordQualityKey): ChordTemplate => {
   return TEMPLATES.find((t) => t.rootPc === rootPc && t.quality.key === key)!;
 };
 
+const triadKeyFor = (quality: ChordQualityKey): ChordQualityKey => TRIAD_FALLBACK[quality];
+
+const SEVENTH_UPGRADE: Partial<Record<ChordQualityKey, ChordQualityKey>> = {
+  maj: "7",
+  min: "m7",
+};
+
+const MAJ7_UPGRADE: Partial<Record<ChordQualityKey, ChordQualityKey>> = {
+  maj: "maj7",
+};
+
 /**
  * If the winner is a 7th-flavoured chord but the seventh pitch class is weak,
  * fall back to the matching triad. Helps avoid spurious "maj7"/"7" detections
@@ -369,8 +406,8 @@ const refineSeventh = (
   for (const pc of triadPcs) triadAvg += chroma[pc];
   triadAvg /= triadPcs.length;
   const seventhEnergy = chroma[seventhPc];
-  // Stricter gate on dominant 7 (most over-detected): need a clearly present b7.
-  const thresh = q.key === "7" ? 0.7 : 0.5;
+  // Strict gate: extensions must be strong enough to survive full-mix noise.
+  const thresh = q.key === "7" ? 0.9 : 0.78;
   if (seventhEnergy < thresh * triadAvg) {
     const fallback = TRIAD_FALLBACK[q.key];
     const tpl = tplFor(best.template.rootPc, fallback);
@@ -380,36 +417,52 @@ const refineSeventh = (
   return best;
 };
 
+const upgradeSeventh = (
+  chroma: Float32Array,
+  bass: Float32Array | null,
+  triad: ChordScore,
+): ChordScore => {
+  const baseKey = triadKeyFor(triad.template.quality.key);
+  if (baseKey !== "maj" && baseKey !== "min") return triad;
+
+  const rootPc = triad.template.rootPc;
+  const triadPcs = triad.template.quality.intervals.slice(0, 3).map((iv) => (rootPc + iv) % 12);
+  let triadAvg = 0;
+  for (const pc of triadPcs) triadAvg += chroma[pc];
+  triadAvg /= triadPcs.length;
+  if (triadAvg <= 0) return triad;
+
+  const candidates: ChordScore[] = [];
+  const minorSeventhKey = SEVENTH_UPGRADE[baseKey];
+  if (minorSeventhKey) {
+    const pc = (rootPc + 10) % 12;
+    const threshold = baseKey === "maj" ? 0.92 : 0.82;
+    if (chroma[pc] >= threshold * triadAvg) {
+      const tpl = tplFor(rootPc, minorSeventhKey);
+      candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
+    }
+  }
+
+  const majorSeventhKey = MAJ7_UPGRADE[baseKey];
+  if (majorSeventhKey) {
+    const pc = (rootPc + 11) % 12;
+    if (chroma[pc] >= 0.88 * triadAvg) {
+      const tpl = tplFor(rootPc, majorSeventhKey);
+      candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
+    }
+  }
+
+  if (candidates.length === 0) return triad;
+  candidates.sort((a, b) => b.score - a.score);
+  return refineSeventh(chroma, bass, candidates[0]);
+};
+
 // ---------------- Quality filtering, diatonic prior, degree mapping ----------------
 
-const DEFAULT_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
-  "maj", "min", "maj7", "m7", "7", "sus4",
-]);
+const CORE_QUALITIES: ReadonlySet<ChordQualityKey> = new Set(["maj", "min", "sus4"]);
 const EXOTIC_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
   "dim", "aug", "m7b5", "dim7",
 ]);
-
-/**
- * Hard gating to allow an exotic quality: every chord tone must be clearly
- * present in the chroma (>= 0.7 × triad average) AND the candidate must beat
- * the best non-exotic candidate by a margin >= 0.08.
- */
-const exoticPasses = (
-  chroma: Float32Array,
-  tpl: ChordTemplate,
-  exoticScore: number,
-  bestNonExoticScore: number,
-): boolean => {
-  const pcs = tpl.quality.intervals.map((iv) => (tpl.rootPc + iv) % 12);
-  let avg = 0;
-  for (const pc of pcs) avg += chroma[pc];
-  avg /= pcs.length;
-  if (avg <= 0) return false;
-  for (const pc of pcs) {
-    if (chroma[pc] < 0.7 * avg) return false;
-  }
-  return exoticScore - bestNonExoticScore >= 0.08;
-};
 
 // Expected qualities per scale degree (offset in semitones from tonic).
 // sus4 is treated as neutral (no bonus / no malus).
@@ -449,12 +502,10 @@ const diatonicBonus = (
   return 0;
 };
 
-/** Roman-numeral token (normalisé, sans suffixe d'extension) pour le prior de transition. */
 const degreeToken = (
   rootPc: number,
   quality: ChordQualityKey,
   tonicPc: number,
-  mode: "major" | "minor",
 ): string => {
   const semis = ((rootPc - tonicPc) % 12 + 12) % 12;
   let base: string = NUMERAL_BY_SEMITONE[semis];
@@ -465,11 +516,37 @@ const degreeToken = (
   }
   const qDef = QUALITIES.find((x) => x.key === quality)!;
   if (qDef.minorCase) base = base.toLowerCase();
-  let suffix = "";
-  if (quality === "dim" || quality === "dim7") suffix = "°";
-  return prefix + base + suffix;
+  if (quality === "dim" || quality === "dim7") return `${prefix}${base}°`;
+  return prefix + base;
 };
 
+const predictiveTieBreak = (
+  candidates: ChordScore[],
+  prevDegree: string | null,
+  tonicPc: number,
+  mode: "major" | "minor",
+): ChordScore | undefined => {
+  const top = candidates[0];
+  if (!top || !prevDegree || candidates.length < 2) return top;
+  const second = candidates[1];
+  const topAbs = Math.abs(top.score) + 1e-3;
+  const margin = (top.score - second.score) / topAbs;
+  if (margin > 0.08) return top;
+
+  const plausible = candidates.slice(0, 5).filter((cand) => (top.score - cand.score) / topAbs <= 0.08);
+  let chosen = top;
+  let best = -Infinity;
+  for (const cand of plausible) {
+    const deg = degreeToken(cand.template.rootPc, cand.template.quality.key, tonicPc);
+    const prior = Math.max(-1.2, Math.min(0, transitionLogProb(prevDegree, deg, mode)));
+    const score = cand.score + 0.025 * prior;
+    if (score > best) {
+      best = score;
+      chosen = cand;
+    }
+  }
+  return chosen;
+};
 
 // ---------------- Inversion detection ----------------
 
@@ -522,6 +599,23 @@ export interface ChordGridResult {
   bars: ChordHit[];
   segments: ChordSegment[];
   modulations: ModulationEvent[];
+  diagnostics?: ChordBarDiagnostic[];
+}
+
+export interface ChordCandidateDiagnostic {
+  symbol: string;
+  quality: ChordQualityKey;
+  acousticScore: number;
+  finalScore: number;
+}
+
+export interface ChordBarDiagnostic {
+  barIndex: number;
+  chosen: string;
+  confidence: number;
+  margin: number;
+  beatAgreement: number;
+  candidates: ChordCandidateDiagnostic[];
 }
 
 interface DetectOptions {
@@ -573,7 +667,8 @@ export const detectChords = (
     maxBars * beatsPerBar,
   );
 
-  // First pass: per-beat ranking with quality filtering + diatonic prior
+  // First pass: per-beat triad ranking. Beats are deliberately conservative:
+  // maj/min/sus4 first, then optional 7th upgrade if the chroma really proves it.
   interface BeatRanked {
     chroma: Float32Array;
     bass: Float32Array;
@@ -585,30 +680,9 @@ export const detectChords = (
     const fEnd = Math.floor(((b + 1) * beatDurationSec) / hopSec);
     const chroma = sumChromas(chromas, fStart, fEnd);
     const bass = sumChromas(bassChromas, fStart, fEnd);
-    const raw = rankTemplates(chroma, bass);
+    const filtered = rankTemplates(chroma, bass, CORE_QUALITIES);
 
-    // Best non-exotic score (for exotic gating)
-    let bestNonExoticScore = -Infinity;
-    for (const r of raw) {
-      if (DEFAULT_QUALITIES.has(r.template.quality.key)) {
-        if (r.score > bestNonExoticScore) bestNonExoticScore = r.score;
-      }
-    }
-
-    // Filter exotic qualities unless they pass hard gating
-    const filtered: ChordScore[] = [];
-    for (const r of raw) {
-      const qk = r.template.quality.key;
-      if (DEFAULT_QUALITIES.has(qk)) {
-        filtered.push(r);
-      } else if (EXOTIC_QUALITIES.has(qk)) {
-        if (exoticPasses(chroma, r.template, r.score, bestNonExoticScore)) {
-          filtered.push(r);
-        }
-      }
-    }
-
-    // Apply diatonic bonus / non-diatonic exotic malus
+    // Apply a small diatonic bonus only after acoustic scoring.
     for (const r of filtered) {
       r.score += diatonicBonus(r.template.rootPc, r.template.quality.key, tonicPc, mode);
     }
@@ -624,7 +698,7 @@ export const detectChords = (
   for (let b = 0; b < beatRanks.length; b += 1) {
     const top = beatRanks[b].ranking[0];
     if (!top) continue;
-    const refined = refineSeventh(beatRanks[b].chroma, beatRanks[b].bass, top);
+    const refined = upgradeSeventh(beatRanks[b].chroma, beatRanks[b].bass, top);
     winners.push(refined);
   }
 
@@ -632,7 +706,9 @@ export const detectChords = (
 
   const beats: ChordHit[] = winners.map((w, b) => {
     const { chroma, bass, ranking } = beatRanks[b];
-    const second = ranking.find((r) => r.template !== w.template) ?? ranking[1] ?? ranking[0];
+    const second = ranking.find((r) => (
+      r.template.rootPc !== w.template.rootPc || r.template.quality.key !== triadKeyFor(w.template.quality.key)
+    )) ?? ranking[1] ?? ranking[0];
     const bestScore = Math.max(0, w.score);
     const secondScore = Math.max(0, second?.score ?? 0);
     const marginNorm = bestScore > 0 ? (bestScore - secondScore) / (bestScore + 1e-3) : 0;
@@ -653,6 +729,11 @@ export const detectChords = (
   // only as a tiebreaker. This prevents a single biased beat sequence from
   // locking a whole bar onto a wrong chord.
   const bars: ChordHit[] = [];
+  const diagnostics: ChordBarDiagnostic[] = [];
+  let prevDegree: string | null = null;
+  const shouldLogDiagnostics = typeof window !== "undefined"
+    && window.localStorage.getItem("chordGridDebug") === "1";
+
   for (let bar = 0; bar * beatsPerBar < totalBeats; bar += 1) {
     const slice = beats.slice(bar * beatsPerBar, (bar + 1) * beatsPerBar);
     if (slice.length === 0) break;
@@ -662,26 +743,12 @@ export const detectChords = (
     const barChroma = sumChromas(chromas, fStart, fEnd);
     const barBass = sumChromas(bassChromas, fStart, fEnd);
 
-    // Rank templates on the bar chroma directly
-    const rawBar = rankTemplates(barChroma, barBass);
-    let bestNonExoticScore = -Infinity;
-    for (const r of rawBar) {
-      if (DEFAULT_QUALITIES.has(r.template.quality.key)) {
-        if (r.score > bestNonExoticScore) bestNonExoticScore = r.score;
-      }
-    }
-    const filteredBar: ChordScore[] = [];
-    for (const r of rawBar) {
-      const qk = r.template.quality.key;
-      if (DEFAULT_QUALITIES.has(qk)) {
-        filteredBar.push(r);
-      } else if (EXOTIC_QUALITIES.has(qk)) {
-        if (exoticPasses(barChroma, r.template, r.score, bestNonExoticScore)) {
-          filteredBar.push(r);
-        }
-      }
-    }
+    // Rank core triads on the bar chroma directly. Extensions are handled only
+    // after this choice, so a weak seventh can no longer win the whole bar.
+    const filteredBar = rankTemplates(barChroma, barBass, CORE_QUALITIES);
+    const acousticScores = new Map<ChordTemplate, number>();
     for (const r of filteredBar) {
+      acousticScores.set(r.template, r.score);
       r.score += diatonicBonus(r.template.rootPc, r.template.quality.key, tonicPc, mode);
     }
     filteredBar.sort((a, b2) => b2.score - a.score);
@@ -690,10 +757,10 @@ export const detectChords = (
     // the majority beat winner if scores are within 5%.
     const beatVote = new Map<string, number>();
     for (const h of slice) {
-      const k = `${h.root}:${h.quality}`;
+      const k = `${h.root}:${triadKeyFor(h.quality)}`;
       beatVote.set(k, (beatVote.get(k) ?? 0) + 1);
     }
-    let chosen = filteredBar[0];
+    let chosen = predictiveTieBreak(filteredBar, prevDegree, tonicPc, mode);
     if (chosen && filteredBar.length > 1) {
       const top = chosen.score;
       for (let i = 1; i < Math.min(3, filteredBar.length); i += 1) {
@@ -706,15 +773,17 @@ export const detectChords = (
     }
     if (!chosen) continue;
 
-    // Refine 7ths on bar chroma too
-    chosen = refineSeventh(barChroma, barBass, chosen);
+    const chosenTriad = chosen;
+    prevDegree = degreeToken(chosenTriad.template.rootPc, chosenTriad.template.quality.key, tonicPc);
+    // Add 7ths only after the bar triad is chosen and only if strongly present.
+    chosen = upgradeSeventh(barChroma, barBass, chosenTriad);
     const tpl = chosen.template;
 
     // Confidence: blend acoustic margin (bar), beat agreement, avg beat conf
     const secondScore = Math.max(0, filteredBar[1]?.score ?? 0);
-    const bestScore = Math.max(0, chosen.score);
+    const bestScore = Math.max(0, chosenTriad.score);
     const marginNorm = bestScore > 0 ? (bestScore - secondScore) / (bestScore + 1e-3) : 0;
-    const winnerKey = `${NOTE_NAMES[tpl.rootPc]}:${tpl.quality.key}`;
+    const winnerKey = `${NOTE_NAMES[chosenTriad.template.rootPc]}:${chosenTriad.template.quality.key}`;
     const agreement = (beatVote.get(winnerKey) ?? 0) / slice.length;
     const beatConfAvg = slice.reduce((a, h) => a + h.confidence, 0) / slice.length;
     let conf = Math.max(0, Math.min(1,
@@ -725,11 +794,23 @@ export const detectChords = (
     if (marginNorm < 0.03) conf = Math.min(conf, 0.3);
     else if (marginNorm < 0.06) conf = Math.min(conf, 0.5);
 
-
     const root = NOTE_NAMES[tpl.rootPc];
     const { roman, fn } = romanize(tpl.rootPc, tpl.quality, tonicPc, mode);
     const bassNote = detectBass(barBass, tpl.rootPc, tpl.quality);
     const symbol = bassNote ? `${root}${tpl.quality.symbolSuffix}/${bassNote}` : `${root}${tpl.quality.symbolSuffix}`;
+    diagnostics.push({
+      barIndex: bar,
+      chosen: symbol,
+      confidence: conf,
+      margin: marginNorm,
+      beatAgreement: agreement,
+      candidates: filteredBar.slice(0, 5).map((r) => ({
+        symbol: `${NOTE_NAMES[r.template.rootPc]}${r.template.quality.symbolSuffix}`,
+        quality: r.template.quality.key,
+        acousticScore: acousticScores.get(r.template) ?? r.score,
+        finalScore: r.score,
+      })),
+    });
     bars.push({
       root,
       quality: tpl.quality.key,
@@ -740,6 +821,17 @@ export const detectChords = (
       extensions: detectExtensions(barChroma, tpl.rootPc, tpl.quality),
       bass: bassNote,
     });
+  }
+
+  if (shouldLogDiagnostics && diagnostics.length > 0) {
+    console.table(diagnostics.map((d) => ({
+      mesure: d.barIndex + 1,
+      accord: d.chosen,
+      confiance: Math.round(d.confidence * 100),
+      marge: Number(d.margin.toFixed(3)),
+      accordBeats: Number(d.beatAgreement.toFixed(2)),
+      top5: d.candidates.map((c) => `${c.symbol}:${c.finalScore.toFixed(3)}`).join(" | "),
+    })));
   }
 
   // Segments
@@ -805,6 +897,7 @@ export const detectChords = (
     bars,
     segments,
     modulations,
+    diagnostics,
   };
 };
 
