@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Music, Sparkles, ChevronsRight, Play, Pencil, Download, KeyRound } from "lucide-react";
+import { Music, Sparkles, ChevronsRight, Play, Pencil, Download, KeyRound, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import {
   buildPianoVoicing,
-  chordPitchClasses,
   symbolSuffixFor,
   type ChordGridResult,
   type ChordHit,
