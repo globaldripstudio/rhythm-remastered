@@ -562,15 +562,15 @@ const predictiveTieBreak = (
   const second = candidates[1];
   const topAbs = Math.abs(top.score) + 1e-3;
   const margin = (top.score - second.score) / topAbs;
-  if (margin > 0.08) return top;
+  if (margin > TH.predictiveMargin) return top;
 
-  const plausible = candidates.slice(0, 5).filter((cand) => (top.score - cand.score) / topAbs <= 0.08);
+  const plausible = candidates.slice(0, 5).filter((cand) => (top.score - cand.score) / topAbs <= TH.predictiveMargin);
   let chosen = top;
   let best = -Infinity;
   for (const cand of plausible) {
     const deg = degreeToken(cand.template.rootPc, cand.template.quality.key, tonicPc);
     const prior = Math.max(-1.2, Math.min(0, transitionLogProb(prevDegree, deg, mode)));
-    const score = cand.score + 0.025 * prior;
+    const score = cand.score + TH.predictivePriorWeight * prior;
     if (score > best) {
       best = score;
       chosen = cand;
