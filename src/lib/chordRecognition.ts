@@ -21,8 +21,6 @@
  */
 
 import { FFT } from "./audioAnalysis";
-import { transitionLogProb } from "./musicTheory/chords";
-
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 export type NoteName = typeof NOTE_NAMES[number];
 
@@ -601,6 +599,23 @@ export interface ChordGridResult {
   bars: ChordHit[];
   segments: ChordSegment[];
   modulations: ModulationEvent[];
+  diagnostics?: ChordBarDiagnostic[];
+}
+
+export interface ChordCandidateDiagnostic {
+  symbol: string;
+  quality: ChordQualityKey;
+  acousticScore: number;
+  finalScore: number;
+}
+
+export interface ChordBarDiagnostic {
+  barIndex: number;
+  chosen: string;
+  confidence: number;
+  margin: number;
+  beatAgreement: number;
+  candidates: ChordCandidateDiagnostic[];
 }
 
 interface DetectOptions {
@@ -652,7 +667,8 @@ export const detectChords = (
     maxBars * beatsPerBar,
   );
 
-  // First pass: per-beat ranking with quality filtering + diatonic prior
+  // First pass: per-beat triad ranking. Beats are deliberately conservative:
+  // maj/min/sus4 first, then optional 7th upgrade if the chroma really proves it.
   interface BeatRanked {
     chroma: Float32Array;
     bass: Float32Array;
@@ -664,30 +680,9 @@ export const detectChords = (
     const fEnd = Math.floor(((b + 1) * beatDurationSec) / hopSec);
     const chroma = sumChromas(chromas, fStart, fEnd);
     const bass = sumChromas(bassChromas, fStart, fEnd);
-    const raw = rankTemplates(chroma, bass);
+    const filtered = rankTemplates(chroma, bass, CORE_QUALITIES);
 
-    // Best non-exotic score (for exotic gating)
-    let bestNonExoticScore = -Infinity;
-    for (const r of raw) {
-      if (DEFAULT_QUALITIES.has(r.template.quality.key)) {
-        if (r.score > bestNonExoticScore) bestNonExoticScore = r.score;
-      }
-    }
-
-    // Filter exotic qualities unless they pass hard gating
-    const filtered: ChordScore[] = [];
-    for (const r of raw) {
-      const qk = r.template.quality.key;
-      if (DEFAULT_QUALITIES.has(qk)) {
-        filtered.push(r);
-      } else if (EXOTIC_QUALITIES.has(qk)) {
-        if (exoticPasses(chroma, r.template, r.score, bestNonExoticScore)) {
-          filtered.push(r);
-        }
-      }
-    }
-
-    // Apply diatonic bonus / non-diatonic exotic malus
+    // Apply a small diatonic bonus only after acoustic scoring.
     for (const r of filtered) {
       r.score += diatonicBonus(r.template.rootPc, r.template.quality.key, tonicPc, mode);
     }
@@ -703,7 +698,7 @@ export const detectChords = (
   for (let b = 0; b < beatRanks.length; b += 1) {
     const top = beatRanks[b].ranking[0];
     if (!top) continue;
-    const refined = refineSeventh(beatRanks[b].chroma, beatRanks[b].bass, top);
+    const refined = upgradeSeventh(beatRanks[b].chroma, beatRanks[b].bass, top);
     winners.push(refined);
   }
 
@@ -711,7 +706,9 @@ export const detectChords = (
 
   const beats: ChordHit[] = winners.map((w, b) => {
     const { chroma, bass, ranking } = beatRanks[b];
-    const second = ranking.find((r) => r.template !== w.template) ?? ranking[1] ?? ranking[0];
+    const second = ranking.find((r) => (
+      r.template.rootPc !== w.template.rootPc || r.template.quality.key !== triadKeyFor(w.template.quality.key)
+    )) ?? ranking[1] ?? ranking[0];
     const bestScore = Math.max(0, w.score);
     const secondScore = Math.max(0, second?.score ?? 0);
     const marginNorm = bestScore > 0 ? (bestScore - secondScore) / (bestScore + 1e-3) : 0;
