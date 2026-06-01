@@ -71,6 +71,12 @@ const ChordTile = ({
   onEdit?: () => void;
 }) => {
   const fnClass = chord.fn ? FN_STYLE[chord.fn] : "bg-muted/20 text-muted-foreground border-border/40";
+  // Honnêteté visuelle (Acte 7) :
+  //  - mesure ambiguë → liseré pointillé + opacité légèrement réduite + "?" discret.
+  //  - accord approximatif (confiance moyenne) → opacité légèrement réduite seulement.
+  //  - accord confiant → rendu plein habituel.
+  const isAmbiguous = chord.ambiguous === true;
+  const isApprox = !isAmbiguous && chord.confidence < 0.5;
   return (
     <button
       type="button"
@@ -79,16 +85,30 @@ const ChordTile = ({
         "group relative flex flex-col items-center justify-center rounded-md border bg-background/40 px-2 py-2 text-center transition-all cursor-pointer",
         "border-border/60 hover:border-primary hover:bg-primary/5",
         isPlaying && "border-primary bg-primary/10 ring-2 ring-primary/40",
+        isAmbiguous && "border-dashed border-muted-foreground/50 opacity-70",
+        isApprox && "opacity-85",
         compact ? "min-w-[78px]" : "min-w-[102px]",
       )}
-      title="Cliquer pour écouter"
+      title={isAmbiguous
+        ? "Mesure ambiguë : le signal n'a pas dégagé clairement un accord."
+        : isApprox
+          ? "Accord approximatif : confiance moyenne."
+          : "Cliquer pour écouter"}
     >
       {label && (
         <span className="absolute left-1 top-1 text-[9px] uppercase tracking-wide text-muted-foreground/70">
           {label}
         </span>
       )}
-      {onEdit && (
+      {isAmbiguous && (
+        <span
+          aria-hidden
+          className="absolute right-1 top-1 text-[10px] font-bold text-muted-foreground/60"
+        >
+          ?
+        </span>
+      )}
+      {onEdit && !isAmbiguous && (
         <span
           role="button"
           tabIndex={0}
@@ -203,6 +223,7 @@ export default function ChordGrid({ data }: Props) {
       fn: undefined,
       confidence: 1, // user-asserted
       extensions: [],
+      ambiguous: false,
     };
     setEdits((m) => new Map(m).set(barIdx, updated));
   };
@@ -394,7 +415,15 @@ export default function ChordGrid({ data }: Props) {
         <div className="flex flex-wrap items-center gap-1.5 text-sm">
           {data.segments.map((seg, i) => (
             <span key={`seg-${i}`} className="inline-flex items-center gap-1">
-              <span className="rounded border border-border bg-background px-2 py-0.5 font-semibold text-foreground">
+              <span
+                className={cn(
+                  "rounded border px-2 py-0.5 font-semibold text-foreground",
+                  seg.chord.ambiguous
+                    ? "border-dashed border-muted-foreground/50 bg-background/50 opacity-70"
+                    : "border-border bg-background",
+                )}
+                title={seg.chord.ambiguous ? "Mesure ambiguë" : undefined}
+              >
                 {seg.chord.symbol}
                 {seg.beatLength > data.beatsPerBar && (
                   <span className="ml-1 font-mono text-[10px] text-muted-foreground">×{seg.beatLength / data.beatsPerBar}</span>

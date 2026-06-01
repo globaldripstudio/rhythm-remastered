@@ -1,61 +1,43 @@
-Objectif : repartir proprement sur l’outil de grille d’accords et le rendre fiable, honnête et calibrable. Le problème actuel n’est pas un simple détail de pondération : si Tirita reste bloqué sur B7, il faut reprendre la chaîne complète de décision au lieu d’empiler des rustines.
+L'outil ne bloque plus sur un seul accord. Les actes 2, 3 et 5 sont en place (triades d'abord, gating des 7e, prédictif réduit à un tie-break). Les vraies faiblesses restantes sont : la décision par mesure n'est pas encore robuste, on n'a aucune calibration sérieuse, et l'UI ne dit pas quand elle hésite. Voici la suite, en 4 étapes ciblées.
 
-Acte 1 — Diagnostic reproductible
-- Ajouter un mode diagnostic interne pour l’analyse d’accords, sans changement visuel majeur.
-- Pour chaque mesure : capturer le chroma, la basse, les 5 meilleurs candidats, leur score brut, leur score après bonus/malus, la marge, la confiance et les raisons de rejet.
-- Objectif : savoir si B7 vient du signal chroma, du template, du bonus tonal, de la basse, des extensions ou de l’agrégation.
-- Sortie attendue : une trace claire permettant de comparer Tirita mesure par mesure.
+Étape A — Décision par mesure vraiment solide (Acte 4 complet)
+- La mesure reste l'unité de décision, mais on renforce trois points :
+  - Stabilité intra-mesure : si les beats d'une mesure désignent des triades incompatibles, on baisse la confiance au lieu de trancher arbitrairement.
+  - Fusion de mesures consécutives : on ne fusionne deux mesures en un seul accord affiché que si même triade ET confiance correcte des deux côtés.
+  - Détection de mesure ambiguë : marquer explicitement les mesures où aucun candidat ne sort clairement, plutôt que d'inventer un accord propre.
+- Objectif : éliminer les "faux accords nets" qui apparaissent encore sur les passages bruités.
 
-Acte 2 — Assainir le moteur acoustique
-- Séparer strictement le score audio brut des aides musicales.
-- Réécrire le score de template autour de trois critères lisibles : présence des notes de l’accord, pénalité des notes incompatibles, cohérence de basse.
-- Détecter d’abord les triades stables (`maj`, `min`, `sus4`) avant les enrichissements.
-- Les accords 7/maj7/m7 ne doivent plus concourir au même niveau que les triades tant que la triade n’est pas fiable.
-- Objectif : arrêter les accords “intelligents mais faux” et privilégier un accord simple mais probable.
+Étape B — Calibration sur cas tests (Acte 6)
+- Geler 3 morceaux de référence :
+  - Tirita (cas qui a tout déclenché).
+  - Une boucle diatonique simple (vérifier qu'on ne casse rien de basique).
+  - Un morceau avec vraies dominantes 7 (vérifier que le gating des 7e ne tue pas les vraies 7e).
+- Pour chaque morceau, capturer une trace : accord retenu, qualité, confiance, marge, top 3 candidats par mesure.
+- Sauvegarder ces traces comme référence de non-régression (fichier interne, pas d'UI).
+- Tout changement futur du moteur doit être comparé à ces traces avant d'être validé.
 
-Acte 3 — Gating strict des enrichissements
-- Ajouter une 7e seulement en post-traitement, à partir du chroma de la mesure entière.
-- Pour une dominante 7 : la 7e mineure doit être clairement présente, sinon fallback automatique vers majeur.
-- Pour maj7/m7 : même logique, avec seuils distincts mais explicites.
-- Les extensions 9/11/13 restent décoratives et ne doivent jamais influencer l’identité principale de l’accord.
-- Objectif : empêcher définitivement les faux B7, A7, E7 générés par un fragment spectral faible.
+Étape C — UX honnête sur l'incertitude (Acte 7)
+- Dans `ChordGrid`, distinguer visuellement trois états sans refonte :
+  - accord confiant (rendu actuel),
+  - accord approximatif (confiance moyenne, marge faible),
+  - mesure ambiguë (aucun candidat clair).
+- Garder le label d'accord lisible, ajouter seulement un indicateur discret (opacité, point, liseré).
+- Ne pas toucher à l'édition manuelle ni à l'export MIDI.
 
-Acte 4 — Décision par mesure d’abord
-- La mesure devient l’unité principale de reconnaissance.
-- Les beats servent uniquement à confirmer, repérer une mesure instable ou signaler une coupe plus fine.
-- Si une mesure est contradictoire, la confiance baisse au lieu de verrouiller un faux accord.
-- Les segments consécutifs ne sont fusionnés que si la confiance et la stabilité sont suffisantes.
-- Objectif : obtenir une grille musicale lisible plutôt qu’une moyenne de beats bruités.
+Étape D — Nettoyage et garde-fous
+- Retirer les rustines devenues inutiles depuis la refonte (anciens biais Markov résiduels, anciens bonus tonals doublons).
+- Vérifier que le mode diagnostic (`localStorage.chordGridDebug = "1"`) couvre bien les nouveaux états (mesure ambiguë, fusion refusée, 7e rejetée).
+- Documenter brièvement dans le code les seuils clés (gating 7e, marge tie-break, seuil ambiguïté) pour pouvoir les régler sans relire toute la logique.
 
-Acte 5 — Réintroduire le prédictif comme garde-fou, pas comme pilote
-- Le calcul prédictif ne choisit jamais un accord absent du top acoustique plausible.
-- Il sert uniquement à départager des candidats proches et jouables dans la tonalité ou la progression précédente.
-- Pondération très faible, bornée, désactivée quand la marge acoustique est nette.
-- Les degrés impossibles ou très improbables sont pénalisés, mais jamais au point d’écraser le signal.
-- Objectif : retrouver l’idée du builder guidé “Accords & Gamme” sans recréer un verrouillage harmonique.
+Ordre d'exécution : A → B (test Tirita + 2 autres) → C → D.
 
-Acte 6 — Calibration sur morceaux tests
-- Utiliser Tirita comme cas prioritaire de non-régression.
-- Ajouter au moins 3 profils de test : boucle simple diatonique, morceau full mix dense, progression avec vraies dominantes 7.
-- Comparer avant/après : accord principal, qualité, confiance, stabilité par mesure.
-- Objectif : ne plus valider une correction “au feeling”.
+Hors scope :
+- Refonte visuelle de l'outil.
+- Nouvelle dépendance d'analyse audio.
+- Réintroduction des mini-pianos.
+- Promesse de reconnaissance parfaite sur full mix dense.
 
-Acte 7 — Finition UX honnête
-- Garder l’UI actuelle, sans refonte visuelle.
-- Rendre les états d’incertitude plus clairs : confiance basse, accord approximatif, mesure ambiguë.
-- Conserver l’édition manuelle et l’export MIDI, mais ne pas les mélanger avec le chantier moteur.
-- Objectif : un outil utilisable même quand l’audio ne permet pas une certitude totale.
-
-Ordre d’exécution recommandé : Acte 1 → Acte 2 → Acte 3 → test Tirita → Acte 4 → test Tirita → Acte 5 → calibration complète → Acte 7.
-
-Fichiers principaux concernés :
-- `src/lib/chordRecognition.ts`
-- `src/lib/musicTheory/chords.ts` uniquement pour le prédictif / transitions
-- `src/components/tools/ChordGrid.tsx` uniquement si on affiche les états d’incertitude
-
-Hors scope pour cette refonte :
-- changer l’upload audio
-- changer l’export MIDI
-- réintroduire les mini-pianos
-- ajouter une dépendance lourde
-- promettre une reconnaissance parfaite sur tous les full mixes
+Fichiers concernés :
+- `src/lib/chordRecognition.ts` (étapes A et D).
+- `src/components/tools/ChordGrid.tsx` (étape C uniquement, affichage incertitude).
+- Référence de calibration : nouveau fichier interne sous `src/lib/chordRecognition/__fixtures__/` pour les traces (étape B).

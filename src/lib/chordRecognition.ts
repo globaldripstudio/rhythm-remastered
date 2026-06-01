@@ -321,6 +321,12 @@ export interface ChordHit {
   extensions: Array<"9" | "11" | "13">;
   /** Detected bass note when it differs from the root (slash chord). */
   bass?: NoteName | null;
+  /**
+   * True when the bar/beat chroma did not clearly designate a winner
+   * (small acoustic margin, or beats disagree across triads).
+   * The UI uses this to soften the rendering instead of pretending certainty.
+   */
+  ambiguous?: boolean;
 }
 
 const romanize = (
@@ -370,6 +376,31 @@ const detectExtensions = (
   if (!isChordTone(pc13) && ratio(pc13) >= THRESH) out.push("13");
   return out;
 };
+
+// ---------------- Tunable thresholds (kept in one place on purpose) ----------------
+// All thresholds the engine relies on. Tweak here, not deep inside loops.
+const TH = {
+  /** Bar acoustic margin below this → confidence capped low, bar flagged ambiguous. */
+  ambiguousMargin: 0.04,
+  /** Bar acoustic margin below this → confidence capped to medium. */
+  lowConfidenceMargin: 0.06,
+  /** Predictive prior only fires when the acoustic margin is under this. */
+  predictiveMargin: 0.08,
+  /** Weight of the predictive prior in the tie-break (intentionally tiny). */
+  predictivePriorWeight: 0.025,
+  /** Minor-7th gating ratio on a triad-classified MAJ chord (dominant 7). */
+  seventhOnMajThresh: 0.92,
+  /** Minor-7th gating ratio on a triad-classified MIN chord. */
+  seventhOnMinThresh: 0.82,
+  /** Major-7th gating ratio on a triad-classified MAJ chord. */
+  maj7Thresh: 0.88,
+  /** Minimum confidence to allow fusing two consecutive bars into one segment. */
+  mergeMinConfidence: 0.45,
+  /** Beats vote agreement below this → bar flagged ambiguous. */
+  ambiguousAgreement: 0.4,
+  /** Distinct triads across beats of one bar above this → bar flagged unstable. */
+  unstableTriadCount: 2,
+} as const;
 
 // ---------------- Stricter 7th gating ----------------
 
@@ -436,7 +467,7 @@ const upgradeSeventh = (
   const minorSeventhKey = SEVENTH_UPGRADE[baseKey];
   if (minorSeventhKey) {
     const pc = (rootPc + 10) % 12;
-    const threshold = baseKey === "maj" ? 0.92 : 0.82;
+    const threshold = baseKey === "maj" ? TH.seventhOnMajThresh : TH.seventhOnMinThresh;
     if (chroma[pc] >= threshold * triadAvg) {
       const tpl = tplFor(rootPc, minorSeventhKey);
       candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
@@ -446,7 +477,7 @@ const upgradeSeventh = (
   const majorSeventhKey = MAJ7_UPGRADE[baseKey];
   if (majorSeventhKey) {
     const pc = (rootPc + 11) % 12;
-    if (chroma[pc] >= 0.88 * triadAvg) {
+    if (chroma[pc] >= TH.maj7Thresh * triadAvg) {
       const tpl = tplFor(rootPc, majorSeventhKey);
       candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
     }
@@ -531,15 +562,15 @@ const predictiveTieBreak = (
   const second = candidates[1];
   const topAbs = Math.abs(top.score) + 1e-3;
   const margin = (top.score - second.score) / topAbs;
-  if (margin > 0.08) return top;
+  if (margin > TH.predictiveMargin) return top;
 
-  const plausible = candidates.slice(0, 5).filter((cand) => (top.score - cand.score) / topAbs <= 0.08);
+  const plausible = candidates.slice(0, 5).filter((cand) => (top.score - cand.score) / topAbs <= TH.predictiveMargin);
   let chosen = top;
   let best = -Infinity;
   for (const cand of plausible) {
     const deg = degreeToken(cand.template.rootPc, cand.template.quality.key, tonicPc);
     const prior = Math.max(-1.2, Math.min(0, transitionLogProb(prevDegree, deg, mode)));
-    const score = cand.score + 0.025 * prior;
+    const score = cand.score + TH.predictivePriorWeight * prior;
     if (score > best) {
       best = score;
       chosen = cand;
@@ -615,6 +646,12 @@ export interface ChordBarDiagnostic {
   confidence: number;
   margin: number;
   beatAgreement: number;
+  /** Number of distinct triads the beats of this bar voted for. */
+  triadDiversity: number;
+  /** True when the bar was flagged unreliable (small margin OR unstable beats). */
+  ambiguous: boolean;
+  /** True when this bar was eligible to merge with the previous one but was refused. */
+  mergeRefused?: boolean;
   candidates: ChordCandidateDiagnostic[];
 }
 
@@ -786,13 +823,21 @@ export const detectChords = (
     const winnerKey = `${NOTE_NAMES[chosenTriad.template.rootPc]}:${chosenTriad.template.quality.key}`;
     const agreement = (beatVote.get(winnerKey) ?? 0) / slice.length;
     const beatConfAvg = slice.reduce((a, h) => a + h.confidence, 0) / slice.length;
+    const triadDiversity = beatVote.size;
+    const unstableBeats = triadDiversity > TH.unstableTriadCount;
     let conf = Math.max(0, Math.min(1,
       0.25 * agreement + 0.30 * beatConfAvg + 0.45 * sigmoid(marginNorm * 6 - 0.5),
     ));
     // Ambiguous bar (acoustic margin too small) → cap confidence low instead
     // of falsely affirming a chord. Bars decide the grid; if they hesitate, say so.
-    if (marginNorm < 0.03) conf = Math.min(conf, 0.3);
-    else if (marginNorm < 0.06) conf = Math.min(conf, 0.5);
+    if (marginNorm < TH.ambiguousMargin) conf = Math.min(conf, 0.3);
+    else if (marginNorm < TH.lowConfidenceMargin) conf = Math.min(conf, 0.5);
+    // Beats that disagree across many triads → bar is intrinsically unstable.
+    // Don't bump confidence up, but mark it so the UI can soften.
+    if (unstableBeats) conf = Math.min(conf, 0.5);
+    const ambiguous = marginNorm < TH.ambiguousMargin
+      || agreement < TH.ambiguousAgreement
+      || unstableBeats;
 
     const root = NOTE_NAMES[tpl.rootPc];
     const { roman, fn } = romanize(tpl.rootPc, tpl.quality, tonicPc, mode);
@@ -804,6 +849,8 @@ export const detectChords = (
       confidence: conf,
       margin: marginNorm,
       beatAgreement: agreement,
+      triadDiversity,
+      ambiguous,
       candidates: filteredBar.slice(0, 5).map((r) => ({
         symbol: `${NOTE_NAMES[r.template.rootPc]}${r.template.quality.symbolSuffix}`,
         quality: r.template.quality.key,
@@ -820,6 +867,7 @@ export const detectChords = (
       confidence: conf,
       extensions: detectExtensions(barChroma, tpl.rootPc, tpl.quality),
       bass: bassNote,
+      ambiguous,
     });
   }
 
@@ -830,20 +878,35 @@ export const detectChords = (
       confiance: Math.round(d.confidence * 100),
       marge: Number(d.margin.toFixed(3)),
       accordBeats: Number(d.beatAgreement.toFixed(2)),
+      diversite: d.triadDiversity,
+      ambigu: d.ambiguous ? "oui" : "",
+      fusionRefusee: d.mergeRefused ? "oui" : "",
       top5: d.candidates.map((c) => `${c.symbol}:${c.finalScore.toFixed(3)}`).join(" | "),
     })));
   }
 
-  // Segments
+  // Segments — fusion gating (Acte 4) :
+  // Two consecutive bars only merge when (a) they share the exact same symbol,
+  // (b) neither is flagged ambiguous, and (c) both reach a minimum confidence.
+  // Otherwise we keep them as distinct bars to avoid hiding a contradiction
+  // inside one wide block.
   const segments: ChordSegment[] = [];
   for (let i = 0; i < bars.length; i += 1) {
     const cur = bars[i];
     if (segments.length > 0) {
       const last = segments[segments.length - 1];
-      if (last.chord.symbol === cur.symbol) {
+      const sameSymbol = last.chord.symbol === cur.symbol;
+      const bothConfident = !last.chord.ambiguous
+        && !cur.ambiguous
+        && last.chord.confidence >= TH.mergeMinConfidence
+        && cur.confidence >= TH.mergeMinConfidence;
+      if (sameSymbol && bothConfident) {
         last.beatLength += beatsPerBar;
         last.durationSec += barDurationSec;
         continue;
+      }
+      if (sameSymbol && !bothConfident && diagnostics[i]) {
+        diagnostics[i].mergeRefused = true;
       }
     }
     segments.push({
