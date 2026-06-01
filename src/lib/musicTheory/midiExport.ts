@@ -49,3 +49,24 @@ export function downloadBlob(blob: Blob, filename: string) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+/** Convert a chord grid (raw MIDI voicings per bar) to a MIDI blob, one bar per chord. */
+export function chordGridToMidiBlob(
+  voicedBars: Array<{ midi: number[] }>,
+  bpm: number,
+  beatsPerBar = 4,
+): Blob {
+  const midi = new Midi();
+  midi.header.setTempo(bpm);
+  const track = midi.addTrack();
+  const secondsPerBeat = 60 / bpm;
+  const dur = beatsPerBar * secondsPerBeat;
+  let t = 0;
+  voicedBars.forEach((bar) => {
+    bar.midi.forEach((n) => {
+      track.addNote({ midi: n, time: t, duration: dur * 0.95, velocity: 0.8 });
+    });
+    t += dur;
+  });
+  return new Blob([midi.toArray().buffer as ArrayBuffer], { type: "audio/midi" });
+}
