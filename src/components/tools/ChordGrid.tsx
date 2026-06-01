@@ -270,14 +270,6 @@ export default function ChordGrid({ data }: Props) {
               {t("keybpm.chords.showExt", { defaultValue: "Extensions 9/11/13" })}
             </span>
           </label>
-          {/* removed duplicate extensions label below */}
-          <label className="flex items-center gap-2 cursor-pointer">
-            <Switch checked={showExtensions} onCheckedChange={setShowExtensions} />
-            <span className="inline-flex items-center gap-1">
-              <Sparkles className="h-3 w-3" />
-              {t("keybpm.chords.showExt", { defaultValue: "Extensions 9/11/13" })}
-            </span>
-          </label>
         </div>
       </div>
 
