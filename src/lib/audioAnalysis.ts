@@ -105,7 +105,7 @@ const downsample = (input: Float32Array, srIn: number, srOut: number): Float32Ar
 
 // ---------------- FFT (radix-2 Cooley-Tukey, in-place) ----------------
 
-class FFT {
+export class FFT {
   private readonly n: number;
   private readonly cosTable: Float64Array;
   private readonly sinTable: Float64Array;
