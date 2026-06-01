@@ -325,7 +325,6 @@ export default function ChordGrid({ data }: Props) {
                               chord={c}
                               label={`M${barIdx + 1}`}
                               showExtensions={showExtensions}
-                              showVoicings={showVoicings}
                               isPlaying={playingKey === key}
                               onPlay={() => playChordHit(c, key)}
                               onEdit={() => setEditingBar(barIdx)}
@@ -359,7 +358,6 @@ export default function ChordGrid({ data }: Props) {
                         chord={c}
                         label={ci % data.beatsPerBar === 0 ? `M${Math.floor((ri * row.length + ci) / data.beatsPerBar) + 1}` : undefined}
                         showExtensions={showExtensions}
-                        showVoicings={false}
                         compact
                         isPlaying={playingKey === key}
                         onPlay={() => playChordHit(c, key)}
