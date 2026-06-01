@@ -32,6 +32,7 @@ const KeyBpmFinder = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AudioAnalysisResult | null>(null);
   const [elapsed, setElapsed] = useState<number | null>(null);
+  const [chords, setChords] = useState<ChordGridResult | null>(null);
 
   const toggleLanguage = () => {
     document.body.classList.add("lang-switching");
