@@ -461,5 +461,6 @@ export const analyzeAudioFile = async (file: File): Promise<AudioAnalysisResult>
     sampleRate: sr,
     channels: audioBuffer.numberOfChannels,
     fileName: file.name,
+    monoSamples: mono,
   };
 };
