@@ -1457,6 +1457,18 @@
           "description": "Analyse rapidement un acapella ou un instrumental pour caler ton remix dans la bonne tonalité."
         }
       }
+    },
+    "chords": {
+      "title": "Grille d'accords",
+      "analyzing": "Analyse de la grille d'accords…",
+      "empty": "Aucune grille détectée (fichier trop court ou silencieux).",
+      "byBar": "Par mesure",
+      "byBeat": "Par temps",
+      "showExt": "Extensions 9/11/13 (prédictif)",
+      "disclaimer": "Détection beta : ~70-85% de précision sur triades, moins sur productions denses. Les extensions 9/11/13 sont indicatives, noyées dans les harmoniques d'un mix final — à prendre avec recul.",
+      "legend": "Fonctions",
+      "confLegend": "Confiance",
+      "sequence": "Séquence"
     }
   },
   "tempoTools": {

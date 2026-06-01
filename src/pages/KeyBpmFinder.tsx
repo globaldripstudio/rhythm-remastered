@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
 import { analyzeAudioFile, type AudioAnalysisResult } from "@/lib/audioAnalysis";
+import { detectChords, type ChordGridResult, type NoteName } from "@/lib/chordRecognition";
+import ChordGrid from "@/components/tools/ChordGrid";
 
 const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -30,6 +32,7 @@ const KeyBpmFinder = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AudioAnalysisResult | null>(null);
   const [elapsed, setElapsed] = useState<number | null>(null);
+  const [chords, setChords] = useState<ChordGridResult | null>(null);
 
   const toggleLanguage = () => {
     document.body.classList.add("lang-switching");
@@ -45,6 +48,7 @@ const KeyBpmFinder = () => {
     }
     setError(null);
     setResult(null);
+    setChords(null);
     setIsAnalyzing(true);
     const start = performance.now();
     try {
@@ -53,6 +57,20 @@ const KeyBpmFinder = () => {
       const analysis = await analyzeAudioFile(file);
       setResult(analysis);
       setElapsed((performance.now() - start) / 1000);
+      // Chord grid is heavier — run after first paint so results are visible
+      await new Promise((r) => setTimeout(r, 30));
+      try {
+        const grid = detectChords(
+          analysis.monoSamples,
+          analysis.sampleRate,
+          analysis.bpm.bpm,
+          analysis.key.tonic as NoteName,
+          analysis.key.mode,
+        );
+        setChords(grid);
+      } catch (chordErr) {
+        console.warn("Chord detection failed", chordErr);
+      }
     } catch (err) {
       console.error(err);
       setError(t("keybpm.errors.analysis"));
@@ -76,6 +94,7 @@ const KeyBpmFinder = () => {
               "Détection automatique du BPM",
               "Détection de la tonalité musicale (clé majeure/mineure)",
               "Notation Camelot Wheel pour DJs",
+              "Analyseur de grille d'accords avec degrés romains (beta)",
               "100% local dans le navigateur, aucune upload",
             ],
           }),
@@ -268,6 +287,22 @@ const KeyBpmFinder = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Chord grid (beta) */}
+              <Card className="equipment-card lg:col-span-2">
+                <CardContent className="p-4 sm:p-6">
+                  {chords ? (
+                    <ChordGrid data={chords} />
+                  ) : (
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      {t("keybpm.chords.analyzing", { defaultValue: "Analyse de la grille d'accords…" })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+
 
               <Card className="equipment-card">
                 <CardContent className="p-4 sm:p-6">

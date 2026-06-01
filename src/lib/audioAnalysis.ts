@@ -27,6 +27,8 @@ export interface AudioAnalysisResult {
   sampleRate: number;
   channels: number;
   fileName: string;
+  /** Decoded mono samples at original sample rate — used for downstream chord analysis. */
+  monoSamples: Float32Array;
 }
 
 // ---------------- Note / Camelot tables ----------------
@@ -103,7 +105,7 @@ const downsample = (input: Float32Array, srIn: number, srOut: number): Float32Ar
 
 // ---------------- FFT (radix-2 Cooley-Tukey, in-place) ----------------
 
-class FFT {
+export class FFT {
   private readonly n: number;
   private readonly cosTable: Float64Array;
   private readonly sinTable: Float64Array;
@@ -459,5 +461,6 @@ export const analyzeAudioFile = async (file: File): Promise<AudioAnalysisResult>
     sampleRate: sr,
     channels: audioBuffer.numberOfChannels,
     fileName: file.name,
+    monoSamples: mono,
   };
 };

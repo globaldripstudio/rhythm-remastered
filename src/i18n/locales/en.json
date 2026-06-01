@@ -1457,6 +1457,18 @@
           "description": "Quickly analyze an acapella or instrumental to lock your remix in the right key."
         }
       }
+    },
+    "chords": {
+      "title": "Chord grid",
+      "analyzing": "Analyzing chord grid…",
+      "empty": "No grid detected (file too short or silent).",
+      "byBar": "Per bar",
+      "byBeat": "Per beat",
+      "showExt": "9/11/13 extensions (predictive)",
+      "disclaimer": "Beta detection: ~70-85% accuracy on triads, less on dense productions. 9/11/13 extensions are indicative — they're buried in the harmonics of a final mix, so take them with a grain of salt.",
+      "legend": "Functions",
+      "confLegend": "Confidence",
+      "sequence": "Sequence"
     }
   },
   "tempoTools": {
