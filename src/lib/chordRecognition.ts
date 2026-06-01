@@ -378,6 +378,17 @@ const tplFor = (rootPc: number, key: ChordQualityKey): ChordTemplate => {
   return TEMPLATES.find((t) => t.rootPc === rootPc && t.quality.key === key)!;
 };
 
+const triadKeyFor = (quality: ChordQualityKey): ChordQualityKey => TRIAD_FALLBACK[quality];
+
+const SEVENTH_UPGRADE: Partial<Record<ChordQualityKey, ChordQualityKey>> = {
+  maj: "7",
+  min: "m7",
+};
+
+const MAJ7_UPGRADE: Partial<Record<ChordQualityKey, ChordQualityKey>> = {
+  maj: "maj7",
+};
+
 /**
  * If the winner is a 7th-flavoured chord but the seventh pitch class is weak,
  * fall back to the matching triad. Helps avoid spurious "maj7"/"7" detections
@@ -396,8 +407,8 @@ const refineSeventh = (
   for (const pc of triadPcs) triadAvg += chroma[pc];
   triadAvg /= triadPcs.length;
   const seventhEnergy = chroma[seventhPc];
-  // Stricter gate on dominant 7 (most over-detected): need a clearly present b7.
-  const thresh = q.key === "7" ? 0.7 : 0.5;
+  // Strict gate: extensions must be strong enough to survive full-mix noise.
+  const thresh = q.key === "7" ? 0.9 : 0.78;
   if (seventhEnergy < thresh * triadAvg) {
     const fallback = TRIAD_FALLBACK[q.key];
     const tpl = tplFor(best.template.rootPc, fallback);
@@ -407,10 +418,51 @@ const refineSeventh = (
   return best;
 };
 
+const upgradeSeventh = (
+  chroma: Float32Array,
+  bass: Float32Array | null,
+  triad: ChordScore,
+): ChordScore => {
+  const baseKey = triadKeyFor(triad.template.quality.key);
+  if (baseKey !== "maj" && baseKey !== "min") return triad;
+
+  const rootPc = triad.template.rootPc;
+  const triadPcs = triad.template.quality.intervals.slice(0, 3).map((iv) => (rootPc + iv) % 12);
+  let triadAvg = 0;
+  for (const pc of triadPcs) triadAvg += chroma[pc];
+  triadAvg /= triadPcs.length;
+  if (triadAvg <= 0) return triad;
+
+  const candidates: ChordScore[] = [];
+  const minorSeventhKey = SEVENTH_UPGRADE[baseKey];
+  if (minorSeventhKey) {
+    const pc = (rootPc + 10) % 12;
+    const threshold = baseKey === "maj" ? 0.92 : 0.82;
+    if (chroma[pc] >= threshold * triadAvg) {
+      const tpl = tplFor(rootPc, minorSeventhKey);
+      candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
+    }
+  }
+
+  const majorSeventhKey = MAJ7_UPGRADE[baseKey];
+  if (majorSeventhKey) {
+    const pc = (rootPc + 11) % 12;
+    if (chroma[pc] >= 0.88 * triadAvg) {
+      const tpl = tplFor(rootPc, majorSeventhKey);
+      candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
+    }
+  }
+
+  if (candidates.length === 0) return triad;
+  candidates.sort((a, b) => b.score - a.score);
+  return refineSeventh(chroma, bass, candidates[0]);
+};
+
 // ---------------- Quality filtering, diatonic prior, degree mapping ----------------
 
+const CORE_QUALITIES: ReadonlySet<ChordQualityKey> = new Set(["maj", "min", "sus4"]);
 const DEFAULT_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
-  "maj", "min", "maj7", "m7", "7", "sus4",
+  "maj", "min", "sus4",
 ]);
 const EXOTIC_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
   "dim", "aug", "m7b5", "dim7",
