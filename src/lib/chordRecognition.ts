@@ -459,34 +459,9 @@ const upgradeSeventh = (
 // ---------------- Quality filtering, diatonic prior, degree mapping ----------------
 
 const CORE_QUALITIES: ReadonlySet<ChordQualityKey> = new Set(["maj", "min", "sus4"]);
-const DEFAULT_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
-  "maj", "min", "sus4",
-]);
 const EXOTIC_QUALITIES: ReadonlySet<ChordQualityKey> = new Set([
   "dim", "aug", "m7b5", "dim7",
 ]);
-
-/**
- * Hard gating to allow an exotic quality: every chord tone must be clearly
- * present in the chroma (>= 0.7 × triad average) AND the candidate must beat
- * the best non-exotic candidate by a margin >= 0.08.
- */
-const exoticPasses = (
-  chroma: Float32Array,
-  tpl: ChordTemplate,
-  exoticScore: number,
-  bestNonExoticScore: number,
-): boolean => {
-  const pcs = tpl.quality.intervals.map((iv) => (tpl.rootPc + iv) % 12);
-  let avg = 0;
-  for (const pc of pcs) avg += chroma[pc];
-  avg /= pcs.length;
-  if (avg <= 0) return false;
-  for (const pc of pcs) {
-    if (chroma[pc] < 0.7 * avg) return false;
-  }
-  return exoticScore - bestNonExoticScore >= 0.08;
-};
 
 // Expected qualities per scale degree (offset in semitones from tonic).
 // sus4 is treated as neutral (no bonus / no malus).
@@ -525,28 +500,6 @@ const diatonicBonus = (
   if (EXOTIC_QUALITIES.has(quality)) return -NON_DIATONIC_EXOTIC_MALUS;
   return 0;
 };
-
-/** Roman-numeral token (normalisé, sans suffixe d'extension) pour le prior de transition. */
-const degreeToken = (
-  rootPc: number,
-  quality: ChordQualityKey,
-  tonicPc: number,
-  mode: "major" | "minor",
-): string => {
-  const semis = ((rootPc - tonicPc) % 12 + 12) % 12;
-  let base: string = NUMERAL_BY_SEMITONE[semis];
-  let prefix = "";
-  if (base.startsWith("b") || base.startsWith("#")) {
-    prefix = base[0];
-    base = base.slice(1);
-  }
-  const qDef = QUALITIES.find((x) => x.key === quality)!;
-  if (qDef.minorCase) base = base.toLowerCase();
-  let suffix = "";
-  if (quality === "dim" || quality === "dim7") suffix = "°";
-  return prefix + base + suffix;
-};
-
 
 // ---------------- Inversion detection ----------------
 
