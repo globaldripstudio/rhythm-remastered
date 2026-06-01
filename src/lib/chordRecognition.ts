@@ -729,6 +729,10 @@ export const detectChords = (
   // only as a tiebreaker. This prevents a single biased beat sequence from
   // locking a whole bar onto a wrong chord.
   const bars: ChordHit[] = [];
+  const diagnostics: ChordBarDiagnostic[] = [];
+  const shouldLogDiagnostics = typeof window !== "undefined"
+    && window.localStorage.getItem("chordGridDebug") === "1";
+
   for (let bar = 0; bar * beatsPerBar < totalBeats; bar += 1) {
     const slice = beats.slice(bar * beatsPerBar, (bar + 1) * beatsPerBar);
     if (slice.length === 0) break;
@@ -738,26 +742,12 @@ export const detectChords = (
     const barChroma = sumChromas(chromas, fStart, fEnd);
     const barBass = sumChromas(bassChromas, fStart, fEnd);
 
-    // Rank templates on the bar chroma directly
-    const rawBar = rankTemplates(barChroma, barBass);
-    let bestNonExoticScore = -Infinity;
-    for (const r of rawBar) {
-      if (DEFAULT_QUALITIES.has(r.template.quality.key)) {
-        if (r.score > bestNonExoticScore) bestNonExoticScore = r.score;
-      }
-    }
-    const filteredBar: ChordScore[] = [];
-    for (const r of rawBar) {
-      const qk = r.template.quality.key;
-      if (DEFAULT_QUALITIES.has(qk)) {
-        filteredBar.push(r);
-      } else if (EXOTIC_QUALITIES.has(qk)) {
-        if (exoticPasses(barChroma, r.template, r.score, bestNonExoticScore)) {
-          filteredBar.push(r);
-        }
-      }
-    }
+    // Rank core triads on the bar chroma directly. Extensions are handled only
+    // after this choice, so a weak seventh can no longer win the whole bar.
+    const filteredBar = rankTemplates(barChroma, barBass, CORE_QUALITIES);
+    const acousticScores = new Map<ChordTemplate, number>();
     for (const r of filteredBar) {
+      acousticScores.set(r.template, r.score);
       r.score += diatonicBonus(r.template.rootPc, r.template.quality.key, tonicPc, mode);
     }
     filteredBar.sort((a, b2) => b2.score - a.score);
@@ -782,15 +772,16 @@ export const detectChords = (
     }
     if (!chosen) continue;
 
-    // Refine 7ths on bar chroma too
-    chosen = refineSeventh(barChroma, barBass, chosen);
+    const chosenTriad = chosen;
+    // Add 7ths only after the bar triad is chosen and only if strongly present.
+    chosen = upgradeSeventh(barChroma, barBass, chosenTriad);
     const tpl = chosen.template;
 
     // Confidence: blend acoustic margin (bar), beat agreement, avg beat conf
     const secondScore = Math.max(0, filteredBar[1]?.score ?? 0);
-    const bestScore = Math.max(0, chosen.score);
+    const bestScore = Math.max(0, chosenTriad.score);
     const marginNorm = bestScore > 0 ? (bestScore - secondScore) / (bestScore + 1e-3) : 0;
-    const winnerKey = `${NOTE_NAMES[tpl.rootPc]}:${tpl.quality.key}`;
+    const winnerKey = `${NOTE_NAMES[chosenTriad.template.rootPc]}:${chosenTriad.template.quality.key}`;
     const agreement = (beatVote.get(winnerKey) ?? 0) / slice.length;
     const beatConfAvg = slice.reduce((a, h) => a + h.confidence, 0) / slice.length;
     let conf = Math.max(0, Math.min(1,
@@ -801,11 +792,23 @@ export const detectChords = (
     if (marginNorm < 0.03) conf = Math.min(conf, 0.3);
     else if (marginNorm < 0.06) conf = Math.min(conf, 0.5);
 
-
     const root = NOTE_NAMES[tpl.rootPc];
     const { roman, fn } = romanize(tpl.rootPc, tpl.quality, tonicPc, mode);
     const bassNote = detectBass(barBass, tpl.rootPc, tpl.quality);
     const symbol = bassNote ? `${root}${tpl.quality.symbolSuffix}/${bassNote}` : `${root}${tpl.quality.symbolSuffix}`;
+    diagnostics.push({
+      barIndex: bar,
+      chosen: symbol,
+      confidence: conf,
+      margin: marginNorm,
+      beatAgreement: agreement,
+      candidates: filteredBar.slice(0, 5).map((r) => ({
+        symbol: `${NOTE_NAMES[r.template.rootPc]}${r.template.quality.symbolSuffix}`,
+        quality: r.template.quality.key,
+        acousticScore: acousticScores.get(r.template) ?? r.score,
+        finalScore: r.score,
+      })),
+    });
     bars.push({
       root,
       quality: tpl.quality.key,
