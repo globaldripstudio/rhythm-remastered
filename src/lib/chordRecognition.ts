@@ -703,53 +703,92 @@ export const detectChords = (
     return { root, quality: q.key, symbol, roman, fn, confidence: conf, extensions, bass: bassNote };
   });
 
-  // Bar aggregation
+  // Bar aggregation — recompute the best chord directly on the BAR chroma
+  // (with exotic gating + diatonic prior + 7th refinement). Beat votes are used
+  // only as a tiebreaker. This prevents a single biased beat sequence from
+  // locking a whole bar onto a wrong chord.
   const bars: ChordHit[] = [];
   for (let bar = 0; bar * beatsPerBar < totalBeats; bar += 1) {
     const slice = beats.slice(bar * beatsPerBar, (bar + 1) * beatsPerBar);
     if (slice.length === 0) break;
-    const counts = new Map<string, { hit: ChordHit; count: number; totalConf: number }>();
-    for (const h of slice) {
-      const k = `${h.root}:${h.quality}`; // ignore inversion in vote
-      const entry = counts.get(k);
-      if (entry) {
-        entry.count += 1;
-        entry.totalConf += h.confidence;
-      } else {
-        counts.set(k, { hit: h, count: 1, totalConf: h.confidence });
-      }
-    }
-    const sorted = [...counts.values()].sort((a, b) =>
-      b.count - a.count || b.totalConf - a.totalConf,
-    );
-    const winner = sorted[0];
 
     const fStart = Math.floor((bar * barDurationSec) / hopSec);
     const fEnd = Math.floor(((bar + 1) * barDurationSec) / hopSec);
     const barChroma = sumChromas(chromas, fStart, fEnd);
     const barBass = sumChromas(bassChromas, fStart, fEnd);
-    const tpl = tplFor(pitchClass(winner.hit.root), winner.hit.quality);
 
-    const ranking = rankTemplates(barChroma, barBass).slice(0, 4);
-    const bestScore = Math.max(0, ranking[0].score);
-    const winnerScore = Math.max(0, scoreTemplate(barChroma, barBass, tpl));
-    const secondScore = Math.max(0, ranking[1]?.score ?? 0);
-    const marginNorm = bestScore > 0 ? (winnerScore - secondScore) / (bestScore + 1e-3) : 0;
-    const agreement = winner.count / slice.length;
+    // Rank templates on the bar chroma directly
+    const rawBar = rankTemplates(barChroma, barBass);
+    let bestNonExoticScore = -Infinity;
+    for (const r of rawBar) {
+      if (DEFAULT_QUALITIES.has(r.template.quality.key)) {
+        if (r.score > bestNonExoticScore) bestNonExoticScore = r.score;
+      }
+    }
+    const filteredBar: ChordScore[] = [];
+    for (const r of rawBar) {
+      const qk = r.template.quality.key;
+      if (DEFAULT_QUALITIES.has(qk)) {
+        filteredBar.push(r);
+      } else if (EXOTIC_QUALITIES.has(qk)) {
+        if (exoticPasses(barChroma, r.template, r.score, bestNonExoticScore)) {
+          filteredBar.push(r);
+        }
+      }
+    }
+    for (const r of filteredBar) {
+      r.score += diatonicBonus(r.template.rootPc, r.template.quality.key, tonicPc, mode);
+    }
+    filteredBar.sort((a, b2) => b2.score - a.score);
+
+    // Beat-vote tiebreak: among the top 3 bar candidates, prefer the one matching
+    // the majority beat winner if scores are within 5%.
+    const beatVote = new Map<string, number>();
+    for (const h of slice) {
+      const k = `${h.root}:${h.quality}`;
+      beatVote.set(k, (beatVote.get(k) ?? 0) + 1);
+    }
+    let chosen = filteredBar[0];
+    if (chosen && filteredBar.length > 1) {
+      const top = chosen.score;
+      for (let i = 1; i < Math.min(3, filteredBar.length); i += 1) {
+        const cand = filteredBar[i];
+        if (top - cand.score > 0.05 * Math.abs(top + 1e-3)) break;
+        const candKey = `${NOTE_NAMES[cand.template.rootPc]}:${cand.template.quality.key}`;
+        const chosenKey = `${NOTE_NAMES[chosen.template.rootPc]}:${chosen.template.quality.key}`;
+        if ((beatVote.get(candKey) ?? 0) > (beatVote.get(chosenKey) ?? 0)) chosen = cand;
+      }
+    }
+    if (!chosen) continue;
+
+    // Refine 7ths on bar chroma too
+    chosen = refineSeventh(barChroma, barBass, chosen);
+    const tpl = chosen.template;
+
+    // Confidence: blend acoustic margin (bar), beat agreement, avg beat conf
+    const secondScore = Math.max(0, filteredBar[1]?.score ?? 0);
+    const bestScore = Math.max(0, chosen.score);
+    const marginNorm = bestScore > 0 ? (bestScore - secondScore) / (bestScore + 1e-3) : 0;
+    const winnerKey = `${NOTE_NAMES[tpl.rootPc]}:${tpl.quality.key}`;
+    const agreement = (beatVote.get(winnerKey) ?? 0) / slice.length;
     const beatConfAvg = slice.reduce((a, h) => a + h.confidence, 0) / slice.length;
     const conf = Math.max(0, Math.min(1,
-      0.35 * agreement + 0.35 * beatConfAvg + 0.30 * sigmoid(marginNorm * 6 - 0.5),
+      0.25 * agreement + 0.30 * beatConfAvg + 0.45 * sigmoid(marginNorm * 6 - 0.5),
     ));
 
-    const root = winner.hit.root;
+    const root = NOTE_NAMES[tpl.rootPc];
+    const { roman, fn } = romanize(tpl.rootPc, tpl.quality, tonicPc, mode);
     const bassNote = detectBass(barBass, tpl.rootPc, tpl.quality);
     const symbol = bassNote ? `${root}${tpl.quality.symbolSuffix}/${bassNote}` : `${root}${tpl.quality.symbolSuffix}`;
     bars.push({
-      ...winner.hit,
+      root,
+      quality: tpl.quality.key,
       symbol,
-      bass: bassNote,
+      roman,
+      fn,
       confidence: conf,
       extensions: detectExtensions(barChroma, tpl.rootPc, tpl.quality),
+      bass: bassNote,
     });
   }
 
