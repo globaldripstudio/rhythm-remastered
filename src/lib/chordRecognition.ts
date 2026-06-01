@@ -467,7 +467,7 @@ const upgradeSeventh = (
   const minorSeventhKey = SEVENTH_UPGRADE[baseKey];
   if (minorSeventhKey) {
     const pc = (rootPc + 10) % 12;
-    const threshold = baseKey === "maj" ? 0.92 : 0.82;
+    const threshold = baseKey === "maj" ? TH.seventhOnMajThresh : TH.seventhOnMinThresh;
     if (chroma[pc] >= threshold * triadAvg) {
       const tpl = tplFor(rootPc, minorSeventhKey);
       candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
@@ -477,7 +477,7 @@ const upgradeSeventh = (
   const majorSeventhKey = MAJ7_UPGRADE[baseKey];
   if (majorSeventhKey) {
     const pc = (rootPc + 11) % 12;
-    if (chroma[pc] >= 0.88 * triadAvg) {
+    if (chroma[pc] >= TH.maj7Thresh * triadAvg) {
       const tpl = tplFor(rootPc, majorSeventhKey);
       candidates.push({ template: tpl, score: scoreTemplate(chroma, bass, tpl) });
     }
