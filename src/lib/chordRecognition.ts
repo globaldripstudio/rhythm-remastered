@@ -823,13 +823,21 @@ export const detectChords = (
     const winnerKey = `${NOTE_NAMES[chosenTriad.template.rootPc]}:${chosenTriad.template.quality.key}`;
     const agreement = (beatVote.get(winnerKey) ?? 0) / slice.length;
     const beatConfAvg = slice.reduce((a, h) => a + h.confidence, 0) / slice.length;
+    const triadDiversity = beatVote.size;
+    const unstableBeats = triadDiversity > TH.unstableTriadCount;
     let conf = Math.max(0, Math.min(1,
       0.25 * agreement + 0.30 * beatConfAvg + 0.45 * sigmoid(marginNorm * 6 - 0.5),
     ));
     // Ambiguous bar (acoustic margin too small) → cap confidence low instead
     // of falsely affirming a chord. Bars decide the grid; if they hesitate, say so.
-    if (marginNorm < 0.03) conf = Math.min(conf, 0.3);
-    else if (marginNorm < 0.06) conf = Math.min(conf, 0.5);
+    if (marginNorm < TH.ambiguousMargin) conf = Math.min(conf, 0.3);
+    else if (marginNorm < TH.lowConfidenceMargin) conf = Math.min(conf, 0.5);
+    // Beats that disagree across many triads → bar is intrinsically unstable.
+    // Don't bump confidence up, but mark it so the UI can soften.
+    if (unstableBeats) conf = Math.min(conf, 0.5);
+    const ambiguous = marginNorm < TH.ambiguousMargin
+      || agreement < TH.ambiguousAgreement
+      || unstableBeats;
 
     const root = NOTE_NAMES[tpl.rootPc];
     const { roman, fn } = romanize(tpl.rootPc, tpl.quality, tonicPc, mode);
@@ -841,6 +849,8 @@ export const detectChords = (
       confidence: conf,
       margin: marginNorm,
       beatAgreement: agreement,
+      triadDiversity,
+      ambiguous,
       candidates: filteredBar.slice(0, 5).map((r) => ({
         symbol: `${NOTE_NAMES[r.template.rootPc]}${r.template.quality.symbolSuffix}`,
         quality: r.template.quality.key,
@@ -857,6 +867,7 @@ export const detectChords = (
       confidence: conf,
       extensions: detectExtensions(barChroma, tpl.rootPc, tpl.quality),
       bass: bassNote,
+      ambiguous,
     });
   }
 
