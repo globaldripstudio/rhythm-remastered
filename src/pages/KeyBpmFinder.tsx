@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
 import { analyzeAudioFile, type AudioAnalysisResult } from "@/lib/audioAnalysis";
+import { detectChords, type ChordGridResult, type NoteName } from "@/lib/chordRecognition";
+import ChordGrid from "@/components/tools/ChordGrid";
 
 const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
