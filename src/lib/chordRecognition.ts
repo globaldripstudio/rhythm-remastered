@@ -646,6 +646,12 @@ export interface ChordBarDiagnostic {
   confidence: number;
   margin: number;
   beatAgreement: number;
+  /** Number of distinct triads the beats of this bar voted for. */
+  triadDiversity: number;
+  /** True when the bar was flagged unreliable (small margin OR unstable beats). */
+  ambiguous: boolean;
+  /** True when this bar was eligible to merge with the previous one but was refused. */
+  mergeRefused?: boolean;
   candidates: ChordCandidateDiagnostic[];
 }
 
