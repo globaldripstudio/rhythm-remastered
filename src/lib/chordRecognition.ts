@@ -878,20 +878,35 @@ export const detectChords = (
       confiance: Math.round(d.confidence * 100),
       marge: Number(d.margin.toFixed(3)),
       accordBeats: Number(d.beatAgreement.toFixed(2)),
+      diversite: d.triadDiversity,
+      ambigu: d.ambiguous ? "oui" : "",
+      fusionRefusee: d.mergeRefused ? "oui" : "",
       top5: d.candidates.map((c) => `${c.symbol}:${c.finalScore.toFixed(3)}`).join(" | "),
     })));
   }
 
-  // Segments
+  // Segments — fusion gating (Acte 4) :
+  // Two consecutive bars only merge when (a) they share the exact same symbol,
+  // (b) neither is flagged ambiguous, and (c) both reach a minimum confidence.
+  // Otherwise we keep them as distinct bars to avoid hiding a contradiction
+  // inside one wide block.
   const segments: ChordSegment[] = [];
   for (let i = 0; i < bars.length; i += 1) {
     const cur = bars[i];
     if (segments.length > 0) {
       const last = segments[segments.length - 1];
-      if (last.chord.symbol === cur.symbol) {
+      const sameSymbol = last.chord.symbol === cur.symbol;
+      const bothConfident = !last.chord.ambiguous
+        && !cur.ambiguous
+        && last.chord.confidence >= TH.mergeMinConfidence
+        && cur.confidence >= TH.mergeMinConfidence;
+      if (sameSymbol && bothConfident) {
         last.beatLength += beatsPerBar;
         last.durationSec += barDurationSec;
         continue;
+      }
+      if (sameSymbol && !bothConfident && diagnostics[i]) {
+        diagnostics[i].mergeRefused = true;
       }
     }
     segments.push({
