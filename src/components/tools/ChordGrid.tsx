@@ -53,64 +53,10 @@ const confidenceDots = (conf: number) => {
   return "●○○";
 };
 
-// Inline mini-piano (2 octaves, C3..B4) highlighting the chord's pitch classes.
-const MiniPiano = ({ pcs }: { pcs: Set<number> }) => {
-  const whiteOffs = [0, 2, 4, 5, 7, 9, 11];
-  const blackOffs = [1, 3, 6, 8, 10];
-  const blackAfter = [0, 1, 3, 4, 5];
-  const octaves = 2;
-  const whiteCount = octaves * 7;
-  return (
-    <div className="relative h-10 w-full">
-      <div className="absolute inset-0 flex">
-        {Array.from({ length: whiteCount }).map((_, i) => {
-          const o = Math.floor(i / 7);
-          const idx = i % 7;
-          const pc = (whiteOffs[idx]) % 12;
-          const on = pcs.has(pc);
-          return (
-            <div
-              key={`w-${i}`}
-              className={cn(
-                "h-full flex-1 border-r border-border/60 last:border-r-0 rounded-b-sm",
-                on ? "bg-primary/60" : "bg-background",
-              )}
-              style={{ marginLeft: 0 }}
-            />
-          );
-        })}
-      </div>
-      <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: octaves }).map((_, o) =>
-          blackOffs.map((off, bi) => {
-            const pc = off % 12;
-            const on = pcs.has(pc);
-            const whiteIndex = o * 7 + blackAfter[bi];
-            const whiteWidth = 100 / whiteCount;
-            const blackWidth = whiteWidth * 0.62;
-            const left = whiteWidth * (whiteIndex + 1) - blackWidth / 2;
-            return (
-              <div
-                key={`b-${o}-${bi}`}
-                className={cn(
-                  "absolute top-0 h-[62%] rounded-b-sm border border-border/80",
-                  on ? "bg-secondary" : "bg-foreground/85",
-                )}
-                style={{ left: `${left}%`, width: `${blackWidth}%` }}
-              />
-            );
-          }),
-        )}
-      </div>
-    </div>
-  );
-};
-
 const ChordTile = ({
   chord,
   label,
   showExtensions,
-  showVoicings,
   compact,
   isPlaying,
   onPlay,
@@ -119,14 +65,12 @@ const ChordTile = ({
   chord: ChordHit;
   label?: string;
   showExtensions: boolean;
-  showVoicings: boolean;
   compact?: boolean;
   isPlaying: boolean;
   onPlay: () => void;
   onEdit?: () => void;
 }) => {
   const fnClass = chord.fn ? FN_STYLE[chord.fn] : "bg-muted/20 text-muted-foreground border-border/40";
-  const pcs = useMemo(() => chordPitchClasses(chord, showExtensions), [chord, showExtensions]);
   return (
     <button
       type="button"
@@ -172,11 +116,6 @@ const ChordTile = ({
       >
         {confidenceDots(chord.confidence)}
       </span>
-      {showVoicings && (
-        <div className="mt-1.5 w-full">
-          <MiniPiano pcs={pcs} />
-        </div>
-      )}
       <Play className={cn("absolute bottom-1 right-1 h-3 w-3 text-muted-foreground/40 group-hover:text-primary", isPlaying && "text-primary")} />
     </button>
   );
