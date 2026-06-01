@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import {
   buildPianoVoicing,
   chordPitchClasses,
-  intervalsFor,
   symbolSuffixFor,
   type ChordGridResult,
   type ChordHit,
