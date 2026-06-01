@@ -94,6 +94,7 @@ const KeyBpmFinder = () => {
               "Détection automatique du BPM",
               "Détection de la tonalité musicale (clé majeure/mineure)",
               "Notation Camelot Wheel pour DJs",
+              "Analyseur de grille d'accords avec degrés romains (beta)",
               "100% local dans le navigateur, aucune upload",
             ],
           }),
