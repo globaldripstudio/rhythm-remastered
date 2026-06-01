@@ -223,6 +223,7 @@ export default function ChordGrid({ data }: Props) {
       fn: undefined,
       confidence: 1, // user-asserted
       extensions: [],
+      ambiguous: false,
     };
     setEdits((m) => new Map(m).set(barIdx, updated));
   };
