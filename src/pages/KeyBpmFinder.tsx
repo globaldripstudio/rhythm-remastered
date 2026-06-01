@@ -48,6 +48,7 @@ const KeyBpmFinder = () => {
     }
     setError(null);
     setResult(null);
+    setChords(null);
     setIsAnalyzing(true);
     const start = performance.now();
     try {
@@ -56,6 +57,20 @@ const KeyBpmFinder = () => {
       const analysis = await analyzeAudioFile(file);
       setResult(analysis);
       setElapsed((performance.now() - start) / 1000);
+      // Chord grid is heavier — run after first paint so results are visible
+      await new Promise((r) => setTimeout(r, 30));
+      try {
+        const grid = detectChords(
+          analysis.monoSamples,
+          analysis.sampleRate,
+          analysis.bpm.bpm,
+          analysis.key.tonic as NoteName,
+          analysis.key.mode,
+        );
+        setChords(grid);
+      } catch (chordErr) {
+        console.warn("Chord detection failed", chordErr);
+      }
     } catch (err) {
       console.error(err);
       setError(t("keybpm.errors.analysis"));
