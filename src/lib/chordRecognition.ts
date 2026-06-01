@@ -717,9 +717,14 @@ export const detectChords = (
     const winnerKey = `${NOTE_NAMES[tpl.rootPc]}:${tpl.quality.key}`;
     const agreement = (beatVote.get(winnerKey) ?? 0) / slice.length;
     const beatConfAvg = slice.reduce((a, h) => a + h.confidence, 0) / slice.length;
-    const conf = Math.max(0, Math.min(1,
+    let conf = Math.max(0, Math.min(1,
       0.25 * agreement + 0.30 * beatConfAvg + 0.45 * sigmoid(marginNorm * 6 - 0.5),
     ));
+    // Ambiguous bar (acoustic margin too small) → cap confidence low instead
+    // of falsely affirming a chord. Bars decide the grid; if they hesitate, say so.
+    if (marginNorm < 0.03) conf = Math.min(conf, 0.3);
+    else if (marginNorm < 0.06) conf = Math.min(conf, 0.5);
+
 
     const root = NOTE_NAMES[tpl.rootPc];
     const { roman, fn } = romanize(tpl.rootPc, tpl.quality, tonicPc, mode);
