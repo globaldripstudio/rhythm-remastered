@@ -296,14 +296,31 @@ export default function ChordGrid({ data }: Props) {
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-        <span className="uppercase tracking-wide">{t("keybpm.chords.legend", { defaultValue: "Fonctions" })} :</span>
+        <span className="uppercase tracking-wide">Fonctions :</span>
         <span className="inline-flex items-center gap-1"><span className="rounded border border-primary/40 bg-primary/15 px-1 text-[10px] text-primary">T</span> Tonique</span>
         <span className="inline-flex items-center gap-1"><span className="rounded border border-secondary/40 bg-secondary/20 px-1 text-[10px] text-secondary">S</span> Sous-dominante</span>
         <span className="inline-flex items-center gap-1"><span className="rounded border border-destructive/40 bg-destructive/15 px-1 text-[10px] text-destructive">D</span> Dominante</span>
         <span className="ml-auto font-mono text-[10px]">
-          {t("keybpm.chords.confLegend", { defaultValue: "Confiance" })} : ●●● {t("keybpm.confidence.high")} · ●●○ {t("keybpm.confidence.medium")} · ●○○ {t("keybpm.confidence.low")}
+          Confiance : ●●● {t("keybpm.confidence.high")} · ●●○ {t("keybpm.confidence.medium")} · ●○○ {t("keybpm.confidence.low")}
         </span>
       </div>
+
+      {/* Symbols legend */}
+      <details className="rounded-md border border-border bg-background/40 p-3 text-[11px] text-muted-foreground">
+        <summary className="cursor-pointer font-semibold text-foreground inline-flex items-center gap-1.5">
+          <Info className="h-3.5 w-3.5 text-primary" /> Que veulent dire les symboles ?
+        </summary>
+        <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
+          <div><span className="font-mono text-foreground">C</span> = accord majeur · <span className="font-mono text-foreground">Cm</span> = mineur</div>
+          <div><span className="font-mono text-foreground">Cmaj7</span> = septième majeure (couleur jazz/lounge)</div>
+          <div><span className="font-mono text-foreground">C7</span> = septième de dominante · <span className="font-mono text-foreground">Cm7</span> = mineur 7</div>
+          <div><span className="font-mono text-foreground">Csus4</span> = quarte suspendue (tension non résolue)</div>
+          <div><span className="font-mono text-foreground">C°</span> = diminué (rare hors classique/jazz)</div>
+          <div><span className="font-mono text-foreground">C°7</span> = septième diminuée (très tendu, accord de passage)</div>
+          <div><span className="font-mono text-foreground">Cø</span> = demi-diminué / m7b5 (couleur jazz, typique du <em>ii</em> en mineur)</div>
+          <div><span className="font-mono text-foreground">C/E</span> = accord de C avec E à la basse (renversement)</div>
+        </div>
+      </details>
 
       {/* Grid */}
       <div className="space-y-3">
