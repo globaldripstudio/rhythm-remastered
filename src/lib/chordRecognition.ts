@@ -756,7 +756,7 @@ export const detectChords = (
     // the majority beat winner if scores are within 5%.
     const beatVote = new Map<string, number>();
     for (const h of slice) {
-      const k = `${h.root}:${h.quality}`;
+      const k = `${h.root}:${triadKeyFor(h.quality)}`;
       beatVote.set(k, (beatVote.get(k) ?? 0) + 1);
     }
     let chosen = filteredBar[0];
@@ -819,6 +819,17 @@ export const detectChords = (
       extensions: detectExtensions(barChroma, tpl.rootPc, tpl.quality),
       bass: bassNote,
     });
+  }
+
+  if (shouldLogDiagnostics && diagnostics.length > 0) {
+    console.table(diagnostics.map((d) => ({
+      mesure: d.barIndex + 1,
+      accord: d.chosen,
+      confiance: Math.round(d.confidence * 100),
+      marge: Number(d.margin.toFixed(3)),
+      accordBeats: Number(d.beatAgreement.toFixed(2)),
+      top5: d.candidates.map((c) => `${c.symbol}:${c.finalScore.toFixed(3)}`).join(" | "),
+    })));
   }
 
   // Segments
@@ -884,6 +895,7 @@ export const detectChords = (
     bars,
     segments,
     modulations,
+    diagnostics,
   };
 };
 
