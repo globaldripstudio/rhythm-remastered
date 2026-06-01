@@ -27,6 +27,8 @@ export interface AudioAnalysisResult {
   sampleRate: number;
   channels: number;
   fileName: string;
+  /** Decoded mono samples at original sample rate — used for downstream chord analysis. */
+  monoSamples: Float32Array;
 }
 
 // ---------------- Note / Camelot tables ----------------
