@@ -7,14 +7,11 @@
  *  3. Per-frame chroma over [65 Hz, 2000 Hz] with low-mid emphasis.
  *  4. Bass chroma over [65 Hz, 250 Hz] (used for inversion detection).
  *  5. Temporal median filter over chromas (3 frames) to smooth transients.
- *  6. Per-beat aggregation + template matching with:
- *     - Templates weighted by overtone series (1 / 0.5 / 0.33 / 0.25)
- *     - Non-chord-tone penalty (λ ≈ 0.3 of out-of-template energy)
- *     - Bass-match bonus (+0.2 when bass PC == root PC)
- *  7. Beat-to-beat transition penalty (small cost to change chord) — Viterbi-lite.
- *  8. Bar = majority vote of beat winners, confidence re-calibrated from bar chroma.
- *  9. Stricter 7th: a 7th flavour is only kept if the 7th pitch class is strong
- *     (>= 0.5 × triad-tone average), otherwise the triad version wins.
+ *  6. Triad-first scoring: stable maj/min/sus4 templates are ranked from the
+ *     signal before any musical prior or extension is allowed to intervene.
+ *  7. Bar = primary recognition unit; beats only confirm / lower confidence.
+ *  8. 7ths are added only in post-processing when the seventh pitch class is
+ *     clearly present on the whole beat/bar chroma.
  * 10. Inversion: if a non-root chord tone dominates the bass chroma → "slash" bass.
  * 11. Modulation: sliding window of 8 bars; if the best-fit key changes vs the
  *     reference, mark a modulation event.
@@ -211,32 +208,54 @@ const computeFrameChromas = (samples: Float32Array, sampleRate: number): FrameCh
 
 // ---------------- Scoring ----------------
 
-const dot = (a: Float32Array, b: Float32Array): number => {
-  let s = 0;
-  for (let i = 0; i < 12; i += 1) s += a[i] * b[i];
-  return s;
-};
+const hasPc = (pcs: number[], pc: number): boolean => pcs.includes(pc);
 
-/** Score = dot(chroma, template) − λ × out-of-template energy + bass bonus. */
+/**
+ * Acoustic score only. The score favours complete triads, penalises strong
+ * non-chord tones, and treats bass as evidence — never as a hard lock.
+ */
 const scoreTemplate = (
   chroma: Float32Array,
   bassChroma: Float32Array | null,
   tpl: ChordTemplate,
 ): number => {
-  const lambda = 0.3;
-  let inT = 0;
-  let outT = 0;
-  for (let i = 0; i < 12; i += 1) {
-    if (tpl.vector[i] > 0.01) inT += chroma[i] * tpl.vector[i];
-    else outT += chroma[i];
+  const pcs = tpl.quality.intervals.map((iv) => (tpl.rootPc + iv) % 12);
+  let chordSum = 0;
+  let chordMin = Infinity;
+  for (const pc of pcs) {
+    const weight = pc === tpl.rootPc ? 1.12 : 1;
+    const energy = chroma[pc] * weight;
+    chordSum += energy;
+    if (energy < chordMin) chordMin = energy;
   }
-  let score = inT - lambda * outT;
+
+  let outSum = 0;
+  let outMax = 0;
+  for (let pc = 0; pc < 12; pc += 1) {
+    if (!hasPc(pcs, pc)) {
+      outSum += chroma[pc];
+      if (chroma[pc] > outMax) outMax = chroma[pc];
+    }
+  }
+
+  const chordAvg = chordSum / pcs.length;
+  const outAvg = outSum / Math.max(1, 12 - pcs.length);
+  let score = 1.2 * chordAvg + 0.45 * chordMin - 0.72 * outAvg - 0.32 * outMax;
+
   if (bassChroma) {
-    // Bonus when the bass clearly outlines the chord root.
-    const bassRoot = bassChroma[tpl.rootPc];
+    let bassPc = 0;
     let bassMax = 0;
-    for (let i = 0; i < 12; i += 1) if (bassChroma[i] > bassMax) bassMax = bassChroma[i];
-    if (bassMax > 0 && bassRoot / bassMax > 0.7) score += 0.2 * bassRoot;
+    for (let pc = 0; pc < 12; pc += 1) {
+      if (bassChroma[pc] > bassMax) {
+        bassMax = bassChroma[pc];
+        bassPc = pc;
+      }
+    }
+    if (bassMax > 0) {
+      if (bassPc === tpl.rootPc) score += 0.12 * bassMax;
+      else if (hasPc(pcs, bassPc)) score += 0.04 * bassMax;
+      else score -= 0.16 * bassMax;
+    }
   }
   return score;
 };
@@ -246,9 +265,17 @@ interface ChordScore {
   score: number;
 }
 
-const rankTemplates = (chroma: Float32Array, bass: Float32Array | null): ChordScore[] => {
+const rankTemplates = (
+  chroma: Float32Array,
+  bass: Float32Array | null,
+  allowedQualities?: ReadonlySet<ChordQualityKey>,
+): ChordScore[] => {
   const out: ChordScore[] = [];
-  for (const t of TEMPLATES) out.push({ template: t, score: scoreTemplate(chroma, bass, t) });
+  for (const t of TEMPLATES) {
+    if (!allowedQualities || allowedQualities.has(t.quality.key)) {
+      out.push({ template: t, score: scoreTemplate(chroma, bass, t) });
+    }
+  }
   out.sort((a, b) => b.score - a.score);
   return out;
 };
