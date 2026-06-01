@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Music, Sparkles, ChevronsRight, Play, Pencil, Download, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -233,6 +233,12 @@ export default function ChordGrid({ data }: Props) {
   const [exportRange, setExportRange] = useState<"full" | "custom">("full");
   const [rangeFrom, setRangeFrom] = useState(1);
   const [rangeTo, setRangeTo] = useState(Math.min(8, data.bars.length));
+
+  useEffect(() => {
+    setEdits(new Map());
+    setRangeFrom(1);
+    setRangeTo(Math.min(8, data.bars.length));
+  }, [data]);
 
   const bars = useMemo(() => data.bars.map((b, i) => edits.get(i) ?? b), [data.bars, edits]);
 
