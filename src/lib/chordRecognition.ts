@@ -321,6 +321,12 @@ export interface ChordHit {
   extensions: Array<"9" | "11" | "13">;
   /** Detected bass note when it differs from the root (slash chord). */
   bass?: NoteName | null;
+  /**
+   * True when the bar/beat chroma did not clearly designate a winner
+   * (small acoustic margin, or beats disagree across triads).
+   * The UI uses this to soften the rendering instead of pretending certainty.
+   */
+  ambiguous?: boolean;
 }
 
 const romanize = (
