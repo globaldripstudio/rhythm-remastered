@@ -287,6 +287,22 @@ const KeyBpmFinder = () => {
                 </CardContent>
               </Card>
 
+              {/* Chord grid (beta) */}
+              <Card className="equipment-card lg:col-span-2">
+                <CardContent className="p-4 sm:p-6">
+                  {chords ? (
+                    <ChordGrid data={chords} />
+                  ) : (
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      {t("keybpm.chords.analyzing", { defaultValue: "Analyse de la grille d'accords…" })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+
+
               <Card className="equipment-card">
                 <CardContent className="p-4 sm:p-6">
                   <h3 className="text-sm font-semibold text-muted-foreground">{t("keybpm.metrics.file")}</h3>
