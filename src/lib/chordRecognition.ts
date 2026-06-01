@@ -230,8 +230,8 @@ const romanize = (
   mode: "major" | "minor",
 ): { roman: string; fn?: "T" | "S" | "D" } => {
   const semis = ((rootPc - tonicPc) % 12 + 12) % 12;
-  const baseNumeral = NUMERAL_BY_SEMITONE[semis];
-  let body = baseNumeral;
+  const baseNumeral: string = NUMERAL_BY_SEMITONE[semis];
+  let body: string = baseNumeral;
   let prefix = "";
   if (body.startsWith("b") || body.startsWith("#")) {
     prefix = body[0];
