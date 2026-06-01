@@ -164,7 +164,6 @@ export default function ChordGrid({ data }: Props) {
   const { t } = useTranslation();
   const [resolution, setResolution] = useState<"bar" | "beat">("bar");
   const [showExtensions, setShowExtensions] = useState(false);
-  const [showVoicings, setShowVoicings] = useState(true);
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [edits, setEdits] = useState<Map<number, ChordHit>>(new Map());
   const [editingBar, setEditingBar] = useState<number | null>(null);
