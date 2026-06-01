@@ -298,3 +298,37 @@ export function randomProgression(modeMood: "major" | "minor"): string[] {
   const pick = pool[Math.floor(Math.random() * pool.length)];
   return [...pick.tokens];
 }
+
+/**
+ * Log-probabilité de transition entre deux degrés (normalisés, sans extension).
+ * Réutilise les tables MAJOR_TRANSITIONS / MINOR_TRANSITIONS pour rester aligné
+ * sur le builder guidé "Accords & Gamme".
+ *  - Si `next ∈ goods(prev)` → log(P_high / |goods|)
+ *  - Sinon → log(P_low / (totalDegrees − |goods|))
+ *  - Premier accord (prev === null) → 0 (uniforme).
+ *  - `next === prev` (continuation) → neutre (~0).
+ */
+export function transitionLogProb(
+  prev: string | null,
+  next: string,
+  mood: "major" | "minor",
+): number {
+  if (!prev) return 0;
+  const table = mood === "major" ? MAJOR_TRANSITIONS : MINOR_TRANSITIONS;
+  const allDegrees = mood === "major"
+    ? ["I", "ii", "iii", "IV", "V", "vi", "vii°"]
+    : ["i", "ii°", "bIII", "iv", "v", "V", "bVI", "bVII"];
+  const p = normalizeDegree(prev);
+  const n = normalizeDegree(next);
+  if (p === n) return 0; // continuation : neutre
+  const goods = table[p] ?? allDegrees;
+  const goodSet = new Set(goods);
+  const total = allDegrees.length;
+  const P_HIGH = 0.9;
+  const P_LOW = 0.1;
+  if (goodSet.has(n)) {
+    return Math.log(P_HIGH / Math.max(1, goodSet.size));
+  }
+  return Math.log(P_LOW / Math.max(1, total - goodSet.size));
+}
+
