@@ -414,7 +414,15 @@ export default function ChordGrid({ data }: Props) {
         <div className="flex flex-wrap items-center gap-1.5 text-sm">
           {data.segments.map((seg, i) => (
             <span key={`seg-${i}`} className="inline-flex items-center gap-1">
-              <span className="rounded border border-border bg-background px-2 py-0.5 font-semibold text-foreground">
+              <span
+                className={cn(
+                  "rounded border px-2 py-0.5 font-semibold text-foreground",
+                  seg.chord.ambiguous
+                    ? "border-dashed border-muted-foreground/50 bg-background/50 opacity-70"
+                    : "border-border bg-background",
+                )}
+                title={seg.chord.ambiguous ? "Mesure ambiguë" : undefined}
+              >
                 {seg.chord.symbol}
                 {seg.beatLength > data.beatsPerBar && (
                   <span className="ml-1 font-mono text-[10px] text-muted-foreground">×{seg.beatLength / data.beatsPerBar}</span>
