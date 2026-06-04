@@ -1662,6 +1662,30 @@
         "title": "Gratuit & illimité",
         "description": "Pas de quota, pas d'inscription. Utilise-le autant que tu veux."
       }
+    },
+    "info": {
+      "profile": "Profil",
+      "key": "Tonalité",
+      "lowConfidence": "incertain"
+    },
+    "profiles": {
+      "mono-clean": "Mélodie monophonique",
+      "piano-clean": "Piano / clavier clean",
+      "piano-dirty": "Piano sale / bitcrushé",
+      "dense-pad": "Accords denses / pad",
+      "custom": "Personnalisé"
+    },
+    "advanced": {
+      "toggle": "Réglages avancés",
+      "profileLabel": "Profil sonore",
+      "passesLabel": "Nettoyage automatique",
+      "passesHint": "Toutes ces passes sont activées par défaut et s'auto-désactivent si elles retirent plus de 30 % des notes.",
+      "passes": {
+        "octaveGhost": "Filtre d'octaves fantômes",
+        "hardenedMerge": "Fusion durcie des répétitions",
+        "snapToGrid": "Snap léger sur la grille (si BPM fiable)",
+        "tonalFilter": "Filtre tonal (si tonalité fiable)"
+      }
     }
   },
   "chordTools": {

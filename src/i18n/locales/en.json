@@ -1662,6 +1662,30 @@
         "title": "Free & unlimited",
         "description": "No quota, no signup. Use it as much as you want."
       }
+    },
+    "info": {
+      "profile": "Profile",
+      "key": "Key",
+      "lowConfidence": "uncertain"
+    },
+    "profiles": {
+      "mono-clean": "Monophonic melody",
+      "piano-clean": "Clean piano / keys",
+      "piano-dirty": "Dirty / bitcrushed piano",
+      "dense-pad": "Dense chords / pad",
+      "custom": "Custom"
+    },
+    "advanced": {
+      "toggle": "Advanced settings",
+      "profileLabel": "Audio profile",
+      "passesLabel": "Automatic cleanup",
+      "passesHint": "All passes are on by default and auto-disable if they remove more than 30% of the notes.",
+      "passes": {
+        "octaveGhost": "Ghost-octave filter",
+        "hardenedMerge": "Strict repeat merging",
+        "snapToGrid": "Light grid snap (if BPM reliable)",
+        "tonalFilter": "Tonal filter (if key reliable)"
+      }
     }
   },
   "chordTools": {
