@@ -12,6 +12,8 @@ export interface AudioToMidiOptions {
   minNoteDurationMs?: number;
   inferOnsets?: boolean;
   includePitchBends?: boolean;
+  /** If true, skip the default same-pitch merging — useful when running our own post-process pipeline. */
+  skipDefaultMerge?: boolean;
 }
 
 export interface AudioToMidiProgress {
