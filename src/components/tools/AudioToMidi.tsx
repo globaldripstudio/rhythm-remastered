@@ -77,11 +77,21 @@ const AudioToMidi = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // Less sensitive defaults — fewer doubled notes
-  const onsetThreshold = 0.7;
-  const frameThreshold = 0.45;
-  const minNoteMs = 120;
+  // Default thresholds (overridden once profile is detected)
+  const [thresholds, setThresholds] = useState<ProfileThresholds>(PROFILE_PRESETS["piano-clean"]);
+  const [profile, setProfile] = useState<AudioProfile>("piano-clean");
+  const [keyResult, setKeyResult] = useState<KeyResult | null>(null);
+  const [bpmResult, setBpmResult] = useState<BpmResult | null>(null);
+  const [rawNotesCache, setRawNotesCache] = useState<NoteEvent[]>([]);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [pp, setPp] = useState({
+    octaveGhost: true,
+    hardenedMerge: true,
+    snapToGrid: true,
+    tonalFilter: true,
+  });
   const includeBends = false;
+
 
   const handleFile = useCallback(
     (f?: File) => {
