@@ -1,23 +1,36 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
+  ChevronDown,
   Download,
   FileAudio,
   Loader2,
   Music4,
   Pause,
   Play,
+  Settings2,
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { audioToMidiNotes, type AudioToMidiProgress } from "@/lib/audioToMidi/basicPitch";
+import {
+  estimateProfile,
+  PROFILE_PRESETS,
+  type AudioProfile,
+  type ProfileThresholds,
+} from "@/lib/audioToMidi/profile";
+import { runPostProcessPipeline } from "@/lib/audioToMidi/postProcess";
+import { analyzeAudioFile, type KeyResult, type BpmResult } from "@/lib/audioAnalysis";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
+
 
 
 interface AudioToMidiProps {
