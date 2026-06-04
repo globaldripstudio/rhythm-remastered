@@ -607,6 +607,91 @@ const AudioToMidi = ({
                   </Button>
                 </div>
               </div>
+
+              {/* Info banner: profile / key / bpm */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                <span>
+                  <span className="text-muted-foreground/80">{t("audio2midi.info.profile")} : </span>
+                  <span className="font-medium text-foreground">{t(`audio2midi.profiles.${profile}`)}</span>
+                </span>
+                {keyResult && (
+                  <span>
+                    <span className="text-muted-foreground/80">{t("audio2midi.info.key")} : </span>
+                    <span className="font-medium text-foreground">
+                      {keyResult.tonic} {keyResult.mode === "minor" ? "min" : "maj"}
+                    </span>
+                    {keyResult.confidence < 0.6 && (
+                      <span className="ml-1 text-[10px] uppercase tracking-wide text-muted-foreground/70">
+                        ({t("audio2midi.info.lowConfidence")})
+                      </span>
+                    )}
+                  </span>
+                )}
+                {bpmResult && bpmResult.bpm > 0 && (
+                  <span>
+                    <span className="text-muted-foreground/80">BPM : </span>
+                    <span className="font-medium text-foreground">{bpmResult.bpm}</span>
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setAdvancedOpen((v) => !v)}
+                  className="ml-auto inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <Settings2 className="h-3.5 w-3.5" />
+                  {t("audio2midi.advanced.toggle")}
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+                </button>
+              </div>
+
+              {/* Advanced panel */}
+              {advancedOpen && (
+                <div className="space-y-4 rounded-md border border-border/60 bg-background/40 p-3 sm:p-4">
+                  <div>
+                    <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {t("audio2midi.advanced.profileLabel")}
+                    </Label>
+                    <div className="flex flex-wrap gap-2">
+                      {(["mono-clean", "piano-clean", "piano-dirty", "dense-pad"] as const).map((p) => (
+                        <Button
+                          key={p}
+                          size="sm"
+                          variant={profile === p ? "default" : "outline"}
+                          onClick={() => handleApplyProfile(p)}
+                          disabled={isProcessing}
+                        >
+                          {t(`audio2midi.profiles.${p}`)}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {t("audio2midi.advanced.passesLabel")}
+                    </Label>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {([
+                        { key: "octaveGhost", label: t("audio2midi.advanced.passes.octaveGhost") },
+                        { key: "hardenedMerge", label: t("audio2midi.advanced.passes.hardenedMerge") },
+                        { key: "snapToGrid", label: t("audio2midi.advanced.passes.snapToGrid") },
+                        { key: "tonalFilter", label: t("audio2midi.advanced.passes.tonalFilter") },
+                      ] as const).map(({ key, label }) => (
+                        <div key={key} className="flex items-center justify-between rounded-md border border-border/40 bg-muted/10 px-3 py-2">
+                          <span className="text-sm text-foreground">{label}</span>
+                          <Switch
+                            checked={pp[key]}
+                            onCheckedChange={(v) => setPp((s) => ({ ...s, [key]: v }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      {t("audio2midi.advanced.passesHint")}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div ref={wrapRef} className="rounded-lg border border-border/60 bg-card/40 p-2">
                 <canvas
                   ref={canvasRef}
