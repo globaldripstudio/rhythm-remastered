@@ -287,63 +287,54 @@ const AudioToMidi = ({
   const handleRun = async (overrideFile?: File, overrideThresholds?: ProfileThresholds) => {
     const target = overrideFile ?? file;
     if (!target) return;
-    const useThresholds = overrideThresholds ?? thresholds;
     setIsProcessing(true);
     setNotes([]);
     setRawNotesCache([]);
     setPlayheadSec(0);
     playheadRef.current = 0;
     try {
-      // Run Basic Pitch + audio analysis (key + bpm) in parallel
-      const [result, analysis] = await Promise.all([
-        audioToMidiNotes(
-          target,
-          {
-            onsetThreshold: useThresholds.onsetThreshold,
-            frameThreshold: useThresholds.frameThreshold,
-            minNoteDurationMs: useThresholds.minNoteDurationMs,
-            includePitchBends: includeBends,
-            skipDefaultMerge: true,
-          },
-          setProgress,
-        ),
-        analyzeAudioFile(target).catch(() => null),
-      ]);
+      // Step 1 — quick audio analysis (key + bpm + mono samples). Fast (~1-2s).
+      let analysis: Awaited<ReturnType<typeof analyzeAudioFile>> | null = null;
+      try {
+        analysis = await analyzeAudioFile(target);
+      } catch {
+        analysis = null;
+      }
 
-      // If we haven't picked a profile from the user yet, auto-detect from samples
-      let detectedProfile = profile;
-      if (!overrideThresholds && profile === "piano-clean") {
+      // Step 2 — pick thresholds. If user supplied an override (Advanced panel),
+      // use it. Otherwise auto-detect a profile from the analysis samples.
+      let useThresholds = overrideThresholds ?? thresholds;
+      let pickedProfile: AudioProfile = profile;
+      if (!overrideThresholds && analysis) {
         try {
-          const est = estimateProfile(result.samples, 22050);
-          detectedProfile = est.profile;
+          const est = estimateProfile(analysis.monoSamples, analysis.sampleRate);
+          pickedProfile = est.profile;
+          useThresholds = est.thresholds;
           setProfile(est.profile);
           setThresholds(est.thresholds);
-          // If profile changed materially, re-run once with the new thresholds
-          if (
-            est.thresholds.onsetThreshold !== useThresholds.onsetThreshold ||
-            est.thresholds.frameThreshold !== useThresholds.frameThreshold ||
-            est.thresholds.minNoteDurationMs !== useThresholds.minNoteDurationMs
-          ) {
-            const reRun = await audioToMidiNotes(
-              target,
-              {
-                onsetThreshold: est.thresholds.onsetThreshold,
-                frameThreshold: est.thresholds.frameThreshold,
-                minNoteDurationMs: est.thresholds.minNoteDurationMs,
-                includePitchBends: includeBends,
-                skipDefaultMerge: true,
-              },
-              setProgress,
-            );
-            result.notes = reRun.notes;
-            result.durationSec = reRun.durationSec;
-          }
         } catch (e) {
           if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
             console.warn("[audio2midi] profile estimation failed", e);
           }
         }
       }
+
+      if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
+        console.log("[audio2midi] run", { profile: pickedProfile, thresholds: useThresholds, key: analysis?.key, bpm: analysis?.bpm });
+      }
+
+      // Step 3 — Basic Pitch with the chosen thresholds
+      const result = await audioToMidiNotes(
+        target,
+        {
+          onsetThreshold: useThresholds.onsetThreshold,
+          frameThreshold: useThresholds.frameThreshold,
+          minNoteDurationMs: useThresholds.minNoteDurationMs,
+          includePitchBends: includeBends,
+          skipDefaultMerge: true,
+        },
+        setProgress,
+      );
 
       setKeyResult(analysis?.key ?? null);
       setBpmResult(analysis?.bpm ?? null);
@@ -369,6 +360,7 @@ const AudioToMidi = ({
       setIsProcessing(false);
     }
   };
+
 
   // Re-apply post-process when toggles change, without re-running Basic Pitch
   useEffect(() => {
