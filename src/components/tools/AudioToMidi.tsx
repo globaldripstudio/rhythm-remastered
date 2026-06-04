@@ -1,23 +1,36 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
+  ChevronDown,
   Download,
   FileAudio,
   Loader2,
   Music4,
   Pause,
   Play,
+  Settings2,
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { audioToMidiNotes, type AudioToMidiProgress } from "@/lib/audioToMidi/basicPitch";
+import {
+  estimateProfile,
+  PROFILE_PRESETS,
+  type AudioProfile,
+  type ProfileThresholds,
+} from "@/lib/audioToMidi/profile";
+import { runPostProcessPipeline } from "@/lib/audioToMidi/postProcess";
+import { analyzeAudioFile, type KeyResult, type BpmResult } from "@/lib/audioAnalysis";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
+
 
 
 interface AudioToMidiProps {
@@ -64,11 +77,21 @@ const AudioToMidi = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // Less sensitive defaults — fewer doubled notes
-  const onsetThreshold = 0.7;
-  const frameThreshold = 0.45;
-  const minNoteMs = 120;
+  // Default thresholds (overridden once profile is detected)
+  const [thresholds, setThresholds] = useState<ProfileThresholds>(PROFILE_PRESETS["piano-clean"]);
+  const [profile, setProfile] = useState<AudioProfile>("piano-clean");
+  const [keyResult, setKeyResult] = useState<KeyResult | null>(null);
+  const [bpmResult, setBpmResult] = useState<BpmResult | null>(null);
+  const [rawNotesCache, setRawNotesCache] = useState<NoteEvent[]>([]);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [pp, setPp] = useState({
+    octaveGhost: true,
+    hardenedMerge: true,
+    snapToGrid: true,
+    tonalFilter: true,
+  });
   const includeBends = false;
+
 
   const handleFile = useCallback(
     (f?: File) => {
@@ -241,29 +264,91 @@ const AudioToMidi = ({
     return () => cancelAnimationFrame(raf);
   }, [isProcessing, progress]);
 
+  // Apply post-process pipeline to a raw note set with current key/bpm/pp toggles
+  const applyPostProcess = useCallback(
+    (raw: NoteEvent[], key: KeyResult | null, bpm: BpmResult | null) => {
+      const { notes: out } = runPostProcessPipeline(raw, {
+        octaveGhost: pp.octaveGhost,
+        hardenedMerge: pp.hardenedMerge,
+        snapToGrid: pp.snapToGrid,
+        tonalFilter: pp.tonalFilter,
+        bpm: bpm?.bpm ?? null,
+        bpmConfidence: bpm?.confidence ?? 0,
+        tonic: key?.tonic ?? null,
+        mode: key?.mode ?? null,
+        keyConfidence: key?.confidence ?? 0,
+      });
+      return out;
+    },
+    [pp],
+  );
+
   // ---- Conversion ----
-  const handleRun = async (overrideFile?: File) => {
+  const handleRun = async (overrideFile?: File, overrideThresholds?: ProfileThresholds) => {
     const target = overrideFile ?? file;
     if (!target) return;
     setIsProcessing(true);
     setNotes([]);
+    setRawNotesCache([]);
     setPlayheadSec(0);
     playheadRef.current = 0;
     try {
+      // Step 1 — quick audio analysis (key + bpm + mono samples). Fast (~1-2s).
+      let analysis: Awaited<ReturnType<typeof analyzeAudioFile>> | null = null;
+      try {
+        analysis = await analyzeAudioFile(target);
+      } catch {
+        analysis = null;
+      }
+
+      // Step 2 — pick thresholds. If user supplied an override (Advanced panel),
+      // use it. Otherwise auto-detect a profile from the analysis samples.
+      let useThresholds = overrideThresholds ?? thresholds;
+      let pickedProfile: AudioProfile = profile;
+      if (!overrideThresholds && analysis) {
+        try {
+          const est = estimateProfile(analysis.monoSamples, analysis.sampleRate);
+          pickedProfile = est.profile;
+          useThresholds = est.thresholds;
+          setProfile(est.profile);
+          setThresholds(est.thresholds);
+        } catch (e) {
+          if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
+            console.warn("[audio2midi] profile estimation failed", e);
+          }
+        }
+      }
+
+      if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
+        console.log("[audio2midi] run", { profile: pickedProfile, thresholds: useThresholds, key: analysis?.key, bpm: analysis?.bpm });
+      }
+
+      // Step 3 — Basic Pitch with the chosen thresholds
       const result = await audioToMidiNotes(
         target,
         {
-          onsetThreshold,
-          frameThreshold,
-          minNoteDurationMs: minNoteMs,
+          onsetThreshold: useThresholds.onsetThreshold,
+          frameThreshold: useThresholds.frameThreshold,
+          minNoteDurationMs: useThresholds.minNoteDurationMs,
           includePitchBends: includeBends,
+          skipDefaultMerge: true,
         },
         setProgress,
       );
-      setNotes(result.notes);
+
+      setKeyResult(analysis?.key ?? null);
+      setBpmResult(analysis?.bpm ?? null);
+      setRawNotesCache(result.notes);
+
+      const processed = applyPostProcess(result.notes, analysis?.key ?? null, analysis?.bpm ?? null);
+
+      setNotes(processed);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
-      toast({ title: t("audio2midi.toasts.doneTitle"), description: t("audio2midi.toasts.doneDesc", { count: result.notes.length }) });
+      toast({
+        title: t("audio2midi.toasts.doneTitle"),
+        description: t("audio2midi.toasts.doneDesc", { count: processed.length }),
+      });
     } catch (err) {
       console.error(err);
       toast({
@@ -275,6 +360,25 @@ const AudioToMidi = ({
       setIsProcessing(false);
     }
   };
+
+
+  // Re-apply post-process when toggles change, without re-running Basic Pitch
+  useEffect(() => {
+    if (rawNotesCache.length === 0) return;
+    const processed = applyPostProcess(rawNotesCache, keyResult, bpmResult);
+    setNotes(processed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pp, keyResult, bpmResult, rawNotesCache, applyPostProcess]);
+
+  // Re-run Basic Pitch with new thresholds (Advanced panel profile change)
+  const handleApplyProfile = (next: AudioProfile) => {
+    setProfile(next);
+    if (next === "custom") return;
+    const preset = PROFILE_PRESETS[next];
+    setThresholds(preset);
+    if (file) void handleRun(file, preset);
+  };
+
 
   const handleSelectAndRun = (f?: File) => {
     if (!f) return;
@@ -503,6 +607,91 @@ const AudioToMidi = ({
                   </Button>
                 </div>
               </div>
+
+              {/* Info banner: profile / key / bpm */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                <span>
+                  <span className="text-muted-foreground/80">{t("audio2midi.info.profile")} : </span>
+                  <span className="font-medium text-foreground">{t(`audio2midi.profiles.${profile}`)}</span>
+                </span>
+                {keyResult && (
+                  <span>
+                    <span className="text-muted-foreground/80">{t("audio2midi.info.key")} : </span>
+                    <span className="font-medium text-foreground">
+                      {keyResult.tonic} {keyResult.mode === "minor" ? "min" : "maj"}
+                    </span>
+                    {keyResult.confidence < 0.6 && (
+                      <span className="ml-1 text-[10px] uppercase tracking-wide text-muted-foreground/70">
+                        ({t("audio2midi.info.lowConfidence")})
+                      </span>
+                    )}
+                  </span>
+                )}
+                {bpmResult && bpmResult.bpm > 0 && (
+                  <span>
+                    <span className="text-muted-foreground/80">BPM : </span>
+                    <span className="font-medium text-foreground">{bpmResult.bpm}</span>
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setAdvancedOpen((v) => !v)}
+                  className="ml-auto inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <Settings2 className="h-3.5 w-3.5" />
+                  {t("audio2midi.advanced.toggle")}
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+                </button>
+              </div>
+
+              {/* Advanced panel */}
+              {advancedOpen && (
+                <div className="space-y-4 rounded-md border border-border/60 bg-background/40 p-3 sm:p-4">
+                  <div>
+                    <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {t("audio2midi.advanced.profileLabel")}
+                    </Label>
+                    <div className="flex flex-wrap gap-2">
+                      {(["mono-clean", "piano-clean", "piano-dirty", "dense-pad"] as const).map((p) => (
+                        <Button
+                          key={p}
+                          size="sm"
+                          variant={profile === p ? "default" : "outline"}
+                          onClick={() => handleApplyProfile(p)}
+                          disabled={isProcessing}
+                        >
+                          {t(`audio2midi.profiles.${p}`)}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {t("audio2midi.advanced.passesLabel")}
+                    </Label>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {([
+                        { key: "octaveGhost", label: t("audio2midi.advanced.passes.octaveGhost") },
+                        { key: "hardenedMerge", label: t("audio2midi.advanced.passes.hardenedMerge") },
+                        { key: "snapToGrid", label: t("audio2midi.advanced.passes.snapToGrid") },
+                        { key: "tonalFilter", label: t("audio2midi.advanced.passes.tonalFilter") },
+                      ] as const).map(({ key, label }) => (
+                        <div key={key} className="flex items-center justify-between rounded-md border border-border/40 bg-muted/10 px-3 py-2">
+                          <span className="text-sm text-foreground">{label}</span>
+                          <Switch
+                            checked={pp[key]}
+                            onCheckedChange={(v) => setPp((s) => ({ ...s, [key]: v }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      {t("audio2midi.advanced.passesHint")}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div ref={wrapRef} className="rounded-lg border border-border/60 bg-card/40 p-2">
                 <canvas
                   ref={canvasRef}
