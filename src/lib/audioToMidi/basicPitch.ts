@@ -119,42 +119,49 @@ export async function audioToMidiNotes(
     velocity: Math.max(0.1, Math.min(1, n.amplitude)),
   }));
 
-  // Dedupe: merge same-pitch notes that overlap or are <120ms apart
-  const byPitch = new Map<number, NoteEvent[]>();
-  rawNotes.forEach((n) => {
-    const arr = byPitch.get(n.midi) ?? [];
-    arr.push(n);
-    byPitch.set(n.midi, arr);
-  });
-  const merged: NoteEvent[] = [];
-  byPitch.forEach((arr) => {
-    arr.sort((a, b) => a.startSec - b.startSec);
-    let cur: NoteEvent | null = null;
-    for (const n of arr) {
-      if (!cur) {
-        cur = { ...n };
-        continue;
+  let processed: NoteEvent[] = rawNotes;
+
+  if (!opts.skipDefaultMerge) {
+    // Dedupe: merge same-pitch notes that overlap or are <120ms apart
+    const byPitch = new Map<number, NoteEvent[]>();
+    rawNotes.forEach((n) => {
+      const arr = byPitch.get(n.midi) ?? [];
+      arr.push(n);
+      byPitch.set(n.midi, arr);
+    });
+    const merged: NoteEvent[] = [];
+    byPitch.forEach((arr) => {
+      arr.sort((a, b) => a.startSec - b.startSec);
+      let cur: NoteEvent | null = null;
+      for (const n of arr) {
+        if (!cur) {
+          cur = { ...n };
+          continue;
+        }
+        const curEnd = cur.startSec + cur.durationSec;
+        const gap = n.startSec - curEnd;
+        if (gap < 0.12) {
+          const newEnd = Math.max(curEnd, n.startSec + n.durationSec);
+          cur.durationSec = newEnd - cur.startSec;
+          cur.velocity = Math.max(cur.velocity, n.velocity);
+        } else {
+          merged.push(cur);
+          cur = { ...n };
+        }
       }
-      const curEnd = cur.startSec + cur.durationSec;
-      const gap = n.startSec - curEnd;
-      if (gap < 0.12) {
-        const newEnd = Math.max(curEnd, n.startSec + n.durationSec);
-        cur.durationSec = newEnd - cur.startSec;
-        cur.velocity = Math.max(cur.velocity, n.velocity);
-      } else {
-        merged.push(cur);
-        cur = { ...n };
-      }
-    }
-    if (cur) merged.push(cur);
-  });
-  // Drop notes shorter than minNoteDurationMs after merge
+      if (cur) merged.push(cur);
+    });
+    processed = merged;
+  }
+
+  // Drop notes shorter than minNoteDurationMs
   const minSec = opts.minNoteDurationMs / 1000;
-  const notes = merged
+  const notes = processed
     .filter((n) => n.durationSec >= minSec)
     .sort((a, b) => a.startSec - b.startSec);
 
 
   onProgress?.({ stage: "done", percent: 100 });
-  return { notes, durationSec };
+  return { notes, durationSec, samples };
 }
+
