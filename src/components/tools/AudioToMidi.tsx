@@ -264,29 +264,100 @@ const AudioToMidi = ({
     return () => cancelAnimationFrame(raf);
   }, [isProcessing, progress]);
 
+  // Apply post-process pipeline to a raw note set with current key/bpm/pp toggles
+  const applyPostProcess = useCallback(
+    (raw: NoteEvent[], key: KeyResult | null, bpm: BpmResult | null) => {
+      const { notes: out } = runPostProcessPipeline(raw, {
+        octaveGhost: pp.octaveGhost,
+        hardenedMerge: pp.hardenedMerge,
+        snapToGrid: pp.snapToGrid,
+        tonalFilter: pp.tonalFilter,
+        bpm: bpm?.bpm ?? null,
+        bpmConfidence: bpm?.confidence ?? 0,
+        tonic: key?.tonic ?? null,
+        mode: key?.mode ?? null,
+        keyConfidence: key?.confidence ?? 0,
+      });
+      return out;
+    },
+    [pp],
+  );
+
   // ---- Conversion ----
-  const handleRun = async (overrideFile?: File) => {
+  const handleRun = async (overrideFile?: File, overrideThresholds?: ProfileThresholds) => {
     const target = overrideFile ?? file;
     if (!target) return;
+    const useThresholds = overrideThresholds ?? thresholds;
     setIsProcessing(true);
     setNotes([]);
+    setRawNotesCache([]);
     setPlayheadSec(0);
     playheadRef.current = 0;
     try {
-      const result = await audioToMidiNotes(
-        target,
-        {
-          onsetThreshold,
-          frameThreshold,
-          minNoteDurationMs: minNoteMs,
-          includePitchBends: includeBends,
-        },
-        setProgress,
-      );
-      setNotes(result.notes);
+      // Run Basic Pitch + audio analysis (key + bpm) in parallel
+      const [result, analysis] = await Promise.all([
+        audioToMidiNotes(
+          target,
+          {
+            onsetThreshold: useThresholds.onsetThreshold,
+            frameThreshold: useThresholds.frameThreshold,
+            minNoteDurationMs: useThresholds.minNoteDurationMs,
+            includePitchBends: includeBends,
+            skipDefaultMerge: true,
+          },
+          setProgress,
+        ),
+        analyzeAudioFile(target).catch(() => null),
+      ]);
+
+      // If we haven't picked a profile from the user yet, auto-detect from samples
+      let detectedProfile = profile;
+      if (!overrideThresholds && profile === "piano-clean") {
+        try {
+          const est = estimateProfile(result.samples, 22050);
+          detectedProfile = est.profile;
+          setProfile(est.profile);
+          setThresholds(est.thresholds);
+          // If profile changed materially, re-run once with the new thresholds
+          if (
+            est.thresholds.onsetThreshold !== useThresholds.onsetThreshold ||
+            est.thresholds.frameThreshold !== useThresholds.frameThreshold ||
+            est.thresholds.minNoteDurationMs !== useThresholds.minNoteDurationMs
+          ) {
+            const reRun = await audioToMidiNotes(
+              target,
+              {
+                onsetThreshold: est.thresholds.onsetThreshold,
+                frameThreshold: est.thresholds.frameThreshold,
+                minNoteDurationMs: est.thresholds.minNoteDurationMs,
+                includePitchBends: includeBends,
+                skipDefaultMerge: true,
+              },
+              setProgress,
+            );
+            result.notes = reRun.notes;
+            result.durationSec = reRun.durationSec;
+          }
+        } catch (e) {
+          if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
+            console.warn("[audio2midi] profile estimation failed", e);
+          }
+        }
+      }
+
+      setKeyResult(analysis?.key ?? null);
+      setBpmResult(analysis?.bpm ?? null);
+      setRawNotesCache(result.notes);
+
+      const processed = applyPostProcess(result.notes, analysis?.key ?? null, analysis?.bpm ?? null);
+
+      setNotes(processed);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
-      toast({ title: t("audio2midi.toasts.doneTitle"), description: t("audio2midi.toasts.doneDesc", { count: result.notes.length }) });
+      toast({
+        title: t("audio2midi.toasts.doneTitle"),
+        description: t("audio2midi.toasts.doneDesc", { count: processed.length }),
+      });
     } catch (err) {
       console.error(err);
       toast({
@@ -298,6 +369,24 @@ const AudioToMidi = ({
       setIsProcessing(false);
     }
   };
+
+  // Re-apply post-process when toggles change, without re-running Basic Pitch
+  useEffect(() => {
+    if (rawNotesCache.length === 0) return;
+    const processed = applyPostProcess(rawNotesCache, keyResult, bpmResult);
+    setNotes(processed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pp, keyResult, bpmResult, rawNotesCache, applyPostProcess]);
+
+  // Re-run Basic Pitch with new thresholds (Advanced panel profile change)
+  const handleApplyProfile = (next: AudioProfile) => {
+    setProfile(next);
+    if (next === "custom") return;
+    const preset = PROFILE_PRESETS[next];
+    setThresholds(preset);
+    if (file) void handleRun(file, preset);
+  };
+
 
   const handleSelectAndRun = (f?: File) => {
     if (!f) return;
