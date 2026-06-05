@@ -15,6 +15,7 @@ export interface PostProcessOptions {
   hardenedMerge: boolean;
   snapToGrid: boolean;
   tonalFilter: boolean;
+  monophonic?: boolean;
   bpm?: number | null;
   bpmConfidence?: number;
   tonic?: string | null;     // e.g. "A"
@@ -27,6 +28,7 @@ export interface PostProcessTrace {
   hardenedMerge: { removed: number; aborted: boolean };
   snapToGrid: { snapped: number; skipped: boolean };
   tonalFilter: { removed: number; aborted: boolean; skipped: boolean };
+  monophonic?: { removed: number; trimmed: number };
 }
 
 const MAX_REMOVAL_RATIO = 0.30;
