@@ -697,6 +697,37 @@ const AudioToMidi = ({
                 </div>
               )}
 
+              {/* Chord strip */}
+              {chords.length > 0 && durationSec > 0 && (
+                <div className="rounded-md border border-border/60 bg-background/40 p-2">
+                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground/80">
+                    {t("audio2midi.info.chords", "Accords détectés")}
+                  </div>
+                  <div className="relative h-8 w-full overflow-hidden rounded bg-muted/30">
+                    {chords.map((c, i) => {
+                      const left = (c.startSec / durationSec) * 100;
+                      const width = ((c.endSec - c.startSec) / durationSec) * 100;
+                      const opacity = 0.35 + 0.55 * c.confidence;
+                      return (
+                        <div
+                          key={i}
+                          className="absolute top-0 flex h-full items-center justify-center overflow-hidden border-l border-background/60 text-[10px] font-semibold text-foreground"
+                          style={{
+                            left: `${left}%`,
+                            width: `${width}%`,
+                            background: `hsla(180, 60%, 40%, ${opacity})`,
+                          }}
+                          title={`${formatChord(c)} · ${c.startSec.toFixed(1)}s–${c.endSec.toFixed(1)}s · conf ${(c.confidence * 100).toFixed(0)}%`}
+                        >
+                          {width > 3 ? formatChord(c) : ""}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+
               <div ref={wrapRef} className="rounded-lg border border-border/60 bg-card/40 p-2">
                 <canvas
                   ref={canvasRef}
