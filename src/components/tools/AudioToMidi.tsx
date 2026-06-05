@@ -381,6 +381,21 @@ const AudioToMidi = ({
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
 
+      // Cache for manual overrides
+      if (ctx) {
+        harmonicRef.current = {
+          samples: ctx.harmonicSamples,
+          sampleRate: ctx.sampleRate,
+          duration: ctx.durationSec,
+        };
+      }
+      originalKeyRef.current = reconciledKey;
+      originalBpmRef.current = ctx?.bpm ?? null;
+      setKeyLocked(false);
+      setBpmLocked(false);
+      setEditingKey(false);
+      setEditingBpm(false);
+
       const previewCount = runPostProcessPipeline(result.notes, {
         octaveGhost: pp.octaveGhost,
         hardenedMerge: pp.hardenedMerge,
