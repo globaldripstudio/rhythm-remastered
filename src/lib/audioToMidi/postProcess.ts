@@ -1,14 +1,16 @@
 /**
  * Musical post-processing for Audio → MIDI notes.
  *
- * Four independent passes, each is pure and can be toggled off.
- * Hard guarantee: no pass ever changes a note's pitch. They only KEEP or REMOVE.
+ * Passes are pure and each can be toggled off. They never change pitch.
+ * Each guarded by a "max removal ratio" safeguard.
  *
- * Each pass has a built-in safeguard: if it removes more than `maxRemovalRatio`
- * of the notes, it auto-disables itself and returns the input untouched.
+ * The chord-aware pass takes a chord track (per-segment pitch-class set)
+ * and trims low-confidence out-of-chord noise notes.
  */
 
 import type { NoteEvent } from "@/lib/musicTheory/midiExport";
+import type { ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { chordAtTime } from "@/lib/audioToMidi/chordDetection";
 
 export interface PostProcessOptions {
   octaveGhost: boolean;
@@ -16,6 +18,8 @@ export interface PostProcessOptions {
   snapToGrid: boolean;
   tonalFilter: boolean;
   monophonic?: boolean;
+  chordAware?: boolean;
+  chords?: ChordSegment[];
   bpm?: number | null;
   bpmConfidence?: number;
   tonic?: string | null;     // e.g. "A"
