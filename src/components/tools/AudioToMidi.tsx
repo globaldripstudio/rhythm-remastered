@@ -437,6 +437,54 @@ const AudioToMidi = ({
     if (file) void handleRun(file, preset);
   };
 
+  // ---- Manual overrides (key / BPM) ----
+  const recomputeChordsWith = (bpm: number | null, tonic: string | null, mode: "major" | "minor" | null) => {
+    const cache = harmonicRef.current;
+    if (!cache) return;
+    try {
+      const r = detectChords(cache.samples, cache.sampleRate, {
+        bpm: bpm && bpm > 0 ? bpm : undefined,
+        beatsPerSegment: 1,
+        durationSec: cache.duration,
+        keyTonic: tonic ?? undefined,
+        keyMode: mode ?? undefined,
+      });
+      setChords(r.chords);
+    } catch (e) {
+      console.warn("[audio2midi] chord recompute failed", e);
+    }
+  };
+
+  const applyKeyOverride = (tonic: string, mode: "major" | "minor") => {
+    setKeyResult({ tonic, mode, confidence: 1 });
+    setKeyLocked(true);
+    setEditingKey(false);
+    recomputeChordsWith(bpmResult?.bpm ?? null, tonic, mode);
+  };
+  const resetKey = () => {
+    setKeyResult(originalKeyRef.current);
+    setKeyLocked(false);
+    setEditingKey(false);
+    const ok = originalKeyRef.current;
+    recomputeChordsWith(bpmResult?.bpm ?? null, ok?.tonic ?? null, ok?.mode ?? null);
+  };
+
+  const applyBpmOverride = (rawBpm: number) => {
+    const bpm = Math.min(240, Math.max(40, Math.round(rawBpm * 10) / 10));
+    setBpmResult({ bpm, confidence: 1 });
+    setBpmLocked(true);
+    setEditingBpm(false);
+    recomputeChordsWith(bpm, keyResult?.tonic ?? null, keyResult?.mode ?? null);
+  };
+  const resetBpm = () => {
+    setBpmResult(originalBpmRef.current);
+    setBpmLocked(false);
+    setEditingBpm(false);
+    recomputeChordsWith(originalBpmRef.current?.bpm ?? null, keyResult?.tonic ?? null, keyResult?.mode ?? null);
+  };
+
+
+
 
   const handleSelectAndRun = (f?: File) => {
     if (!f) return;
