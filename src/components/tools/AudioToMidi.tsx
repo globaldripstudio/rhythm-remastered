@@ -123,7 +123,7 @@ const AudioToMidi = ({
         return;
       }
       setFile(f);
-      setNotes([]);
+      setRawNotesCache([]);
     },
     [toast, t],
   );
