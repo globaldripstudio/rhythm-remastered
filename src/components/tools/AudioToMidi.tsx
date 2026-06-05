@@ -5,15 +5,20 @@ import {
   Download,
   FileAudio,
   Loader2,
+  Lock,
   Music4,
   Pause,
+  Pencil,
   Play,
+  RotateCcw,
   Settings2,
   Upload,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
@@ -27,7 +32,7 @@ import {
 } from "@/lib/audioToMidi/profile";
 import { runPostProcessPipeline } from "@/lib/audioToMidi/postProcess";
 import { analyzeMusicalContext, reconcileKeyWithNotes, type MusicalContext } from "@/lib/audioToMidi/musicalContext";
-import type { ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { detectChords, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
 import { formatChord } from "@/lib/audioToMidi/chordDetection";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
