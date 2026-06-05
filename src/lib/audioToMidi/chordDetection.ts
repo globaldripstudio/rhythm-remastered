@@ -1,20 +1,27 @@
 /**
  * Chord detection from a harmonic-only signal.
  *
- * Improvements over the v1:
- * 1. **Bass / mid chroma split.** Bass band (40–250 Hz) is used to score the
- *    chord root; mid band (250–2000 Hz) scores the quality. This lets us
- *    weight inversions and avoid letting the bass pollute the quality match.
- * 2. **Harmonic-aware templates.** Each chord template includes weight from
- *    the first 6 harmonics of its chord tones (so a plain C major template
- *    already predicts a bit of energy on G and E above, instead of getting
- *    confused with C7 or Cadd9).
- * 3. **Extended quality set.** maj, min, dim, aug, sus2, sus4, 7, maj7, min7,
- *    m7b5, dim7, 6, m6.
- * 4. **Viterbi smoothing.** Per-beat emission scores combined with a
- *    transition matrix that strongly favours staying on the same chord and
- *    softly favours diatonic moves when a key prior is provided. This kills
- *    the per-beat flicker that templates produce on their own.
+ * v3 — Phase A + B refinements:
+ * 1. **CQT-style filterbank** instead of round-to-nearest-bin FFT chroma.
+ *    Each semitone from C1 (32.7 Hz) to C7 (2093 Hz) gets a triangular
+ *    weighting around its centre frequency. Bass resolution gains ~4×.
+ * 2. **HPS-enhanced chroma**: each pitch class is boosted when its 3rd and
+ *    5th are also present, which suppresses harmonic-ghost confusions
+ *    (e.g. C ↔ Em).
+ * 3. **Temporal median filter (3 frames)** on each chroma to kill
+ *    transient flickers from ornamentation, before per-beat averaging.
+ * 4. **Bass / mid chroma split** kept for inversion/slash detection.
+ * 5. **Harmonic-aware templates** kept (Fourier-derived weights for the
+ *    first 6 harmonics of each chord tone).
+ * 6. **Extended quality set** kept: maj, min, dim, aug, sus2, sus4, 7,
+ *    maj7, min7, m7b5, dim7, 6, m6.
+ * 7. **Function-weighted Viterbi**: per-beat emission scores combined
+ *    with a transition matrix that strongly favours staying, and within
+ *    a tonality boosts cadential moves (V→I, IV→I, ii→V, vi→IV…)
+ *    relative to other diatonic moves.
+ * 8. **Beat-aligned segmentation**: when a beat grid is supplied,
+ *    segments are anchored to actual beats instead of a rigid grid
+ *    starting at t=0.
  */
 
 import { FFT } from "@/lib/audioAnalysis";
@@ -59,8 +66,9 @@ const INTERVALS: Record<ChordQuality, number[]> = {
   "6":  [0, 4, 7, 9],
   m6:   [0, 3, 7, 9],
 };
+const QUALITY_KEYS = Object.keys(INTERVALS) as ChordQuality[];
 
-// Soft prior — favors simple triads over rare jazz qualities. Multiplicative on emission scores.
+// Soft prior — favors simple triads over rare jazz qualities.
 const QUALITY_PRIOR: Record<ChordQuality, number> = {
   maj: 1.10, min: 1.10,
   sus2: 0.95, sus4: 0.95,
@@ -70,8 +78,7 @@ const QUALITY_PRIOR: Record<ChordQuality, number> = {
   "6": 0.86, m6: 0.86,
 };
 
-// Pitch-class offsets of the first 6 harmonics of a given note (rounded to nearest semitone):
-// n=1 → 0, n=2 → +12 (=0), n=3 → +19 (≈7), n=4 → +24 (=0), n=5 → +28 (≈4), n=6 → +31 (≈7)
+// First 6 harmonics → pitch-class offsets and amplitude weights
 const HARMONIC_PC_OFFSETS = [0, 0, 7, 0, 4, 7];
 const HARMONIC_WEIGHTS = [1.0, 0.55, 0.40, 0.28, 0.20, 0.15];
 
@@ -83,7 +90,6 @@ function buildHarmonicTemplate(intervals: number[]): number[] {
       t[pc] += HARMONIC_WEIGHTS[h];
     }
   }
-  // L2 normalize
   let sumSq = 0;
   for (const v of t) sumSq += v * v;
   const n = Math.sqrt(sumSq);
@@ -96,8 +102,6 @@ const QUALITY_TEMPLATES: Record<ChordQuality, number[]> =
     (Object.entries(INTERVALS) as Array<[ChordQuality, number[]]>).map(([q, iv]) => [q, buildHarmonicTemplate(iv)]),
   ) as Record<ChordQuality, number[]>;
 
-// Bass template: spike on the root pitch class (plus a touch on the 5th for
-// open-voicing piano playing the root + 5 in the left hand).
 const BASS_TEMPLATE_ROOT = (() => {
   const t = new Array<number>(12).fill(0);
   t[0] = 1.0;
@@ -126,6 +130,77 @@ function rotate(v: number[] | Float32Array, n: number): number[] {
   return out;
 }
 
+// ---------------- CQT-style filterbank ----------------
+
+interface CqtBank {
+  /** For each semitone filter, the FFT bins it covers + their weights. */
+  filters: Array<{ bins: number[]; weights: number[]; midi: number }>;
+  /** Index ranges (inclusive) into `filters` for bass and mid bands. */
+  bassRange: [number, number];
+  midRange: [number, number];
+  /** Mid-band Gaussian weighting around MIDI 60. */
+  midWeights: number[];
+}
+
+const cqtCache = new Map<string, CqtBank>();
+
+function buildCqtBank(fftSize: number, sampleRate: number): CqtBank {
+  const cacheKey = `${fftSize}_${sampleRate}`;
+  const cached = cqtCache.get(cacheKey);
+  if (cached) return cached;
+
+  // Cover MIDI 24 (C1, 32.7 Hz) to MIDI 96 (C7, 2093 Hz) → 73 filters
+  const MIDI_LO = 24, MIDI_HI = 96;
+  const filters: CqtBank["filters"] = [];
+  const halfBins = fftSize / 2;
+
+  for (let midi = MIDI_LO; midi <= MIDI_HI; midi++) {
+    const fCenter = 440 * Math.pow(2, (midi - 69) / 12);
+    const fLow = 440 * Math.pow(2, (midi - 69 - 0.5) / 12);
+    const fHigh = 440 * Math.pow(2, (midi - 69 + 0.5) / 12);
+    const binCenter = (fCenter * fftSize) / sampleRate;
+    const binLow = (fLow * fftSize) / sampleRate;
+    const binHigh = (fHigh * fftSize) / sampleRate;
+    const lo = Math.max(1, Math.floor(binLow));
+    const hi = Math.min(halfBins - 1, Math.ceil(binHigh));
+    const bins: number[] = [];
+    const weights: number[] = [];
+    for (let b = lo; b <= hi; b++) {
+      let w: number;
+      if (b <= binCenter) {
+        w = (b - binLow) / Math.max(1e-6, binCenter - binLow);
+      } else {
+        w = (binHigh - b) / Math.max(1e-6, binHigh - binCenter);
+      }
+      w = Math.max(0, w);
+      if (w > 0) { bins.push(b); weights.push(w); }
+    }
+    // If filter is narrower than a single FFT bin (true in low octaves), at
+    // least include the nearest bin to avoid empty filters.
+    if (bins.length === 0) {
+      const nearest = Math.max(1, Math.min(halfBins - 1, Math.round(binCenter)));
+      bins.push(nearest);
+      weights.push(1);
+    }
+    filters.push({ bins, weights, midi });
+  }
+
+  // Bass: C1 (24) → B3 (59), Mid: C2 (36) → B6 (95)
+  const idxOfMidi = (m: number) => Math.max(0, Math.min(filters.length - 1, m - MIDI_LO));
+  const bassRange: [number, number] = [idxOfMidi(24), idxOfMidi(59)];
+  const midRange: [number, number] = [idxOfMidi(36), idxOfMidi(95)];
+
+  // Mid weighting: Gaussian centred on MIDI 60 (C4), σ = 18 semitones
+  const midWeights: number[] = filters.map((f) => {
+    const z = (f.midi - 60) / 18;
+    return Math.exp(-z * z);
+  });
+
+  const bank: CqtBank = { filters, bassRange, midRange, midWeights };
+  cqtCache.set(cacheKey, bank);
+  return bank;
+}
+
 // ---------------- STFT + dual-band chroma frames ----------------
 
 export interface ChromaFrames {
@@ -143,65 +218,103 @@ export function computeChromaFrames(samples: Float32Array, sampleRate: number): 
     window[i] = 0.5 * (1 - Math.cos((2 * Math.PI * i) / (fftSize - 1)));
   }
 
-  const bassMinHz = 40, bassMaxHz = 250;
-  const midMinHz = 250, midMaxHz = 2000;
-  const bassMinBin = Math.max(1, Math.floor((bassMinHz * fftSize) / sampleRate));
-  const bassMaxBin = Math.min(fftSize / 2 - 1, Math.ceil((bassMaxHz * fftSize) / sampleRate));
-  const midMinBin = Math.max(1, Math.floor((midMinHz * fftSize) / sampleRate));
-  const midMaxBin = Math.min(fftSize / 2 - 1, Math.ceil((midMaxHz * fftSize) / sampleRate));
-
-  const binPc = new Int8Array(fftSize / 2);
-  for (let bin = 1; bin < fftSize / 2; bin++) {
-    const freq = (bin * sampleRate) / fftSize;
-    const midi = 69 + 12 * Math.log2(freq / 440);
-    binPc[bin] = ((Math.round(midi) % 12) + 12) % 12;
-  }
-  // Mid-band weighting: bell centered on MIDI 60
-  const midBinW = new Float32Array(fftSize / 2);
-  for (let bin = midMinBin; bin <= midMaxBin; bin++) {
-    const freq = (bin * sampleRate) / fftSize;
-    const midi = 69 + 12 * Math.log2(freq / 440);
-    const z = (midi - 60) / 24;
-    midBinW[bin] = Math.exp(-z * z);
-  }
+  const bank = buildCqtBank(fftSize, sampleRate);
 
   const numFrames = Math.max(0, Math.floor((samples.length - fftSize) / hopSize) + 1);
   const bass: Float32Array[] = new Array(numFrames);
   const mid: Float32Array[] = new Array(numFrames);
   const buf = new Float64Array(fftSize);
 
+  // Filter response cache per frame
+  const filterEnergy = new Float32Array(bank.filters.length);
+
   for (let f = 0; f < numFrames; f++) {
     const offset = f * hopSize;
     for (let i = 0; i < fftSize; i++) buf[i] = samples[offset + i] * window[i];
     const mags = fft.forwardMagnitudes(buf);
 
-    // Light spectral whitening: divide by smoothed magnitude → de-emphasises broad timbre.
-    // (Cheap version: subtract a moving average of log magnitudes.)
+    // Log compression — reduces dynamic range disparity between bass and treble
     const logMag = new Float32Array(mags.length);
-    for (let i = 0; i < mags.length; i++) logMag[i] = Math.log1p(mags[i]);
+    for (let i = 0; i < mags.length; i++) logMag[i] = Math.log1p(mags[i] * 32);
+
+    // Cheap spectral whitening: subtract local mean (radius 8 bins)
     const R = 8;
-    const smooth = new Float32Array(mags.length);
     for (let i = 0; i < mags.length; i++) {
       let s = 0, c = 0;
       for (let j = Math.max(0, i - R); j <= Math.min(mags.length - 1, i + R); j++) { s += logMag[j]; c++; }
-      smooth[i] = s / c;
+      // reuse logMag in-place is unsafe — write back into mags as whitened
+      mags[i] = Math.max(0, logMag[i] - s / c);
     }
-    const whitened = new Float32Array(mags.length);
-    for (let i = 0; i < mags.length; i++) whitened[i] = Math.max(0, logMag[i] - smooth[i]);
+
+    // Apply CQT filterbank
+    for (let k = 0; k < bank.filters.length; k++) {
+      const ft = bank.filters[k];
+      let e = 0;
+      for (let j = 0; j < ft.bins.length; j++) e += mags[ft.bins[j]] * ft.weights[j];
+      filterEnergy[k] = e;
+    }
 
     const bch = new Float32Array(12);
     const mch = new Float32Array(12);
-    for (let bin = bassMinBin; bin <= bassMaxBin; bin++) bch[binPc[bin]] += whitened[bin];
-    for (let bin = midMinBin; bin <= midMaxBin; bin++) mch[binPc[bin]] += whitened[bin] * midBinW[bin];
+    for (let k = bank.bassRange[0]; k <= bank.bassRange[1]; k++) {
+      bch[((bank.filters[k].midi % 12) + 12) % 12] += filterEnergy[k];
+    }
+    for (let k = bank.midRange[0]; k <= bank.midRange[1]; k++) {
+      mch[((bank.filters[k].midi % 12) + 12) % 12] += filterEnergy[k] * bank.midWeights[k];
+    }
 
+    // L1 normalize
     let bs = 0, ms = 0;
     for (let i = 0; i < 12; i++) { bs += bch[i]; ms += mch[i]; }
     if (bs > 0) for (let i = 0; i < 12; i++) bch[i] /= bs;
     if (ms > 0) for (let i = 0; i < 12; i++) mch[i] /= ms;
+
     bass[f] = bch;
     mid[f] = mch;
   }
-  return { bass, mid, hopSec: hopSize / sampleRate };
+
+  // Temporal median (length 3) — kill flickers without smearing transitions
+  const bassSmoothed = temporalMedian3(bass);
+  const midSmoothed = temporalMedian3(mid);
+
+  // HPS-style enhancement on the mid chroma (the one that carries the colour)
+  for (let f = 0; f < midSmoothed.length; f++) {
+    const c = midSmoothed[f];
+    const out = new Float32Array(12);
+    for (let pc = 0; pc < 12; pc++) {
+      const fifth = c[(pc + 7) % 12];
+      const third = c[(pc + 4) % 12];
+      const thirdMin = c[(pc + 3) % 12];
+      // Reinforce a pc when its 5th and a third (major OR minor) are also lit.
+      const reinf = 0.35 * Math.sqrt(c[pc] * fifth) + 0.20 * Math.sqrt(c[pc] * Math.max(third, thirdMin));
+      out[pc] = c[pc] + reinf;
+    }
+    // Re-normalize
+    let s = 0;
+    for (let i = 0; i < 12; i++) s += out[i];
+    if (s > 0) for (let i = 0; i < 12; i++) out[i] /= s;
+    midSmoothed[f] = out;
+  }
+
+  return { bass: bassSmoothed, mid: midSmoothed, hopSec: hopSize / sampleRate };
+}
+
+function temporalMedian3(frames: Float32Array[]): Float32Array[] {
+  if (frames.length === 0) return frames;
+  const out: Float32Array[] = new Array(frames.length);
+  for (let f = 0; f < frames.length; f++) {
+    const prev = frames[Math.max(0, f - 1)];
+    const cur = frames[f];
+    const next = frames[Math.min(frames.length - 1, f + 1)];
+    const o = new Float32Array(12);
+    for (let pc = 0; pc < 12; pc++) {
+      const a = prev[pc], b = cur[pc], c = next[pc];
+      // median of 3
+      o[pc] = a < b ? (b < c ? b : (a < c ? c : a)) : (a < c ? a : (b < c ? c : b));
+    }
+    out[f] = o;
+  }
+  return out;
 }
 
 function meanChroma(frames: Float32Array[], hopSec: number, startSec: number, endSec: number): Float32Array {
@@ -221,30 +334,75 @@ function meanChroma(frames: Float32Array[], hopSec: number, startSec: number, en
   return out;
 }
 
-// ---------------- Diatonic transition prior ----------------
+// ---------------- Function-weighted diatonic transitions ----------------
 
-// 7 scale degrees → typical triad quality (major scale & natural minor)
 const DIATONIC_MAJOR_INTERVALS = [0, 2, 4, 5, 7, 9, 11];
 const DIATONIC_MINOR_INTERVALS = [0, 2, 3, 5, 7, 8, 10];
 const DIATONIC_MAJOR_QUALITIES: ChordQuality[] = ["maj", "min", "min", "maj", "maj", "min", "dim"];
 const DIATONIC_MINOR_QUALITIES: ChordQuality[] = ["min", "dim", "maj", "min", "min", "maj", "maj"];
 
-function diatonicChordSet(tonic: string | null, mode: "major" | "minor" | null): Set<string> {
-  if (!tonic || !mode) return new Set();
+/**
+ * For a diatonic destination degree (0=I … 6=vii), returns a multiplier on
+ * the base diatonic transition probability. Cadential moves (V→I, IV→I,
+ * ii→V, vi→IV, I→IV/V/vi, V→vi deceptive) get a boost. Reversed/awkward
+ * moves stay near 1.0 (still allowed, just not boosted).
+ */
+const FUNCTION_TRANSITION_BOOST: number[][] = (() => {
+  // 7×7 matrix, index [srcDeg][dstDeg], base 1.0
+  const m: number[][] = [];
+  for (let i = 0; i < 7; i++) m.push(new Array<number>(7).fill(1));
+  const set = (s: number, d: number, v: number) => { m[s][d] = v; };
+  // From I (0)
+  set(0, 3, 2.5); set(0, 4, 2.5); set(0, 5, 2.0); set(0, 1, 1.4); set(0, 0, 1.0);
+  // From ii (1)
+  set(1, 4, 3.0); set(1, 0, 1.2);
+  // From iii (2)
+  set(2, 5, 2.2); set(2, 3, 1.6);
+  // From IV (3)
+  set(3, 0, 3.0); set(3, 4, 2.4); set(3, 1, 1.6); set(3, 6, 1.5);
+  // From V (4)
+  set(4, 0, 3.5); set(4, 5, 2.0); /* deceptive */ set(4, 3, 1.2);
+  // From vi (5)
+  set(5, 3, 2.8); set(5, 1, 2.0); set(5, 4, 1.6); set(5, 0, 1.4);
+  // From vii° (6)
+  set(6, 0, 3.0); set(6, 2, 1.5);
+  return m;
+})();
+
+interface DiatonicCtx {
+  /** Map state-key "root:quality" → diatonic degree (0..6), or -1 if non-diatonic. */
+  degreeOf: Int8Array; // length = ALL_STATES.length
+}
+
+function buildDiatonicContext(tonic: string | null, mode: "major" | "minor" | null): DiatonicCtx | null {
+  if (!tonic || !mode) return null;
   const root = PITCH_CLASSES[tonic] ?? 0;
   const intervals = mode === "major" ? DIATONIC_MAJOR_INTERVALS : DIATONIC_MINOR_INTERVALS;
   const qualities = mode === "major" ? DIATONIC_MAJOR_QUALITIES : DIATONIC_MINOR_QUALITIES;
-  const set = new Set<string>();
+  // Map "root:quality" → degree
+  const map = new Map<string, number>();
   for (let i = 0; i < 7; i++) {
     const r = (root + intervals[i]) % 12;
     const base = qualities[i];
-    set.add(`${r}:${base}`);
-    // Allow common 7th extensions of each degree
-    if (base === "maj") { set.add(`${r}:maj7`); set.add(`${r}:7`); set.add(`${r}:6`); set.add(`${r}:sus2`); set.add(`${r}:sus4`); }
-    if (base === "min") { set.add(`${r}:min7`); set.add(`${r}:m6`); }
-    if (base === "dim") { set.add(`${r}:m7b5`); set.add(`${r}:dim7`); }
+    map.set(`${r}:${base}`, i);
+    // Extensions of each degree map to the same degree
+    if (base === "maj") {
+      map.set(`${r}:maj7`, i); map.set(`${r}:7`, i); map.set(`${r}:6`, i);
+      map.set(`${r}:sus2`, i); map.set(`${r}:sus4`, i);
+    }
+    if (base === "min") {
+      map.set(`${r}:min7`, i); map.set(`${r}:m6`, i);
+      map.set(`${r}:sus2`, i); map.set(`${r}:sus4`, i);
+    }
+    if (base === "dim") {
+      map.set(`${r}:m7b5`, i); map.set(`${r}:dim7`, i);
+    }
   }
-  return set;
+  const degreeOf = new Int8Array(ALL_STATES.length);
+  for (let s = 0; s < ALL_STATES.length; s++) {
+    degreeOf[s] = map.has(ALL_STATES[s].key) ? (map.get(ALL_STATES[s].key) ?? -1) : -1;
+  }
+  return { degreeOf };
 }
 
 // ---------------- Public API ----------------
@@ -256,95 +414,100 @@ export interface DetectChordsOptions {
   /** Fallback segment length when bpm is unavailable. */
   fallbackSegmentSec?: number;
   durationSec: number;
-  /** Optional key prior — when set, diatonic transitions get a small boost. */
+  /** Optional key prior — when set, diatonic transitions get a boost. */
   keyTonic?: string | null;
   keyMode?: "major" | "minor" | null;
-  /** Precomputed chroma frames — pass when re-running with new params on cached audio. */
+  /** Precomputed chroma frames — pass when re-running with new params. */
   precomputedFrames?: ChromaFrames;
+  /** Optional pre-aligned beat times in seconds. When provided, segments are
+   *  built between consecutive beats (after merging beatsPerSegment-many). */
+  beatTimes?: number[];
 }
 
 interface CandidateState {
   root: number;
   quality: ChordQuality;
-  /** Key string "root:quality" used by the diatonic set. */
   key: string;
 }
 
 const ALL_STATES: CandidateState[] = (() => {
   const out: CandidateState[] = [];
   for (let r = 0; r < 12; r++) {
-    for (const q of Object.keys(INTERVALS) as ChordQuality[]) {
+    for (const q of QUALITY_KEYS) {
       out.push({ root: r, quality: q, key: `${r}:${q}` });
     }
   }
   return out;
 })();
 
-/** Compute one segment's emission score per state. Returns a flat array aligned with ALL_STATES. */
 function segmentEmissions(bassChroma: Float32Array, midChroma: Float32Array): Float32Array {
   const out = new Float32Array(ALL_STATES.length);
-  // Pre-rotate chromas once per root
   for (let root = 0; root < 12; root++) {
     const rotBass = rotate(bassChroma, root);
     const rotMid = rotate(midChroma, root);
     const bassScore = cosine(rotBass, BASS_TEMPLATE_ROOT);
-    for (const q of Object.keys(INTERVALS) as ChordQuality[]) {
+    for (let qi = 0; qi < QUALITY_KEYS.length; qi++) {
+      const q = QUALITY_KEYS[qi];
       const qualityScore = cosine(rotMid, QUALITY_TEMPLATES[q]);
       const score = (0.35 * bassScore + 0.65 * qualityScore) * QUALITY_PRIOR[q];
-      const idx = root * Object.keys(INTERVALS).length + Object.keys(INTERVALS).indexOf(q);
-      // Note: ALL_STATES is built in the same order, so this index matches.
-      out[idx] = Math.max(0, score);
+      out[root * QUALITY_KEYS.length + qi] = Math.max(0, score);
     }
   }
   return out;
 }
 
-/** Viterbi decode: returns one state index per segment. */
+/** Viterbi decode with function-weighted diatonic transitions. */
 function viterbiDecode(
   emissions: Float32Array[],
-  diatonicSet: Set<string>,
+  diatonic: DiatonicCtx | null,
 ): { path: number[]; pathScores: number[] } {
   const T = emissions.length;
   const S = ALL_STATES.length;
   if (T === 0) return { path: [], pathScores: [] };
 
   const SELF = Math.log(0.55);
-  const DIATONIC = Math.log(0.025);
+  const DIATONIC_BASE = Math.log(0.020);
   const OTHER = Math.log(0.001);
   const EPS = 1e-6;
 
-  // Precompute per-state diatonic flag
-  const isDiatonic = new Uint8Array(S);
-  if (diatonicSet.size > 0) {
-    for (let s = 0; s < S; s++) isDiatonic[s] = diatonicSet.has(ALL_STATES[s].key) ? 1 : 0;
-  }
-
   let prevLL = new Float64Array(S);
-  // Initial distribution: emissions × small diatonic boost
   for (let s = 0; s < S; s++) {
     const em = Math.log(emissions[0][s] + EPS);
-    const prior = diatonicSet.size > 0 && isDiatonic[s] ? Math.log(1 / 7) : Math.log(1 / S);
+    const isDia = diatonic ? diatonic.degreeOf[s] >= 0 : false;
+    const prior = diatonic
+      ? (isDia ? Math.log(1 / 12) : Math.log(1 / (S * 4)))
+      : Math.log(1 / S);
     prevLL[s] = em + prior;
   }
 
   const backptr: Int16Array[] = new Array(T);
-  backptr[0] = new Int16Array(S); // unused but allocated for symmetry
+  backptr[0] = new Int16Array(S);
 
   for (let t = 1; t < T; t++) {
     const curLL = new Float64Array(S);
     const bp = new Int16Array(S);
-    // For efficiency: compute per-destination max separately for self vs others.
-    // But with S=156 and T~few hundred, O(T·S²) ≈ a few million ops — acceptable in JS.
     for (let dst = 0; dst < S; dst++) {
       const em = Math.log(emissions[t][dst] + EPS);
+      const dstDeg = diatonic ? diatonic.degreeOf[dst] : -1;
       let best = -Infinity;
       let bestSrc = 0;
-      const dstDiatonic = diatonicSet.size > 0 && isDiatonic[dst];
       for (let src = 0; src < S; src++) {
         let trans: number;
-        if (src === dst) trans = SELF;
-        else if (dstDiatonic) trans = DIATONIC;
-        else trans = OTHER;
+        if (src === dst) {
+          trans = SELF;
+        } else if (diatonic && dstDeg >= 0) {
+          const srcDeg = diatonic.degreeOf[src];
+          if (srcDeg >= 0) {
+            // Diatonic → diatonic: apply function boost
+            const boost = FUNCTION_TRANSITION_BOOST[srcDeg][dstDeg];
+            trans = DIATONIC_BASE + Math.log(boost);
+          } else {
+            // Non-diatonic → diatonic: standard diatonic prob (return to scale)
+            trans = DIATONIC_BASE;
+          }
+        } else {
+          trans = OTHER;
+        }
         const cand = prevLL[src] + trans;
         if (cand > best) { best = cand; bestSrc = src; }
       }
@@ -355,7 +518,6 @@ function viterbiDecode(
     prevLL = curLL;
   }
 
-  // Backtrack
   let bestS = 0, bestV = -Infinity;
   for (let s = 0; s < S; s++) if (prevLL[s] > bestV) { bestV = prevLL[s]; bestS = s; }
   const path = new Array<number>(T);
@@ -369,7 +531,6 @@ function viterbiDecode(
   return { path, pathScores };
 }
 
-/** Bass pitch-class for a segment: argmax of the bass chroma. */
 function dominantBass(chroma: Float32Array): number {
   let bestPc = 0, best = -Infinity;
   for (let pc = 0; pc < 12; pc++) if (chroma[pc] > best) { best = chroma[pc]; bestPc = pc; }
@@ -384,23 +545,35 @@ export function detectChords(
   const frames = opts.precomputedFrames ?? computeChromaFrames(samples, sampleRate);
   if (frames.bass.length === 0) return { chords: [], frames };
 
-  const segLen = (opts.bpm && opts.bpm > 0)
-    ? (60 / opts.bpm) * (opts.beatsPerSegment ?? 1)
-    : (opts.fallbackSegmentSec ?? 0.6);
-
   const total = opts.durationSec;
+
   // Build segment boundaries
   const boundaries: Array<[number, number]> = [];
-  for (let t = 0; t < total; t += segLen) {
-    boundaries.push([t, Math.min(total, t + segLen)]);
+  const beatsPer = Math.max(1, Math.round(opts.beatsPerSegment ?? 1));
+  if (opts.beatTimes && opts.beatTimes.length >= 2) {
+    const bt = opts.beatTimes;
+    for (let i = 0; i + beatsPer < bt.length; i += beatsPer) {
+      boundaries.push([bt[i], bt[i + beatsPer]]);
+    }
+    // Cap to duration
+    if (boundaries.length > 0) {
+      boundaries[boundaries.length - 1][1] = Math.min(total, boundaries[boundaries.length - 1][1]);
+    }
+  } else {
+    const segLen = (opts.bpm && opts.bpm > 0)
+      ? (60 / opts.bpm) * beatsPer
+      : (opts.fallbackSegmentSec ?? 0.6);
+    for (let t = 0; t < total; t += segLen) {
+      boundaries.push([t, Math.min(total, t + segLen)]);
+    }
   }
 
-  // Compute emissions + bass dominants per segment
   const emissions: Float32Array[] = [];
   const bassDominants: number[] = [];
   const validIdx: number[] = [];
   for (let i = 0; i < boundaries.length; i++) {
     const [s, e] = boundaries[i];
+    if (e - s < 0.05) continue;
     const bassMean = meanChroma(frames.bass, frames.hopSec, s, e);
     const midMean = meanChroma(frames.mid, frames.hopSec, s, e);
     let energy = 0;
@@ -412,20 +585,15 @@ export function detectChords(
   }
   if (emissions.length === 0) return { chords: [], frames };
 
-  // Diatonic set from key prior
-  const diatonic = diatonicChordSet(opts.keyTonic ?? null, opts.keyMode ?? null);
-
-  // Viterbi
+  const diatonic = buildDiatonicContext(opts.keyTonic ?? null, opts.keyMode ?? null);
   const { path, pathScores } = viterbiDecode(emissions, diatonic);
 
-  // Build segments
   const segs: ChordSegment[] = [];
   for (let i = 0; i < path.length; i++) {
     const state = ALL_STATES[path[i]];
     const [s, e] = boundaries[validIdx[i]];
     const pcs = new Set<number>();
     INTERVALS[state.quality].forEach((iv) => pcs.add((iv + state.root) % 12));
-    // Confidence: normalize emission to [0..1]
     const conf = Math.max(0, Math.min(1, (pathScores[i] - 0.4) * 2));
     segs.push({
       startSec: s,
@@ -445,6 +613,8 @@ export function detectChords(
     if (last && last.root === seg.root && last.quality === seg.quality) {
       last.endSec = seg.endSec;
       last.confidence = Math.max(last.confidence, seg.confidence);
+      // Keep first bass if consistent, else clear it
+      if (last.bassPc !== seg.bassPc) last.bassPc = undefined;
     } else {
       merged.push({ ...seg, pitchClasses: new Set(seg.pitchClasses) });
     }
@@ -482,7 +652,6 @@ export function formatChord(c: ChordSegment): string {
     c.quality === "6" ? "6" :
     c.quality === "m6" ? "m6" : c.quality;
   const root = c.root;
-  // Append slash bass when bass clearly differs from root
   if (c.bassPc !== undefined) {
     const rootPc = PITCH_CLASSES[root] ?? 0;
     if (c.bassPc !== rootPc) {
@@ -493,10 +662,9 @@ export function formatChord(c: ChordSegment): string {
 }
 
 /**
- * Estimate the key from a chord track. Weights each chord by its duration and
- * computes a 12-bin pitch-class histogram over its chord tones, then runs
- * Krumhansl-Schmuckler. Often more reliable than the raw audio chroma because
- * the chord detector already discounted bass octave noise and timbral bias.
+ * Estimate the key from a chord track. Weights each chord by its duration
+ * and computes a 12-bin pitch-class histogram over its chord tones, then
+ * runs Krumhansl-Schmuckler.
  */
 export function detectKeyFromChords(chords: ChordSegment[]): { tonic: string; mode: "major" | "minor"; confidence: number } | null {
   if (chords.length === 0) return null;
@@ -505,7 +673,6 @@ export function detectKeyFromChords(chords: ChordSegment[]): { tonic: string; mo
   const hist = new Array<number>(12).fill(0);
   for (const c of chords) {
     const dur = Math.max(0.05, c.endSec - c.startSec);
-    // root weight high, third/fifth moderate
     const rootPc = PITCH_CLASSES[c.root] ?? 0;
     const intervals = INTERVALS[c.quality];
     intervals.forEach((iv, i) => {
@@ -546,4 +713,50 @@ export function detectKeyFromChords(chords: ChordSegment[]): { tonic: string; mo
   const gap = best.score - second;
   const confidence = Math.max(0, Math.min(1, gap * 4 + best.score * 0.3));
   return { tonic: best.tonic, mode: best.mode, confidence };
+}
+
+// ---------------- Beat tracking helpers ----------------
+
+/**
+ * Given an onset envelope and a BPM estimate, returns a phase-aligned grid
+ * of beat times (seconds) covering [0, durationSec]. The phase is chosen
+ * to maximise envelope energy at beat positions.
+ */
+export function alignBeatGrid(
+  envelope: Float32Array,
+  hopRate: number,
+  bpm: number,
+  durationSec: number,
+): number[] {
+  if (bpm <= 0 || envelope.length < 4) return [];
+  const period = (60 / bpm) * hopRate; // in frames
+  const periodInt = Math.max(2, Math.round(period));
+  // Try every phase 0..periodInt-1, score by sum of env at beat positions.
+  let bestPhase = 0;
+  let bestScore = -Infinity;
+  const N = envelope.length;
+  for (let phase = 0; phase < periodInt; phase++) {
+    let s = 0;
+    // Look up env around each beat position (±1 frame for resilience)
+    for (let i = phase; i < N; i += period) {
+      const idx = Math.round(i);
+      if (idx < 0 || idx >= N) continue;
+      const a = idx > 0 ? envelope[idx - 1] : 0;
+      const b = envelope[idx];
+      const c = idx < N - 1 ? envelope[idx + 1] : 0;
+      s += Math.max(a, b, c);
+    }
+    if (s > bestScore) { bestScore = s; bestPhase = phase; }
+  }
+  const beats: number[] = [];
+  const startSec = bestPhase / hopRate;
+  const periodSec = 60 / bpm;
+  for (let t = startSec; t <= durationSec + 1e-6; t += periodSec) {
+    beats.push(t);
+  }
+  // Ensure the grid starts at or before 0 so first segment isn't lost
+  if (beats.length === 0 || beats[0] > 0.001) {
+    beats.unshift(Math.max(0, (beats[0] ?? 0) - periodSec));
+  }
+  return beats;
 }
