@@ -94,20 +94,21 @@ const AudioToMidi = ({
 
   // Single source of truth: notes derive from raw + toggles + key/bpm.
   // Toggling a pass off then on is mathematically guaranteed to restore the previous result.
-  const { notes, trace } = useMemo(
+  const { notes } = useMemo(
     () =>
       runPostProcessPipeline(rawNotesCache, {
         octaveGhost: pp.octaveGhost,
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        monophonic: profile === "mono-clean",
         bpm: bpmResult?.bpm ?? null,
         bpmConfidence: bpmResult?.confidence ?? 0,
         tonic: keyResult?.tonic ?? null,
         mode: keyResult?.mode ?? null,
         keyConfidence: keyResult?.confidence ?? 0,
       }),
-    [rawNotesCache, pp, keyResult, bpmResult],
+    [rawNotesCache, pp, keyResult, bpmResult, profile],
   );
 
 
