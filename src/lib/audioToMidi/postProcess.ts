@@ -1,14 +1,16 @@
 /**
  * Musical post-processing for Audio → MIDI notes.
  *
- * Four independent passes, each is pure and can be toggled off.
- * Hard guarantee: no pass ever changes a note's pitch. They only KEEP or REMOVE.
+ * Passes are pure and each can be toggled off. They never change pitch.
+ * Each guarded by a "max removal ratio" safeguard.
  *
- * Each pass has a built-in safeguard: if it removes more than `maxRemovalRatio`
- * of the notes, it auto-disables itself and returns the input untouched.
+ * The chord-aware pass takes a chord track (per-segment pitch-class set)
+ * and trims low-confidence out-of-chord noise notes.
  */
 
 import type { NoteEvent } from "@/lib/musicTheory/midiExport";
+import type { ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { chordAtTime } from "@/lib/audioToMidi/chordDetection";
 
 export interface PostProcessOptions {
   octaveGhost: boolean;
@@ -16,6 +18,8 @@ export interface PostProcessOptions {
   snapToGrid: boolean;
   tonalFilter: boolean;
   monophonic?: boolean;
+  chordAware?: boolean;
+  chords?: ChordSegment[];
   bpm?: number | null;
   bpmConfidence?: number;
   tonic?: string | null;     // e.g. "A"
@@ -28,6 +32,7 @@ export interface PostProcessTrace {
   hardenedMerge: { removed: number; aborted: boolean };
   snapToGrid: { snapped: number; skipped: boolean };
   tonalFilter: { removed: number; aborted: boolean; skipped: boolean };
+  chordAware?: { removed: number; aborted: boolean; skipped: boolean };
   monophonic?: { removed: number; trimmed: number };
 }
 
@@ -126,16 +131,16 @@ function passHardenedMerge(notes: NoteEvent[]): { notes: NoteEvent[]; removed: n
   return { notes: merged, removed, aborted: false };
 }
 
-/** Pass C — snap onsets to the 16th-note grid if and only if the offset is within ±15 ms. */
+/** Pass C — snap onsets to the 8th-note grid if and only if the offset is within ±25 ms. */
 function passSnapToGrid(notes: NoteEvent[], bpm: number): { notes: NoteEvent[]; snapped: number } {
   if (notes.length === 0 || bpm <= 0) return { notes, snapped: 0 };
-  const sixteenthSec = 60 / bpm / 4;
+  const eighthSec = 60 / bpm / 2;
   let snapped = 0;
   const out = notes.map((n) => {
-    const k = Math.round(n.startSec / sixteenthSec);
-    const target = k * sixteenthSec;
+    const k = Math.round(n.startSec / eighthSec);
+    const target = k * eighthSec;
     const diff = target - n.startSec;
-    if (Math.abs(diff) <= 0.015) {
+    if (Math.abs(diff) <= 0.025) {
       snapped++;
       return { ...n, startSec: target };
     }
@@ -213,6 +218,31 @@ function passMonophonic(notes: NoteEvent[]): { notes: NoteEvent[]; removed: numb
   return { notes: kept, removed, trimmed };
 }
 
+/** Pass F — chord-aware filter: drop weak out-of-chord notes given a chord track.
+ *  In-chord notes always kept. Out-of-chord kept only if loud OR sustained.
+ *  Out-of-chord short + quiet → removed (likely artifact).
+ */
+function passChordAware(notes: NoteEvent[], chords: ChordSegment[]): { notes: NoteEvent[]; removed: number; aborted: boolean } {
+  if (notes.length === 0 || chords.length === 0) return { notes, removed: 0, aborted: false };
+  let maxVel = 0;
+  for (const n of notes) if (n.velocity > maxVel) maxVel = n.velocity;
+  const velThreshold = maxVel * 0.45;
+  const kept: NoteEvent[] = [];
+  for (const n of notes) {
+    const c = chordAtTime(chords, n.startSec + n.durationSec * 0.5);
+    if (!c) { kept.push(n); continue; }
+    const pc = ((n.midi % 12) + 12) % 12;
+    if (c.pitchClasses.has(pc)) { kept.push(n); continue; }
+    // Out of chord — keep if salient.
+    if (n.velocity >= velThreshold) { kept.push(n); continue; }
+    if (n.durationSec >= 0.200) { kept.push(n); continue; }
+    // Drop
+  }
+  const removed = notes.length - kept.length;
+  if (removed / notes.length > MAX_REMOVAL_RATIO) return { notes, removed: 0, aborted: true };
+  return { notes: kept, removed, aborted: false };
+}
+
 export function runPostProcessPipeline(
   input: NoteEvent[],
   opts: PostProcessOptions,
@@ -247,6 +277,16 @@ export function runPostProcessPipeline(
     }
   }
 
+  if (opts.chordAware) {
+    if (opts.chords && opts.chords.length > 0) {
+      const r = passChordAware(cur, opts.chords);
+      cur = r.notes;
+      trace.chordAware = { removed: r.removed, aborted: r.aborted, skipped: false };
+    } else {
+      trace.chordAware = { removed: 0, aborted: false, skipped: true };
+    }
+  }
+
   if (opts.tonalFilter) {
     if (opts.tonic && opts.mode && (opts.keyConfidence ?? 0) >= 0.6) {
       const r = passTonalFilter(cur, opts.tonic, opts.mode);
@@ -269,3 +309,4 @@ export function runPostProcessPipeline(
 
   return { notes: cur, trace };
 }
+

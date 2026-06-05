@@ -26,7 +26,9 @@ import {
   type ProfileThresholds,
 } from "@/lib/audioToMidi/profile";
 import { runPostProcessPipeline } from "@/lib/audioToMidi/postProcess";
-import { analyzeAudioFile, type KeyResult, type BpmResult } from "@/lib/audioAnalysis";
+import { analyzeMusicalContext, reconcileKeyWithNotes, type MusicalContext } from "@/lib/audioToMidi/musicalContext";
+import type { ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { formatChord } from "@/lib/audioToMidi/chordDetection";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
@@ -80,20 +82,21 @@ const AudioToMidi = ({
   // Default thresholds (overridden once profile is detected)
   const [thresholds, setThresholds] = useState<ProfileThresholds>(PROFILE_PRESETS["piano-clean"]);
   const [profile, setProfile] = useState<AudioProfile>("piano-clean");
-  const [keyResult, setKeyResult] = useState<KeyResult | null>(null);
-  const [bpmResult, setBpmResult] = useState<BpmResult | null>(null);
+  const [keyResult, setKeyResult] = useState<{ tonic: string; mode: "major" | "minor"; confidence: number } | null>(null);
+  const [bpmResult, setBpmResult] = useState<{ bpm: number; confidence: number } | null>(null);
+  const [chords, setChords] = useState<ChordSegment[]>([]);
   const [rawNotesCache, setRawNotesCache] = useState<NoteEvent[]>([]);
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [pp, setPp] = useState({
+  const [pp] = useState({
     octaveGhost: true,
     hardenedMerge: true,
     snapToGrid: true,
     tonalFilter: true,
+    chordAware: true,
   });
   const includeBends = false;
 
-  // Single source of truth: notes derive from raw + toggles + key/bpm.
-  // Toggling a pass off then on is mathematically guaranteed to restore the previous result.
+  // Single source of truth: notes derive from raw + toggles + key/bpm/chords.
   const { notes } = useMemo(
     () =>
       runPostProcessPipeline(rawNotesCache, {
@@ -101,6 +104,8 @@ const AudioToMidi = ({
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        chordAware: pp.chordAware,
+        chords,
         monophonic: profile === "mono-clean",
         bpm: bpmResult?.bpm ?? null,
         bpmConfidence: bpmResult?.confidence ?? 0,
@@ -108,8 +113,9 @@ const AudioToMidi = ({
         mode: keyResult?.mode ?? null,
         keyConfidence: keyResult?.confidence ?? 0,
       }),
-    [rawNotesCache, pp, keyResult, bpmResult, profile],
+    [rawNotesCache, pp, keyResult, bpmResult, chords, profile],
   );
+
 
 
   const handleFile = useCallback(
@@ -293,21 +299,34 @@ const AudioToMidi = ({
     setPlayheadSec(0);
     playheadRef.current = 0;
     try {
-      // Step 1 — quick audio analysis (key + bpm + mono samples). Fast (~1-2s).
-      let analysis: Awaited<ReturnType<typeof analyzeAudioFile>> | null = null;
+      // Step 1 — full musical context: decode + HPSS + BPM + key + chords.
+      let ctx: MusicalContext | null = null;
       try {
-        analysis = await analyzeAudioFile(target);
-      } catch {
-        analysis = null;
+        ctx = await analyzeMusicalContext(target, (p) => {
+          // map context stages into the overall progress UI
+          const stageMap: Record<typeof p.stage, AudioToMidiProgress["stage"]> = {
+            decoding: "decoding",
+            hpss: "loading-model",
+            bpm: "loading-model",
+            key: "loading-model",
+            chords: "loading-model",
+            done: "loading-model",
+          };
+          setProgress({ stage: stageMap[p.stage], percent: Math.min(40, p.percent * 0.4) });
+        });
+      } catch (e) {
+        if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
+          console.warn("[audio2midi] musical context failed", e);
+        }
+        ctx = null;
       }
 
-      // Step 2 — pick thresholds. If user supplied an override (Advanced panel),
-      // use it. Otherwise auto-detect a profile from the analysis samples.
+      // Step 2 — pick thresholds. If user supplied an override, use it. Otherwise auto-detect.
       let useThresholds = overrideThresholds ?? thresholds;
       let pickedProfile: AudioProfile = profile;
-      if (!overrideThresholds && analysis) {
+      if (!overrideThresholds && ctx) {
         try {
-          const est = estimateProfile(analysis.monoSamples, analysis.sampleRate);
+          const est = estimateProfile(ctx.monoSamples, ctx.sampleRate);
           pickedProfile = est.profile;
           useThresholds = est.thresholds;
           setProfile(est.profile);
@@ -320,10 +339,10 @@ const AudioToMidi = ({
       }
 
       if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
-        console.log("[audio2midi] run", { profile: pickedProfile, thresholds: useThresholds, key: analysis?.key, bpm: analysis?.bpm });
+        console.log("[audio2midi] run", { profile: pickedProfile, thresholds: useThresholds, key: ctx?.key, bpm: ctx?.bpm, chords: ctx?.chords?.length });
       }
 
-      // Step 3 — Basic Pitch with the chosen thresholds
+      // Step 3 — Basic Pitch on the HARMONIC signal (drums removed → cleaner notes).
       const result = await audioToMidiNotes(
         target,
         {
@@ -334,26 +353,33 @@ const AudioToMidi = ({
           skipDefaultMerge: true,
         },
         setProgress,
+        ctx?.harmonicSamples,
       );
 
-      setKeyResult(analysis?.key ?? null);
-      setBpmResult(analysis?.bpm ?? null);
+      // Step 4 — reconcile key with detected notes.
+      const reconciledKey = ctx ? reconcileKeyWithNotes(ctx.key, result.notes) : null;
+      const chordTrack = ctx?.chords ?? [];
+
+      setKeyResult(reconciledKey);
+      setBpmResult(ctx?.bpm ?? null);
+      setChords(chordTrack);
       setRawNotesCache(result.notes);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
 
-      // Preview count via a one-shot pipeline run (notes themselves are derived).
       const previewCount = runPostProcessPipeline(result.notes, {
         octaveGhost: pp.octaveGhost,
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        chordAware: pp.chordAware,
+        chords: chordTrack,
         monophonic: pickedProfile === "mono-clean",
-        bpm: analysis?.bpm?.bpm ?? null,
-        bpmConfidence: analysis?.bpm?.confidence ?? 0,
-        tonic: analysis?.key?.tonic ?? null,
-        mode: analysis?.key?.mode ?? null,
-        keyConfidence: analysis?.key?.confidence ?? 0,
+        bpm: ctx?.bpm?.bpm ?? null,
+        bpmConfidence: ctx?.bpm?.confidence ?? 0,
+        tonic: reconciledKey?.tonic ?? null,
+        mode: reconciledKey?.mode ?? null,
+        keyConfidence: reconciledKey?.confidence ?? 0,
       }).notes.length;
       toast({
         title: t("audio2midi.toasts.doneTitle"),
@@ -670,6 +696,37 @@ const AudioToMidi = ({
                   </div>
                 </div>
               )}
+
+              {/* Chord strip */}
+              {chords.length > 0 && durationSec > 0 && (
+                <div className="rounded-md border border-border/60 bg-background/40 p-2">
+                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground/80">
+                    {t("audio2midi.info.chords", "Accords détectés")}
+                  </div>
+                  <div className="relative h-8 w-full overflow-hidden rounded bg-muted/30">
+                    {chords.map((c, i) => {
+                      const left = (c.startSec / durationSec) * 100;
+                      const width = ((c.endSec - c.startSec) / durationSec) * 100;
+                      const opacity = 0.35 + 0.55 * c.confidence;
+                      return (
+                        <div
+                          key={i}
+                          className="absolute top-0 flex h-full items-center justify-center overflow-hidden border-l border-background/60 text-[10px] font-semibold text-foreground"
+                          style={{
+                            left: `${left}%`,
+                            width: `${width}%`,
+                            background: `hsla(180, 60%, 40%, ${opacity})`,
+                          }}
+                          title={`${formatChord(c)} · ${c.startSec.toFixed(1)}s–${c.endSec.toFixed(1)}s · conf ${(c.confidence * 100).toFixed(0)}%`}
+                        >
+                          {width > 3 ? formatChord(c) : ""}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
 
               <div ref={wrapRef} className="rounded-lg border border-border/60 bg-card/40 p-2">
                 <canvas
