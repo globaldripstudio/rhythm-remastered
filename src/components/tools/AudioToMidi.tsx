@@ -60,7 +60,7 @@ const AudioToMidi = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<AudioToMidiProgress>({ stage: "decoding", percent: 0 });
   const [displayPercent, setDisplayPercent] = useState(0);
-  const [notes, setNotes] = useState<NoteEvent[]>([]);
+  // `notes` is derived (useMemo) from rawNotesCache + pp toggles. See below.
   const [durationSec, setDurationSec] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
