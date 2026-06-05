@@ -1685,7 +1685,13 @@
         "hardenedMerge": "Strict repeat merging",
         "snapToGrid": "Light grid snap (if BPM reliable)",
         "tonalFilter": "Tonal filter (if key reliable)"
-      }
+      },
+      "resetPasses": "Reset",
+      "traceRemoved": "−{{count}} notes",
+      "traceSnapped": "{{count}} notes snapped",
+      "traceNoChange": "No effect on this file",
+      "traceAborted": "Aborted (30% safeguard)",
+      "traceSkipped": "Skipped (low confidence)"
     }
   },
   "chordTools": {
