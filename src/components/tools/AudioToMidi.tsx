@@ -305,40 +305,47 @@ const AudioToMidi = ({
 
 
   // ---- Conversion ----
-  const handleRun = async (overrideFile?: File, overrideThresholds?: ProfileThresholds) => {
+  const handleRun = async (
+    overrideFile?: File,
+    overrideThresholds?: ProfileThresholds,
+    runOpts?: { preserveContext?: boolean },
+  ) => {
     const target = overrideFile ?? file;
     if (!target) return;
+    const preserve = !!runOpts?.preserveContext && !!harmonicRef.current;
     setIsProcessing(true);
     setRawNotesCache([]);
     setPlayheadSec(0);
     playheadRef.current = 0;
     try {
       // Step 1 — full musical context: decode + HPSS + BPM + key + chords.
+      // Skipped when we're only re-running for a profile change.
       let ctx: MusicalContext | null = null;
-      try {
-        ctx = await analyzeMusicalContext(target, (p) => {
-          // map context stages into the overall progress UI
-          const stageMap: Record<typeof p.stage, AudioToMidiProgress["stage"]> = {
-            decoding: "decoding",
-            hpss: "loading-model",
-            bpm: "loading-model",
-            key: "loading-model",
-            chords: "loading-model",
-            done: "loading-model",
-          };
-          setProgress({ stage: stageMap[p.stage], percent: Math.min(40, p.percent * 0.4) });
-        });
-      } catch (e) {
-        if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
-          console.warn("[audio2midi] musical context failed", e);
+      if (!preserve) {
+        try {
+          ctx = await analyzeMusicalContext(target, (p) => {
+            const stageMap: Record<typeof p.stage, AudioToMidiProgress["stage"]> = {
+              decoding: "decoding",
+              hpss: "loading-model",
+              bpm: "loading-model",
+              key: "loading-model",
+              chords: "loading-model",
+              done: "loading-model",
+            };
+            setProgress({ stage: stageMap[p.stage], percent: Math.min(40, p.percent * 0.4) });
+          });
+        } catch (e) {
+          if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
+            console.warn("[audio2midi] musical context failed", e);
+          }
+          ctx = null;
         }
-        ctx = null;
       }
 
-      // Step 2 — pick thresholds. If user supplied an override, use it. Otherwise auto-detect.
+      // Step 2 — pick thresholds.
       let useThresholds = overrideThresholds ?? thresholds;
       let pickedProfile: AudioProfile = profile;
-      if (!overrideThresholds && ctx) {
+      if (!preserve && !overrideThresholds && ctx) {
         try {
           const est = estimateProfile(ctx.monoSamples, ctx.sampleRate);
           pickedProfile = est.profile;
@@ -352,11 +359,8 @@ const AudioToMidi = ({
         }
       }
 
-      if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
-        console.log("[audio2midi] run", { profile: pickedProfile, thresholds: useThresholds, key: ctx?.key, bpm: ctx?.bpm, chords: ctx?.chords?.length });
-      }
-
-      // Step 3 — Basic Pitch on the HARMONIC signal (drums removed → cleaner notes).
+      // Step 3 — Basic Pitch. Reuse cached harmonic samples when preserving context.
+      const harmonicForBp = preserve ? harmonicRef.current!.samples : ctx?.harmonicSamples;
       const result = await audioToMidiNotes(
         target,
         {
@@ -367,34 +371,41 @@ const AudioToMidi = ({
           skipDefaultMerge: true,
         },
         setProgress,
-        ctx?.harmonicSamples,
+        harmonicForBp,
       );
 
-      // Step 4 — reconcile key with detected notes.
-      const reconciledKey = ctx ? reconcileKeyWithNotes(ctx.key, result.notes) : null;
-      const chordTrack = ctx?.chords ?? [];
+      // Step 4 — keep current key/bpm/chords when preserving; otherwise compute fresh.
+      let effectiveKey = keyResult;
+      let effectiveBpm = bpmResult;
+      let effectiveChords = chords;
 
-      setKeyResult(reconciledKey);
-      setBpmResult(ctx?.bpm ?? null);
-      setChords(chordTrack);
+      if (!preserve) {
+        effectiveKey = ctx ? reconcileKeyWithNotes(ctx.key, result.notes) : null;
+        effectiveBpm = ctx?.bpm ?? null;
+        effectiveChords = ctx?.chords ?? [];
+
+        setKeyResult(effectiveKey);
+        setBpmResult(effectiveBpm);
+        setChords(effectiveChords);
+
+        if (ctx) {
+          harmonicRef.current = {
+            samples: ctx.harmonicSamples,
+            sampleRate: ctx.sampleRate,
+            duration: ctx.durationSec,
+          };
+        }
+        originalKeyRef.current = effectiveKey;
+        originalBpmRef.current = ctx?.bpm ?? null;
+        setKeyLocked(false);
+        setBpmLocked(false);
+        setEditingKey(false);
+        setEditingBpm(false);
+      }
+
       setRawNotesCache(result.notes);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
-
-      // Cache for manual overrides
-      if (ctx) {
-        harmonicRef.current = {
-          samples: ctx.harmonicSamples,
-          sampleRate: ctx.sampleRate,
-          duration: ctx.durationSec,
-        };
-      }
-      originalKeyRef.current = reconciledKey;
-      originalBpmRef.current = ctx?.bpm ?? null;
-      setKeyLocked(false);
-      setBpmLocked(false);
-      setEditingKey(false);
-      setEditingBpm(false);
 
       const previewCount = runPostProcessPipeline(result.notes, {
         octaveGhost: pp.octaveGhost,
@@ -402,13 +413,13 @@ const AudioToMidi = ({
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
         chordAware: pp.chordAware,
-        chords: chordTrack,
+        chords: effectiveChords,
         monophonic: pickedProfile === "mono-clean",
-        bpm: ctx?.bpm?.bpm ?? null,
-        bpmConfidence: ctx?.bpm?.confidence ?? 0,
-        tonic: reconciledKey?.tonic ?? null,
-        mode: reconciledKey?.mode ?? null,
-        keyConfidence: reconciledKey?.confidence ?? 0,
+        bpm: effectiveBpm?.bpm ?? null,
+        bpmConfidence: effectiveBpm?.confidence ?? 0,
+        tonic: effectiveKey?.tonic ?? null,
+        mode: effectiveKey?.mode ?? null,
+        keyConfidence: effectiveKey?.confidence ?? 0,
       }).notes.length;
       toast({
         title: t("audio2midi.toasts.doneTitle"),
@@ -434,8 +445,9 @@ const AudioToMidi = ({
     if (next === "custom") return;
     const preset = PROFILE_PRESETS[next];
     setThresholds(preset);
-    if (file) void handleRun(file, preset);
+    if (file) void handleRun(file, preset, { preserveContext: true });
   };
+
 
   // ---- Manual overrides (key / BPM) ----
   const recomputeChordsWith = (bpm: number | null, tonic: string | null, mode: "major" | "minor" | null) => {
