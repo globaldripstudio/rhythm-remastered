@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Switch } from "@/components/ui/switch";
+
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
@@ -94,20 +94,21 @@ const AudioToMidi = ({
 
   // Single source of truth: notes derive from raw + toggles + key/bpm.
   // Toggling a pass off then on is mathematically guaranteed to restore the previous result.
-  const { notes, trace } = useMemo(
+  const { notes } = useMemo(
     () =>
       runPostProcessPipeline(rawNotesCache, {
         octaveGhost: pp.octaveGhost,
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        monophonic: profile === "mono-clean",
         bpm: bpmResult?.bpm ?? null,
         bpmConfidence: bpmResult?.confidence ?? 0,
         tonic: keyResult?.tonic ?? null,
         mode: keyResult?.mode ?? null,
         keyConfidence: keyResult?.confidence ?? 0,
       }),
-    [rawNotesCache, pp, keyResult, bpmResult],
+    [rawNotesCache, pp, keyResult, bpmResult, profile],
   );
 
 
@@ -347,6 +348,7 @@ const AudioToMidi = ({
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        monophonic: pickedProfile === "mono-clean",
         bpm: analysis?.bpm?.bpm ?? null,
         bpmConfidence: analysis?.bpm?.confidence ?? 0,
         tonic: analysis?.key?.tonic ?? null,
@@ -665,95 +667,6 @@ const AudioToMidi = ({
                         </Button>
                       ))}
                     </div>
-                  </div>
-                  <div>
-                    <div className="mb-2 flex items-center justify-between gap-2">
-                      <Label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        {t("audio2midi.advanced.passesLabel")}
-                      </Label>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
-                        onClick={() =>
-                          setPp({ octaveGhost: true, hardenedMerge: true, snapToGrid: true, tonalFilter: true })
-                        }
-                      >
-                        {t("audio2midi.advanced.resetPasses")}
-                      </Button>
-                    </div>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {([
-                        { passKey: "octaveGhost", label: t("audio2midi.advanced.passes.octaveGhost") },
-                        { passKey: "hardenedMerge", label: t("audio2midi.advanced.passes.hardenedMerge") },
-                        { passKey: "snapToGrid", label: t("audio2midi.advanced.passes.snapToGrid") },
-                        { passKey: "tonalFilter", label: t("audio2midi.advanced.passes.tonalFilter") },
-                      ] as const).map(({ passKey, label }) => {
-                        const id = `pp-${passKey}`;
-                        const checked = pp[passKey];
-                        const toggle = () => setPp((s) => ({ ...s, [passKey]: !s[passKey] }));
-                        let traceLabel = "";
-                        if (checked) {
-                          if (passKey === "snapToGrid") {
-                            const tr = trace.snapToGrid;
-                            traceLabel = tr.skipped
-                              ? t("audio2midi.advanced.traceSkipped")
-                              : tr.snapped > 0
-                                ? t("audio2midi.advanced.traceSnapped", { count: tr.snapped })
-                                : t("audio2midi.advanced.traceNoChange");
-                          } else if (passKey === "tonalFilter") {
-                            const tr = trace.tonalFilter;
-                            traceLabel = tr.skipped
-                              ? t("audio2midi.advanced.traceSkipped")
-                              : tr.aborted
-                                ? t("audio2midi.advanced.traceAborted")
-                                : tr.removed > 0
-                                  ? t("audio2midi.advanced.traceRemoved", { count: tr.removed })
-                                  : t("audio2midi.advanced.traceNoChange");
-                          } else {
-                            const tr = trace[passKey];
-                            traceLabel = tr.aborted
-                              ? t("audio2midi.advanced.traceAborted")
-                              : tr.removed > 0
-                                ? t("audio2midi.advanced.traceRemoved", { count: tr.removed })
-                                : t("audio2midi.advanced.traceNoChange");
-                          }
-                        }
-                        return (
-                          <div
-                            key={passKey}
-                            role="button"
-                            tabIndex={0}
-                            onClick={toggle}
-                            onKeyDown={(e) => {
-                              if (e.key === " " || e.key === "Enter") {
-                                e.preventDefault();
-                                toggle();
-                              }
-                            }}
-                            className="flex cursor-pointer items-center justify-between rounded-md border border-border/40 bg-muted/10 px-3 py-2 transition-colors hover:bg-muted/20"
-                          >
-                            <div className="flex flex-col">
-                              <label htmlFor={id} className="cursor-pointer text-sm text-foreground" onClick={(e) => e.preventDefault()}>
-                                {label}
-                              </label>
-                              {traceLabel && (
-                                <span className="text-[10px] text-muted-foreground/80">{traceLabel}</span>
-                              )}
-                            </div>
-                            <Switch
-                              id={id}
-                              checked={checked}
-                              onCheckedChange={(v) => setPp((s) => ({ ...s, [passKey]: v }))}
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <p className="mt-2 text-[11px] text-muted-foreground">
-                      {t("audio2midi.advanced.passesHint")}
-                    </p>
                   </div>
                 </div>
               )}

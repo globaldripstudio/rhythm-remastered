@@ -15,6 +15,7 @@ export interface PostProcessOptions {
   hardenedMerge: boolean;
   snapToGrid: boolean;
   tonalFilter: boolean;
+  monophonic?: boolean;
   bpm?: number | null;
   bpmConfidence?: number;
   tonic?: string | null;     // e.g. "A"
@@ -27,6 +28,7 @@ export interface PostProcessTrace {
   hardenedMerge: { removed: number; aborted: boolean };
   snapToGrid: { snapped: number; skipped: boolean };
   tonalFilter: { removed: number; aborted: boolean; skipped: boolean };
+  monophonic?: { removed: number; trimmed: number };
 }
 
 const MAX_REMOVAL_RATIO = 0.30;
@@ -169,6 +171,57 @@ function passTonalFilter(
   return { notes: filtered, removed, aborted: false };
 }
 
+/** Pass E — enforce monophony: at any instant only one note may sound.
+ *  - When two notes overlap, keep the one with the higher velocity (ties → longer).
+ *  - The previous note is trimmed to end right before the next onset (1 ms gap).
+ *  - Notes fully shadowed by a louder neighbour are removed.
+ */
+function passMonophonic(notes: NoteEvent[]): { notes: NoteEvent[]; removed: number; trimmed: number } {
+  if (notes.length === 0) return { notes, removed: 0, trimmed: 0 };
+  const sorted = [...notes].sort((a, b) => a.startSec - b.startSec || b.velocity - a.velocity);
+  const out: NoteEvent[] = [];
+  let removed = 0;
+  let trimmed = 0;
+  const GAP = 0.001;
+  for (const n of sorted) {
+    const prev = out[out.length - 1];
+    if (!prev) { out.push({ ...n }); continue; }
+    const prevEnd = prev.startSec + prev.durationSec;
+    if (n.startSec >= prevEnd) {
+      out.push({ ...n });
+      continue;
+    }
+    // Overlap. Decide who wins.
+    const nWins =
+      n.velocity > prev.velocity * 1.05 ||
+      (Math.abs(n.velocity - prev.velocity) <= prev.velocity * 0.05 &&
+        n.durationSec > prev.durationSec);
+    if (nWins) {
+      // Trim prev to end just before n; remove prev entirely if it becomes too short.
+      const newDur = n.startSec - prev.startSec - GAP;
+      if (newDur < 0.030) {
+        out.pop();
+        removed++;
+      } else {
+        prev.durationSec = newDur;
+        trimmed++;
+      }
+      out.push({ ...n });
+    } else {
+      // prev wins: drop n unless it extends beyond prev — then keep its tail.
+      const nEnd = n.startSec + n.durationSec;
+      if (nEnd > prevEnd + 0.030) {
+        const tailStart = prevEnd + GAP;
+        out.push({ ...n, startSec: tailStart, durationSec: nEnd - tailStart });
+        trimmed++;
+      } else {
+        removed++;
+      }
+    }
+  }
+  return { notes: out, removed, trimmed };
+}
+
 export function runPostProcessPipeline(
   input: NoteEvent[],
   opts: PostProcessOptions,
@@ -211,6 +264,12 @@ export function runPostProcessPipeline(
     } else {
       trace.tonalFilter = { removed: 0, aborted: false, skipped: true };
     }
+  }
+
+  if (opts.monophonic) {
+    const r = passMonophonic(cur);
+    cur = r.notes;
+    trace.monophonic = { removed: r.removed, trimmed: r.trimmed };
   }
 
   if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
