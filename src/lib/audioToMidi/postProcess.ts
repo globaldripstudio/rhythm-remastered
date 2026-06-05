@@ -218,6 +218,31 @@ function passMonophonic(notes: NoteEvent[]): { notes: NoteEvent[]; removed: numb
   return { notes: kept, removed, trimmed };
 }
 
+/** Pass F — chord-aware filter: drop weak out-of-chord notes given a chord track.
+ *  In-chord notes always kept. Out-of-chord kept only if loud OR sustained.
+ *  Out-of-chord short + quiet → removed (likely artifact).
+ */
+function passChordAware(notes: NoteEvent[], chords: ChordSegment[]): { notes: NoteEvent[]; removed: number; aborted: boolean } {
+  if (notes.length === 0 || chords.length === 0) return { notes, removed: 0, aborted: false };
+  let maxVel = 0;
+  for (const n of notes) if (n.velocity > maxVel) maxVel = n.velocity;
+  const velThreshold = maxVel * 0.45;
+  const kept: NoteEvent[] = [];
+  for (const n of notes) {
+    const c = chordAtTime(chords, n.startSec + n.durationSec * 0.5);
+    if (!c) { kept.push(n); continue; }
+    const pc = ((n.midi % 12) + 12) % 12;
+    if (c.pitchClasses.has(pc)) { kept.push(n); continue; }
+    // Out of chord — keep if salient.
+    if (n.velocity >= velThreshold) { kept.push(n); continue; }
+    if (n.durationSec >= 0.200) { kept.push(n); continue; }
+    // Drop
+  }
+  const removed = notes.length - kept.length;
+  if (removed / notes.length > MAX_REMOVAL_RATIO) return { notes, removed: 0, aborted: true };
+  return { notes: kept, removed, aborted: false };
+}
+
 export function runPostProcessPipeline(
   input: NoteEvent[],
   opts: PostProcessOptions,
@@ -252,6 +277,16 @@ export function runPostProcessPipeline(
     }
   }
 
+  if (opts.chordAware) {
+    if (opts.chords && opts.chords.length > 0) {
+      const r = passChordAware(cur, opts.chords);
+      cur = r.notes;
+      trace.chordAware = { removed: r.removed, aborted: r.aborted, skipped: false };
+    } else {
+      trace.chordAware = { removed: 0, aborted: false, skipped: true };
+    }
+  }
+
   if (opts.tonalFilter) {
     if (opts.tonic && opts.mode && (opts.keyConfidence ?? 0) >= 0.6) {
       const r = passTonalFilter(cur, opts.tonic, opts.mode);
@@ -274,3 +309,4 @@ export function runPostProcessPipeline(
 
   return { notes: cur, trace };
 }
+
