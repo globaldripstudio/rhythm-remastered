@@ -171,55 +171,46 @@ function passTonalFilter(
   return { notes: filtered, removed, aborted: false };
 }
 
-/** Pass E — enforce monophony: at any instant only one note may sound.
- *  - When two notes overlap, keep the one with the higher velocity (ties → longer).
- *  - The previous note is trimmed to end right before the next onset (1 ms gap).
- *  - Notes fully shadowed by a louder neighbour are removed.
+/** Pass E — strict monophony: at any instant exactly one note may sound.
+ *  Greedy: walk by onset; on overlap, keep the louder note (ties → longer),
+ *  drop the other entirely (no tails). Final pass trims each kept note so it
+ *  ends at most at the next onset minus a 1 ms gap.
  */
 function passMonophonic(notes: NoteEvent[]): { notes: NoteEvent[]; removed: number; trimmed: number } {
   if (notes.length === 0) return { notes, removed: 0, trimmed: 0 };
-  const sorted = [...notes].sort((a, b) => a.startSec - b.startSec || b.velocity - a.velocity);
-  const out: NoteEvent[] = [];
+  const sorted = [...notes].sort((a, b) => a.startSec - b.startSec);
+  const kept: NoteEvent[] = [];
   let removed = 0;
-  let trimmed = 0;
-  const GAP = 0.001;
   for (const n of sorted) {
-    const prev = out[out.length - 1];
-    if (!prev) { out.push({ ...n }); continue; }
+    const prev = kept[kept.length - 1];
+    if (!prev) { kept.push({ ...n }); continue; }
     const prevEnd = prev.startSec + prev.durationSec;
     if (n.startSec >= prevEnd) {
-      out.push({ ...n });
+      kept.push({ ...n });
       continue;
     }
-    // Overlap. Decide who wins.
-    const nWins =
-      n.velocity > prev.velocity * 1.05 ||
-      (Math.abs(n.velocity - prev.velocity) <= prev.velocity * 0.05 &&
-        n.durationSec > prev.durationSec);
-    if (nWins) {
-      // Trim prev to end just before n; remove prev entirely if it becomes too short.
-      const newDur = n.startSec - prev.startSec - GAP;
-      if (newDur < 0.030) {
-        out.pop();
-        removed++;
-      } else {
-        prev.durationSec = newDur;
-        trimmed++;
-      }
-      out.push({ ...n });
-    } else {
-      // prev wins: drop n unless it extends beyond prev — then keep its tail.
-      const nEnd = n.startSec + n.durationSec;
-      if (nEnd > prevEnd + 0.030) {
-        const tailStart = prevEnd + GAP;
-        out.push({ ...n, startSec: tailStart, durationSec: nEnd - tailStart });
-        trimmed++;
-      } else {
-        removed++;
-      }
+    // Overlap: pick winner
+    const nScore = n.velocity * 1000 + n.durationSec;
+    const prevScore = prev.velocity * 1000 + prev.durationSec;
+    if (nScore > prevScore) {
+      kept[kept.length - 1] = { ...n };
+    }
+    removed++;
+  }
+  // Trim each kept note so it ends before the next onset
+  let trimmed = 0;
+  const GAP = 0.001;
+  for (let i = 0; i < kept.length - 1; i++) {
+    const cur = kept[i];
+    const next = kept[i + 1];
+    const maxEnd = next.startSec - GAP;
+    const curEnd = cur.startSec + cur.durationSec;
+    if (curEnd > maxEnd) {
+      cur.durationSec = Math.max(0.030, maxEnd - cur.startSec);
+      trimmed++;
     }
   }
-  return { notes: out, removed, trimmed };
+  return { notes: kept, removed, trimmed };
 }
 
 export function runPostProcessPipeline(
