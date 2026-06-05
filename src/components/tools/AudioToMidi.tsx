@@ -714,31 +714,176 @@ const AudioToMidi = ({
                 </div>
               </div>
 
-              {/* Info banner: profile / key / bpm */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+              {/* Info banner: profile / key / bpm — editable */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
                 <span>
                   <span className="text-muted-foreground/80">{t("audio2midi.info.profile")} : </span>
                   <span className="font-medium text-foreground">{t(`audio2midi.profiles.${profile}`)}</span>
                 </span>
+
+                {/* Key editor */}
                 {keyResult && (
-                  <span>
-                    <span className="text-muted-foreground/80">{t("audio2midi.info.key")} : </span>
-                    <span className="font-medium text-foreground">
-                      {keyResult.tonic} {keyResult.mode === "minor" ? "min" : "maj"}
-                    </span>
-                    {keyResult.confidence < 0.6 && (
-                      <span className="ml-1 text-[10px] uppercase tracking-wide text-muted-foreground/70">
-                        ({t("audio2midi.info.lowConfidence")})
+                  <span className="inline-flex items-center gap-1">
+                    <span className="text-muted-foreground/80">{t("audio2midi.info.key")} :</span>
+                    {!editingKey ? (
+                      <>
+                        <span className="font-medium text-foreground">
+                          {keyResult.tonic} {keyResult.mode === "minor" ? "min" : "maj"}
+                        </span>
+                        {keyLocked ? (
+                          <Lock className="h-3 w-3 text-primary" aria-label={t("audio2midi.info.locked")} />
+                        ) : keyResult.confidence < 0.6 ? (
+                          <span className="text-[10px] uppercase tracking-wide text-muted-foreground/70">
+                            ({t("audio2midi.info.lowConfidence")})
+                          </span>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => setEditingKey(true)}
+                          className="ml-1 inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-primary hover:bg-primary/10"
+                          title={t("audio2midi.info.edit")}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                        {keyLocked && (
+                          <button
+                            type="button"
+                            onClick={resetKey}
+                            className="inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-muted-foreground hover:bg-muted/40"
+                            title={t("audio2midi.info.reset")}
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <span className="inline-flex items-center gap-1">
+                        <select
+                          defaultValue={keyResult.tonic}
+                          id="key-tonic-select"
+                          className="h-7 rounded border border-border bg-background px-1 text-xs text-foreground"
+                        >
+                          {["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"].map((n) => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </select>
+                        <select
+                          defaultValue={keyResult.mode}
+                          id="key-mode-select"
+                          className="h-7 rounded border border-border bg-background px-1 text-xs text-foreground"
+                        >
+                          <option value="major">maj</option>
+                          <option value="minor">min</option>
+                        </select>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => {
+                            const tonic = (document.getElementById("key-tonic-select") as HTMLSelectElement)?.value || "C";
+                            const mode = ((document.getElementById("key-mode-select") as HTMLSelectElement)?.value || "major") as "major" | "minor";
+                            applyKeyOverride(tonic, mode);
+                          }}
+                        >
+                          OK
+                        </Button>
+                        <button type="button" onClick={() => setEditingKey(false)} className="rounded p-1 text-muted-foreground hover:bg-muted/40">
+                          <X className="h-3 w-3" />
+                        </button>
                       </span>
                     )}
                   </span>
                 )}
-                {bpmResult && bpmResult.bpm > 0 && (
-                  <span>
-                    <span className="text-muted-foreground/80">BPM : </span>
-                    <span className="font-medium text-foreground">{bpmResult.bpm}</span>
+
+                {/* BPM editor */}
+                {bpmResult && (
+                  <span className="inline-flex items-center gap-1">
+                    <span className="text-muted-foreground/80">BPM :</span>
+                    {!editingBpm ? (
+                      <>
+                        <span className="font-medium text-foreground">{bpmResult.bpm > 0 ? bpmResult.bpm : "—"}</span>
+                        {bpmLocked ? (
+                          <Lock className="h-3 w-3 text-primary" aria-label={t("audio2midi.info.locked")} />
+                        ) : bpmResult.confidence < 0.5 ? (
+                          <span className="text-[10px] uppercase tracking-wide text-muted-foreground/70">
+                            ({t("audio2midi.info.lowConfidence")})
+                          </span>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => { setBpmDraft(String(bpmResult.bpm || 120)); setEditingBpm(true); }}
+                          className="ml-1 inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-primary hover:bg-primary/10"
+                          title={t("audio2midi.info.edit")}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                        {bpmResult.bpm > 0 && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => applyBpmOverride(bpmResult.bpm / 2)}
+                              className="rounded px-1 py-0.5 text-muted-foreground hover:bg-muted/40"
+                              title="÷2"
+                            >
+                              ÷2
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => applyBpmOverride(bpmResult.bpm * 2)}
+                              className="rounded px-1 py-0.5 text-muted-foreground hover:bg-muted/40"
+                              title="×2"
+                            >
+                              ×2
+                            </button>
+                          </>
+                        )}
+                        {bpmLocked && (
+                          <button
+                            type="button"
+                            onClick={resetBpm}
+                            className="inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-muted-foreground hover:bg-muted/40"
+                            title={t("audio2midi.info.reset")}
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <span className="inline-flex items-center gap-1">
+                        <Input
+                          type="number"
+                          min={40}
+                          max={240}
+                          step={0.1}
+                          value={bpmDraft}
+                          onChange={(e) => setBpmDraft(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const v = parseFloat(bpmDraft);
+                              if (!isNaN(v)) applyBpmOverride(v);
+                            } else if (e.key === "Escape") setEditingBpm(false);
+                          }}
+                          className="h-7 w-20 px-2 text-xs"
+                        />
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => {
+                            const v = parseFloat(bpmDraft);
+                            if (!isNaN(v)) applyBpmOverride(v);
+                          }}
+                        >
+                          OK
+                        </Button>
+                        <button type="button" onClick={() => setEditingBpm(false)} className="rounded p-1 text-muted-foreground hover:bg-muted/40">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
                   </span>
                 )}
+
                 <button
                   type="button"
                   onClick={() => setAdvancedOpen((v) => !v)}
@@ -749,6 +894,7 @@ const AudioToMidi = ({
                   <ChevronDown className={`h-3.5 w-3.5 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
                 </button>
               </div>
+
 
               {/* Advanced panel */}
               {advancedOpen && (
