@@ -299,21 +299,34 @@ const AudioToMidi = ({
     setPlayheadSec(0);
     playheadRef.current = 0;
     try {
-      // Step 1 — quick audio analysis (key + bpm + mono samples). Fast (~1-2s).
-      let analysis: Awaited<ReturnType<typeof analyzeAudioFile>> | null = null;
+      // Step 1 — full musical context: decode + HPSS + BPM + key + chords.
+      let ctx: MusicalContext | null = null;
       try {
-        analysis = await analyzeAudioFile(target);
-      } catch {
-        analysis = null;
+        ctx = await analyzeMusicalContext(target, (p) => {
+          // map context stages into the overall progress UI
+          const stageMap: Record<typeof p.stage, AudioToMidiProgress["stage"]> = {
+            decoding: "decoding",
+            hpss: "loading-model",
+            bpm: "loading-model",
+            key: "loading-model",
+            chords: "loading-model",
+            done: "loading-model",
+          };
+          setProgress({ stage: stageMap[p.stage], percent: Math.min(40, p.percent * 0.4) });
+        });
+      } catch (e) {
+        if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
+          console.warn("[audio2midi] musical context failed", e);
+        }
+        ctx = null;
       }
 
-      // Step 2 — pick thresholds. If user supplied an override (Advanced panel),
-      // use it. Otherwise auto-detect a profile from the analysis samples.
+      // Step 2 — pick thresholds. If user supplied an override, use it. Otherwise auto-detect.
       let useThresholds = overrideThresholds ?? thresholds;
       let pickedProfile: AudioProfile = profile;
-      if (!overrideThresholds && analysis) {
+      if (!overrideThresholds && ctx) {
         try {
-          const est = estimateProfile(analysis.monoSamples, analysis.sampleRate);
+          const est = estimateProfile(ctx.monoSamples, ctx.sampleRate);
           pickedProfile = est.profile;
           useThresholds = est.thresholds;
           setProfile(est.profile);
@@ -326,10 +339,10 @@ const AudioToMidi = ({
       }
 
       if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
-        console.log("[audio2midi] run", { profile: pickedProfile, thresholds: useThresholds, key: analysis?.key, bpm: analysis?.bpm });
+        console.log("[audio2midi] run", { profile: pickedProfile, thresholds: useThresholds, key: ctx?.key, bpm: ctx?.bpm, chords: ctx?.chords?.length });
       }
 
-      // Step 3 — Basic Pitch with the chosen thresholds
+      // Step 3 — Basic Pitch on the HARMONIC signal (drums removed → cleaner notes).
       const result = await audioToMidiNotes(
         target,
         {
@@ -340,26 +353,33 @@ const AudioToMidi = ({
           skipDefaultMerge: true,
         },
         setProgress,
+        ctx?.harmonicSamples,
       );
 
-      setKeyResult(analysis?.key ?? null);
-      setBpmResult(analysis?.bpm ?? null);
+      // Step 4 — reconcile key with detected notes.
+      const reconciledKey = ctx ? reconcileKeyWithNotes(ctx.key, result.notes) : null;
+      const chordTrack = ctx?.chords ?? [];
+
+      setKeyResult(reconciledKey);
+      setBpmResult(ctx?.bpm ?? null);
+      setChords(chordTrack);
       setRawNotesCache(result.notes);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
 
-      // Preview count via a one-shot pipeline run (notes themselves are derived).
       const previewCount = runPostProcessPipeline(result.notes, {
         octaveGhost: pp.octaveGhost,
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        chordAware: pp.chordAware,
+        chords: chordTrack,
         monophonic: pickedProfile === "mono-clean",
-        bpm: analysis?.bpm?.bpm ?? null,
-        bpmConfidence: analysis?.bpm?.confidence ?? 0,
-        tonic: analysis?.key?.tonic ?? null,
-        mode: analysis?.key?.mode ?? null,
-        keyConfidence: analysis?.key?.confidence ?? 0,
+        bpm: ctx?.bpm?.bpm ?? null,
+        bpmConfidence: ctx?.bpm?.confidence ?? 0,
+        tonic: reconciledKey?.tonic ?? null,
+        mode: reconciledKey?.mode ?? null,
+        keyConfidence: reconciledKey?.confidence ?? 0,
       }).notes.length;
       toast({
         title: t("audio2midi.toasts.doneTitle"),
