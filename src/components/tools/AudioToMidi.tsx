@@ -667,9 +667,21 @@ const AudioToMidi = ({
                     </div>
                   </div>
                   <div>
-                    <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t("audio2midi.advanced.passesLabel")}
-                    </Label>
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("audio2midi.advanced.passesLabel")}
+                      </Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() =>
+                          setPp({ octaveGhost: true, hardenedMerge: true, snapToGrid: true, tonalFilter: true })
+                        }
+                      >
+                        {t("audio2midi.advanced.resetPasses")}
+                      </Button>
+                    </div>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {([
                         { passKey: "octaveGhost", label: t("audio2midi.advanced.passes.octaveGhost") },
@@ -680,6 +692,33 @@ const AudioToMidi = ({
                         const id = `pp-${passKey}`;
                         const checked = pp[passKey];
                         const toggle = () => setPp((s) => ({ ...s, [passKey]: !s[passKey] }));
+                        let traceLabel = "";
+                        if (checked) {
+                          if (passKey === "snapToGrid") {
+                            const tr = trace.snapToGrid;
+                            traceLabel = tr.skipped
+                              ? t("audio2midi.advanced.traceSkipped")
+                              : tr.snapped > 0
+                                ? t("audio2midi.advanced.traceSnapped", { count: tr.snapped })
+                                : t("audio2midi.advanced.traceNoChange");
+                          } else if (passKey === "tonalFilter") {
+                            const tr = trace.tonalFilter;
+                            traceLabel = tr.skipped
+                              ? t("audio2midi.advanced.traceSkipped")
+                              : tr.aborted
+                                ? t("audio2midi.advanced.traceAborted")
+                                : tr.removed > 0
+                                  ? t("audio2midi.advanced.traceRemoved", { count: tr.removed })
+                                  : t("audio2midi.advanced.traceNoChange");
+                          } else {
+                            const tr = trace[passKey];
+                            traceLabel = tr.aborted
+                              ? t("audio2midi.advanced.traceAborted")
+                              : tr.removed > 0
+                                ? t("audio2midi.advanced.traceRemoved", { count: tr.removed })
+                                : t("audio2midi.advanced.traceNoChange");
+                          }
+                        }
                         return (
                           <div
                             key={passKey}
@@ -694,9 +733,14 @@ const AudioToMidi = ({
                             }}
                             className="flex cursor-pointer items-center justify-between rounded-md border border-border/40 bg-muted/10 px-3 py-2 transition-colors hover:bg-muted/20"
                           >
-                            <label htmlFor={id} className="cursor-pointer text-sm text-foreground" onClick={(e) => e.preventDefault()}>
-                              {label}
-                            </label>
+                            <div className="flex flex-col">
+                              <label htmlFor={id} className="cursor-pointer text-sm text-foreground" onClick={(e) => e.preventDefault()}>
+                                {label}
+                              </label>
+                              {traceLabel && (
+                                <span className="text-[10px] text-muted-foreground/80">{traceLabel}</span>
+                              )}
+                            </div>
                             <Switch
                               id={id}
                               checked={checked}
