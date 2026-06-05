@@ -1,120 +1,122 @@
-# Refonte du moteur Audio → MIDI
+# Saisie manuelle + détection d'accords renforcée
 
-## Diagnostic honnête
+## Pourquoi la détection actuelle échoue souvent
 
-L'implémentation actuelle empile trois faiblesses qui se renforcent :
+Trois causes structurelles, indépendantes de la qualité du fichier :
 
-1. **Basic Pitch seul** est un modèle généraliste calibré sur du piano solo. Sur des accords plaqués, des pads, ou des arrangements denses, il fragmente les notes, hallucine des octaves, et rate les harmonies tenues.
-2. **Détection de tonalité** : Krumhansl-Schmuckler appliqué au spectre brut (chroma du signal complet) est très bruité dès qu'il y a percussions, basse, ou réverbération.
-3. **Détection de BPM** : l'autocorrélation sur le flux spectral brut confond souvent x2 / x/2 et échoue sur les morceaux sans batterie franche (justement les plaqués d'accords).
-4. **Post-process tonal** dépend de la tonalité détectée — donc quand la tonalité est fausse, il *aggrave* le résultat.
+1. **BPM** — l'autocorrélation/tempogramme sur le flux spectral repère une *périodicité*, pas un *tempo musical*. Sur un plaqué d'accords (pas de transitoires nets), un arpège syncopé, ou un morceau à grosse réverbe, le pic dominant tombe souvent sur une subdivision (croches → x2) ou sur le rythme harmonique (changement d'accord toutes les 2 mesures → /2 voire /4). La désambiguïsation x2/x/2 actuelle suppose une fenêtre 70-180 BPM, ce qui marche pour la pop mais rate le jazz lent ou la dance rapide.
+2. **Tonalité** — Krumhansl-Schmuckler corrèle un chroma global à 24 profils. Si le morceau module, contient des emprunts modaux, ou si la basse domine le chroma (très fréquent), le tonique détecté est souvent le V ou le vi. Le revote par les notes Basic Pitch n'aide pas si Basic Pitch a lui-même halluciné.
+3. **Accords** — les templates actuels sont des vecteurs binaires 12-bins. Ils ignorent :
+   - **la basse** (un C/E n'est pas un C),
+   - **les harmoniques** (un C majeur excite aussi G et E aigus → ressemble à C7 ou Cadd9),
+   - **la cohérence temporelle** (un accord ne change pas tous les 500 ms — un lisseur Viterbi/HMM est indispensable),
+   - **la tonalité** (un Bdim dans C majeur est plus probable qu'un Bb augmenté).
 
-Les toggles ne sont pas le problème de fond. Le problème est qu'on demande à 4 modules indépendants de bien marcher en parallèle, alors qu'ils devraient se nourrir l'un l'autre.
+C'est rattrapable sans librairie externe, en gardant tout client-side.
 
-## Principe directeur du correctif
+## Plan
 
-**Chaîne en cascade** : chaque étape consomme la sortie validée de la précédente et augmente la robustesse globale.
+### 1. Saisie manuelle BPM et tonalité (UI)
+
+Dans `AudioToMidi.tsx`, sous le bandeau de résultats actuels (BPM, tonalité, Camelot), ajouter une zone éditable :
 
 ```text
-audio ─┬─► HPSS (harmonique / percussif)
-       │       │
-       │       ├─► percussif ─► BPM (onsets percussifs) ──┐
-       │       │                                          │
-       │       └─► harmonique ─► chroma-CQT ──┬─► tonalité (depuis chroma stable)
-       │                                      │
-       │                                      └─► accords (template match)
-       │
-       └─► Basic Pitch (sur harmonique) ─► notes brutes
-                                              │
-                                              ▼
-                       post-process informé par {tonalité, BPM, accords}
-                                              │
-                                              ▼
-                                         notes finales
+┌─────────────────────────────────────────────────────────┐
+│ Tonalité détectée : C minor (62%)    [✎ Corriger]      │
+│ BPM détecté       : 92.4 (48%)       [✎ Corriger]      │
+└─────────────────────────────────────────────────────────┘
 ```
 
-Trois gains :
-- Le BPM est calculé sur la piste percussive (ou les onsets harmoniques si pas de drums), pas sur le signal complet → fini les confusions x2.
-- La tonalité vient du **chroma de la piste harmonique** + une corroboration par les notes détectées (vote pondéré par durée × vélocité) → beaucoup plus stable.
-- Les accords sortent du même chroma, alignés sur la grille BPM → on peut afficher une grille d'accords et l'utiliser pour valider/corriger les notes Basic Pitch.
+Au clic sur *Corriger* :
+- Tonalité : un `Select` (12 toniques × 2 modes = 24 options) + bouton "Réinitialiser".
+- BPM : un `Input` numérique (40-240, pas 0.1) + bouton "÷2" / "×2" / "Réinitialiser".
 
-## Plan d'implémentation (4 étapes)
+Comportement :
+- L'override force `keyResult` / `bpmResult` avec `confidence = 1.0` (verrouillé).
+- Re-déclenche **automatiquement** : détection d'accords (qui dépend du BPM pour la segmentation), puis post-process (qui dépend des accords + tonalité).
+- Indicateur visuel "verrouillé manuellement" (icône cadenas) tant que l'utilisateur n'a pas réinitialisé.
+- État stocké en `useState`, pas de persistance disque.
 
-### Étape 1 — Séparation harmonique/percussive (HPSS)
+### 2. Détection d'accords renforcée
 
-Nouveau fichier `src/lib/audioToMidi/hpss.ts`.
+Refonte de `src/lib/audioToMidi/chordDetection.ts` autour de 4 améliorations qui se cumulent.
 
-Implémentation classique par filtres médians sur le spectrogramme STFT :
-- STFT (FFT 2048, hop 512) → magnitude
-- Filtre médian horizontal (17 frames) → composante harmonique
-- Filtre médian vertical (17 bins) → composante percussive
-- Masques doux (ratio) → resynthèse iSTFT pour obtenir deux Float32Array
+#### 2.a Chroma plus propre : CRP (Chroma DCT-Reduced log Pitch)
 
-Léger (≈300 lignes JS, < 2s sur 3 min d'audio). Aucune dépendance externe.
+Au lieu d'un chroma magnitude brut :
+- Spectre log-magnitude par bin de pitch (CQT-like via banque de filtres bandlimités centrés sur chaque demi-ton de C1 à C7).
+- Compression logarithmique → DCT → on garde les coefficients 50-120 → IDCT.
+- Repliement en 12 pitch classes.
 
-### Étape 2 — Refonte BPM + tonalité
+Effet : supprime le timbre (les harmoniques d'un piano disparaissent), garde la couleur harmonique. C'est ce qui fait que MIR distingue C de Cmaj7.
 
-Nouveau fichier `src/lib/audioToMidi/musicalContext.ts`. Remplace l'usage de `analyzeAudioFile` dans `AudioToMidi.tsx`.
+#### 2.b Séparation basse / médium
 
-**BPM** :
-- Onsets calculés sur la **piste percussive** par flux spectral + pic-picking adaptatif.
-- Si la piste percussive est trop faible (énergie < seuil), fallback sur les onsets de Basic Pitch (déjà calculés !) ce qui résout le cas "plaqués d'accords sans batterie".
-- Autocorrélation tempogram 60–200 BPM, **désambiguïsation x2/x/2** via score de plausibilité (60–140 BPM favorisé sauf si pic strictement > 1.5× du concurrent).
-- Confiance = (pic principal − médiane) / pic principal.
+Deux chromas :
+- `chromaBass` : 40-250 Hz (E1-B3) → identifie la fondamentale réelle / le renversement.
+- `chromaMid`  : 250-2000 Hz → identifie la qualité (tierce, septième, extensions).
 
-**Tonalité** :
-- Chroma CQT (12 bins) sur la piste harmonique, moyenné sur tout le morceau **après seuillage des frames silencieuses**.
-- Corrélation Krumhansl-Schmuckler sur ce chroma → top-3 candidats.
-- Une fois Basic Pitch terminé, on **revote** : histogramme des pitch-classes des notes détectées pondéré par `durée × vélocité`, puis on re-corrèle. Les deux votes doivent concorder ; sinon confiance abaissée.
-- Camelot conservé.
+Le score d'un accord devient : `0.4 × cos(chromaBass, bassTemplate) + 0.6 × cos(chromaMid, qualityTemplate)`.
 
-### Étape 3 — Reconnaissance d'accords
+Permet de détecter les renversements (C/E, C/G) et de pondérer correctement les accords avec basse dissonante.
 
-Nouveau fichier `src/lib/audioToMidi/chordDetection.ts`.
+#### 2.c Templates étendus + harmoniques
 
-- Chroma CQT segmenté sur la grille BPM (1 accord par temps fort, ou par demi-mesure selon densité).
-- Templates pour : maj, min, 7, maj7, min7, sus2, sus4, dim, aug (et inversions par rotation du chroma).
-- Score de cohérence par segment → liste `{ startSec, endSec, root, quality, confidence }`.
-- Affichée dans une nouvelle bande au-dessus du piano roll (réutilise les composants `ChordGrid` existants si possible).
+Templates passés à 13 qualités : maj, min, dim, aug, sus2, sus4, 7, maj7, min7, m7b5, dim7, 6, m6. Au lieu de vecteurs binaires, chaque template inclut **les harmoniques attendues** :
 
-Bonus : ce flux d'accords sert au post-process — on peut renforcer les notes qui appartiennent à l'accord du moment, atténuer celles qui sortent.
+```text
+C major template (idéal) = [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+C major + harmoniques    = [1.0, 0, 0, 0, 0.6, 0, 0, 0.55, 0, 0, 0.15, 0.1]
+```
 
-### Étape 4 — Post-process recalibré
+(coefficients dérivés du théorème de Fourier pour les 6 premières harmoniques de C, E, G, normalisés).
 
-Modifications dans `src/lib/audioToMidi/postProcess.ts` :
+Effet : les "faux positifs C7" sur un simple C disparaissent, parce que le template C major prédit déjà la présence d'un peu de Bb (10e harmonique faible).
 
-- **Nouveau pass "chord-aware"** : pour chaque note, on regarde l'accord actif. Note dans l'accord → gardée. Note hors accord avec vélocité < 30 % du max local **et** durée < 100 ms → retirée.
-- **Pass octave-ghost** durci : ne déclenche que si l'octave inférieure existe ET fait partie de l'accord actif.
-- **Snap to grid** : grille de croches (et non plus doubles-croches) par défaut, parce qu'à 120 BPM une fenêtre de ±15 ms en doubles est trop serrée. Tolérance ±20 ms.
-- **Tonal filter** : remplacé par le chord-aware filter, plus précis.
+#### 2.d Lissage temporel Viterbi
 
-L'UI des "Réglages avancés" reste minimaliste (juste le profil sonore comme demandé). Les passes tournent automatiquement, leur trace reste visible en debug.
+Au lieu d'élire l'accord segment par segment :
+- Sur la grille (1 segment par temps avec `beatsPerSegment = 1`), calculer pour chaque segment le **vecteur de log-vraisemblance** sur tous les accords candidats (12 × 13 = 156).
+- Matrice de transition `P(chord_{t+1} | chord_t)` :
+  - rester sur le même accord : `0.6` (les accords durent),
+  - transitions cohérentes dans la tonalité (I→V, vi→IV, ii→V…) : `0.05` chacune,
+  - autres transitions : `0.001`.
+- Viterbi → chemin optimal d'accords.
+- Re-merge des segments consécutifs identiques.
 
-## Détails techniques
+Effet : disparition des "flickers" (un C qui devient F pendant 1 temps puis revient C). C'est la vraie raison pour laquelle Chordify et consorts paraissent magiques.
 
-- **Pas de nouvelles dépendances npm.** Tout est implémenté en TypeScript pur (FFT, filtre médian, CQT via banque de filtres bandlimités). Performance ciblée : < 4s d'analyse totale (HPSS + chroma + BPM + tonalité + accords) sur un morceau de 3 min, en sus de Basic Pitch.
-- **Workers Web** : HPSS et CQT déportés dans un Web Worker pour ne pas bloquer le thread principal pendant que Basic Pitch tourne (qui lui occupe déjà le GPU/WASM).
-- **Cache** : tous les artefacts intermédiaires (STFT, chroma, onsets percussifs) gardés en mémoire pour la durée du composant — permet de re-tourner le post-process instantanément quand l'utilisateur change de profil sonore.
-- **Debug** : `localStorage.audio2midiDebug = "1"` logge à chaque étape les confidences, les top-3 candidats tonalité, le tempogram, et la matrice d'accords.
+### 3. Couplage tonalité ↔ accords
 
-## Hors scope (Phase 2, après validation)
+Boucle de cohérence en deux passes :
 
-- Saisie manuelle BPM/tonalité par l'utilisateur (l'utilisateur l'a explicitement demandé en second temps).
-- Quantization rythmique des notes sur la grille d'accords.
-- Export d'un MIDI multi-pistes (mélodie + accords séparés).
-- Détection de mesure (4/4 vs 3/4 vs 6/8).
+1. Passe 1 : tonalité depuis chroma global, accords avec transitions uniformes.
+2. **Re-vote tonalité depuis la liste d'accords** : histogramme des fondamentales d'accords pondéré par durée → détermine la tonalité plus fiablement que le chroma brut. Si concordance avec passe 1 → confiance haute. Sinon, on garde la version "accords" (plus parlante musicalement) et on baisse la confiance affichée.
+3. Passe 2 : Viterbi avec matrice de transition diatonique basée sur la tonalité retenue.
 
-## Vérification
+Si l'utilisateur override la tonalité (section 1), on saute directement à la passe 2 avec sa valeur.
 
-Jeu de tests qualitatifs (manuels) sur 5 fichiers représentatifs :
-1. Plaqués d'accords piano (cas qui échoue actuellement) — viser tonalité juste, BPM juste à ±2, accords corrects sur > 70 % des temps.
-2. Mélodie monophonique nette — viser > 95 % des notes correctes.
-3. Pad synthé tenu — viser absence de fragmentation excessive.
-4. Morceau pop complet avec batterie — viser BPM exact, tonalité juste.
-5. Morceau jazz avec accords étendus (maj7, min7) — viser détection de la qualité, pas seulement de la fondamentale.
+### 4. Fichiers touchés
 
-Chaque test loggé via `audio2midiDebug` pour comparaison avant/après.
+```text
+src/components/tools/AudioToMidi.tsx     — UI override BPM/tonalité + re-déclenchement
+src/lib/audioToMidi/chordDetection.ts    — CRP, double chroma, templates harmoniques, Viterbi
+src/lib/audioToMidi/musicalContext.ts    — re-vote tonalité depuis accords, 2 passes
+src/i18n/locales/{fr,en}.json            — libellés "Corriger / Réinitialiser / Verrouillé"
+```
 
-## Effort estimé
+Pas de nouveau fichier, pas de nouvelle dépendance npm.
 
-~1500 lignes de code TypeScript (FFT et filtres réutilisables), 4 nouveaux fichiers, 2 fichiers modifiés. Faisable en une itération si tu valides l'architecture. Sinon on peut faire étape par étape (HPSS + nouveau BPM d'abord, le reste ensuite).
+### 5. Hors scope
+
+- Modulation détectée (changement de tonalité au sein du morceau) — phase ultérieure.
+- Détection de mesure (4/4 vs 3/4 vs 6/8) — toujours phase ultérieure.
+- Saisie manuelle d'une grille d'accords — l'override BPM/tonalité couvre 90 % des cas problématiques.
+
+### 6. Vérification
+
+Test manuel sur les 5 fichiers du jeu de référence du plan précédent + un cas piano avec basse renversée (vise détection du renversement) + un cas modulant (vise downgrade de confiance plutôt que faux tonique). Debug via `localStorage.audio2midiDebug = "1"` qui logge maintenant la matrice Viterbi top-3 et le détail des deux chromas.
+
+## Effort
+
+~600 lignes ajoutées/modifiées. Faisable en une itération. Le gros morceau est le Viterbi (~150 lignes propres), le reste est de l'extension incrémentale des fonctions existantes.
