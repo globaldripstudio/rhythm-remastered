@@ -82,7 +82,7 @@ function onsetEnvelope(samples: Float32Array, sampleRate: number): { envelope: F
   for (let i = 0; i < fftSize; i++) win[i] = 0.5 * (1 - Math.cos((2 * Math.PI * i) / (fftSize - 1)));
   const numFrames = Math.max(1, Math.floor((samples.length - fftSize) / hopSize) + 1);
   const env = new Float32Array(numFrames);
-  let prev = new Float64Array(fftSize / 2);
+  let prev: Float64Array = new Float64Array(new ArrayBuffer((fftSize / 2) * 8));
   const buf = new Float64Array(fftSize);
   for (let f = 0; f < numFrames; f++) {
     const off = f * hopSize;
@@ -94,7 +94,7 @@ function onsetEnvelope(samples: Float32Array, sampleRate: number): { envelope: F
       if (d > 0) flux += d;
     }
     env[f] = flux;
-    prev = mags;
+    prev = mags as unknown as Float64Array;
   }
   // Local-mean subtraction
   const smooth = new Float32Array(numFrames);
