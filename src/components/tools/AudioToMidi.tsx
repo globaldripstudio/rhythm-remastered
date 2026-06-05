@@ -289,7 +289,6 @@ const AudioToMidi = ({
     if (!target) return;
     setIsProcessing(true);
     setRawNotesCache([]);
-    setRawNotesCache([]);
     setPlayheadSec(0);
     playheadRef.current = 0;
     try {
