@@ -60,7 +60,7 @@ const AudioToMidi = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<AudioToMidiProgress>({ stage: "decoding", percent: 0 });
   const [displayPercent, setDisplayPercent] = useState(0);
-  const [notes, setNotes] = useState<NoteEvent[]>([]);
+  // `notes` is derived (useMemo) from rawNotesCache + pp toggles. See below.
   const [durationSec, setDurationSec] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,6 +92,24 @@ const AudioToMidi = ({
   });
   const includeBends = false;
 
+  // Single source of truth: notes derive from raw + toggles + key/bpm.
+  // Toggling a pass off then on is mathematically guaranteed to restore the previous result.
+  const { notes, trace } = useMemo(
+    () =>
+      runPostProcessPipeline(rawNotesCache, {
+        octaveGhost: pp.octaveGhost,
+        hardenedMerge: pp.hardenedMerge,
+        snapToGrid: pp.snapToGrid,
+        tonalFilter: pp.tonalFilter,
+        bpm: bpmResult?.bpm ?? null,
+        bpmConfidence: bpmResult?.confidence ?? 0,
+        tonic: keyResult?.tonic ?? null,
+        mode: keyResult?.mode ?? null,
+        keyConfidence: keyResult?.confidence ?? 0,
+      }),
+    [rawNotesCache, pp, keyResult, bpmResult],
+  );
+
 
   const handleFile = useCallback(
     (f?: File) => {
@@ -105,7 +123,7 @@ const AudioToMidi = ({
         return;
       }
       setFile(f);
-      setNotes([]);
+      setRawNotesCache([]);
     },
     [toast, t],
   );
@@ -264,31 +282,12 @@ const AudioToMidi = ({
     return () => cancelAnimationFrame(raf);
   }, [isProcessing, progress]);
 
-  // Apply post-process pipeline to a raw note set with current key/bpm/pp toggles
-  const applyPostProcess = useCallback(
-    (raw: NoteEvent[], key: KeyResult | null, bpm: BpmResult | null) => {
-      const { notes: out } = runPostProcessPipeline(raw, {
-        octaveGhost: pp.octaveGhost,
-        hardenedMerge: pp.hardenedMerge,
-        snapToGrid: pp.snapToGrid,
-        tonalFilter: pp.tonalFilter,
-        bpm: bpm?.bpm ?? null,
-        bpmConfidence: bpm?.confidence ?? 0,
-        tonic: key?.tonic ?? null,
-        mode: key?.mode ?? null,
-        keyConfidence: key?.confidence ?? 0,
-      });
-      return out;
-    },
-    [pp],
-  );
 
   // ---- Conversion ----
   const handleRun = async (overrideFile?: File, overrideThresholds?: ProfileThresholds) => {
     const target = overrideFile ?? file;
     if (!target) return;
     setIsProcessing(true);
-    setNotes([]);
     setRawNotesCache([]);
     setPlayheadSec(0);
     playheadRef.current = 0;
@@ -339,15 +338,24 @@ const AudioToMidi = ({
       setKeyResult(analysis?.key ?? null);
       setBpmResult(analysis?.bpm ?? null);
       setRawNotesCache(result.notes);
-
-      const processed = applyPostProcess(result.notes, analysis?.key ?? null, analysis?.bpm ?? null);
-
-      setNotes(processed);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
+
+      // Preview count via a one-shot pipeline run (notes themselves are derived).
+      const previewCount = runPostProcessPipeline(result.notes, {
+        octaveGhost: pp.octaveGhost,
+        hardenedMerge: pp.hardenedMerge,
+        snapToGrid: pp.snapToGrid,
+        tonalFilter: pp.tonalFilter,
+        bpm: analysis?.bpm?.bpm ?? null,
+        bpmConfidence: analysis?.bpm?.confidence ?? 0,
+        tonic: analysis?.key?.tonic ?? null,
+        mode: analysis?.key?.mode ?? null,
+        keyConfidence: analysis?.key?.confidence ?? 0,
+      }).notes.length;
       toast({
         title: t("audio2midi.toasts.doneTitle"),
-        description: t("audio2midi.toasts.doneDesc", { count: processed.length }),
+        description: t("audio2midi.toasts.doneDesc", { count: previewCount }),
       });
     } catch (err) {
       console.error(err);
@@ -362,13 +370,6 @@ const AudioToMidi = ({
   };
 
 
-  // Re-apply post-process when toggles change, without re-running Basic Pitch
-  useEffect(() => {
-    if (rawNotesCache.length === 0) return;
-    const processed = applyPostProcess(rawNotesCache, keyResult, bpmResult);
-    setNotes(processed);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pp, keyResult, bpmResult, rawNotesCache, applyPostProcess]);
 
   // Re-run Basic Pitch with new thresholds (Advanced panel profile change)
   const handleApplyProfile = (next: AudioProfile) => {
@@ -666,9 +667,21 @@ const AudioToMidi = ({
                     </div>
                   </div>
                   <div>
-                    <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t("audio2midi.advanced.passesLabel")}
-                    </Label>
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("audio2midi.advanced.passesLabel")}
+                      </Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() =>
+                          setPp({ octaveGhost: true, hardenedMerge: true, snapToGrid: true, tonalFilter: true })
+                        }
+                      >
+                        {t("audio2midi.advanced.resetPasses")}
+                      </Button>
+                    </div>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {([
                         { passKey: "octaveGhost", label: t("audio2midi.advanced.passes.octaveGhost") },
@@ -679,6 +692,33 @@ const AudioToMidi = ({
                         const id = `pp-${passKey}`;
                         const checked = pp[passKey];
                         const toggle = () => setPp((s) => ({ ...s, [passKey]: !s[passKey] }));
+                        let traceLabel = "";
+                        if (checked) {
+                          if (passKey === "snapToGrid") {
+                            const tr = trace.snapToGrid;
+                            traceLabel = tr.skipped
+                              ? t("audio2midi.advanced.traceSkipped")
+                              : tr.snapped > 0
+                                ? t("audio2midi.advanced.traceSnapped", { count: tr.snapped })
+                                : t("audio2midi.advanced.traceNoChange");
+                          } else if (passKey === "tonalFilter") {
+                            const tr = trace.tonalFilter;
+                            traceLabel = tr.skipped
+                              ? t("audio2midi.advanced.traceSkipped")
+                              : tr.aborted
+                                ? t("audio2midi.advanced.traceAborted")
+                                : tr.removed > 0
+                                  ? t("audio2midi.advanced.traceRemoved", { count: tr.removed })
+                                  : t("audio2midi.advanced.traceNoChange");
+                          } else {
+                            const tr = trace[passKey];
+                            traceLabel = tr.aborted
+                              ? t("audio2midi.advanced.traceAborted")
+                              : tr.removed > 0
+                                ? t("audio2midi.advanced.traceRemoved", { count: tr.removed })
+                                : t("audio2midi.advanced.traceNoChange");
+                          }
+                        }
                         return (
                           <div
                             key={passKey}
@@ -693,9 +733,14 @@ const AudioToMidi = ({
                             }}
                             className="flex cursor-pointer items-center justify-between rounded-md border border-border/40 bg-muted/10 px-3 py-2 transition-colors hover:bg-muted/20"
                           >
-                            <label htmlFor={id} className="cursor-pointer text-sm text-foreground" onClick={(e) => e.preventDefault()}>
-                              {label}
-                            </label>
+                            <div className="flex flex-col">
+                              <label htmlFor={id} className="cursor-pointer text-sm text-foreground" onClick={(e) => e.preventDefault()}>
+                                {label}
+                              </label>
+                              {traceLabel && (
+                                <span className="text-[10px] text-muted-foreground/80">{traceLabel}</span>
+                              )}
+                            </div>
                             <Switch
                               id={id}
                               checked={checked}
