@@ -282,24 +282,6 @@ const AudioToMidi = ({
     return () => cancelAnimationFrame(raf);
   }, [isProcessing, progress]);
 
-  // Apply post-process pipeline to a raw note set with current key/bpm/pp toggles
-  const applyPostProcess = useCallback(
-    (raw: NoteEvent[], key: KeyResult | null, bpm: BpmResult | null) => {
-      const { notes: out } = runPostProcessPipeline(raw, {
-        octaveGhost: pp.octaveGhost,
-        hardenedMerge: pp.hardenedMerge,
-        snapToGrid: pp.snapToGrid,
-        tonalFilter: pp.tonalFilter,
-        bpm: bpm?.bpm ?? null,
-        bpmConfidence: bpm?.confidence ?? 0,
-        tonic: key?.tonic ?? null,
-        mode: key?.mode ?? null,
-        keyConfidence: key?.confidence ?? 0,
-      });
-      return out;
-    },
-    [pp],
-  );
 
   // ---- Conversion ----
   const handleRun = async (overrideFile?: File, overrideThresholds?: ProfileThresholds) => {
