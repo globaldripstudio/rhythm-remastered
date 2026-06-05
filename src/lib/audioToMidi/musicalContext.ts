@@ -14,7 +14,7 @@
  */
 
 import { hpss } from "@/lib/audioToMidi/hpss";
-import { detectChords, detectKeyFromChords, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { detectChords, detectKeyFromChords, alignBeatGrid, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
 import type { NoteEvent } from "@/lib/musicTheory/midiExport";
 
 // Reuse the FFT-tempogram BPM detector + key detector from audioAnalysis to avoid duplicating ~200 lines.
@@ -307,15 +307,24 @@ export async function analyzeMusicalContext(
 
   onProgress?.({ stage: "bpm", percent: 55 });
   let bpm: BpmEstimate;
+  let beatEnv: Float32Array;
+  let beatHopRate: number;
   if (hp.percussiveEnergyRatio > 0.10) {
-    const { envelope, hopRate } = onsetEnvelope(hp.percussive, sampleRate);
-    bpm = detectBpmFromEnvelope(envelope, hopRate);
+    const oe = onsetEnvelope(hp.percussive, sampleRate);
+    beatEnv = oe.envelope; beatHopRate = oe.hopRate;
+    bpm = detectBpmFromEnvelope(beatEnv, beatHopRate);
   } else {
     // No drums — use harmonic onsets (often gives chord-strum tempo).
-    const { envelope, hopRate } = onsetEnvelope(hp.harmonic, sampleRate);
-    bpm = detectBpmFromEnvelope(envelope, hopRate);
+    const oe = onsetEnvelope(hp.harmonic, sampleRate);
+    beatEnv = oe.envelope; beatHopRate = oe.hopRate;
+    bpm = detectBpmFromEnvelope(beatEnv, beatHopRate);
     bpm.confidence *= 0.7; // less trusted
   }
+
+  // Align a beat grid so chord segments start on actual beats, not at t=0.
+  const beatTimes = bpm.bpm > 0
+    ? alignBeatGrid(beatEnv, beatHopRate, bpm.bpm, durationSec)
+    : [];
 
   onProgress?.({ stage: "key", percent: 75 });
   const chroma = chromaFromSamples(hp.harmonic, sampleRate);
@@ -327,6 +336,7 @@ export async function analyzeMusicalContext(
     bpm: bpm.bpm > 0 ? bpm.bpm : undefined,
     beatsPerSegment: 1,
     durationSec,
+    beatTimes: beatTimes.length >= 2 ? beatTimes : undefined,
   });
 
   // Re-vote key from chord track (often more reliable than raw chroma).
@@ -342,7 +352,7 @@ export async function analyzeMusicalContext(
     }
   }
 
-  // Pass 2: re-run chord detection with the key prior using cached frames.
+  // Pass 2: re-run chord detection with the key prior using cached frames + beat grid.
   const pass2 = detectChords(hp.harmonic, sampleRate, {
     bpm: bpm.bpm > 0 ? bpm.bpm : undefined,
     beatsPerSegment: 1,
@@ -350,6 +360,7 @@ export async function analyzeMusicalContext(
     keyTonic: bestKey.tonic,
     keyMode: bestKey.mode,
     precomputedFrames: pass1.frames,
+    beatTimes: beatTimes.length >= 2 ? beatTimes : undefined,
   });
 
   onProgress?.({ stage: "done", percent: 100 });
