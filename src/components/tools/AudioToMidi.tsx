@@ -26,7 +26,9 @@ import {
   type ProfileThresholds,
 } from "@/lib/audioToMidi/profile";
 import { runPostProcessPipeline } from "@/lib/audioToMidi/postProcess";
-import { analyzeAudioFile, type KeyResult, type BpmResult } from "@/lib/audioAnalysis";
+import { analyzeMusicalContext, reconcileKeyWithNotes, type MusicalContext } from "@/lib/audioToMidi/musicalContext";
+import type { ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { formatChord } from "@/lib/audioToMidi/chordDetection";
 import { notesToMidiBlob, downloadBlob, type NoteEvent } from "@/lib/musicTheory/midiExport";
 import { playNoteHandle, getAudioContext, type NoteHandle } from "@/lib/musicTheory/audio";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
