@@ -131,16 +131,16 @@ function passHardenedMerge(notes: NoteEvent[]): { notes: NoteEvent[]; removed: n
   return { notes: merged, removed, aborted: false };
 }
 
-/** Pass C — snap onsets to the 16th-note grid if and only if the offset is within ±15 ms. */
+/** Pass C — snap onsets to the 8th-note grid if and only if the offset is within ±25 ms. */
 function passSnapToGrid(notes: NoteEvent[], bpm: number): { notes: NoteEvent[]; snapped: number } {
   if (notes.length === 0 || bpm <= 0) return { notes, snapped: 0 };
-  const sixteenthSec = 60 / bpm / 4;
+  const eighthSec = 60 / bpm / 2;
   let snapped = 0;
   const out = notes.map((n) => {
-    const k = Math.round(n.startSec / sixteenthSec);
-    const target = k * sixteenthSec;
+    const k = Math.round(n.startSec / eighthSec);
+    const target = k * eighthSec;
     const diff = target - n.startSec;
-    if (Math.abs(diff) <= 0.015) {
+    if (Math.abs(diff) <= 0.025) {
       snapped++;
       return { ...n, startSec: target };
     }
