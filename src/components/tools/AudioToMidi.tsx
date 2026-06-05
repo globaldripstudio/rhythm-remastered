@@ -288,7 +288,7 @@ const AudioToMidi = ({
     const target = overrideFile ?? file;
     if (!target) return;
     setIsProcessing(true);
-    setNotes([]);
+    setRawNotesCache([]);
     setRawNotesCache([]);
     setPlayheadSec(0);
     playheadRef.current = 0;
