@@ -1666,7 +1666,11 @@
     "info": {
       "profile": "Profil",
       "key": "Tonalité",
-      "lowConfidence": "incertain"
+      "lowConfidence": "incertain",
+      "locked": "Verrouillé manuellement",
+      "edit": "Corriger",
+      "reset": "Réinitialiser",
+      "chords": "Accords détectés"
     },
     "profiles": {
       "mono-clean": "Mélodie monophonique",
