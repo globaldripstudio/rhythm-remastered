@@ -32,6 +32,7 @@ export interface PostProcessTrace {
   hardenedMerge: { removed: number; aborted: boolean };
   snapToGrid: { snapped: number; skipped: boolean };
   tonalFilter: { removed: number; aborted: boolean; skipped: boolean };
+  chordAware?: { removed: number; aborted: boolean; skipped: boolean };
   monophonic?: { removed: number; trimmed: number };
 }
 
