@@ -671,19 +671,40 @@ const AudioToMidi = ({
                     </Label>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {([
-                        { key: "octaveGhost", label: t("audio2midi.advanced.passes.octaveGhost") },
-                        { key: "hardenedMerge", label: t("audio2midi.advanced.passes.hardenedMerge") },
-                        { key: "snapToGrid", label: t("audio2midi.advanced.passes.snapToGrid") },
-                        { key: "tonalFilter", label: t("audio2midi.advanced.passes.tonalFilter") },
-                      ] as const).map(({ key, label }) => (
-                        <div key={key} className="flex items-center justify-between rounded-md border border-border/40 bg-muted/10 px-3 py-2">
-                          <span className="text-sm text-foreground">{label}</span>
-                          <Switch
-                            checked={pp[key]}
-                            onCheckedChange={(v) => setPp((s) => ({ ...s, [key]: v }))}
-                          />
-                        </div>
-                      ))}
+                        { passKey: "octaveGhost", label: t("audio2midi.advanced.passes.octaveGhost") },
+                        { passKey: "hardenedMerge", label: t("audio2midi.advanced.passes.hardenedMerge") },
+                        { passKey: "snapToGrid", label: t("audio2midi.advanced.passes.snapToGrid") },
+                        { passKey: "tonalFilter", label: t("audio2midi.advanced.passes.tonalFilter") },
+                      ] as const).map(({ passKey, label }) => {
+                        const id = `pp-${passKey}`;
+                        const checked = pp[passKey];
+                        const toggle = () => setPp((s) => ({ ...s, [passKey]: !s[passKey] }));
+                        return (
+                          <div
+                            key={passKey}
+                            role="button"
+                            tabIndex={0}
+                            onClick={toggle}
+                            onKeyDown={(e) => {
+                              if (e.key === " " || e.key === "Enter") {
+                                e.preventDefault();
+                                toggle();
+                              }
+                            }}
+                            className="flex cursor-pointer items-center justify-between rounded-md border border-border/40 bg-muted/10 px-3 py-2 transition-colors hover:bg-muted/20"
+                          >
+                            <label htmlFor={id} className="cursor-pointer text-sm text-foreground" onClick={(e) => e.preventDefault()}>
+                              {label}
+                            </label>
+                            <Switch
+                              id={id}
+                              checked={checked}
+                              onCheckedChange={(v) => setPp((s) => ({ ...s, [passKey]: v }))}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                     <p className="mt-2 text-[11px] text-muted-foreground">
                       {t("audio2midi.advanced.passesHint")}
