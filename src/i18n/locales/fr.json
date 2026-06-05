@@ -1685,7 +1685,13 @@
         "hardenedMerge": "Fusion durcie des répétitions",
         "snapToGrid": "Snap léger sur la grille (si BPM fiable)",
         "tonalFilter": "Filtre tonal (si tonalité fiable)"
-      }
+      },
+      "resetPasses": "Réinitialiser",
+      "traceRemoved": "−{{count}} notes",
+      "traceSnapped": "{{count}} notes recalées",
+      "traceNoChange": "Aucun effet sur ce fichier",
+      "traceAborted": "Annulée (garde-fou 30 %)",
+      "traceSkipped": "Ignorée (confiance insuffisante)"
     }
   },
   "chordTools": {
