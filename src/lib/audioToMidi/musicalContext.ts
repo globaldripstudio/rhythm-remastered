@@ -14,7 +14,7 @@
  */
 
 import { hpss } from "@/lib/audioToMidi/hpss";
-import { detectChords, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { detectChords, detectKeyFromChords, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
 import type { NoteEvent } from "@/lib/musicTheory/midiExport";
 
 // Reuse the FFT-tempogram BPM detector + key detector from audioAnalysis to avoid duplicating ~200 lines.
