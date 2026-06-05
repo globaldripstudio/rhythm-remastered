@@ -14,7 +14,7 @@
  */
 
 import { hpss } from "@/lib/audioToMidi/hpss";
-import { detectChords, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
+import { detectChords, detectKeyFromChords, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
 import type { NoteEvent } from "@/lib/musicTheory/midiExport";
 
 // Reuse the FFT-tempogram BPM detector + key detector from audioAnalysis to avoid duplicating ~200 lines.
@@ -322,18 +322,42 @@ export async function analyzeMusicalContext(
   const { best: keyEst } = keyFromChroma(chroma);
 
   onProgress?.({ stage: "chords", percent: 85 });
-  const chords = detectChords(hp.harmonic, sampleRate, {
+  // Pass 1: chord detection with no key prior (uniform diatonic).
+  const pass1 = detectChords(hp.harmonic, sampleRate, {
     bpm: bpm.bpm > 0 ? bpm.bpm : undefined,
-    beatsPerSegment: 2,
+    beatsPerSegment: 1,
     durationSec,
+  });
+
+  // Re-vote key from chord track (often more reliable than raw chroma).
+  const chordKey = detectKeyFromChords(pass1.chords);
+  let bestKey: KeyEstimate = keyEst;
+  if (chordKey) {
+    if (chordKey.tonic === keyEst.tonic && chordKey.mode === keyEst.mode) {
+      bestKey = { ...keyEst, confidence: Math.min(1, keyEst.confidence * 1.2 + 0.15) };
+    } else if (chordKey.confidence > keyEst.confidence) {
+      bestKey = chordKey;
+    } else {
+      bestKey = { ...keyEst, confidence: Math.max(0, keyEst.confidence - 0.15) };
+    }
+  }
+
+  // Pass 2: re-run chord detection with the key prior using cached frames.
+  const pass2 = detectChords(hp.harmonic, sampleRate, {
+    bpm: bpm.bpm > 0 ? bpm.bpm : undefined,
+    beatsPerSegment: 1,
+    durationSec,
+    keyTonic: bestKey.tonic,
+    keyMode: bestKey.mode,
+    precomputedFrames: pass1.frames,
   });
 
   onProgress?.({ stage: "done", percent: 100 });
 
   return {
-    key: keyEst,
+    key: bestKey,
     bpm,
-    chords,
+    chords: pass2.chords,
     harmonicSamples: hp.harmonic,
     monoSamples: mono,
     sampleRate,

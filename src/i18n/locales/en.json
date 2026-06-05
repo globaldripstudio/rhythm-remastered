@@ -1666,7 +1666,11 @@
     "info": {
       "profile": "Profile",
       "key": "Key",
-      "lowConfidence": "uncertain"
+      "lowConfidence": "uncertain",
+      "locked": "Locked manually",
+      "edit": "Edit",
+      "reset": "Reset",
+      "chords": "Detected chords"
     },
     "profiles": {
       "mono-clean": "Monophonic melody",
