@@ -266,6 +266,12 @@ export function runPostProcessPipeline(
     }
   }
 
+  if (opts.monophonic) {
+    const r = passMonophonic(cur);
+    cur = r.notes;
+    trace.monophonic = { removed: r.removed, trimmed: r.trimmed };
+  }
+
   if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
     console.log("[audio2midi] post-process trace", trace, { in: input.length, out: cur.length, opts });
   }
