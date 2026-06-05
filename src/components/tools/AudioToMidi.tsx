@@ -338,15 +338,24 @@ const AudioToMidi = ({
       setKeyResult(analysis?.key ?? null);
       setBpmResult(analysis?.bpm ?? null);
       setRawNotesCache(result.notes);
-
-      const processed = applyPostProcess(result.notes, analysis?.key ?? null, analysis?.bpm ?? null);
-
-      setNotes(processed);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
+
+      // Preview count via a one-shot pipeline run (notes themselves are derived).
+      const previewCount = runPostProcessPipeline(result.notes, {
+        octaveGhost: pp.octaveGhost,
+        hardenedMerge: pp.hardenedMerge,
+        snapToGrid: pp.snapToGrid,
+        tonalFilter: pp.tonalFilter,
+        bpm: analysis?.bpm?.bpm ?? null,
+        bpmConfidence: analysis?.bpm?.confidence ?? 0,
+        tonic: analysis?.key?.tonic ?? null,
+        mode: analysis?.key?.mode ?? null,
+        keyConfidence: analysis?.key?.confidence ?? 0,
+      }).notes.length;
       toast({
         title: t("audio2midi.toasts.doneTitle"),
-        description: t("audio2midi.toasts.doneDesc", { count: processed.length }),
+        description: t("audio2midi.toasts.doneDesc", { count: previewCount }),
       });
     } catch (err) {
       console.error(err);
@@ -361,13 +370,6 @@ const AudioToMidi = ({
   };
 
 
-  // Re-apply post-process when toggles change, without re-running Basic Pitch
-  useEffect(() => {
-    if (rawNotesCache.length === 0) return;
-    const processed = applyPostProcess(rawNotesCache, keyResult, bpmResult);
-    setNotes(processed);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pp, keyResult, bpmResult, rawNotesCache, applyPostProcess]);
 
   // Re-run Basic Pitch with new thresholds (Advanced panel profile change)
   const handleApplyProfile = (next: AudioProfile) => {
