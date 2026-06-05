@@ -60,6 +60,7 @@ export async function audioToMidiNotes(
   file: File,
   options: AudioToMidiOptions = {},
   onProgress?: (p: AudioToMidiProgress) => void,
+  preDecodedSamples?: Float32Array,
 ): Promise<{ notes: NoteEvent[]; durationSec: number; samples: Float32Array }> {
   const opts = {
     onsetThreshold: 0.7,
@@ -71,7 +72,10 @@ export async function audioToMidiNotes(
   };
 
   onProgress?.({ stage: "decoding", percent: 0 });
-  const { samples, durationSec } = await decodeForBasicPitch(file);
+  const decoded = preDecodedSamples
+    ? { samples: preDecodedSamples, durationSec: preDecodedSamples.length / 22050 }
+    : await decodeForBasicPitch(file);
+  const { samples, durationSec } = decoded;
 
   onProgress?.({ stage: "loading-model", percent: 0 });
   const bp = getBasicPitch();
