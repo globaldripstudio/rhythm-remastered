@@ -82,20 +82,21 @@ const AudioToMidi = ({
   // Default thresholds (overridden once profile is detected)
   const [thresholds, setThresholds] = useState<ProfileThresholds>(PROFILE_PRESETS["piano-clean"]);
   const [profile, setProfile] = useState<AudioProfile>("piano-clean");
-  const [keyResult, setKeyResult] = useState<KeyResult | null>(null);
-  const [bpmResult, setBpmResult] = useState<BpmResult | null>(null);
+  const [keyResult, setKeyResult] = useState<{ tonic: string; mode: "major" | "minor"; confidence: number } | null>(null);
+  const [bpmResult, setBpmResult] = useState<{ bpm: number; confidence: number } | null>(null);
+  const [chords, setChords] = useState<ChordSegment[]>([]);
   const [rawNotesCache, setRawNotesCache] = useState<NoteEvent[]>([]);
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [pp, setPp] = useState({
+  const [pp] = useState({
     octaveGhost: true,
     hardenedMerge: true,
     snapToGrid: true,
     tonalFilter: true,
+    chordAware: true,
   });
   const includeBends = false;
 
-  // Single source of truth: notes derive from raw + toggles + key/bpm.
-  // Toggling a pass off then on is mathematically guaranteed to restore the previous result.
+  // Single source of truth: notes derive from raw + toggles + key/bpm/chords.
   const { notes } = useMemo(
     () =>
       runPostProcessPipeline(rawNotesCache, {
@@ -103,6 +104,8 @@ const AudioToMidi = ({
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        chordAware: pp.chordAware,
+        chords,
         monophonic: profile === "mono-clean",
         bpm: bpmResult?.bpm ?? null,
         bpmConfidence: bpmResult?.confidence ?? 0,
@@ -110,8 +113,9 @@ const AudioToMidi = ({
         mode: keyResult?.mode ?? null,
         keyConfidence: keyResult?.confidence ?? 0,
       }),
-    [rawNotesCache, pp, keyResult, bpmResult, profile],
+    [rawNotesCache, pp, keyResult, bpmResult, chords, profile],
   );
+
 
 
   const handleFile = useCallback(
