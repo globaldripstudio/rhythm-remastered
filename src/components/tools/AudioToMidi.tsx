@@ -92,6 +92,15 @@ const AudioToMidi = ({
   const [chords, setChords] = useState<ChordSegment[]>([]);
   const [rawNotesCache, setRawNotesCache] = useState<NoteEvent[]>([]);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  // Manual overrides
+  const harmonicRef = useRef<{ samples: Float32Array; sampleRate: number; duration: number } | null>(null);
+  const originalKeyRef = useRef<{ tonic: string; mode: "major" | "minor"; confidence: number } | null>(null);
+  const originalBpmRef = useRef<{ bpm: number; confidence: number } | null>(null);
+  const [keyLocked, setKeyLocked] = useState(false);
+  const [bpmLocked, setBpmLocked] = useState(false);
+  const [editingKey, setEditingKey] = useState(false);
+  const [editingBpm, setEditingBpm] = useState(false);
+  const [bpmDraft, setBpmDraft] = useState<string>("");
   const [pp] = useState({
     octaveGhost: true,
     hardenedMerge: true,
