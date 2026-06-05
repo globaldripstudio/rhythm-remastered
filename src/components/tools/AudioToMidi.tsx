@@ -348,6 +348,7 @@ const AudioToMidi = ({
         hardenedMerge: pp.hardenedMerge,
         snapToGrid: pp.snapToGrid,
         tonalFilter: pp.tonalFilter,
+        monophonic: pickedProfile === "mono-clean",
         bpm: analysis?.bpm?.bpm ?? null,
         bpmConfidence: analysis?.bpm?.confidence ?? 0,
         tonic: analysis?.key?.tonic ?? null,
