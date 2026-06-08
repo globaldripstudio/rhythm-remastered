@@ -594,9 +594,11 @@ const AudioToMidi = ({
 
   const handleDownloadMidi = () => {
     if (notes.length === 0) return;
-    const blob = notesToMidiBlob(notes, 120);
+    const exportBpm = bpmResult?.bpm && bpmResult.bpm > 0 ? bpmResult.bpm : 120;
+    const blob = notesToMidiBlob(notes, exportBpm);
     const name = file?.name?.replace(/\.[^.]+$/, "") ?? "audio";
-    downloadBlob(blob, `${name}.mid`);
+    const bpmTag = exportBpm !== 120 ? `-${Math.round(exportBpm)}bpm` : "";
+    downloadBlob(blob, `${name}${bpmTag}.mid`);
   };
 
   const stageLabel = STAGE_LABEL[progress.stage];
