@@ -439,42 +439,90 @@ const AISongChecker = () => {
         </div>
 
         <div className="mx-auto mt-8 max-w-3xl">
-          {!result && !isAnalyzing && (
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragging(false);
-                handleFile(e.dataTransfer.files?.[0]);
-              }}
-              onClick={() => fileInputRef.current?.click()}
-              className={`group cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-colors ${
-                isDragging ? "border-primary bg-primary/5" : "border-border bg-card/40 hover:border-primary/50"
-              }`}
-            >
-              <Upload className="mx-auto mb-3 h-10 w-10 text-primary" />
-              <p className="font-medium">{L.dropTitle}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{L.dropSub}</p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept={AUDIO_ACCEPT}
-                className="hidden"
-                onChange={(e) => handleFile(e.target.files?.[0] ?? undefined)}
-              />
+          {!result && !isAnalyzing && !isFetching && (
+            <>
+              {/* Mode tabs */}
+              <div className="mb-3 inline-flex rounded-md border border-border bg-card/40 p-1">
+                <button
+                  type="button"
+                  onClick={() => setInputMode("upload")}
+                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm transition-colors ${
+                    inputMode === "upload" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Upload className="h-3.5 w-3.5" /> {L.tabUpload}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputMode("url")}
+                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm transition-colors ${
+                    inputMode === "url" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <LinkIcon className="h-3.5 w-3.5" /> {L.tabUrl}
+                </button>
+              </div>
+
+              {inputMode === "upload" ? (
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    handleFile(e.dataTransfer.files?.[0]);
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`group cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-colors ${
+                    isDragging ? "border-primary bg-primary/5" : "border-border bg-card/40 hover:border-primary/50"
+                  }`}
+                >
+                  <Upload className="mx-auto mb-3 h-10 w-10 text-primary" />
+                  <p className="font-medium">{L.dropTitle}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{L.dropSub}</p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={AUDIO_ACCEPT}
+                    className="hidden"
+                    onChange={(e) => handleFile(e.target.files?.[0] ?? undefined)}
+                  />
+                </div>
+              ) : (
+                <div className="rounded-xl border border-border bg-card/40 p-6">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <LinkIcon className="h-4 w-4 text-primary" />
+                    {L.tabUrl}
+                  </div>
+                  <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                    <Input
+                      type="url"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      placeholder={L.urlPlaceholder}
+                      onKeyDown={(e) => { if (e.key === "Enter") void handleUrlFetch(); }}
+                      className="flex-1"
+                    />
+                    <Button onClick={() => void handleUrlFetch()} disabled={!urlInput.trim()}>
+                      <LinkIcon className="mr-2 h-4 w-4" /> {L.urlFetch}
+                    </Button>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">{L.urlHelp}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {(isAnalyzing || isFetching) && (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card/40 p-12">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="mt-3 text-sm text-muted-foreground">{isFetching ? L.urlFetching : L.analyzing}</p>
             </div>
           )}
 
-          {isAnalyzing && (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card/40 p-12">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="mt-3 text-sm text-muted-foreground">{L.analyzing}</p>
-            </div>
-          )}
 
           {error && (
             <div className="mt-4 flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
