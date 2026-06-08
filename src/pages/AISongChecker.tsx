@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity, HelpCircle, ShieldCheck, ShieldAlert, ShieldQuestion } from "lucide-react";
+import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity, HelpCircle, ShieldCheck, ShieldAlert, ShieldQuestion, Link as LinkIcon } from "lucide-react";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 import { analyzeForAI, type AISongCheckResult, type Verdict, type ProbBlock, type MarkerId, type MarkerSide, type Confidence, type QualityIssue, type TopMarker } from "@/lib/aiSongCheck";
 import SEO from "@/components/SEO";
@@ -9,8 +9,10 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { softwareAppSchema, breadcrumbSchema } from "@/lib/seo/schemas";
+import { supabase } from "@/integrations/supabase/client";
 
 type FeatureKey =
   | "spectralFlatnessMean"
