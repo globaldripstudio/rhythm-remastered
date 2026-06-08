@@ -306,20 +306,37 @@ export async function analyzeMusicalContext(
   const hp = hpss(mono, sampleRate);
 
   onProgress?.({ stage: "bpm", percent: 55 });
+  // Compute BPM from BOTH percussive and harmonic streams and vote.
+  // Agreement (same BPM within 1 % or octave-related) boosts confidence;
+  // disagreement falls back to the more confident estimate.
+  const percOe = onsetEnvelope(hp.percussive, sampleRate);
+  const harmOe = onsetEnvelope(hp.harmonic, sampleRate);
+  const bpmPerc = detectBpmFromEnvelope(percOe.envelope, percOe.hopRate);
+  const bpmHarm = detectBpmFromEnvelope(harmOe.envelope, harmOe.hopRate);
+
+  const hasDrums = hp.percussiveEnergyRatio > 0.10;
+  // Bias percussive when drums dominate, harmonic otherwise.
+  const primary = hasDrums ? bpmPerc : bpmHarm;
+  const secondary = hasDrums ? bpmHarm : bpmPerc;
+
+  const agree = (a: number, b: number) => {
+    if (a <= 0 || b <= 0) return false;
+    const folds = [b, b * 2, b / 2, b * 3, b / 3];
+    return folds.some((f) => Math.abs(a - f) / a < 0.02);
+  };
+
   let bpm: BpmEstimate;
-  let beatEnv: Float32Array;
-  let beatHopRate: number;
-  if (hp.percussiveEnergyRatio > 0.10) {
-    const oe = onsetEnvelope(hp.percussive, sampleRate);
-    beatEnv = oe.envelope; beatHopRate = oe.hopRate;
-    bpm = detectBpmFromEnvelope(beatEnv, beatHopRate);
+  if (agree(primary.bpm, secondary.bpm)) {
+    bpm = { bpm: primary.bpm, confidence: Math.min(1, primary.confidence * 1.25 + 0.15) };
+  } else if (secondary.confidence > primary.confidence + 0.1) {
+    bpm = { ...secondary, confidence: secondary.confidence * (hasDrums ? 0.85 : 1) };
   } else {
-    // No drums — use harmonic onsets (often gives chord-strum tempo).
-    const oe = onsetEnvelope(hp.harmonic, sampleRate);
-    beatEnv = oe.envelope; beatHopRate = oe.hopRate;
-    bpm = detectBpmFromEnvelope(beatEnv, beatHopRate);
-    bpm.confidence *= 0.7; // less trusted
+    bpm = { ...primary, confidence: primary.confidence * (hasDrums ? 1 : 0.8) };
   }
+
+  // Use the source matching the chosen BPM for the beat grid alignment.
+  const beatEnv = (hasDrums ? percOe : harmOe).envelope;
+  const beatHopRate = (hasDrums ? percOe : harmOe).hopRate;
 
   // Align a beat grid so chord segments start on actual beats, not at t=0.
   const beatTimes = bpm.bpm > 0
