@@ -594,9 +594,11 @@ const AudioToMidi = ({
 
   const handleDownloadMidi = () => {
     if (notes.length === 0) return;
-    const blob = notesToMidiBlob(notes, 120);
+    const exportBpm = bpmResult?.bpm && bpmResult.bpm > 0 ? bpmResult.bpm : 120;
+    const blob = notesToMidiBlob(notes, exportBpm);
     const name = file?.name?.replace(/\.[^.]+$/, "") ?? "audio";
-    downloadBlob(blob, `${name}.mid`);
+    const bpmTag = exportBpm !== 120 ? `-${Math.round(exportBpm)}bpm` : "";
+    downloadBlob(blob, `${name}${bpmTag}.mid`);
   };
 
   const stageLabel = STAGE_LABEL[progress.stage];
@@ -932,35 +934,60 @@ const AudioToMidi = ({
                 </div>
               )}
 
-              {/* Chord strip */}
-              {chords.length > 0 && durationSec > 0 && (
-                <div className="rounded-md border border-border/60 bg-background/40 p-2">
-                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground/80">
-                    {t("audio2midi.info.chords", "Accords détectés")}
+              {/* Chord strip — merged consecutive identical chords */}
+              {chords.length > 0 && durationSec > 0 && (() => {
+                const merged: ChordSegment[] = [];
+                for (const c of chords) {
+                  const last = merged[merged.length - 1];
+                  const same = last && last.root === c.root && last.quality === c.quality && last.bassPc === c.bassPc;
+                  if (same) {
+                    last.endSec = c.endSec;
+                    last.confidence = (last.confidence + c.confidence) / 2;
+                  } else {
+                    merged.push({ ...c });
+                  }
+                }
+                return (
+                  <div className="rounded-md border border-border/60 bg-background/40 p-2">
+                    <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wide text-muted-foreground/80">
+                      <span>{t("audio2midi.info.chords", "Accords détectés")}</span>
+                      <span className="font-mono normal-case tracking-normal text-muted-foreground/60">
+                        {merged.length} {merged.length > 1 ? "segments" : "segment"}
+                      </span>
+                    </div>
+                    <div className="relative h-9 w-full overflow-hidden rounded bg-muted/30">
+                      {merged.map((c, i) => {
+                        const left = (c.startSec / durationSec) * 100;
+                        const width = ((c.endSec - c.startSec) / durationSec) * 100;
+                        const opacity = 0.35 + 0.55 * c.confidence;
+                        const dur = c.endSec - c.startSec;
+                        const label = formatChord(c);
+                        return (
+                          <div
+                            key={i}
+                            className="absolute top-0 flex h-full flex-col items-center justify-center overflow-hidden border-l border-background/60 px-1 text-foreground"
+                            style={{
+                              left: `${left}%`,
+                              width: `${width}%`,
+                              background: `hsla(180, 60%, 40%, ${opacity})`,
+                            }}
+                            title={`${label} · ${c.startSec.toFixed(1)}s → ${c.endSec.toFixed(1)}s (${dur.toFixed(1)}s) · ${(c.confidence * 100).toFixed(0)}%`}
+                          >
+                            {width > 4 && (
+                              <span className="truncate text-[11px] font-semibold leading-tight">{label}</span>
+                            )}
+                            {width > 8 && (
+                              <span className="truncate font-mono text-[9px] leading-tight text-foreground/70">
+                                {dur.toFixed(1)}s
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="relative h-8 w-full overflow-hidden rounded bg-muted/30">
-                    {chords.map((c, i) => {
-                      const left = (c.startSec / durationSec) * 100;
-                      const width = ((c.endSec - c.startSec) / durationSec) * 100;
-                      const opacity = 0.35 + 0.55 * c.confidence;
-                      return (
-                        <div
-                          key={i}
-                          className="absolute top-0 flex h-full items-center justify-center overflow-hidden border-l border-background/60 text-[10px] font-semibold text-foreground"
-                          style={{
-                            left: `${left}%`,
-                            width: `${width}%`,
-                            background: `hsla(180, 60%, 40%, ${opacity})`,
-                          }}
-                          title={`${formatChord(c)} · ${c.startSec.toFixed(1)}s–${c.endSec.toFixed(1)}s · conf ${(c.confidence * 100).toFixed(0)}%`}
-                        >
-                          {width > 3 ? formatChord(c) : ""}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
 
               <div ref={wrapRef} className="rounded-lg border border-border/60 bg-card/40 p-2">
