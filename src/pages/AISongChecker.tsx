@@ -328,6 +328,9 @@ const AISongChecker = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AISongCheckResult | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
+  const [urlInput, setUrlInput] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
 
   const handleFile = useCallback(
     async (file?: File) => {
@@ -353,6 +356,48 @@ const AISongChecker = () => {
     },
     [L]
   );
+
+  const handleUrlFetch = useCallback(async () => {
+    const url = urlInput.trim();
+    if (!url) { setError(L.urlEmpty); return; }
+    setError(null);
+    setResult(null);
+    setIsFetching(true);
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("fetch-audio-from-url", {
+        body: { url },
+      });
+      if (fnErr) throw new Error(fnErr.message || L.urlError);
+      // Edge function returns a Blob on success or a JSON error.
+      let blob: Blob;
+      if (data instanceof Blob) {
+        blob = data;
+      } else if (data && typeof data === "object" && "error" in data) {
+        throw new Error((data as { error: string }).error);
+      } else {
+        // Some SDK versions return ArrayBuffer for binary
+        blob = new Blob([data as BlobPart]);
+      }
+      if (!blob.type.startsWith("audio/")) {
+        // Try to read as JSON error
+        try {
+          const txt = await blob.text();
+          const j = JSON.parse(txt);
+          if (j?.error) throw new Error(j.error);
+        } catch {/* fall through */}
+      }
+      const ext = (blob.type.split("/")[1] || "mp3").split(";")[0];
+      const f = new File([blob], `linked-audio.${ext}`, { type: blob.type || "audio/mpeg" });
+      await handleFile(f);
+    } catch (e) {
+      console.error(e);
+      setError((e as Error).message || L.urlError);
+    } finally {
+      setIsFetching(false);
+    }
+  }, [urlInput, L, handleFile]);
+
+
 
   return (
     <div className="min-h-screen bg-background">
