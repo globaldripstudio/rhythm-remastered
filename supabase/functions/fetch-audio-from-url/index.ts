@@ -1,15 +1,16 @@
-// Fetch audio from external URL (YouTube / SoundCloud / direct file) and
-// stream the audio bytes back to the browser so the local analyser can
-// process them. Read-only proxy with strict size + duration caps and a
-// per-IP rate limit (10 / hour).
+// Fetch audio from external URL (SoundCloud / direct file) and stream the
+// audio bytes back to the browser so the local analyser can process them.
+// Read-only proxy with strict size + duration caps and a per-IP rate limit
+// (10 / hour).
 //
-// Legal note: clients should respect platform ToS. Lovable / Global Drip
-// Studio operates this endpoint as a convenience for personal analysis.
+// YouTube is NOT supported: every JS YouTube library (ytdl-core,
+// youtubei.js, play-dl) needs operations blocked by the Supabase edge
+// runtime (Deno.openSync for debug dumps, brotli decompression, dynamic JS
+// eval to decipher signatures). Recommend the user downloads the audio
+// manually and uses the upload tab instead.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import ytdl from "npm:@distube/ytdl-core@4.16.12";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import scdl from "npm:soundcloud-downloader@1.0.0";
 
@@ -75,6 +76,13 @@ Deno.serve(async (req) => {
     return json({ error: "URL invalide." }, 400);
   }
 
+  // Reject YouTube explicitly with a clear message.
+  if (/youtube\.com|youtu\.be/i.test(url)) {
+    return json({
+      error: "YouTube n'est pas supporté (restrictions techniques côté serveur). Télécharge l'audio manuellement et utilise l'onglet Upload, ou colle un lien SoundCloud / un lien direct vers un .mp3 ou .wav.",
+    }, 415);
+  }
+
   // Per-IP rate limit: 10 requests / hour.
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   try {
@@ -100,19 +108,7 @@ Deno.serve(async (req) => {
     let mime = "audio/mpeg";
     let source = "direct";
 
-    if (ytdl.validateURL(url)) {
-      source = "youtube";
-      const info = await ytdl.getInfo(url);
-      const lengthSec = parseInt(info.videoDetails?.lengthSeconds || "0", 10);
-      if (lengthSec > MAX_DURATION_SEC) {
-        return json({ error: `Vidéo trop longue (max ${MAX_DURATION_SEC / 60} min).` }, 413);
-      }
-      title = info.videoDetails?.title || "youtube";
-      const format = ytdl.chooseFormat(info.formats, { quality: "highestaudio", filter: "audioonly" });
-      mime = (format.mimeType?.split(";")[0]) || "audio/mp4";
-      const nodeStream = ytdl.downloadFromInfo(info, { format });
-      stream = nodeReadableToWebStream(nodeStream);
-    } else if (/soundcloud\.com/i.test(url)) {
+    if (/soundcloud\.com/i.test(url)) {
       source = "soundcloud";
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const info: any = await scdl.getInfo(url).catch(() => null);
