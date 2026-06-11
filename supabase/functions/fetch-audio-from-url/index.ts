@@ -107,7 +107,14 @@ Deno.serve(async (req) => {
       source = "youtube";
       const videoId = ytMatch[1];
       try {
-        const yt = await Innertube.create({ retrieve_player: true });
+        // Custom fetch that forces gzip/identity to avoid the Deno node
+        // brotli decompression bug ("Failed to decompress").
+        const ytFetch: typeof fetch = (input, init = {}) => {
+          const headers = new Headers(init.headers || (input as Request).headers || {});
+          headers.set("accept-encoding", "gzip");
+          return fetch(input, { ...init, headers });
+        };
+        const yt = await Innertube.create({ retrieve_player: true, fetch: ytFetch });
         const info = await yt.getInfo(videoId);
         const duration = info.basic_info?.duration ?? 0;
         if (duration && duration > MAX_DURATION_SEC) {
