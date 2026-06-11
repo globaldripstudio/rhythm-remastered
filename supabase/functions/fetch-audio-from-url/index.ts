@@ -109,11 +109,19 @@ Deno.serve(async (req) => {
       try {
         // Custom fetch that forces gzip/identity to avoid the Deno node
         // brotli decompression bug ("Failed to decompress").
-        const ytFetch: typeof fetch = (input, init) => {
-          if (input instanceof Request) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const ytFetch: typeof fetch = (input: any, init?: RequestInit) => {
+          // youtubei.js may pass a Request-like object from a different realm,
+          // so instanceof checks aren't reliable — duck-type instead.
+          if (input && typeof input === "object" && typeof input.url === "string" && typeof input.method === "string") {
             const headers = new Headers(input.headers);
             headers.set("accept-encoding", "gzip");
-            return fetch(new Request(input, { headers }), init);
+            return fetch(input.url, {
+              method: input.method,
+              headers,
+              body: input.body ?? init?.body,
+              redirect: input.redirect ?? init?.redirect ?? "follow",
+            });
           }
           const headers = new Headers(init?.headers || {});
           headers.set("accept-encoding", "gzip");
