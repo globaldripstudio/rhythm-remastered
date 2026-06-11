@@ -1,15 +1,16 @@
-// Fetch audio from external URL (YouTube / SoundCloud / direct file) and
-// stream the audio bytes back to the browser so the local analyser can
-// process them. Read-only proxy with strict size + duration caps and a
-// per-IP rate limit (10 / hour).
+// Fetch audio from external URL (SoundCloud / direct file) and stream the
+// audio bytes back to the browser so the local analyser can process them.
+// Read-only proxy with strict size + duration caps and a per-IP rate limit
+// (10 / hour).
 //
-// YouTube branch uses youtubei.js (InnerTube) — more resilient than
-// ytdl-core, which is regularly broken by YouTube signature changes.
+// YouTube is NOT supported: every JS YouTube library (ytdl-core,
+// youtubei.js, play-dl) needs operations blocked by the Supabase edge
+// runtime (Deno.openSync for debug dumps, brotli decompression, dynamic JS
+// eval to decipher signatures). Recommend the user downloads the audio
+// manually and uses the upload tab instead.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import { Innertube } from "npm:youtubei.js@10.5.0";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import scdl from "npm:soundcloud-downloader@1.0.0";
 
@@ -23,8 +24,6 @@ const json = (body: unknown, status = 200) =>
   });
 
 const sanitize = (s: string) => s.replace(/[^a-zA-Z0-9-_.]/g, "_").slice(0, 80);
-
-const YT_RE = /(?:youtube\.com\/(?:watch\?[^ ]*v=|shorts\/|embed\/|v\/)|youtu\.be\/|music\.youtube\.com\/watch\?[^ ]*v=)([A-Za-z0-9_-]{11})/i;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function nodeReadableToWebStream(nodeStream: any): ReadableStream<Uint8Array> {
@@ -77,6 +76,13 @@ Deno.serve(async (req) => {
     return json({ error: "URL invalide." }, 400);
   }
 
+  // Reject YouTube explicitly with a clear message.
+  if (/youtube\.com|youtu\.be/i.test(url)) {
+    return json({
+      error: "YouTube n'est pas supporté (restrictions techniques côté serveur). Télécharge l'audio manuellement et utilise l'onglet Upload, ou colle un lien SoundCloud / un lien direct vers un .mp3 ou .wav.",
+    }, 415);
+  }
+
   // Per-IP rate limit: 10 requests / hour.
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   try {
@@ -102,57 +108,7 @@ Deno.serve(async (req) => {
     let mime = "audio/mpeg";
     let source = "direct";
 
-    const ytMatch = url.match(YT_RE);
-    if (ytMatch) {
-      source = "youtube";
-      const videoId = ytMatch[1];
-      try {
-        // Custom fetch that forces gzip/identity to avoid the Deno node
-        // brotli decompression bug ("Failed to decompress").
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const ytFetch: typeof fetch = (input: any, init?: RequestInit) => {
-          // youtubei.js may pass a Request-like object from a different realm,
-          // so instanceof checks aren't reliable — duck-type instead.
-          if (input && typeof input === "object" && typeof input.url === "string" && typeof input.method === "string") {
-            const headers = new Headers(input.headers);
-            headers.set("accept-encoding", "gzip");
-            return fetch(input.url, {
-              method: input.method,
-              headers,
-              body: input.body ?? init?.body,
-              redirect: input.redirect ?? init?.redirect ?? "follow",
-            });
-          }
-          const headers = new Headers(init?.headers || {});
-          headers.set("accept-encoding", "gzip");
-          return fetch(input, { ...(init || {}), headers });
-        };
-        const yt = await Innertube.create({ retrieve_player: true, fetch: ytFetch });
-        const info = await yt.getInfo(videoId);
-        const duration = info.basic_info?.duration ?? 0;
-        if (duration && duration > MAX_DURATION_SEC) {
-          return json({ error: `Vidéo trop longue (max ${MAX_DURATION_SEC / 60} min).` }, 413);
-        }
-        title = info.basic_info?.title || "youtube";
-        // youtubei.js download() returns a web ReadableStream<Uint8Array>.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const ytStream: any = await yt.download(videoId, {
-          type: "audio",
-          quality: "best",
-          format: "any",
-        });
-        stream = ytStream as ReadableStream<Uint8Array>;
-        // Best-effort MIME — most YouTube audio-only streams are m4a or webm.
-        mime = "audio/mp4";
-      } catch (e) {
-        const err = e as Error;
-        console.error("youtube fetch failed", err.message, err.stack);
-        return json({
-          error: "Récupération YouTube temporairement indisponible — utilise l'upload de fichier ou un lien direct.",
-          detail: err.message,
-        }, 502);
-      }
-    } else if (/soundcloud\.com/i.test(url)) {
+    if (/soundcloud\.com/i.test(url)) {
       source = "soundcloud";
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const info: any = await scdl.getInfo(url).catch(() => null);
