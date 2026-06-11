@@ -3,13 +3,13 @@
 // process them. Read-only proxy with strict size + duration caps and a
 // per-IP rate limit (10 / hour).
 //
-// Legal note: clients should respect platform ToS. Lovable / Global Drip
-// Studio operates this endpoint as a convenience for personal analysis.
+// YouTube branch uses youtubei.js (InnerTube) — more resilient than
+// ytdl-core, which is regularly broken by YouTube signature changes.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-import ytdl from "npm:@distube/ytdl-core@4.16.12";
+import { Innertube } from "npm:youtubei.js@10.5.0";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import scdl from "npm:soundcloud-downloader@1.0.0";
 
@@ -23,6 +23,8 @@ const json = (body: unknown, status = 200) =>
   });
 
 const sanitize = (s: string) => s.replace(/[^a-zA-Z0-9-_.]/g, "_").slice(0, 80);
+
+const YT_RE = /(?:youtube\.com\/(?:watch\?[^ ]*v=|shorts\/|embed\/|v\/)|youtu\.be\/|music\.youtube\.com\/watch\?[^ ]*v=)([A-Za-z0-9_-]{11})/i;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function nodeReadableToWebStream(nodeStream: any): ReadableStream<Uint8Array> {
@@ -100,18 +102,36 @@ Deno.serve(async (req) => {
     let mime = "audio/mpeg";
     let source = "direct";
 
-    if (ytdl.validateURL(url)) {
+    const ytMatch = url.match(YT_RE);
+    if (ytMatch) {
       source = "youtube";
-      const info = await ytdl.getInfo(url);
-      const lengthSec = parseInt(info.videoDetails?.lengthSeconds || "0", 10);
-      if (lengthSec > MAX_DURATION_SEC) {
-        return json({ error: `Vidéo trop longue (max ${MAX_DURATION_SEC / 60} min).` }, 413);
+      const videoId = ytMatch[1];
+      try {
+        const yt = await Innertube.create({ retrieve_player: true });
+        const info = await yt.getInfo(videoId);
+        const duration = info.basic_info?.duration ?? 0;
+        if (duration && duration > MAX_DURATION_SEC) {
+          return json({ error: `Vidéo trop longue (max ${MAX_DURATION_SEC / 60} min).` }, 413);
+        }
+        title = info.basic_info?.title || "youtube";
+        // youtubei.js download() returns a web ReadableStream<Uint8Array>.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const ytStream: any = await yt.download(videoId, {
+          type: "audio",
+          quality: "best",
+          format: "any",
+        });
+        stream = ytStream as ReadableStream<Uint8Array>;
+        // Best-effort MIME — most YouTube audio-only streams are m4a or webm.
+        mime = "audio/mp4";
+      } catch (e) {
+        const msg = (e as Error).message || "erreur inconnue";
+        console.error("youtube fetch failed", msg);
+        return json({
+          error: "Récupération YouTube temporairement indisponible — utilise l'upload de fichier ou un lien direct.",
+          detail: msg,
+        }, 502);
       }
-      title = info.videoDetails?.title || "youtube";
-      const format = ytdl.chooseFormat(info.formats, { quality: "highestaudio", filter: "audioonly" });
-      mime = (format.mimeType?.split(";")[0]) || "audio/mp4";
-      const nodeStream = ytdl.downloadFromInfo(info, { format });
-      stream = nodeReadableToWebStream(nodeStream);
     } else if (/soundcloud\.com/i.test(url)) {
       source = "soundcloud";
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

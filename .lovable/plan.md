@@ -1,122 +1,53 @@
-# Saisie manuelle + détection d'accords renforcée
+# Correctif : ingestion YouTube dans l'AI Song Checker
 
-## Pourquoi la détection actuelle échoue souvent
+## Diagnostic
 
-Trois causes structurelles, indépendantes de la qualité du fichier :
+L'edge function `fetch-audio-from-url` répond `500 — "No playable formats found"` sur YouTube. Cause : `@distube/ytdl-core` est cassé par les changements récents de signatures côté YouTube (problème connu, le repo cumule des centaines d'issues ouvertes). Ce n'est pas un bug de notre code — la lib elle-même ne résout plus les URLs de stream de façon fiable.
 
-1. **BPM** — l'autocorrélation/tempogramme sur le flux spectral repère une *périodicité*, pas un *tempo musical*. Sur un plaqué d'accords (pas de transitoires nets), un arpège syncopé, ou un morceau à grosse réverbe, le pic dominant tombe souvent sur une subdivision (croches → x2) ou sur le rythme harmonique (changement d'accord toutes les 2 mesures → /2 voire /4). La désambiguïsation x2/x/2 actuelle suppose une fenêtre 70-180 BPM, ce qui marche pour la pop mais rate le jazz lent ou la dance rapide.
-2. **Tonalité** — Krumhansl-Schmuckler corrèle un chroma global à 24 profils. Si le morceau module, contient des emprunts modaux, ou si la basse domine le chroma (très fréquent), le tonique détecté est souvent le V ou le vi. Le revote par les notes Basic Pitch n'aide pas si Basic Pitch a lui-même halluciné.
-3. **Accords** — les templates actuels sont des vecteurs binaires 12-bins. Ils ignorent :
-   - **la basse** (un C/E n'est pas un C),
-   - **les harmoniques** (un C majeur excite aussi G et E aigus → ressemble à C7 ou Cadd9),
-   - **la cohérence temporelle** (un accord ne change pas tous les 500 ms — un lisseur Viterbi/HMM est indispensable),
-   - **la tonalité** (un Bdim dans C majeur est plus probable qu'un Bb augmenté).
+SoundCloud et liens directs ne sont pas affectés.
 
-C'est rattrapable sans librairie externe, en gardant tout client-side.
+## Correctif
 
-## Plan
+### 1. Remplacer `ytdl-core` par `youtubei.js`
 
-### 1. Saisie manuelle BPM et tonalité (UI)
+`youtubei.js` (alias YouTube.js / InnerTube) est la lib la plus maintenue pour Deno aujourd'hui : elle parle directement à l'API InnerTube interne de YouTube (la même que l'app Android), donc beaucoup plus résiliente aux changements de signatures que les libs basées sur le scraping du watch page.
 
-Dans `AudioToMidi.tsx`, sous le bandeau de résultats actuels (BPM, tonalité, Camelot), ajouter une zone éditable :
+Dans `supabase/functions/fetch-audio-from-url/index.ts` :
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│ Tonalité détectée : C minor (62%)    [✎ Corriger]      │
-│ BPM détecté       : 92.4 (48%)       [✎ Corriger]      │
-└─────────────────────────────────────────────────────────┘
-```
+- Retirer l'import `@distube/ytdl-core`.
+- Importer `npm:youtubei.js@10` et instancier `Innertube.create({ retrieve_player: false })` au démarrage de la requête (client web).
+- Détection d'URL YouTube : regex `youtube\.com|youtu\.be` (plus large qu'avant).
+- Récupérer l'`Innertube.getInfo(videoId)` puis sélectionner `info.chooseFormat({ type: 'audio', quality: 'best' })`. Garde-fou : si `info.basic_info.duration > MAX_DURATION_SEC`, renvoyer 413.
+- Récupérer le `stream` via `info.download({ type: 'audio', quality: 'best' })` qui retourne déjà un `ReadableStream<Uint8Array>` web-standard — on peut court-circuiter `nodeReadableToWebStream` pour YouTube.
+- `mime` = `audio/mp4` (m4a/AAC) ou `audio/webm` selon le format choisi.
+- Title = `info.basic_info.title`.
 
-Au clic sur *Corriger* :
-- Tonalité : un `Select` (12 toniques × 2 modes = 24 options) + bouton "Réinitialiser".
-- BPM : un `Input` numérique (40-240, pas 0.1) + bouton "÷2" / "×2" / "Réinitialiser".
+### 2. Garde-fou si InnerTube échoue aussi
 
-Comportement :
-- L'override force `keyResult` / `bpmResult` avec `confidence = 1.0` (verrouillé).
-- Re-déclenche **automatiquement** : détection d'accords (qui dépend du BPM pour la segmentation), puis post-process (qui dépend des accords + tonalité).
-- Indicateur visuel "verrouillé manuellement" (icône cadenas) tant que l'utilisateur n'a pas réinitialisé.
-- État stocké en `useState`, pas de persistance disque.
+Si `youtubei.js` lève (rare mais possible quand YouTube fait un push cassant), renvoyer un 502 avec un message clair : « Récupération YouTube temporairement indisponible — utilise l'upload de fichier ou un lien direct. » Le client (`AISongChecker.tsx`) affiche déjà l'erreur dans le toast, pas de changement front nécessaire.
 
-### 2. Détection d'accords renforcée
+### 3. Pas de changement nécessaire côté UI
 
-Refonte de `src/lib/audioToMidi/chordDetection.ts` autour de 4 améliorations qui se cumulent.
+`AISongChecker.tsx` lit déjà le `Response` en blob et l'envoie au pipeline d'analyse — il s'en moque que le MIME soit `audio/mp4`, `audio/webm` ou `audio/mpeg` puisque `decodeAudioData` accepte les trois.
 
-#### 2.a Chroma plus propre : CRP (Chroma DCT-Reduced log Pitch)
+### 4. Limites conservées
 
-Au lieu d'un chroma magnitude brut :
-- Spectre log-magnitude par bin de pitch (CQT-like via banque de filtres bandlimités centrés sur chaque demi-ton de C1 à C7).
-- Compression logarithmique → DCT → on garde les coefficients 50-120 → IDCT.
-- Repliement en 12 pitch classes.
+`MAX_BYTES = 30 MB`, `MAX_DURATION_SEC = 600`, rate-limit 10/h par IP — inchangés.
 
-Effet : supprime le timbre (les harmoniques d'un piano disparaissent), garde la couleur harmonique. C'est ce qui fait que MIR distingue C de Cmaj7.
+## Détails techniques
 
-#### 2.b Séparation basse / médium
+- `youtubei.js` est pur TypeScript, compatible Deno via `npm:` — pas besoin de polyfills Node spécifiques.
+- Pour YouTube, le stream renvoyé est un MP4 audio fragmenté (m4a). `AudioContext.decodeAudioData` Firefox/Chrome/Safari le lit sans souci.
+- Le `capStream` actuel continue de fonctionner puisqu'il prend n'importe quel `ReadableStream<Uint8Array>`.
 
-Deux chromas :
-- `chromaBass` : 40-250 Hz (E1-B3) → identifie la fondamentale réelle / le renversement.
-- `chromaMid`  : 250-2000 Hz → identifie la qualité (tierce, septième, extensions).
+## Limites résiduelles (à savoir)
 
-Le score d'un accord devient : `0.4 × cos(chromaBass, bassTemplate) + 0.6 × cos(chromaMid, qualityTemplate)`.
+- Si YouTube fait un changement cassant côté InnerTube, la lib peut elle aussi se retrouver KO le temps qu'un patch sorte. Aucune lib n'est immunisée — c'est intrinsèque au fait de scraper une plateforme qui ne veut pas qu'on télécharge.
+- Vidéos avec age-restriction ou region-locked : possible échec — on renverra un 502 propre.
+- Pas de support pour les playlists, shorts, ou Music (le format `music.youtube.com` peut être traité comme un watch URL standard via normalisation de l'ID).
 
-Permet de détecter les renversements (C/E, C/G) et de pondérer correctement les accords avec basse dissonante.
+## Fichiers modifiés
 
-#### 2.c Templates étendus + harmoniques
+- `supabase/functions/fetch-audio-from-url/index.ts` (remplacement de la branche YouTube)
 
-Templates passés à 13 qualités : maj, min, dim, aug, sus2, sus4, 7, maj7, min7, m7b5, dim7, 6, m6. Au lieu de vecteurs binaires, chaque template inclut **les harmoniques attendues** :
-
-```text
-C major template (idéal) = [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
-C major + harmoniques    = [1.0, 0, 0, 0, 0.6, 0, 0, 0.55, 0, 0, 0.15, 0.1]
-```
-
-(coefficients dérivés du théorème de Fourier pour les 6 premières harmoniques de C, E, G, normalisés).
-
-Effet : les "faux positifs C7" sur un simple C disparaissent, parce que le template C major prédit déjà la présence d'un peu de Bb (10e harmonique faible).
-
-#### 2.d Lissage temporel Viterbi
-
-Au lieu d'élire l'accord segment par segment :
-- Sur la grille (1 segment par temps avec `beatsPerSegment = 1`), calculer pour chaque segment le **vecteur de log-vraisemblance** sur tous les accords candidats (12 × 13 = 156).
-- Matrice de transition `P(chord_{t+1} | chord_t)` :
-  - rester sur le même accord : `0.6` (les accords durent),
-  - transitions cohérentes dans la tonalité (I→V, vi→IV, ii→V…) : `0.05` chacune,
-  - autres transitions : `0.001`.
-- Viterbi → chemin optimal d'accords.
-- Re-merge des segments consécutifs identiques.
-
-Effet : disparition des "flickers" (un C qui devient F pendant 1 temps puis revient C). C'est la vraie raison pour laquelle Chordify et consorts paraissent magiques.
-
-### 3. Couplage tonalité ↔ accords
-
-Boucle de cohérence en deux passes :
-
-1. Passe 1 : tonalité depuis chroma global, accords avec transitions uniformes.
-2. **Re-vote tonalité depuis la liste d'accords** : histogramme des fondamentales d'accords pondéré par durée → détermine la tonalité plus fiablement que le chroma brut. Si concordance avec passe 1 → confiance haute. Sinon, on garde la version "accords" (plus parlante musicalement) et on baisse la confiance affichée.
-3. Passe 2 : Viterbi avec matrice de transition diatonique basée sur la tonalité retenue.
-
-Si l'utilisateur override la tonalité (section 1), on saute directement à la passe 2 avec sa valeur.
-
-### 4. Fichiers touchés
-
-```text
-src/components/tools/AudioToMidi.tsx     — UI override BPM/tonalité + re-déclenchement
-src/lib/audioToMidi/chordDetection.ts    — CRP, double chroma, templates harmoniques, Viterbi
-src/lib/audioToMidi/musicalContext.ts    — re-vote tonalité depuis accords, 2 passes
-src/i18n/locales/{fr,en}.json            — libellés "Corriger / Réinitialiser / Verrouillé"
-```
-
-Pas de nouveau fichier, pas de nouvelle dépendance npm.
-
-### 5. Hors scope
-
-- Modulation détectée (changement de tonalité au sein du morceau) — phase ultérieure.
-- Détection de mesure (4/4 vs 3/4 vs 6/8) — toujours phase ultérieure.
-- Saisie manuelle d'une grille d'accords — l'override BPM/tonalité couvre 90 % des cas problématiques.
-
-### 6. Vérification
-
-Test manuel sur les 5 fichiers du jeu de référence du plan précédent + un cas piano avec basse renversée (vise détection du renversement) + un cas modulant (vise downgrade de confiance plutôt que faux tonique). Debug via `localStorage.audio2midiDebug = "1"` qui logge maintenant la matrice Viterbi top-3 et le détail des deux chromas.
-
-## Effort
-
-~600 lignes ajoutées/modifiées. Faisable en une itération. Le gros morceau est le Viterbi (~150 lignes propres), le reste est de l'extension incrémentale des fonctions existantes.
+Aucun changement de schéma DB, aucun nouveau secret.
