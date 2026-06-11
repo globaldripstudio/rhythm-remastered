@@ -137,11 +137,11 @@ Deno.serve(async (req) => {
         // Best-effort MIME — most YouTube audio-only streams are m4a or webm.
         mime = "audio/mp4";
       } catch (e) {
-        const msg = (e as Error).message || "erreur inconnue";
-        console.error("youtube fetch failed", msg);
+        const err = e as Error;
+        console.error("youtube fetch failed", err.message, err.stack);
         return json({
           error: "Récupération YouTube temporairement indisponible — utilise l'upload de fichier ou un lien direct.",
-          detail: msg,
+          detail: err.message,
         }, 502);
       }
     } else if (/soundcloud\.com/i.test(url)) {
