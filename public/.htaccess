@@ -8,6 +8,13 @@
   Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" env=NOINDEX_ROUTE
 </IfModule>
 
+# Favicons : cache court (1h) pour qu'un changement se propage rapidement.
+<IfModule mod_headers.c>
+  <FilesMatch "^favicon\.(ico|png)$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
 # Fallback SPA : toutes les routes inconnues servent index.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
