@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { softwareAppSchema, breadcrumbSchema } from "@/lib/seo/schemas";
 import { supabase } from "@/integrations/supabase/client";
+import { isYoutubeUrl, extractYoutubeAudio } from "@/lib/audioFromYoutube";
 
 type FeatureKey =
   | "spectralFlatnessMean"
@@ -114,10 +115,11 @@ const STRINGS = {
     backHome: "← Retour à l'accueil",
     tabUpload: "Importer un fichier",
     tabUrl: "Coller un lien",
-    urlPlaceholder: "Lien SoundCloud ou URL directe vers un .mp3/.wav",
-    urlHelp: "SoundCloud ou lien direct vers un fichier audio (.mp3/.wav/.flac). YouTube n'est pas supporté — télécharge l'audio puis utilise l'onglet Import. Max 10 min · 30 Mo · 10 requêtes/h.",
+    urlPlaceholder: "Lien YouTube, SoundCloud ou URL directe .mp3/.wav",
+    urlHelp: "YouTube (extraction dans ton navigateur), SoundCloud ou lien direct vers un fichier audio. Max 10 min · 30 Mo · 10 requêtes/h.",
     urlFetch: "Récupérer et analyser",
     urlFetching: "Téléchargement de l'audio…",
+    urlYoutubeFetching: "Extraction YouTube en cours…",
     urlError: "Impossible de récupérer cet audio.",
     urlEmpty: "Colle d'abord un lien.",
   },
@@ -208,10 +210,11 @@ const STRINGS = {
     backHome: "← Back home",
     tabUpload: "Upload a file",
     tabUrl: "Paste a link",
-    urlPlaceholder: "SoundCloud link or direct .mp3/.wav URL",
-    urlHelp: "SoundCloud or a direct audio file link (.mp3/.wav/.flac). YouTube is not supported — download the audio and use the Upload tab. Max 10 min · 30 MB · 10 requests/h.",
+    urlPlaceholder: "YouTube, SoundCloud or a direct .mp3/.wav URL",
+    urlHelp: "YouTube (extracted in your browser), SoundCloud or a direct audio file link. Max 10 min · 30 MB · 10 requests/h.",
     urlFetch: "Fetch and analyze",
     urlFetching: "Downloading audio…",
+    urlYoutubeFetching: "Extracting from YouTube…",
     urlError: "Could not fetch this audio.",
     urlEmpty: "Paste a link first.",
   },
@@ -357,43 +360,54 @@ const AISongChecker = () => {
     [L]
   );
 
+  const [fetchProgress, setFetchProgress] = useState<{ loaded: number; total: number | null } | null>(null);
+  const [isYoutube, setIsYoutube] = useState(false);
+
   const handleUrlFetch = useCallback(async () => {
     const url = urlInput.trim();
     if (!url) { setError(L.urlEmpty); return; }
     setError(null);
     setResult(null);
     setIsFetching(true);
+    setFetchProgress(null);
+    const youtube = isYoutubeUrl(url);
+    setIsYoutube(youtube);
     try {
-      const { data, error: fnErr } = await supabase.functions.invoke("fetch-audio-from-url", {
-        body: { url },
-      });
-      if (fnErr) throw new Error(fnErr.message || L.urlError);
-      // Edge function returns a Blob on success or a JSON error.
-      let blob: Blob;
-      if (data instanceof Blob) {
-        blob = data;
-      } else if (data && typeof data === "object" && "error" in data) {
-        throw new Error((data as { error: string }).error);
+      if (youtube) {
+        const { file } = await extractYoutubeAudio(url, {
+          onProgress: (loaded, total) => setFetchProgress({ loaded, total }),
+        });
+        await handleFile(file);
       } else {
-        // Some SDK versions return ArrayBuffer for binary
-        blob = new Blob([data as BlobPart]);
+        const { data, error: fnErr } = await supabase.functions.invoke("fetch-audio-from-url", {
+          body: { url },
+        });
+        if (fnErr) throw new Error(fnErr.message || L.urlError);
+        let blob: Blob;
+        if (data instanceof Blob) {
+          blob = data;
+        } else if (data && typeof data === "object" && "error" in data) {
+          throw new Error((data as { error: string }).error);
+        } else {
+          blob = new Blob([data as BlobPart]);
+        }
+        if (!blob.type.startsWith("audio/")) {
+          try {
+            const txt = await blob.text();
+            const j = JSON.parse(txt);
+            if (j?.error) throw new Error(j.error);
+          } catch {/* fall through */}
+        }
+        const ext = (blob.type.split("/")[1] || "mp3").split(";")[0];
+        const f = new File([blob], `linked-audio.${ext}`, { type: blob.type || "audio/mpeg" });
+        await handleFile(f);
       }
-      if (!blob.type.startsWith("audio/")) {
-        // Try to read as JSON error
-        try {
-          const txt = await blob.text();
-          const j = JSON.parse(txt);
-          if (j?.error) throw new Error(j.error);
-        } catch {/* fall through */}
-      }
-      const ext = (blob.type.split("/")[1] || "mp3").split(";")[0];
-      const f = new File([blob], `linked-audio.${ext}`, { type: blob.type || "audio/mpeg" });
-      await handleFile(f);
     } catch (e) {
       console.error(e);
       setError((e as Error).message || L.urlError);
     } finally {
       setIsFetching(false);
+      setFetchProgress(null);
     }
   }, [urlInput, L, handleFile]);
 
