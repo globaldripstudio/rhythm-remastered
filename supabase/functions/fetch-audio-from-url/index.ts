@@ -1,13 +1,13 @@
-// Fetch audio from external URL (SoundCloud / direct file) and stream the
-// audio bytes back to the browser so the local analyser can process them.
-// Read-only proxy with strict size + duration caps and a per-IP rate limit
-// (10 / hour).
+// Fetch audio from external URL and stream bytes back to the browser.
 //
-// YouTube is NOT supported: every JS YouTube library (ytdl-core,
-// youtubei.js, play-dl) needs operations blocked by the Supabase edge
-// runtime (Deno.openSync for debug dumps, brotli decompression, dynamic JS
-// eval to decipher signatures). Recommend the user downloads the audio
-// manually and uses the upload tab instead.
+// Two modes:
+//   1) { url }                — fetches SoundCloud or a direct audio file
+//   2) { proxyUrl, isYoutubeProxy: true }
+//                             — pure pass-through proxy for a googlevideo URL
+//                               already negotiated by youtubei.js in the
+//                               user's browser. No scraping here.
+//
+// Hard caps: 30 MB, 10 min, 10 requests / hour / IP.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -60,30 +60,7 @@ function capStream(src: ReadableStream<Uint8Array>, maxBytes: number): ReadableS
   });
 }
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "Méthode non supportée." }, 405);
-
-  let body: { url?: string };
-  try {
-    body = await req.json();
-  } catch {
-    return json({ error: "Corps de requête invalide." }, 400);
-  }
-
-  const url = (body.url || "").trim();
-  if (!url || !/^https?:\/\//i.test(url) || url.length > 2048) {
-    return json({ error: "URL invalide." }, 400);
-  }
-
-  // Reject YouTube explicitly with a clear message.
-  if (/youtube\.com|youtu\.be/i.test(url)) {
-    return json({
-      error: "YouTube n'est pas supporté (restrictions techniques côté serveur). Télécharge l'audio manuellement et utilise l'onglet Upload, ou colle un lien SoundCloud / un lien direct vers un .mp3 ou .wav.",
-    }, 415);
-  }
-
-  // Per-IP rate limit: 10 requests / hour.
+async function rateLimitOk(req: Request): Promise<boolean> {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   try {
     const supabase = createClient(
@@ -95,11 +72,71 @@ Deno.serve(async (req) => {
       _max_count: 10,
       _window_seconds: 3600,
     });
-    if (allowed === false) {
-      return json({ error: "Trop de requêtes — réessayez dans une heure." }, 429);
-    }
+    return allowed !== false;
   } catch (e) {
     console.warn("rate limit check failed", e);
+    return true;
+  }
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Méthode non supportée." }, 405);
+
+  let body: { url?: string; proxyUrl?: string; isYoutubeProxy?: boolean };
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: "Corps de requête invalide." }, 400);
+  }
+
+  if (!(await rateLimitOk(req))) {
+    return json({ error: "Trop de requêtes — réessayez dans une heure." }, 429);
+  }
+
+  // ============ Mode 2: pure proxy for a googlevideo URL ============
+  if (body.isYoutubeProxy && body.proxyUrl) {
+    const proxyUrl = body.proxyUrl.trim();
+    let host: string;
+    try { host = new URL(proxyUrl).hostname; } catch { return json({ error: "URL proxy invalide." }, 400); }
+    if (!/\.googlevideo\.com$/i.test(host)) {
+      return json({ error: "Le proxy YouTube n'accepte que les URLs googlevideo.com." }, 400);
+    }
+    try {
+      const r = await fetch(proxyUrl, { redirect: "follow" });
+      if (!r.ok || !r.body) {
+        return json({ error: `YouTube a refusé le téléchargement (${r.status}).` }, 502);
+      }
+      const mime = r.headers.get("content-type")?.split(";")[0] || "audio/webm";
+      const length = r.headers.get("content-length");
+      const capped = capStream(r.body, MAX_BYTES);
+      const headers: Record<string, string> = {
+        ...corsHeaders,
+        "Content-Type": mime,
+        "X-Source": "youtube",
+        "Cache-Control": "no-store",
+      };
+      if (length) headers["Content-Length"] = length;
+      return new Response(capped, { headers });
+    } catch (e) {
+      const msg = (e as Error).message || "Erreur proxy YouTube";
+      console.error("youtube proxy error", msg);
+      return json({ error: msg }, 502);
+    }
+  }
+
+  // ============ Mode 1: SoundCloud / direct file ============
+  const url = (body.url || "").trim();
+  if (!url || !/^https?:\/\//i.test(url) || url.length > 2048) {
+    return json({ error: "URL invalide." }, 400);
+  }
+
+  // YouTube via direct URL is no longer accepted here — the client
+  // negotiates with InnerTube itself and posts back via isYoutubeProxy.
+  if (/youtube\.com|youtu\.be/i.test(url)) {
+    return json({
+      error: "Lien YouTube détecté côté serveur — c'est le navigateur qui doit l'extraire. Recharge la page.",
+    }, 400);
   }
 
   try {
@@ -120,7 +157,6 @@ Deno.serve(async (req) => {
       mime = "audio/mpeg";
       stream = nodeReadableToWebStream(nodeStream);
     } else {
-      // Direct audio file (Dropbox direct link, S3, CDN, etc.)
       const r = await fetch(url, { redirect: "follow" });
       if (!r.ok || !r.body) {
         return json({ error: "Téléchargement direct impossible." }, 502);
