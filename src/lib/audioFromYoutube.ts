@@ -150,7 +150,7 @@ export async function extractYoutubeAudio(
   const mime = format.mime_type?.split(";")[0] || resp.headers.get("content-type")?.split(";")[0] || "audio/webm";
   const ext = mime.includes("mp4") ? "m4a" : "webm";
   const title = (details.title || `youtube-${videoId}`).replace(/[^a-zA-Z0-9-_. ]/g, "_").slice(0, 80);
-  const blob = new Blob(chunks, { type: mime });
+  const blob = new Blob(chunks as BlobPart[], { type: mime });
   const file = new File([blob], `${title}.${ext}`, { type: mime });
 
   return { file, title, durationSec: duration };
