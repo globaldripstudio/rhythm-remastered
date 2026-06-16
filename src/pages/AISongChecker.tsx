@@ -533,7 +533,15 @@ const AISongChecker = () => {
           {(isAnalyzing || isFetching) && (
             <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card/40 p-12">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="mt-3 text-sm text-muted-foreground">{isFetching ? L.urlFetching : L.analyzing}</p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {isFetching ? (isYoutube ? (L as typeof STRINGS.fr).urlYoutubeFetching : L.urlFetching) : L.analyzing}
+              </p>
+              {isFetching && fetchProgress && (
+                <p className="mt-1 text-xs text-muted-foreground/70">
+                  {(fetchProgress.loaded / 1024 / 1024).toFixed(1)} Mo
+                  {fetchProgress.total ? ` / ${(fetchProgress.total / 1024 / 1024).toFixed(1)} Mo` : ""}
+                </p>
+              )}
             </div>
           )}
 
