@@ -1,53 +1,78 @@
-# Correctif : ingestion YouTube dans l'AI Song Checker
+# Plan : YouTube côté client + favicon nettoyé partout
 
-## Diagnostic
+## Partie 1 — Ingestion YouTube 100% côté navigateur
 
-L'edge function `fetch-audio-from-url` répond `500 — "No playable formats found"` sur YouTube. Cause : `@distube/ytdl-core` est cassé par les changements récents de signatures côté YouTube (problème connu, le repo cumule des centaines d'issues ouvertes). Ce n'est pas un bug de notre code — la lib elle-même ne résout plus les URLs de stream de façon fiable.
+L'idée : c'est le navigateur de l'utilisateur final qui télécharge l'audio YouTube, pas notre serveur. Avantage : zéro infra, zéro coût récurrent, pas de dépendance à un service externe. Inconvénient honnête à connaître : ça repose sur `youtubei.js` exécuté dans le browser, et YouTube peut casser le truc à n'importe quel moment (la lib se met à jour vite, mais il peut y avoir des fenêtres de 24-72h où ça ne marche plus).
 
-SoundCloud et liens directs ne sont pas affectés.
+### Mise en œuvre
 
-## Correctif
+**Lib utilisée** : `youtubei.js` (npm), qui parle à l'API InnerTube. Compatible navigateur via le proxy CORS de YouTube lui-même (la lib gère ça nativement avec son `Platform.load('web')`).
 
-### 1. Remplacer `ytdl-core` par `youtubei.js`
+**Côté code** :
 
-`youtubei.js` (alias YouTube.js / InnerTube) est la lib la plus maintenue pour Deno aujourd'hui : elle parle directement à l'API InnerTube interne de YouTube (la même que l'app Android), donc beaucoup plus résiliente aux changements de signatures que les libs basées sur le scraping du watch page.
+- `src/lib/audioFromYoutube.ts` (nouveau) : encapsule la logique
+  - `extractYoutubeAudio(url, { onProgress }): Promise<File>`
+  - Détecte l'ID vidéo (regex YouTube/youtu.be/shorts/music)
+  - Crée une instance `Innertube` configurée pour le navigateur
+  - Appelle `getBasicInfo()` pour récupérer titre + durée
+  - Garde-fou : rejette si durée > 600 s (10 min) avec message clair
+  - Sélectionne le meilleur format audio (`chooseFormat({ type: 'audio', quality: 'best' })`)
+  - Télécharge le stream avec `download()` qui renvoie un `ReadableStream`
+  - Affiche la progression (octets téléchargés / total)
+  - Reconstruit un `File` (`new File([blob], 'youtube-<id>.webm', { type: 'audio/webm' })`)
 
-Dans `supabase/functions/fetch-audio-from-url/index.ts` :
+- `src/pages/AISongChecker.tsx`
+  - Restaure le support YouTube dans l'onglet "Lien"
+  - Détecte si l'URL est YouTube : route vers `extractYoutubeAudio()` (client)
+  - Sinon : continue d'appeler l'edge function `fetch-audio-from-url` (SoundCloud / liens directs)
+  - Affiche une barre de progression pendant le download YouTube
+  - Toast d'erreur clair si YouTube est temporairement KO ("YouTube a changé récemment, réessaye plus tard ou utilise l'upload")
 
-- Retirer l'import `@distube/ytdl-core`.
-- Importer `npm:youtubei.js@10` et instancier `Innertube.create({ retrieve_player: false })` au démarrage de la requête (client web).
-- Détection d'URL YouTube : regex `youtube\.com|youtu\.be` (plus large qu'avant).
-- Récupérer l'`Innertube.getInfo(videoId)` puis sélectionner `info.chooseFormat({ type: 'audio', quality: 'best' })`. Garde-fou : si `info.basic_info.duration > MAX_DURATION_SEC`, renvoyer 413.
-- Récupérer le `stream` via `info.download({ type: 'audio', quality: 'best' })` qui retourne déjà un `ReadableStream<Uint8Array>` web-standard — on peut court-circuiter `nodeReadableToWebStream` pour YouTube.
-- `mime` = `audio/mp4` (m4a/AAC) ou `audio/webm` selon le format choisi.
-- Title = `info.basic_info.title`.
+- `src/i18n/locales/{fr,en}.json` : remet YouTube dans les placeholders + helper texts.
 
-### 2. Garde-fou si InnerTube échoue aussi
+- `supabase/functions/fetch-audio-from-url/index.ts` : retire la branche YouTube (plus de blocage côté serveur, puisque tout se passe client).
 
-Si `youtubei.js` lève (rare mais possible quand YouTube fait un push cassant), renvoyer un 502 avec un message clair : « Récupération YouTube temporairement indisponible — utilise l'upload de fichier ou un lien direct. » Le client (`AISongChecker.tsx`) affiche déjà l'erreur dans le toast, pas de changement front nécessaire.
+### Limites assumées et communiquées
 
-### 3. Pas de changement nécessaire côté UI
+- Vidéos avec age-restriction ou region-lock : échec propre, message expliquant d'utiliser l'upload.
+- Shorts et YouTube Music : supportés (normalisation de l'ID en amont).
+- Playlists : non supporté — on prend juste la première vidéo si l'URL contient `list=`.
+- Plafond 10 min / 30 Mo conservé.
 
-`AISongChecker.tsx` lit déjà le `Response` en blob et l'envoie au pipeline d'analyse — il s'en moque que le MIME soit `audio/mp4`, `audio/webm` ou `audio/mpeg` puisque `decodeAudioData` accepte les trois.
+## Partie 2 — Favicon partout, propre
 
-### 4. Limites conservées
+Objectif simple : le favicon que tu vois sur la landing doit s'afficher partout, sans Lovable nulle part.
 
-`MAX_BYTES = 30 MB`, `MAX_DURATION_SEC = 600`, rate-limit 10/h par IP — inchangés.
+### Trois actions
 
-## Détails techniques
+1. **Régénérer un `.ico` propre depuis ton `favicon.png` actuel**. Les navigateurs (surtout dans l'historique et les onglets) demandent toujours `/favicon.ico` en premier. Je convertis ton PNG en `.ico` multi-résolution (16/32/48 px) avec ImageMagick.
 
-- `youtubei.js` est pur TypeScript, compatible Deno via `npm:` — pas besoin de polyfills Node spécifiques.
-- Pour YouTube, le stream renvoyé est un MP4 audio fragmenté (m4a). `AudioContext.decodeAudioData` Firefox/Chrome/Safari le lit sans souci.
-- Le `capStream` actuel continue de fonctionner puisqu'il prend n'importe quel `ReadableStream<Uint8Array>`.
+2. **Déclarer tous les formats explicitement dans `index.html`** :
+   ```html
+   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=3" />
+   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=3" />
+   <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png?v=3" />
+   <link rel="shortcut icon" href="/favicon.ico?v=3" />
+   <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png?v=3" />
+   ```
+   Le `?v=3` force Chrome/Firefox/Safari à re-télécharger le favicon au lieu de réutiliser celui qu'ils ont en cache.
 
-## Limites résiduelles (à savoir)
+3. **Ajouter un header `Cache-Control` court** sur `/favicon.*` via `public/.htaccess` pour éviter qu'OVH te ressorte un vieux fichier cache trop longtemps.
 
-- Si YouTube fait un changement cassant côté InnerTube, la lib peut elle aussi se retrouver KO le temps qu'un patch sorte. Aucune lib n'est immunisée — c'est intrinsèque au fait de scraper une plateforme qui ne veut pas qu'on télécharge.
-- Vidéos avec age-restriction ou region-locked : possible échec — on renverra un 502 propre.
-- Pas de support pour les playlists, shorts, ou Music (le format `music.youtube.com` peut être traité comme un watch URL standard via normalisation de l'ID).
+### Ce que je ne peux PAS faire (à savoir)
 
-## Fichiers modifiés
+- **L'historique Chrome déjà enregistré** : les vignettes d'historique stockent le favicon vu *à la première visite*. Elles se rafraîchiront uniquement quand tu revisiteras chaque page. Le seul moyen de forcer un nettoyage global de ton côté = `Paramètres → Confidentialité → Effacer les images et fichiers en cache` (ça ne supprime pas ton historique).
+- **L'URL de preview Lovable** (`*.lovable.app`) : c'est un iframe wrapper Lovable, ils peuvent injecter leur propre favicon par-dessus le tien. C'est hors de portée du code projet. Sur ton vrai domaine `globaldripstudio.fr`, c'est 100% sous contrôle.
 
-- `supabase/functions/fetch-audio-from-url/index.ts` (remplacement de la branche YouTube)
+## Fichiers touchés
 
-Aucun changement de schéma DB, aucun nouveau secret.
+- `src/lib/audioFromYoutube.ts` (nouveau)
+- `src/pages/AISongChecker.tsx` (logique URL + progress)
+- `src/i18n/locales/fr.json`, `src/i18n/locales/en.json` (textes YouTube)
+- `supabase/functions/fetch-audio-from-url/index.ts` (retrait branche YouTube)
+- `public/favicon.ico` (régénéré depuis le PNG)
+- `index.html` (déclarations favicon)
+- `public/.htaccess` (cache headers favicon)
+- `package.json` (ajout `youtubei.js`)
+
+Aucun coût récurrent, aucun secret à ajouter, aucun changement DB.
