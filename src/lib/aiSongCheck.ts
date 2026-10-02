@@ -533,26 +533,35 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     if (pDb[i] > pMax) pMax = pDb[i];
   }
   const minBin = Math.floor((13000 * FFT) / sr);
-  const maxBin = Math.min(half - Math.round((600 * FFT) / sr), Math.floor((nyquist * 0.97 * FFT) / sr));
+  // Leave room for the wide "above" window (1–3 kHz past the edge).
+  const maxBin = Math.min(half - Math.round((3100 * FFT) / sr), Math.floor((nyquist * 0.97 * FFT) / sr));
   let bestDrop = 0;
   let bestBin = -1;
   for (let c = minBin; c <= maxBin; c++) {
     let below = 0;
     for (let i = c - 6; i < c; i++) below += pDb[i];
     below /= 6;
+    // Wide comparison band 1–3 kHz above the edge: codec roll-offs are often
+    // gradual (energy lingers just past the cutoff), so a narrow band right
+    // above the edge underestimates the true drop.
     let above = 0;
     let n = 0;
-    for (let i = c + Math.round((100 * FFT) / sr); i < Math.min(half, c + Math.round((550 * FFT) / sr)); i++) { above += pDb[i]; n++; }
+    for (let i = c + Math.round((1000 * FFT) / sr); i < Math.min(half, c + Math.round((3000 * FFT) / sr)); i++) { above += pDb[i]; n++; }
     above /= Math.max(1, n);
     const drop = below - above;
     // require content below the edge to be meaningful (within 90 dB of peak)
     if (below > pMax - 90 && drop > bestDrop) { bestDrop = drop; bestBin = c; }
   }
   const peakCutHz = bestBin > 0 ? (bestBin * sr) / FFT : 0;
-  const peakDetected = bestBin > 0 && bestDrop > 35;
+  // 30 dB threshold: loud sub-bass mixes can soften the measured brickwall drop
+  // (e.g. 32.8 dB on a true 20 kHz MP3 cutoff) — 35 dB was too strict.
+  const peakDetected = bestBin > 0 && bestDrop > 30;
 
   const compressionDetected = peakDetected || frameDetected;
-  const cutHz = peakDetected ? peakCutHz : medCutoff;
+  // Prefer the peak-spectrum cutoff for display when a codec wall was found:
+  // the per-frame median is heavily biased by sub-bass content. Without a
+  // detected wall, fall back to the per-frame mean (no brickwall to report).
+  const cutHz = compressionDetected && bestBin > 0 ? peakCutHz : hfCutoff;
   const guess =
     CODEC_CUTS.reduce((a, b) => (Math.abs(b.hz - cutHz) < Math.abs(a.hz - cutHz) ? b : a)).label;
   const compression: CompressionInfo = {
@@ -848,7 +857,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     features: {
       spectralFlatnessMean: flatnessMean,
       spectralFlatnessStd: flatnessStd,
-      hfCutoffHz: hfCutoff,
+      hfCutoffHz: cutHz,
       hfEnergyRatio,
       stereoCorrelation: stereoCorr,
       onsetIntervalCv: onsetCv,
