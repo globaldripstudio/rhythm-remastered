@@ -60,6 +60,9 @@ export interface FileMeta {
   bitrateKbps: number | null;
   year: number | null;
   encoder: string | null;
+  // True when the container is certified uncompressed (WAV PCM / FLAC):
+  // a lossy-codec brickwall is then impossible by construction.
+  uncompressed: boolean;
 }
 
 export interface AISongCheckResult {
@@ -208,7 +211,7 @@ const readText = (b: Uint8Array, start: number, end: number): string => {
 };
 
 export const parseFileMeta = (b: Uint8Array): FileMeta => {
-  const meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null };
+  const meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null, uncompressed: false };
   const str = (o: number, n: number) => String.fromCharCode(...b.subarray(o, o + n));
   const years: number[] = [];
   const pushYear = (s: string) => {
@@ -222,7 +225,11 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
     while (o + 8 <= b.length) {
       const id = str(o, 4);
       const size = dv.getUint32(o + 4, true);
-      if (id === "fmt " && o + 16 <= b.length) meta.nativeSampleRate = dv.getUint32(o + 12, true);
+      if (id === "fmt " && o + 16 <= b.length) {
+        meta.nativeSampleRate = dv.getUint32(o + 12, true);
+        const audioFormat = dv.getUint16(o + 8, true);
+        if (audioFormat === 1 || audioFormat === 3) meta.uncompressed = true; // PCM / float
+      }
       if (id === "LIST" && str(o + 8, 4) === "INFO") {
         let p = o + 12;
         const end = Math.min(b.length, o + 8 + size);
@@ -241,6 +248,7 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
   // FLAC
   else if (b.length > 22 && str(0, 4) === "fLaC") {
     meta.nativeSampleRate = (b[18] << 12) | (b[19] << 4) | (b[20] >> 4);
+    meta.uncompressed = true;
     const txt = new TextDecoder("utf-8").decode(b.subarray(0, Math.min(b.length, 65536)));
     const d = txt.match(/DATE=([^\0\x00-\x1f]{4,20})/i);
     if (d) pushYear(d[1]);
@@ -313,7 +321,7 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
 const GENERATIVE_ERA_YEAR = 2023;
 
 export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
-  let meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null };
+  let meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null, uncompressed: false };
   let tagBytes = 0;
   try {
     const header = new Uint8Array(await file.slice(0, Math.min(file.size, 4 * 1024 * 1024)).arrayBuffer());
@@ -585,7 +593,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   }
   const minBin = Math.floor((13000 * FFT) / sr);
   // Leave room for the wide "above" window (1–3 kHz past the edge).
-  const maxBin = Math.min(half - Math.round((3100 * FFT) / sr), Math.floor((nyquist * 0.97 * FFT) / sr));
+  // Resampling guard: when the browser upsampled the file (e.g. 44.1 kHz
+  // source on a 48 kHz device), the source Nyquist creates a hard spectral
+  // edge that is NOT a codec wall — never search above it.
+  const nativeNyq = meta.nativeSampleRate !== null && meta.nativeSampleRate < sr ? meta.nativeSampleRate / 2 : nyquist;
+  const maxBin = Math.min(half - Math.round((3100 * FFT) / sr), Math.floor((Math.min(nyquist, nativeNyq * 0.97) * FFT) / sr));
   let bestDrop = 0;
   let bestBin = -1;
   for (let c = minBin; c <= maxBin; c++) {
@@ -608,7 +620,9 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // (e.g. 32.8 dB on a true 20 kHz MP3 cutoff) — 35 dB was too strict.
   const peakDetected = bestBin > 0 && bestDrop > 30;
 
-  const compressionDetected = peakDetected || frameDetected;
+  // A certified uncompressed container (WAV PCM / FLAC) cannot carry a lossy
+  // codec wall: any steep edge found is a source/recording trait, not a codec.
+  const compressionDetected = meta.uncompressed ? false : peakDetected || frameDetected;
   // Prefer the peak-spectrum cutoff for display when a codec wall was found:
   // the per-frame median is heavily biased by sub-bass content. Without a
   // detected wall, fall back to the per-frame mean (no brickwall to report).
