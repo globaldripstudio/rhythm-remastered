@@ -777,8 +777,16 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const spec = evidence(sMarkers);
   const temp = evidence(tMarkers);
 
-  const aiE = spec.ai * 0.45 + temp.ai * 0.55;
-  const huE = spec.human * 0.45 + temp.human * 0.55;
+  let aiE = spec.ai * 0.45 + temp.ai * 0.55;
+  let huE = spec.human * 0.45 + temp.human * 0.55;
+
+  // Metadata dated before generative music existed: probabilistic human
+  // bonus (tags can be forged, so this is not an absolute veto).
+  const preAiEra = meta.year !== null && meta.year < GENERATIVE_ERA_YEAR;
+  if (preAiEra) {
+    aiE *= 0.6;
+    huE = Math.min(1, huE + 0.1);
+  }
 
   // Hybrid score: requires BOTH sides high AND close. Steeper diff penalty
   // and lower multiplier so a clearly dominant side wins decisively.
@@ -826,8 +834,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   }
 
   return {
-    durationSec: dur,
-    sampleRate: sr,
+    durationSec: fullLeft.length / sr,
+    sampleRate: meta.nativeSampleRate ?? sr,
+    meta,
+    trim: { startSec: startS / sr, endSec: endS / sr },
+    preAiEra,
     spectral,
     temporal,
     overall,
