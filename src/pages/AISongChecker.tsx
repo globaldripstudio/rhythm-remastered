@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity, HelpCircle, ShieldCheck, ShieldAlert, ShieldQuestion, Link as LinkIcon } from "lucide-react";
+import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity, HelpCircle, ShieldCheck, ShieldAlert, ShieldQuestion } from "lucide-react";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 import { analyzeForAI, type AISongCheckResult, type Verdict, type ProbBlock, type MarkerId, type MarkerSide, type Confidence, type QualityIssue, type TopMarker } from "@/lib/aiSongCheck";
 import SEO from "@/components/SEO";
@@ -9,11 +9,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { softwareAppSchema, breadcrumbSchema } from "@/lib/seo/schemas";
-import { supabase } from "@/integrations/supabase/client";
-import { isYoutubeUrl, extractYoutubeAudio } from "@/lib/audioFromYoutube";
 
 type FeatureKey =
   | "spectralFlatnessMean"
@@ -114,14 +111,6 @@ const STRINGS = {
     },
     backHome: "← Retour à l'accueil",
     tabUpload: "Importer un fichier",
-    tabUrl: "Coller un lien",
-    urlPlaceholder: "Lien YouTube, SoundCloud ou URL directe .mp3/.wav",
-    urlHelp: "YouTube (extraction dans ton navigateur), SoundCloud ou lien direct vers un fichier audio. Max 10 min · 30 Mo · 10 requêtes/h.",
-    urlFetch: "Récupérer et analyser",
-    urlFetching: "Téléchargement de l'audio…",
-    urlYoutubeFetching: "Extraction YouTube en cours…",
-    urlError: "Impossible de récupérer cet audio.",
-    urlEmpty: "Colle d'abord un lien.",
   },
   en: {
     title: "AI Song Checker",
@@ -209,14 +198,6 @@ const STRINGS = {
     },
     backHome: "← Back home",
     tabUpload: "Upload a file",
-    tabUrl: "Paste a link",
-    urlPlaceholder: "YouTube, SoundCloud or a direct .mp3/.wav URL",
-    urlHelp: "YouTube (extracted in your browser), SoundCloud or a direct audio file link. Max 10 min · 30 MB · 10 requests/h.",
-    urlFetch: "Fetch and analyze",
-    urlFetching: "Downloading audio…",
-    urlYoutubeFetching: "Extracting from YouTube…",
-    urlError: "Could not fetch this audio.",
-    urlEmpty: "Paste a link first.",
   },
 };
 
