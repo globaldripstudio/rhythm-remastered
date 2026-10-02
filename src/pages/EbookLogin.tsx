@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Loader2, LogIn, UserPlus, ArrowLeft } from "lucide-react";
+import { BookOpen, Loader2, LogIn, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 
 const EbookLogin = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState(
     () => new URLSearchParams(window.location.search).get("email")?.slice(0, 255) ?? ""
   );

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Upload, FileText, Users, Loader2, CheckCircle, AlertCircle, Link2, Copy, Trash2 } from "lucide-react";
+import { Upload, FileText, Users, Loader2, CheckCircle, AlertCircle, Link2, Copy, Trash2, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 
 const EbookManager = () => {
@@ -15,6 +15,8 @@ const EbookManager = () => {
   const [grantEmail, setGrantEmail] = useState("");
   const [granting, setGranting] = useState(false);
   const [privateLink, setPrivateLink] = useState<string | null>(null);
+  const [sendEmail, setSendEmail] = useState(true);
+  const [issued, setIssued] = useState<{ email: string; code: string } | null>(null);
 
   const buildLink = (email: string) =>
     `${window.location.origin}/ebook/login?email=${encodeURIComponent(email)}`;
@@ -24,30 +26,39 @@ const EbookManager = () => {
     toast.success("Lien copié !");
   };
 
-  const handleGrant = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const email = grantEmail.trim().toLowerCase();
+  const grantAccess = async (rawEmail: string) => {
+    const email = rawEmail.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Email invalide.");
       return;
     }
     setGranting(true);
     try {
-      if (!purchases.some((p) => p.email?.toLowerCase() === email)) {
-        const { error } = await supabase
-          .from("ebook_purchases")
-          .insert({ email, stripe_session_id: "admin-grant" });
-        if (error) throw error;
+      const { data, error } = await supabase.functions.invoke("ebook-grant", {
+        body: { email, sendEmail },
+      });
+      if (error) {
+        const ctx = (error as any).context;
+        let msg = error.message;
+        try { msg = (await ctx?.json?.())?.error ?? msg; } catch { /* ignore */ }
+        throw new Error(msg);
       }
-      const link = buildLink(email);
-      setPrivateLink(link);
+      setPrivateLink(buildLink(email));
+      setIssued({ email, code: data.code });
       await loadPurchases();
-      toast.success("Accès accordé.");
+      if (data.emailed) toast.success("Code généré et envoyé par email.");
+      else if (sendEmail) toast.warning("Code généré, mais l'email n'a pas pu partir : transmettez-le manuellement.");
+      else toast.success("Code généré.");
     } catch (error: any) {
       toast.error("Erreur : " + (error.message || "Réessayez"));
     } finally {
       setGranting(false);
     }
+  };
+
+  const handleGrant = (e: React.FormEvent) => {
+    e.preventDefault();
+    grantAccess(grantEmail);
   };
 
   const handleRevoke = async (id: string, email: string) => {
@@ -203,7 +214,7 @@ const EbookManager = () => {
             Accès privé
           </CardTitle>
           <CardDescription>
-            Offrez l'accès à la formation sans paiement. La personne crée son compte (ou se connecte) avec cet email via le lien généré.
+            Offrez l'accès sans paiement. Un compte client est créé avec un code d'accès unique (comme après un achat Stripe). Renvoyer un code pour un client existant remplace l'ancien.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -216,15 +227,29 @@ const EbookManager = () => {
               maxLength={255}
             />
             <Button type="submit" disabled={granting}>
-              {granting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Générer le lien"}
+              {granting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Générer le code"}
             </Button>
           </form>
-          {privateLink && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/30 border border-border/50">
-              <span className="text-xs text-foreground break-all flex-1">{privateLink}</span>
-              <Button size="sm" variant="outline" onClick={() => copyLink(privateLink)}>
-                <Copy className="w-4 h-4" />
-              </Button>
+          <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+            <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} />
+            Envoyer automatiquement le code par email
+          </label>
+          {issued && privateLink && (
+            <div className="space-y-2 px-3 py-3 rounded-lg bg-muted/30 border border-border/50">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground w-14">Code</span>
+                <span className="font-mono text-sm text-foreground flex-1">{issued.code}</span>
+                <Button size="sm" variant="outline" onClick={() => copyLink(issued.code)}>
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground w-14">Lien</span>
+                <span className="text-xs text-foreground break-all flex-1">{privateLink}</span>
+                <Button size="sm" variant="outline" onClick={() => copyLink(privateLink)}>
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
@@ -267,8 +292,8 @@ const EbookManager = () => {
                         year: "numeric",
                       })}
                     </span>
-                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Copier le lien" onClick={() => copyLink(buildLink(p.email))}>
-                      <Copy className="w-3.5 h-3.5" />
+                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Générer et renvoyer un nouveau code" disabled={granting} onClick={() => { if (confirm(`Générer un nouveau code pour ${p.email} ? L'ancien ne fonctionnera plus.`)) grantAccess(p.email); }}>
+                      <KeyRound className="w-3.5 h-3.5" />
                     </Button>
                     {p.stripe_session_id === "admin-grant" && (
                       <Button size="icon" variant="ghost" className="h-7 w-7" title="Retirer l'accès" onClick={() => handleRevoke(p.id, p.email)}>
