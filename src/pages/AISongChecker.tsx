@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity, HelpCircle, ShieldCheck, ShieldAlert, ShieldQuestion, Link as LinkIcon } from "lucide-react";
+import { Bot, FileAudio, Loader2, Upload, Sparkles, Info, AlertTriangle, BarChart3, Activity, HelpCircle, ShieldCheck, ShieldAlert, ShieldQuestion } from "lucide-react";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 import { analyzeForAI, type AISongCheckResult, type Verdict, type ProbBlock, type MarkerId, type MarkerSide, type Confidence, type QualityIssue, type TopMarker } from "@/lib/aiSongCheck";
 import SEO from "@/components/SEO";
@@ -9,11 +9,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { softwareAppSchema, breadcrumbSchema } from "@/lib/seo/schemas";
-import { supabase } from "@/integrations/supabase/client";
-import { isYoutubeUrl, extractYoutubeAudio } from "@/lib/audioFromYoutube";
 
 type FeatureKey =
   | "spectralFlatnessMean"
@@ -114,14 +111,6 @@ const STRINGS = {
     },
     backHome: "← Retour à l'accueil",
     tabUpload: "Importer un fichier",
-    tabUrl: "Coller un lien",
-    urlPlaceholder: "Lien YouTube, SoundCloud ou URL directe .mp3/.wav",
-    urlHelp: "YouTube (extraction dans ton navigateur), SoundCloud ou lien direct vers un fichier audio. Max 10 min · 30 Mo · 10 requêtes/h.",
-    urlFetch: "Récupérer et analyser",
-    urlFetching: "Téléchargement de l'audio…",
-    urlYoutubeFetching: "Extraction YouTube en cours…",
-    urlError: "Impossible de récupérer cet audio.",
-    urlEmpty: "Colle d'abord un lien.",
   },
   en: {
     title: "AI Song Checker",
@@ -209,14 +198,6 @@ const STRINGS = {
     },
     backHome: "← Back home",
     tabUpload: "Upload a file",
-    tabUrl: "Paste a link",
-    urlPlaceholder: "YouTube, SoundCloud or a direct .mp3/.wav URL",
-    urlHelp: "YouTube (extracted in your browser), SoundCloud or a direct audio file link. Max 10 min · 30 MB · 10 requests/h.",
-    urlFetch: "Fetch and analyze",
-    urlFetching: "Downloading audio…",
-    urlYoutubeFetching: "Extracting from YouTube…",
-    urlError: "Could not fetch this audio.",
-    urlEmpty: "Paste a link first.",
   },
 };
 
@@ -331,9 +312,6 @@ const AISongChecker = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AISongCheckResult | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
-  const [urlInput, setUrlInput] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
 
   const handleFile = useCallback(
     async (file?: File) => {
@@ -360,56 +338,6 @@ const AISongChecker = () => {
     [L]
   );
 
-  const [fetchProgress, setFetchProgress] = useState<{ loaded: number; total: number | null } | null>(null);
-  const [isYoutube, setIsYoutube] = useState(false);
-
-  const handleUrlFetch = useCallback(async () => {
-    const url = urlInput.trim();
-    if (!url) { setError(L.urlEmpty); return; }
-    setError(null);
-    setResult(null);
-    setIsFetching(true);
-    setFetchProgress(null);
-    const youtube = isYoutubeUrl(url);
-    setIsYoutube(youtube);
-    try {
-      if (youtube) {
-        const { file } = await extractYoutubeAudio(url, {
-          onProgress: (loaded, total) => setFetchProgress({ loaded, total }),
-        });
-        await handleFile(file);
-      } else {
-        const { data, error: fnErr } = await supabase.functions.invoke("fetch-audio-from-url", {
-          body: { url },
-        });
-        if (fnErr) throw new Error(fnErr.message || L.urlError);
-        let blob: Blob;
-        if (data instanceof Blob) {
-          blob = data;
-        } else if (data && typeof data === "object" && "error" in data) {
-          throw new Error((data as { error: string }).error);
-        } else {
-          blob = new Blob([data as BlobPart]);
-        }
-        if (!blob.type.startsWith("audio/")) {
-          try {
-            const txt = await blob.text();
-            const j = JSON.parse(txt);
-            if (j?.error) throw new Error(j.error);
-          } catch {/* fall through */}
-        }
-        const ext = (blob.type.split("/")[1] || "mp3").split(";")[0];
-        const f = new File([blob], `linked-audio.${ext}`, { type: blob.type || "audio/mpeg" });
-        await handleFile(f);
-      }
-    } catch (e) {
-      console.error(e);
-      setError((e as Error).message || L.urlError);
-    } finally {
-      setIsFetching(false);
-      setFetchProgress(null);
-    }
-  }, [urlInput, L, handleFile]);
 
 
 
@@ -453,95 +381,40 @@ const AISongChecker = () => {
         </div>
 
         <div className="mx-auto mt-8 max-w-3xl">
-          {!result && !isAnalyzing && !isFetching && (
-            <>
-              {/* Mode tabs */}
-              <div className="mb-3 inline-flex rounded-md border border-border bg-card/40 p-1">
-                <button
-                  type="button"
-                  onClick={() => setInputMode("upload")}
-                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm transition-colors ${
-                    inputMode === "upload" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Upload className="h-3.5 w-3.5" /> {L.tabUpload}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setInputMode("url")}
-                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm transition-colors ${
-                    inputMode === "url" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <LinkIcon className="h-3.5 w-3.5" /> {L.tabUrl}
-                </button>
-              </div>
-
-              {inputMode === "upload" ? (
-                <div
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDragging(true);
-                  }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setIsDragging(false);
-                    handleFile(e.dataTransfer.files?.[0]);
-                  }}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`group cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-colors ${
-                    isDragging ? "border-primary bg-primary/5" : "border-border bg-card/40 hover:border-primary/50"
-                  }`}
-                >
-                  <Upload className="mx-auto mb-3 h-10 w-10 text-primary" />
-                  <p className="font-medium">{L.dropTitle}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{L.dropSub}</p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept={AUDIO_ACCEPT}
-                    className="hidden"
-                    onChange={(e) => handleFile(e.target.files?.[0] ?? undefined)}
-                  />
-                </div>
-              ) : (
-                <div className="rounded-xl border border-border bg-card/40 p-6">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <LinkIcon className="h-4 w-4 text-primary" />
-                    {L.tabUrl}
-                  </div>
-                  <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                    <Input
-                      type="url"
-                      value={urlInput}
-                      onChange={(e) => setUrlInput(e.target.value)}
-                      placeholder={L.urlPlaceholder}
-                      onKeyDown={(e) => { if (e.key === "Enter") void handleUrlFetch(); }}
-                      className="flex-1"
-                    />
-                    <Button onClick={() => void handleUrlFetch()} disabled={!urlInput.trim()}>
-                      <LinkIcon className="mr-2 h-4 w-4" /> {L.urlFetch}
-                    </Button>
-                  </div>
-                  <p className="mt-2 text-xs text-muted-foreground">{L.urlHelp}</p>
-                </div>
-              )}
-            </>
+          {!result && !isAnalyzing && (
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                handleFile(e.dataTransfer.files?.[0]);
+              }}
+              onClick={() => fileInputRef.current?.click()}
+              className={`group cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-colors ${
+                isDragging ? "border-primary bg-primary/5" : "border-border bg-card/40 hover:border-primary/50"
+              }`}
+            >
+              <Upload className="mx-auto mb-3 h-10 w-10 text-primary" />
+              <p className="font-medium">{L.dropTitle}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{L.dropSub}</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={AUDIO_ACCEPT}
+                className="hidden"
+                onChange={(e) => handleFile(e.target.files?.[0] ?? undefined)}
+              />
+            </div>
           )}
 
-          {(isAnalyzing || isFetching) && (
+          {isAnalyzing && (
             <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card/40 p-12">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="mt-3 text-sm text-muted-foreground">
-                {isFetching ? (isYoutube ? (L as typeof STRINGS.fr).urlYoutubeFetching : L.urlFetching) : L.analyzing}
-              </p>
-              {isFetching && fetchProgress && (
-                <p className="mt-1 text-xs text-muted-foreground/70">
-                  {(fetchProgress.loaded / 1024 / 1024).toFixed(1)} Mo
-                  {fetchProgress.total ? ` / ${(fetchProgress.total / 1024 / 1024).toFixed(1)} Mo` : ""}
-                </p>
-              )}
+              <p className="mt-3 text-sm text-muted-foreground">{L.analyzing}</p>
             </div>
           )}
 
