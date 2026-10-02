@@ -852,7 +852,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     features: {
       spectralFlatnessMean: flatnessMean,
       spectralFlatnessStd: flatnessStd,
-      hfCutoffHz: hfCutoff,
+      hfCutoffHz: cutHz,
       hfEnergyRatio,
       stereoCorrelation: stereoCorr,
       onsetIntervalCv: onsetCv,
