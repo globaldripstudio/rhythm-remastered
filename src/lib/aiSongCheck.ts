@@ -347,6 +347,40 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const hfEnergyRatio = totalEnergy > 0 ? hfEnergy / totalEnergy : 0;
   const rolloff85 = mean(rolloff85Vals);
 
+  // ===== Lossy-codec detection =====
+  // A codec lowpass is a brickwall: steep drop (> 25 dB within ~5 bins)
+  // at a characteristic frequency, with a near-silent floor above.
+  // Natural/AI bandwidth limits roll off progressively instead.
+  const median = (a: number[]) => {
+    if (a.length === 0) return 0;
+    const s = a.slice().sort((x, y) => x - y);
+    return s[Math.floor(s.length / 2)];
+  };
+  const medDrop = median(edgeDropsDb);
+  const medFloor = median(aboveFloorRatios);
+  const medCutoff = median(hfCutoffs);
+  const CODEC_CUTS: { hz: number; label: string }[] = [
+    { hz: 15000, label: "MP3 ~96-128 kbps" },
+    { hz: 16000, label: "MP3 ~128 kbps" },
+    { hz: 17000, label: "MP3 ~160 kbps / AAC" },
+    { hz: 18000, label: "MP3 ~192 kbps / AAC" },
+    { hz: 18500, label: "AAC ~192 kbps" },
+    { hz: 20000, label: "MP3 ~320 kbps / Opus" },
+  ];
+  const nyquist = sr / 2;
+  const matchedCut = CODEC_CUTS.find((c) => Math.abs(medCutoff - c.hz) <= 600);
+  const compressionDetected =
+    medCutoff > 8000 &&
+    medCutoff < nyquist * 0.97 &&
+    medDrop > 25 &&
+    medFloor < 0.01 &&
+    matchedCut !== undefined;
+  const compression: CompressionInfo = {
+    detected: compressionDetected,
+    codecGuess: compressionDetected ? matchedCut!.label : null,
+    cutoffHz: medCutoff,
+  };
+
   // Mel-band variance: average across bands of (std/mean) — coefficient of variation
   const melCv = mean(
     bandEnergyOverTime.map((arr) => {
