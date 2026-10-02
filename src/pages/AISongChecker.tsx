@@ -338,56 +338,6 @@ const AISongChecker = () => {
     [L]
   );
 
-  const [fetchProgress, setFetchProgress] = useState<{ loaded: number; total: number | null } | null>(null);
-  const [isYoutube, setIsYoutube] = useState(false);
-
-  const handleUrlFetch = useCallback(async () => {
-    const url = urlInput.trim();
-    if (!url) { setError(L.urlEmpty); return; }
-    setError(null);
-    setResult(null);
-    setIsFetching(true);
-    setFetchProgress(null);
-    const youtube = isYoutubeUrl(url);
-    setIsYoutube(youtube);
-    try {
-      if (youtube) {
-        const { file } = await extractYoutubeAudio(url, {
-          onProgress: (loaded, total) => setFetchProgress({ loaded, total }),
-        });
-        await handleFile(file);
-      } else {
-        const { data, error: fnErr } = await supabase.functions.invoke("fetch-audio-from-url", {
-          body: { url },
-        });
-        if (fnErr) throw new Error(fnErr.message || L.urlError);
-        let blob: Blob;
-        if (data instanceof Blob) {
-          blob = data;
-        } else if (data && typeof data === "object" && "error" in data) {
-          throw new Error((data as { error: string }).error);
-        } else {
-          blob = new Blob([data as BlobPart]);
-        }
-        if (!blob.type.startsWith("audio/")) {
-          try {
-            const txt = await blob.text();
-            const j = JSON.parse(txt);
-            if (j?.error) throw new Error(j.error);
-          } catch {/* fall through */}
-        }
-        const ext = (blob.type.split("/")[1] || "mp3").split(";")[0];
-        const f = new File([blob], `linked-audio.${ext}`, { type: blob.type || "audio/mpeg" });
-        await handleFile(f);
-      }
-    } catch (e) {
-      console.error(e);
-      setError((e as Error).message || L.urlError);
-    } finally {
-      setIsFetching(false);
-      setFetchProgress(null);
-    }
-  }, [urlInput, L, handleFile]);
 
 
 
