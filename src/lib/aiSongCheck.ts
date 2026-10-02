@@ -620,7 +620,9 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // (e.g. 32.8 dB on a true 20 kHz MP3 cutoff) — 35 dB was too strict.
   const peakDetected = bestBin > 0 && bestDrop > 30;
 
-  const compressionDetected = peakDetected || frameDetected;
+  // A certified uncompressed container (WAV PCM / FLAC) cannot carry a lossy
+  // codec wall: any steep edge found is a source/recording trait, not a codec.
+  const compressionDetected = meta.uncompressed ? false : peakDetected || frameDetected;
   // Prefer the peak-spectrum cutoff for display when a codec wall was found:
   // the per-frame median is heavily biased by sub-bass content. Without a
   // detected wall, fall back to the per-frame mean (no brickwall to report).
