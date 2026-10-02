@@ -312,9 +312,6 @@ const AISongChecker = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AISongCheckResult | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [inputMode, setInputMode] = useState<"upload" | "url">("upload");
-  const [urlInput, setUrlInput] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
 
   const handleFile = useCallback(
     async (file?: File) => {
