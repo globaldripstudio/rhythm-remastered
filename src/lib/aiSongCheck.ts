@@ -786,31 +786,39 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const spec = evidence(sMarkers);
   const temp = evidence(tMarkers);
 
-  let aiE = spec.ai * 0.45 + temp.ai * 0.55;
-  let huE = spec.human * 0.45 + temp.human * 0.55;
+  const aiE = spec.ai * 0.45 + temp.ai * 0.55;
+  const huE = spec.human * 0.45 + temp.human * 0.55;
 
-  // Metadata dated before generative music existed: probabilistic human
-  // bonus (tags can be forged, so this is not an absolute veto).
-  const preAiEra = meta.year !== null && meta.year < GENERATIVE_ERA_YEAR;
-  if (preAiEra) {
-    aiE *= 0.6;
-    huE = Math.min(1, huE + 0.1);
+  // ===== Bayesian fusion =====
+  // Acoustic evidence -> log-likelihood ratio, combined with a historical
+  // prior from file dating. Each source weighs by its reliability.
+  const nowYear = new Date().getFullYear();
+  const yr = meta.year !== null && meta.year >= 1950 && meta.year <= nowYear ? meta.year : null;
+  let priorAI = 0.5;
+  if (yr !== null) {
+    if (yr <= 2020) priorAI = 0.005;
+    else if (yr <= 2022) priorAI = 0.05;
   }
+  const preAiEra = yr !== null && yr < GENERATIVE_ERA_YEAR;
+  const logit = (p: number) => Math.log(p / (1 - p));
+  const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
+  const K_LLR = 6;
+  const pAI = sigmoid(K_LLR * (aiE - huE) + logit(priorAI));
 
-  // Hybrid score: requires BOTH sides high AND close. Steeper diff penalty
-  // and lower multiplier so a clearly dominant side wins decisively.
+  // Hybrid = real disagreement between independent domains, gated by prior.
+  const specNet = spec.ai - spec.human;
+  const tempNet = temp.ai - temp.human;
+  const disagreement = specNet * tempNet < 0 ? Math.min(Math.abs(specNet), Math.abs(tempNet)) : 0;
+  const hY = clamp01(sigmoid(12 * (disagreement - 0.25)) * Math.min(1, priorAI * 2));
+  const aiP = pAI * (1 - hY);
+  const huP = (1 - pAI) * (1 - hY);
+
   const hybridScore = (a: number, h: number) => {
     const m = Math.min(a, h);
     const diff = Math.abs(a - h);
     return 1.4 * m * Math.pow(Math.max(0, 1 - diff), 3);
   };
 
-  const SUPPRESS = 1.6;
-  const pureHumanRaw = Math.pow(huE, 1.05) * clamp01(1 - aiE * SUPPRESS);
-  const pureAiRaw = Math.pow(aiE, 1.05) * clamp01(1 - huE * SUPPRESS);
-  const hybridRaw = hybridScore(aiE, huE);
-
-  // Top markers: rank by |vote| * weight.
   const topFrom = (markers: Marker[], n = 3): TopMarker[] =>
     markers
       .map((m) => ({
@@ -824,7 +832,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
 
   const spectral = toProbBlock(spec.human, hybridScore(spec.ai, spec.human), spec.ai, topFrom(sMarkers));
   const temporal = toProbBlock(temp.human, hybridScore(temp.ai, temp.human), temp.ai, topFrom(tMarkers));
-  const overall = toProbBlock(pureHumanRaw, hybridRaw, pureAiRaw, topFrom([...sMarkers, ...tMarkers]), 0.20);
+  const overall: ProbBlock = {
+    human: huP, hybrid: hY, ai: aiP,
+    humanVerdict: verdictFor(huP), hybridVerdict: verdictFor(hY), aiVerdict: verdictFor(aiP),
+    topMarkers: topFrom([...sMarkers, ...tMarkers]),
+  };
 
   // ===== Quality assessment =====
   const qualityIssues: QualityIssue[] = [];
@@ -834,13 +846,10 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   if (noiseFloorDb > -30) qualityIssues.push("noisy");
   if (stereoCorr > 0.995) qualityIssues.push("monoOnly");
 
-  const evidenceStrength = Math.max(aiE, huE);
+  const decisiveness = Math.max(huP, aiP, hY);
   let confidence: Confidence = "high";
-  if (qualityIssues.includes("shortFile") || qualityIssues.includes("lowBandwidth") || evidenceStrength < 0.18) {
-    confidence = "low";
-  } else if (qualityIssues.length >= 1 || evidenceStrength < 0.3) {
-    confidence = "medium";
-  }
+  if (qualityIssues.includes("shortFile") || (decisiveness < 0.6 && !preAiEra)) confidence = "low";
+  else if (qualityIssues.length >= 1 || decisiveness < 0.8) confidence = "medium";
 
   return {
     durationSec: fullLeft.length / sr,
