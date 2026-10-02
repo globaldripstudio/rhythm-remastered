@@ -186,7 +186,13 @@ All colors MUST be HSL for perfect theming.
   }
 
   .partners-card {
+    position: relative;
     width: calc((100vw - 2rem - 0.75rem) / 2);
+  }
+
+  .partners-card:hover,
+  .partners-card:focus-visible {
+    z-index: 10;
   }
 
   .partners-track {
