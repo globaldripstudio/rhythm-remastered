@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Upload, FileText, Users, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, FileText, Users, Loader2, CheckCircle, AlertCircle, Link2, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const EbookManager = () => {
@@ -12,6 +12,54 @@ const EbookManager = () => {
   const [purchases, setPurchases] = useState<any[]>([]);
   const [loadingPurchases, setLoadingPurchases] = useState(true);
   const [fileExists, setFileExists] = useState(false);
+  const [grantEmail, setGrantEmail] = useState("");
+  const [granting, setGranting] = useState(false);
+  const [privateLink, setPrivateLink] = useState<string | null>(null);
+
+  const buildLink = (email: string) =>
+    `${window.location.origin}/ebook/login?email=${encodeURIComponent(email)}`;
+
+  const copyLink = async (link: string) => {
+    await navigator.clipboard.writeText(link);
+    toast.success("Lien copié !");
+  };
+
+  const handleGrant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = grantEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Email invalide.");
+      return;
+    }
+    setGranting(true);
+    try {
+      if (!purchases.some((p) => p.email?.toLowerCase() === email)) {
+        const { error } = await supabase
+          .from("ebook_purchases")
+          .insert({ email, stripe_session_id: "admin-grant" });
+        if (error) throw error;
+      }
+      const link = buildLink(email);
+      setPrivateLink(link);
+      await loadPurchases();
+      toast.success("Accès accordé.");
+    } catch (error: any) {
+      toast.error("Erreur : " + (error.message || "Réessayez"));
+    } finally {
+      setGranting(false);
+    }
+  };
+
+  const handleRevoke = async (id: string, email: string) => {
+    if (!confirm(`Retirer l'accès de ${email} ?`)) return;
+    const { error } = await supabase.from("ebook_purchases").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur : " + error.message);
+      return;
+    }
+    toast.success("Accès retiré.");
+    loadPurchases();
+  };
 
   useEffect(() => {
     checkCurrentFile();
@@ -147,6 +195,41 @@ const EbookManager = () => {
         </CardContent>
       </Card>
 
+      {/* Private access link */}
+      <Card className="border-primary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Link2 className="w-5 h-5 text-primary" />
+            Accès privé
+          </CardTitle>
+          <CardDescription>
+            Offrez l'accès à la formation sans paiement. La personne crée son compte (ou se connecte) avec cet email via le lien généré.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={handleGrant} className="flex flex-col sm:flex-row gap-2">
+            <Input
+              type="email"
+              placeholder="email@exemple.com"
+              value={grantEmail}
+              onChange={(e) => setGrantEmail(e.target.value)}
+              maxLength={255}
+            />
+            <Button type="submit" disabled={granting}>
+              {granting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Générer le lien"}
+            </Button>
+          </form>
+          {privateLink && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/30 border border-border/50">
+              <span className="text-xs text-foreground break-all flex-1">{privateLink}</span>
+              <Button size="sm" variant="outline" onClick={() => copyLink(privateLink)}>
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Purchases List */}
       <Card>
         <CardHeader>
@@ -173,13 +256,26 @@ const EbookManager = () => {
                   className="flex items-center justify-between px-4 py-3 rounded-lg bg-muted/30 border border-border/50"
                 >
                   <span className="text-sm font-medium text-foreground">{p.email}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(p.created_at).toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {p.stripe_session_id === "admin-grant" && (
+                      <span className="text-[10px] uppercase tracking-wide text-primary">Offert</span>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(p.created_at).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Copier le lien" onClick={() => copyLink(buildLink(p.email))}>
+                      <Copy className="w-3.5 h-3.5" />
+                    </Button>
+                    {p.stripe_session_id === "admin-grant" && (
+                      <Button size="icon" variant="ghost" className="h-7 w-7" title="Retirer l'accès" onClick={() => handleRevoke(p.id, p.email)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
