@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Deny public access to ebook files" ON storage.objects;
