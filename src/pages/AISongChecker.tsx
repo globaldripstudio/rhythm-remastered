@@ -7,6 +7,7 @@ import { analyzeForAI, type AISongCheckResult, type Verdict, type ProbBlock, typ
 import SEO from "@/components/SEO";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
+import ToolResources from "@/components/tools/ToolResources";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -111,6 +112,10 @@ const STRINGS = {
     },
     backHome: "← Retour à l'accueil",
     tabUpload: "Importer un fichier",
+    howTitle: "Comment ça marche ?",
+    how: "L'outil décode votre fichier entièrement dans le navigateur et mesure 16 marqueurs acoustiques : planéité spectrale, coupure des hautes fréquences, corrélation stéréo, micro-dynamique, plancher de bruit, régularité des transitoires, respirations… En croisant ces indices, il estime si le morceau est plutôt IA pur, hybride (IA + humain) ou humain. Aucun fichier ne quitte votre appareil.",
+    reliabilityTitle: "Fiabilité des résultats",
+    reliability: "Les résultats sont indicatifs et ne constituent jamais une preuve. Le verdict repose sur des signatures acoustiques statistiques : un mastering très propre, une production électronique très carrée, un fichier mono ou bas débit peuvent produire des faux positifs ou des faux négatifs. N'utilisez pas cet outil seul pour statuer (litiges, copyright, sélection artistique) — croisez toujours avec votre propre écoute et votre jugement.",
   },
   en: {
     title: "AI Song Checker",
@@ -198,6 +203,10 @@ const STRINGS = {
     },
     backHome: "← Back home",
     tabUpload: "Upload a file",
+    howTitle: "How it works",
+    how: "The tool decodes your file entirely in the browser and measures 16 acoustic markers: spectral flatness, high-frequency cutoff, stereo correlation, micro-dynamics, noise floor, transient regularity, breaths… Cross-checking these signals, it estimates whether the track is pure AI, hybrid (AI + human) or human. No file ever leaves your device.",
+    reliabilityTitle: "Results reliability",
+    reliability: "Results are indicative and never constitute proof. The verdict relies on statistical acoustic signatures: a very clean master, a rigid electronic production, a mono or low-bitrate file can produce false positives or false negatives. Do not use this tool alone to decide (disputes, copyright, artist selection) — always cross-check with your own listening and judgement.",
   },
 };
 
@@ -380,6 +389,13 @@ const AISongChecker = () => {
           <p className="mt-3 text-muted-foreground">{L.tagline}</p>
         </div>
 
+        <div className="mx-auto mt-6 max-w-3xl rounded-lg border border-border bg-background/40 p-4 text-left text-sm leading-relaxed text-muted-foreground sm:p-5">
+          <div className="mb-2 flex items-center gap-2 font-semibold text-foreground">
+            <Info className="h-4 w-4 text-primary" /> {L.howTitle}
+          </div>
+          <p>{L.how}</p>
+        </div>
+
         <div className="mx-auto mt-8 max-w-3xl">
           {!result && !isAnalyzing && (
             <div
@@ -540,6 +556,15 @@ const AISongChecker = () => {
               </div>
             </div>
           )}
+
+          <div className="mt-10 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-left text-sm leading-relaxed text-muted-foreground sm:p-5">
+            <div className="mb-2 flex items-center gap-2 font-semibold text-amber-300">
+              <AlertTriangle className="h-4 w-4" /> {L.reliabilityTitle}
+            </div>
+            <p>{L.reliability}</p>
+          </div>
+
+          <ToolResources current="aisong" />
 
           <div className="mt-10 text-center">
             <Link

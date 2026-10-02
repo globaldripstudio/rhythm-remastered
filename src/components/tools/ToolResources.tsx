@@ -1,8 +1,8 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Drum, Gauge, KeyRound, Music2, Music4 } from "lucide-react";
+import { Bot, Drum, Gauge, KeyRound, Music2, Music4 } from "lucide-react";
 import ContactCTA from "@/components/ContactCTA";
 
-type ToolKey = "loudness" | "keybpm" | "tempo" | "chords" | "audio2midi";
+type ToolKey = "loudness" | "keybpm" | "tempo" | "chords" | "audio2midi" | "aisong";
 
 const ALL_TOOLS: Record<ToolKey, { to: string; icon: typeof Gauge; title: string; description: string }> = {
   loudness: {
@@ -34,6 +34,12 @@ const ALL_TOOLS: Record<ToolKey, { to: string; icon: typeof Gauge; title: string
     icon: Music4,
     title: "Audio → MIDI",
     description: "Conversion polyphonique 100 % locale, prête à importer dans votre DAW.",
+  },
+  aisong: {
+    to: "/ai-song-checker",
+    icon: Bot,
+    title: "AI Song Checker",
+    description: "Détecte si un morceau est IA, humain ou hybride via 16 marqueurs acoustiques, 100 % en local.",
   },
 };
 
