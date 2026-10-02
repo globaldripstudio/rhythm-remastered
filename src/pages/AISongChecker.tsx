@@ -64,6 +64,7 @@ const STRINGS = {
       noisy: "Plancher de bruit élevé — peut masquer les marqueurs IA.",
       monoOnly: "Fichier mono ou stéréo factice — la corrélation stéréo n'est pas exploitable.",
     } as Record<QualityIssue, string>,
+    compressionNotice: "Compression avec pertes détectée ({codec}) — les marqueurs de bande passante ont été neutralisés pour éviter un faux positif.",
     markerLabels: {
       flatnessStd: "Variance spectrale",
       hfCutoff: "Coupure haute fréquence",
@@ -155,6 +156,7 @@ const STRINGS = {
       noisy: "High noise floor — can mask AI markers.",
       monoOnly: "Mono or fake-stereo file — stereo correlation is not exploitable.",
     } as Record<QualityIssue, string>,
+    compressionNotice: "Lossy compression detected ({codec}) — bandwidth markers were neutralized to avoid a false positive.",
     markerLabels: {
       flatnessStd: "Spectral variance",
       hfCutoff: "High-frequency cutoff",
@@ -487,6 +489,17 @@ const AISongChecker = () => {
                         {L.confidenceTitle} : {L.confidence[c]}
                       </div>
                       <p className="text-xs text-muted-foreground">{L.confidenceHelp[c]}</p>
+                      {result.compression.detected && (
+                        <div className="mt-3 flex items-start gap-2 rounded-md border border-sky-500/30 bg-sky-500/5 p-2.5 text-xs text-sky-300">
+                          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                          <span>
+                            {L.compressionNotice.replace(
+                              "{codec}",
+                              result.compression.codecGuess ?? `${Math.round(result.compression.cutoffHz / 100) / 10} kHz`
+                            )}
+                          </span>
+                        </div>
+                      )}
                       {result.qualityIssues.length > 0 && (
                         <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
                           {result.qualityIssues.map((q) => (
