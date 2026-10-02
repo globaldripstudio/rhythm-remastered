@@ -36,6 +36,12 @@ export type QualityIssue =
   | "noisy"
   | "monoOnly";
 
+export interface CompressionInfo {
+  detected: boolean;
+  codecGuess: string | null;
+  cutoffHz: number;
+}
+
 export type Confidence = "high" | "medium" | "low";
 
 export interface ProbBlock {
@@ -56,6 +62,7 @@ export interface AISongCheckResult {
   overall: ProbBlock;
   confidence: Confidence;
   qualityIssues: QualityIssue[];
+  compression: CompressionInfo;
   features: {
     spectralFlatnessMean: number;
     spectralFlatnessStd: number;
