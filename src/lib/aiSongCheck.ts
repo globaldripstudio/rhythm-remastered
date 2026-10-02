@@ -894,8 +894,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const specNet = spec.ai - spec.human;
   const tempNet = temp.ai - temp.human;
   const disagreement = specNet * tempNet < 0 ? Math.min(Math.abs(specNet), Math.abs(tempNet)) : 0;
-  const intrS = hybridScore(spec.ai, spec.human) * clamp01(temp.human * 2);
-  const intrT = hybridScore(temp.ai, temp.human) * clamp01(spec.human * 2);
+  // The corroborating domain must be decidedly one-sided (net margin > 0.15),
+  // otherwise a merely torn domain would manufacture hybrids on pure-AI or
+  // pure-human files whose other domain is simply ambiguous.
+  const intrS = hybridScore(spec.ai, spec.human) * clamp01((temp.human - temp.ai - 0.15) * 3);
+  const intrT = hybridScore(temp.ai, temp.human) * clamp01((spec.human - spec.ai - 0.15) * 3);
   const hybridRaw = Math.max(disagreement, 0.55 * Math.max(intrS, intrT));
   const hY = clamp01(sigmoid(12 * (hybridRaw - 0.25)) * Math.min(1, priorAI * 2));
   const aiP = pAI * (1 - hY);
