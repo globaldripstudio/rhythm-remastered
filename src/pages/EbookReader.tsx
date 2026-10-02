@@ -27,10 +27,23 @@ const EbookReader = () => {
         return;
       }
 
-      // Check purchase
+      // Admin sessions never enter the reader space.
+      const { data: adminRole } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (adminRole) {
+        navigate("/ebook/login", { replace: true });
+        return;
+      }
+
+      // Check purchase (scoped to own email)
       const { data: purchase } = await supabase
         .from("ebook_purchases")
         .select("id")
+        .eq("email", (session.user.email ?? "").toLowerCase())
         .maybeSingle();
 
       if (!purchase) {
