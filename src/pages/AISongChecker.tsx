@@ -460,7 +460,8 @@ const AISongChecker = () => {
                   <div>
                     <p className="font-medium">{fileName}</p>
                     <p className="text-xs text-muted-foreground">
-                      {L.duration}: {result.durationSec.toFixed(1)} {L.seconds} · {result.sampleRate} Hz
+                      {L.duration}: {result.durationSec.toFixed(1)} {L.seconds}
+                      {result.sampleRate !== null ? ` · ${result.sampleRate} Hz` : ""}
                       {result.meta?.year ? ` · ${L.exportLabel}: ${result.meta.year}` : ""}
                       {result.meta?.encoder ? ` · ${L.encoderLabel}: ${result.meta.encoder}` : ""}
                     </p>

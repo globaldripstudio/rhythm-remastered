@@ -56,13 +56,14 @@ export interface ProbBlock {
 
 export interface FileMeta {
   nativeSampleRate: number | null;
+  bitrateKbps: number | null;
   year: number | null;
   encoder: string | null;
 }
 
 export interface AISongCheckResult {
   durationSec: number;
-  sampleRate: number;
+  sampleRate: number | null;
   meta?: FileMeta;
   trim?: { startSec: number; endSec: number };
   preAiEra?: boolean;
@@ -206,7 +207,7 @@ const readText = (b: Uint8Array, start: number, end: number): string => {
 };
 
 export const parseFileMeta = (b: Uint8Array): FileMeta => {
-  const meta: FileMeta = { nativeSampleRate: null, year: null, encoder: null };
+  const meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null };
   const str = (o: number, n: number) => String.fromCharCode(...b.subarray(o, o + n));
   const years: number[] = [];
   const pushYear = (s: string) => {
@@ -268,6 +269,8 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
       o = 10 + tagSize;
     }
     const SR = [[44100, 48000, 32000], [22050, 24000, 16000], [11025, 12000, 8000]];
+    const BR_MPEG1_L3 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
+    const BR_MPEG2_L3 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
     for (let i = o; i < Math.min(b.length - 4, o + 65536); i++) {
       if (b[i] === 0xff && (b[i + 1] & 0xe0) === 0xe0) {
         const verBits = (b[i + 1] >> 3) & 3; // 3=MPEG1, 2=MPEG2, 0=MPEG2.5
@@ -275,8 +278,22 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
         const srIdx = (b[i + 2] >> 2) & 3;
         const brIdx = b[i + 2] >> 4;
         if (verBits === 1 || layer === 0 || srIdx === 3 || brIdx === 15 || brIdx === 0) continue;
-        meta.nativeSampleRate = SR[verBits === 3 ? 0 : verBits === 2 ? 1 : 2][srIdx];
-        break;
+        const sampleRate = SR[verBits === 3 ? 0 : verBits === 2 ? 1 : 2][srIdx];
+        const bitrate = (verBits === 3 ? BR_MPEG1_L3 : BR_MPEG2_L3)[brIdx];
+        const padding = (b[i + 2] >> 1) & 1;
+        const frameLength = Math.floor(((verBits === 3 ? 144 : 72) * bitrate * 1000) / sampleRate) + padding;
+        const next = i + frameLength;
+        // Certify an MP3 header only when the following frame agrees. This
+        // prevents arbitrary bytes in artwork/other containers being shown as 48 kHz.
+        if (frameLength > 4 && next + 3 < b.length && b[next] === 0xff && (b[next + 1] & 0xe0) === 0xe0) {
+          const nextVer = (b[next + 1] >> 3) & 3;
+          const nextSrIdx = (b[next + 2] >> 2) & 3;
+          if (nextVer === verBits && nextSrIdx === srIdx) {
+            meta.nativeSampleRate = sampleRate;
+            meta.bitrateKbps = bitrate;
+            break;
+          }
+        }
       }
     }
     // LAME tag fallback for encoder
@@ -295,9 +312,38 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
 const GENERATIVE_ERA_YEAR = 2023;
 
 export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
-  let meta: FileMeta = { nativeSampleRate: null, year: null, encoder: null };
+  let meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null };
   try {
-    meta = parseFileMeta(new Uint8Array(await file.slice(0, 512 * 1024).arrayBuffer()));
+    const header = new Uint8Array(await file.slice(0, Math.min(file.size, 4 * 1024 * 1024)).arrayBuffer());
+    meta = parseFileMeta(header);
+    // Large embedded artwork can put the first audio frame beyond the initial
+    // read. Probe directly after the declared ID3 tag instead of trusting the
+    // browser-decoded rate, which may have been resampled by the audio device.
+    if (meta.nativeSampleRate === null && header.length >= 10 && String.fromCharCode(...header.subarray(0, 3)) === "ID3") {
+      const tagSize = ((header[6] & 0x7f) << 21) | ((header[7] & 0x7f) << 14) | ((header[8] & 0x7f) << 7) | (header[9] & 0x7f);
+      const audioStart = 10 + tagSize;
+      const probe = new Uint8Array(await file.slice(audioStart, Math.min(file.size, audioStart + 128 * 1024)).arrayBuffer());
+      const audioMeta = parseFileMeta(probe);
+      meta.nativeSampleRate = audioMeta.nativeSampleRate;
+      meta.bitrateKbps = audioMeta.bitrateKbps;
+      if (!meta.encoder) meta.encoder = audioMeta.encoder;
+    }
+    // ID3v1 stores the year in the final 128 bytes and is common on older MP3s.
+    if (meta.year === null && file.size >= 128) {
+      const tail = new Uint8Array(await file.slice(file.size - 128).arrayBuffer());
+      if (String.fromCharCode(...tail.subarray(0, 3)) === "TAG") {
+        const taggedYear = new TextDecoder("latin1").decode(tail.subarray(93, 97));
+        const match = taggedYear.match(/(19|20)\d{2}/);
+        if (match) meta.year = Number(match[0]);
+      }
+    }
+    // The local file date is a final historical source when the container has
+    // no date. It affects the historical prior but is never presented as encoder metadata.
+    if (meta.year === null && file.lastModified > 0) {
+      const modifiedYear = new Date(file.lastModified).getFullYear();
+      const nowYear = new Date().getFullYear();
+      if (modifiedYear >= 1950 && modifiedYear <= nowYear) meta.year = modifiedYear;
+    }
   } catch {
     /* ignore */
   }
@@ -569,6 +615,15 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     codecGuess: compressionDetected ? guess : null,
     cutoffHz: cutHz,
   };
+  // A 15–16.4 kHz source boundary inside a >=160 kbps MP3 is not explained by
+  // that bitrate alone. Treat it as surviving acoustic evidence (often a 32 kHz
+  // generative source), while keeping the later MP3 conversion as file context.
+  const anomalousSourceBoundary =
+    compressionDetected &&
+    peakCutHz >= 14800 &&
+    peakCutHz <= 16400 &&
+    meta.bitrateKbps !== null &&
+    meta.bitrateKbps >= 160;
 
   // Mel-band variance: average across bands of (std/mean) — coefficient of variation
   const melCv = mean(
@@ -759,9 +814,13 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   ];
   // On lossy-compressed files, bandwidth markers measure the codec, not
   // the source — exclude them so an MP3 can't mimic an AI signature.
-  const sMarkers = compressionDetected
+  const sMarkers = compressionDetected && !anomalousSourceBoundary
     ? sMarkersAll.filter((m) => m.id !== "hfCutoff" && m.id !== "rolloff85" && m.id !== "hfEnergyRatio")
-    : sMarkersAll;
+    : sMarkersAll.map((m) =>
+        anomalousSourceBoundary && m.id === "hfCutoff"
+          ? { ...m, v: Math.max(m.v, 0.9), w: 1.2 }
+          : m
+      );
   const tMarkers: Marker[] = [
     { id: "onsetCv", v: vote(onsetCv, 0.5, 0.12), w: 1.2 },
     { id: "rmsMicro", v: vote(rmsMicro, 7, 2.5), w: 1.3 },
@@ -771,6 +830,20 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     { id: "decayRegularity", v: vote(decayRegularity, 6, 1.2), w: 0.9 },
     { id: "breathRatio", v: vote(breathRatio, 1.6, 0.6), w: 0.8 },
   ];
+  // Deep acoustic concurrence survives transcoding better than metadata or the
+  // bandwidth alone. Only reinforce it when several independent signatures
+  // agree, avoiding a global threshold change for old/noisy human recordings.
+  if (anomalousSourceBoundary) {
+    const stereo = tMarkers.length;
+    if (stereoCorr > 0.98 && envRepetition > 0.62) {
+      tMarkers.push({ id: "stereoCorr", v: 0.9, w: 1.2 });
+      tMarkers.push({ id: "envRepetition", v: 0.75, w: 1.1 });
+    }
+    if (noiseFloorDb > -35 && phaseCoherence < 1.35) {
+      tMarkers.push({ id: "noiseFloor", v: 0.65, w: 0.9 });
+    }
+    void stereo;
+  }
 
   const evidence = (markers: Marker[]) => {
     let aiE = 0;
@@ -834,7 +907,12 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
 
   const spectral = toProbBlock(spec.human, hybridScore(spec.ai, spec.human), spec.ai, topFrom(sMarkers));
   const temporal = toProbBlock(temp.human, hybridScore(temp.ai, temp.human), temp.ai, topFrom(tMarkers));
-  const overall: ProbBlock = {
+  const historicalLock = yr !== null && yr <= 2020;
+  const overall: ProbBlock = historicalLock ? {
+    human: 0.995, hybrid: 0.004, ai: 0.001,
+    humanVerdict: "very_likely", hybridVerdict: "very_unlikely", aiVerdict: "very_unlikely",
+    topMarkers: topFrom([...sMarkers, ...tMarkers]),
+  } : {
     human: huP, hybrid: hY, ai: aiP,
     humanVerdict: verdictFor(huP), hybridVerdict: verdictFor(hY), aiVerdict: verdictFor(aiP),
     topMarkers: topFrom([...sMarkers, ...tMarkers]),
@@ -850,12 +928,13 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
 
   const decisiveness = Math.max(huP, aiP, hY);
   let confidence: Confidence = "high";
-  if (qualityIssues.includes("shortFile") || (decisiveness < 0.6 && !preAiEra)) confidence = "low";
+  if (historicalLock) confidence = "high";
+  else if (qualityIssues.includes("shortFile") || decisiveness < 0.6) confidence = "low";
   else if (qualityIssues.length >= 1 || decisiveness < 0.8) confidence = "medium";
 
   return {
     durationSec: fullLeft.length / sr,
-    sampleRate: meta.nativeSampleRate ?? sr,
+    sampleRate: meta.nativeSampleRate,
     meta,
     trim: { startSec: startS / sr, endSec: endS / sr },
     preAiEra,
