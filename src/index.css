@@ -268,6 +268,53 @@ All colors MUST be HSL for perfect theming.
     transform: scale(1.03);
   }
 
+  @keyframes partner-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .partner-carousel-track {
+    animation: partner-marquee 42s linear infinite;
+  }
+
+  .partner-carousel:hover .partner-carousel-track,
+  .partner-carousel:focus-within .partner-carousel-track {
+    animation-play-state: paused;
+  }
+
+  .partner-carousel-set {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    width: 350vw;
+  }
+
+  .partner-carousel-item {
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .partner-carousel-set {
+      width: calc(700% / 3);
+    }
+
+  }
+
+  @media (min-width: 1024px) {
+    .partner-carousel-set {
+      width: calc(700% / 6);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner-carousel {
+      overflow-x: auto;
+    }
+
+    .partner-carousel-track {
+      animation: none;
+    }
+  }
+
   /* Language switch blur transition */
   @keyframes lang-blur {
     0% { filter: blur(4px); opacity: 0.6; }
