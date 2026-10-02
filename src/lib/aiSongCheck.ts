@@ -751,9 +751,10 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     { id: "flatnessStd", v: vote(flatnessStd, 0.05, 0.01), w: 1.0 },
     { id: "hfCutoff", v: vote(hfCutoff, 18000, 14000), w: 0.7 },
     { id: "hfEnergyRatio", v: vote(hfEnergyRatio, 0.04, 0.003), w: 0.6 },
-    { id: "stereoCorr", v: vote(stereoCorr, 0.55, 0.98), w: 0.5 },
+    // Deep markers (survive lossy re-encoding) are weighted higher.
+    { id: "stereoCorr", v: vote(stereoCorr, 0.55, 0.98), w: 0.9 },
     { id: "melCv", v: vote(melCv, 1.0, 0.25), w: 1.0 },
-    { id: "phaseCoherence", v: vote(phaseCoherence, 1.6, 0.6), w: 1.1 },
+    { id: "phaseCoherence", v: vote(phaseCoherence, 1.6, 0.6), w: 1.4 },
     { id: "rolloff85", v: vote(rolloff85, 9000, 4500), w: 0.4 },
   ];
   // On lossy-compressed files, bandwidth markers measure the codec, not
@@ -763,9 +764,9 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     : sMarkersAll;
   const tMarkers: Marker[] = [
     { id: "onsetCv", v: vote(onsetCv, 0.5, 0.12), w: 1.2 },
-    { id: "rmsMicro", v: vote(rmsMicro, 7, 2.5), w: 1.1 },
+    { id: "rmsMicro", v: vote(rmsMicro, 7, 2.5), w: 1.3 },
     { id: "envRepetition", v: vote(envRepetition, 0.25, 0.75), w: 0.9 },
-    { id: "noiseFloor", v: vote(noiseFloorDb, -55, -78), w: 1.0 },
+    { id: "noiseFloor", v: vote(noiseFloorDb, -55, -78), w: 1.3 },
     { id: "zcrCv", v: vote(zcrCv, 0.45, 0.1), w: 0.9 },
     { id: "decayRegularity", v: vote(decayRegularity, 6, 1.2), w: 0.9 },
     { id: "breathRatio", v: vote(breathRatio, 1.6, 0.6), w: 0.8 },
@@ -796,7 +797,8 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const yr = meta.year !== null && meta.year >= 1950 && meta.year <= nowYear ? meta.year : null;
   let priorAI = 0.5;
   if (yr !== null) {
-    if (yr <= 2020) priorAI = 0.005;
+    // Pre-2021 files predate public generative music: treated as human.
+    if (yr <= 2020) priorAI = 0.0005;
     else if (yr <= 2022) priorAI = 0.05;
   }
   const preAiEra = yr !== null && yr < GENERATIVE_ERA_YEAR;
