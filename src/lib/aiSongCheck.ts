@@ -60,6 +60,9 @@ export interface FileMeta {
   bitrateKbps: number | null;
   year: number | null;
   encoder: string | null;
+  // True when the container is certified uncompressed (WAV PCM / FLAC):
+  // a lossy-codec brickwall is then impossible by construction.
+  uncompressed: boolean;
 }
 
 export interface AISongCheckResult {
@@ -208,7 +211,7 @@ const readText = (b: Uint8Array, start: number, end: number): string => {
 };
 
 export const parseFileMeta = (b: Uint8Array): FileMeta => {
-  const meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null };
+  const meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null, uncompressed: false };
   const str = (o: number, n: number) => String.fromCharCode(...b.subarray(o, o + n));
   const years: number[] = [];
   const pushYear = (s: string) => {
