@@ -147,7 +147,7 @@ const Partners = () => {
           </h2>
         </div>
 
-        <div className="partners-carousel overflow-hidden" aria-label={t('partners.title')}>
+        <div className="partners-carousel overflow-x-hidden py-2" aria-label={t('partners.title')}>
           <div className="partners-track flex w-max">
             {[0, 1].map((copy) => (
               <div key={copy} className="partners-group flex shrink-0 gap-3 pr-3 sm:gap-4 sm:pr-4 md:gap-6 md:pr-6">
