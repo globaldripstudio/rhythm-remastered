@@ -399,7 +399,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     below /= 6;
     let above = 0;
     let n = 0;
-    for (let i = c + 3; i < half; i++) { above += pDb[i]; n++; }
+    for (let i = c + 3; i < Math.min(half, c + 10); i++) { above += pDb[i]; n++; }
     above /= Math.max(1, n);
     const drop = below - above;
     // require content below the edge to be meaningful (within 90 dB of peak)
