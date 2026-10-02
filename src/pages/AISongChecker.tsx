@@ -111,6 +111,10 @@ const STRINGS = {
     },
     backHome: "← Retour à l'accueil",
     tabUpload: "Importer un fichier",
+    howTitle: "Comment ça marche ?",
+    how: "L'outil décode votre fichier entièrement dans le navigateur et mesure 16 marqueurs acoustiques : planéité spectrale, coupure des hautes fréquences, corrélation stéréo, micro-dynamique, plancher de bruit, régularité des transitoires, respirations… En croisant ces indices, il estime si le morceau est plutôt IA pur, hybride (IA + humain) ou humain. Aucun fichier ne quitte votre appareil.",
+    reliabilityTitle: "Fiabilité des résultats",
+    reliability: "Les résultats sont indicatifs et ne constituent jamais une preuve. Le verdict repose sur des signatures acoustiques statistiques : un mastering très propre, une production électronique très carrée, un fichier mono ou bas débit peuvent produire des faux positifs ou des faux négatifs. N'utilisez pas cet outil seul pour statuer (litiges, copyright, sélection artistique) — croisez toujours avec votre propre écoute et votre jugement.",
   },
   en: {
     title: "AI Song Checker",
@@ -198,6 +202,10 @@ const STRINGS = {
     },
     backHome: "← Back home",
     tabUpload: "Upload a file",
+    howTitle: "How it works",
+    how: "The tool decodes your file entirely in the browser and measures 16 acoustic markers: spectral flatness, high-frequency cutoff, stereo correlation, micro-dynamics, noise floor, transient regularity, breaths… Cross-checking these signals, it estimates whether the track is pure AI, hybrid (AI + human) or human. No file ever leaves your device.",
+    reliabilityTitle: "Results reliability",
+    reliability: "Results are indicative and never constitute proof. The verdict relies on statistical acoustic signatures: a very clean master, a rigid electronic production, a mono or low-bitrate file can produce false positives or false negatives. Do not use this tool alone to decide (disputes, copyright, artist selection) — always cross-check with your own listening and judgement.",
   },
 };
 
