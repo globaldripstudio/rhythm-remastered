@@ -40,6 +40,7 @@ export interface CompressionInfo {
   detected: boolean;
   codecGuess: string | null;
   cutoffHz: number;
+  sourceBoundary: boolean;
 }
 
 export type Confidence = "high" | "medium" | "low";
@@ -610,11 +611,6 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const cutHz = compressionDetected && bestBin > 0 ? peakCutHz : hfCutoff;
   const guess =
     CODEC_CUTS.reduce((a, b) => (Math.abs(b.hz - cutHz) < Math.abs(a.hz - cutHz) ? b : a)).label;
-  const compression: CompressionInfo = {
-    detected: compressionDetected,
-    codecGuess: compressionDetected ? guess : null,
-    cutoffHz: cutHz,
-  };
   // A 15–16.4 kHz source boundary inside a >=160 kbps MP3 is not explained by
   // that bitrate alone. Treat it as surviving acoustic evidence (often a 32 kHz
   // generative source), while keeping the later MP3 conversion as file context.
@@ -624,6 +620,12 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     peakCutHz <= 16400 &&
     meta.bitrateKbps !== null &&
     meta.bitrateKbps >= 160;
+  const compression: CompressionInfo = {
+    detected: compressionDetected,
+    codecGuess: compressionDetected ? guess : null,
+    cutoffHz: cutHz,
+    sourceBoundary: anomalousSourceBoundary,
+  };
 
   // Mel-band variance: average across bands of (std/mean) — coefficient of variation
   const melCv = mean(
@@ -834,7 +836,6 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // bandwidth alone. Only reinforce it when several independent signatures
   // agree, avoiding a global threshold change for old/noisy human recordings.
   if (anomalousSourceBoundary) {
-    const stereo = tMarkers.length;
     if (stereoCorr > 0.98 && envRepetition > 0.62) {
       tMarkers.push({ id: "stereoCorr", v: 0.9, w: 1.2 });
       tMarkers.push({ id: "envRepetition", v: 0.75, w: 1.1 });
@@ -842,7 +843,6 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     if (noiseFloorDb > -35 && phaseCoherence < 1.35) {
       tMarkers.push({ id: "noiseFloor", v: 0.65, w: 0.9 });
     }
-    void stereo;
   }
 
   const evidence = (markers: Marker[]) => {
@@ -860,7 +860,8 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const spec = evidence(sMarkers);
   const temp = evidence(tMarkers);
 
-  const aiE = spec.ai * 0.45 + temp.ai * 0.55;
+  const deepConcurrence = anomalousSourceBoundary && stereoCorr > 0.98 && envRepetition > 0.62;
+  const aiE = Math.min(1, spec.ai * 0.45 + temp.ai * 0.55 + (deepConcurrence ? 0.08 : 0));
   const huE = spec.human * 0.45 + temp.human * 0.55;
 
   // ===== Bayesian fusion =====

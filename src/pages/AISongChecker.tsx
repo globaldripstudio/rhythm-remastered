@@ -65,6 +65,7 @@ const STRINGS = {
       monoOnly: "Fichier mono ou stéréo factice — la corrélation stéréo n'est pas exploitable.",
     } as Record<QualityIssue, string>,
     compressionNotice: "Compression avec pertes détectée ({codec}) — les marqueurs de bande passante ont été neutralisés pour éviter un faux positif.",
+    sourceBoundaryNotice: "Ré-encodage détecté ({codec}), mais la coupure vers 16 kHz ne correspond pas au débit du fichier : elle reste un indice acoustique, croisé avec les marqueurs profonds.",
     preAiNotice: "Fichier daté de {year}, avant l'arrivée des IA musicales génératives (2023) — bonus de probabilité humaine appliqué (les métadonnées pouvant être modifiées, ce n'est pas une preuve absolue).",
     trimNotice: "Silences ignorés : analyse de {start} s à {end} s.",
     exportLabel: "Export",
@@ -161,6 +162,7 @@ const STRINGS = {
       monoOnly: "Mono or fake-stereo file — stereo correlation is not exploitable.",
     } as Record<QualityIssue, string>,
     compressionNotice: "Lossy compression detected ({codec}) — bandwidth markers were neutralized to avoid a false positive.",
+    sourceBoundaryNotice: "Re-encoding detected ({codec}), but the cutoff near 16 kHz does not match the file bitrate: it remains acoustic evidence, cross-checked against deep markers.",
     preAiNotice: "File dated {year}, before generative music AI existed (2023) — human-probability bonus applied (metadata can be edited, so this is not absolute proof).",
     trimNotice: "Silences skipped: analysed from {start} s to {end} s.",
     exportLabel: "Export",
@@ -514,8 +516,8 @@ const AISongChecker = () => {
                       {result.compression?.detected && (
                         <div className="mt-3 flex items-start gap-2 rounded-md border border-sky-500/30 bg-sky-500/5 p-2.5 text-xs text-sky-300">
                           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                          <span>
-                            {L.compressionNotice.replace(
+                           <span>
+                             {(result.compression.sourceBoundary ? L.sourceBoundaryNotice : L.compressionNotice).replace(
                               "{codec}",
                               result.compression.codecGuess ?? `${Math.round(result.compression.cutoffHz / 100) / 10} kHz`
                             )}
