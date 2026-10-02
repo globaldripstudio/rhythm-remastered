@@ -65,6 +65,10 @@ const STRINGS = {
       monoOnly: "Fichier mono ou stéréo factice — la corrélation stéréo n'est pas exploitable.",
     } as Record<QualityIssue, string>,
     compressionNotice: "Compression avec pertes détectée ({codec}) — les marqueurs de bande passante ont été neutralisés pour éviter un faux positif.",
+    preAiNotice: "Fichier daté de {year}, avant l'arrivée des IA musicales génératives (2023) — bonus de probabilité humaine appliqué (les métadonnées pouvant être modifiées, ce n'est pas une preuve absolue).",
+    trimNotice: "Silences ignorés : analyse de {start} s à {end} s.",
+    exportLabel: "Export",
+    encoderLabel: "Encodeur",
     markerLabels: {
       flatnessStd: "Variance spectrale",
       hfCutoff: "Coupure haute fréquence",
@@ -157,6 +161,10 @@ const STRINGS = {
       monoOnly: "Mono or fake-stereo file — stereo correlation is not exploitable.",
     } as Record<QualityIssue, string>,
     compressionNotice: "Lossy compression detected ({codec}) — bandwidth markers were neutralized to avoid a false positive.",
+    preAiNotice: "File dated {year}, before generative music AI existed (2023) — human-probability bonus applied (metadata can be edited, so this is not absolute proof).",
+    trimNotice: "Silences skipped: analysed from {start} s to {end} s.",
+    exportLabel: "Export",
+    encoderLabel: "Encoder",
     markerLabels: {
       flatnessStd: "Spectral variance",
       hfCutoff: "High-frequency cutoff",
@@ -453,7 +461,14 @@ const AISongChecker = () => {
                     <p className="font-medium">{fileName}</p>
                     <p className="text-xs text-muted-foreground">
                       {L.duration}: {result.durationSec.toFixed(1)} {L.seconds} · {result.sampleRate} Hz
+                      {result.meta?.year ? ` · ${L.exportLabel}: ${result.meta.year}` : ""}
+                      {result.meta?.encoder ? ` · ${L.encoderLabel}: ${result.meta.encoder}` : ""}
                     </p>
+                    {result.trim && (result.trim.startSec > 0.3 || result.durationSec - result.trim.endSec > 0.3) && (
+                      <p className="text-xs text-muted-foreground">
+                        {L.trimNotice.replace("{start}", result.trim.startSec.toFixed(1)).replace("{end}", result.trim.endSec.toFixed(1))}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
@@ -489,6 +504,12 @@ const AISongChecker = () => {
                         {L.confidenceTitle} : {L.confidence[c]}
                       </div>
                       <p className="text-xs text-muted-foreground">{L.confidenceHelp[c]}</p>
+                      {result.preAiEra && result.meta?.year && (
+                        <div className="mt-3 flex items-start gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-2.5 text-xs text-emerald-300">
+                          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                          <span>{L.preAiNotice.replace("{year}", String(result.meta.year))}</span>
+                        </div>
+                      )}
                       {result.compression?.detected && (
                         <div className="mt-3 flex items-start gap-2 rounded-md border border-sky-500/30 bg-sky-500/5 p-2.5 text-xs text-sky-300">
                           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
