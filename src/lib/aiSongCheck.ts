@@ -923,15 +923,20 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const specNet = spec.ai - spec.human;
   const tempNet = temp.ai - temp.human;
   const disagreement = specNet * tempNet < 0 ? Math.min(Math.abs(specNet), Math.abs(tempNet)) : 0;
-  // The corroborating domain must be decidedly one-sided (net margin > 0.15),
+  // The corroborating domain must lean one-sided (net margin > 0.05),
   // otherwise a merely torn domain would manufacture hybrids on pure-AI or
   // pure-human files whose other domain is simply ambiguous.
-  const intrS = hybridScore(spec.ai, spec.human) * clamp01((temp.human - temp.ai - 0.15) * 3);
-  const intrT = hybridScore(temp.ai, temp.human) * clamp01((spec.human - spec.ai - 0.15) * 3);
+  const intrS = hybridScore(spec.ai, spec.human) * clamp01((temp.human - temp.ai - 0.05) * 3);
+  const intrT = hybridScore(temp.ai, temp.human) * clamp01((spec.human - spec.ai - 0.05) * 3);
   // A clear intrinsic signal (>= 0.30) is trusted at face value; a weak one is
   // discounted to avoid manufacturing hybrids on merely ambiguous pure files.
   const intrMax = Math.max(intrS, intrT);
-  const hybridRaw = Math.max(disagreement, intrMax >= 0.3 ? intrMax : 0.55 * intrMax);
+  let hybridRaw = Math.max(disagreement, intrMax >= 0.3 ? intrMax : 0.55 * intrMax);
+  // Dual physical anchors: a certified generative-source boundary (32 kHz
+  // brickwall on a >=160 kbps container) coexisting with unmistakably human
+  // micro-dynamics (>= 7 dB, unreachable by pure generative audio) is direct
+  // proof of a hybrid production (AI loop + real instruments).
+  if (anomalousSourceBoundary && rmsMicro >= 7) hybridRaw = Math.max(hybridRaw, 0.45);
   const hY = clamp01(sigmoid(12 * (hybridRaw - 0.2)) * Math.min(1, priorAI * 2));
   const aiP = pAI * (1 - hY);
   const huP = (1 - pAI) * (1 - hY);
