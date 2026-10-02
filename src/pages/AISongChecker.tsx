@@ -7,6 +7,7 @@ import { analyzeForAI, type AISongCheckResult, type Verdict, type ProbBlock, typ
 import SEO from "@/components/SEO";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ToolkitHeader from "@/components/tools/ToolkitHeader";
+import ToolResources from "@/components/tools/ToolResources";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -388,6 +389,13 @@ const AISongChecker = () => {
           <p className="mt-3 text-muted-foreground">{L.tagline}</p>
         </div>
 
+        <div className="mx-auto mt-6 max-w-3xl rounded-lg border border-border bg-background/40 p-4 text-left text-sm leading-relaxed text-muted-foreground sm:p-5">
+          <div className="mb-2 flex items-center gap-2 font-semibold text-foreground">
+            <Info className="h-4 w-4 text-primary" /> {L.howTitle}
+          </div>
+          <p>{L.how}</p>
+        </div>
+
         <div className="mx-auto mt-8 max-w-3xl">
           {!result && !isAnalyzing && (
             <div
@@ -548,6 +556,15 @@ const AISongChecker = () => {
               </div>
             </div>
           )}
+
+          <div className="mt-10 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-left text-sm leading-relaxed text-muted-foreground sm:p-5">
+            <div className="mb-2 flex items-center gap-2 font-semibold text-amber-300">
+              <AlertTriangle className="h-4 w-4" /> {L.reliabilityTitle}
+            </div>
+            <p>{L.reliability}</p>
+          </div>
+
+          <ToolResources current="aisong" />
 
           <div className="mt-10 text-center">
             <Link
