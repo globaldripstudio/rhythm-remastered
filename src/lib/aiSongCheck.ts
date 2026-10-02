@@ -881,19 +881,28 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const K_LLR = 6;
   const pAI = sigmoid(K_LLR * (aiE - huE) + logit(priorAI));
 
-  // Hybrid = real disagreement between independent domains, gated by prior.
-  const specNet = spec.ai - spec.human;
-  const tempNet = temp.ai - temp.human;
-  const disagreement = specNet * tempNet < 0 ? Math.min(Math.abs(specNet), Math.abs(tempNet)) : 0;
-  const hY = clamp01(sigmoid(12 * (disagreement - 0.25)) * Math.min(1, priorAI * 2));
-  const aiP = pAI * (1 - hY);
-  const huP = (1 - pAI) * (1 - hY);
-
   const hybridScore = (a: number, h: number) => {
     const m = Math.min(a, h);
     const diff = Math.abs(a - h);
     return 1.4 * m * Math.pow(Math.max(0, 1 - diff), 3);
   };
+
+  // Hybrid = real disagreement between independent domains, gated by prior.
+  // Two sources: (1) cross-domain contradiction (spectral vs temporal net signs),
+  // (2) intrinsic hybrid within one domain corroborated by a clear opposite
+  // verdict in the other (e.g. AI-sampled loop + human-played instruments).
+  const specNet = spec.ai - spec.human;
+  const tempNet = temp.ai - temp.human;
+  const disagreement = specNet * tempNet < 0 ? Math.min(Math.abs(specNet), Math.abs(tempNet)) : 0;
+  // The corroborating domain must be decidedly one-sided (net margin > 0.15),
+  // otherwise a merely torn domain would manufacture hybrids on pure-AI or
+  // pure-human files whose other domain is simply ambiguous.
+  const intrS = hybridScore(spec.ai, spec.human) * clamp01((temp.human - temp.ai - 0.15) * 3);
+  const intrT = hybridScore(temp.ai, temp.human) * clamp01((spec.human - spec.ai - 0.15) * 3);
+  const hybridRaw = Math.max(disagreement, 0.55 * Math.max(intrS, intrT));
+  const hY = clamp01(sigmoid(12 * (hybridRaw - 0.25)) * Math.min(1, priorAI * 2));
+  const aiP = pAI * (1 - hY);
+  const huP = (1 - pAI) * (1 - hY);
 
   const topFrom = (markers: Marker[], n = 3): TopMarker[] =>
     markers
