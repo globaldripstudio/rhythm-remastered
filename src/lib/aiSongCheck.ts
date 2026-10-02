@@ -225,7 +225,11 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
     while (o + 8 <= b.length) {
       const id = str(o, 4);
       const size = dv.getUint32(o + 4, true);
-      if (id === "fmt " && o + 16 <= b.length) meta.nativeSampleRate = dv.getUint32(o + 12, true);
+      if (id === "fmt " && o + 16 <= b.length) {
+        meta.nativeSampleRate = dv.getUint32(o + 12, true);
+        const audioFormat = dv.getUint16(o + 8, true);
+        if (audioFormat === 1 || audioFormat === 3) meta.uncompressed = true; // PCM / float
+      }
       if (id === "LIST" && str(o + 8, 4) === "INFO") {
         let p = o + 12;
         const end = Math.min(b.length, o + 8 + size);
@@ -244,6 +248,7 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
   // FLAC
   else if (b.length > 22 && str(0, 4) === "fLaC") {
     meta.nativeSampleRate = (b[18] << 12) | (b[19] << 4) | (b[20] >> 4);
+    meta.uncompressed = true;
     const txt = new TextDecoder("utf-8").decode(b.subarray(0, Math.min(b.length, 65536)));
     const d = txt.match(/DATE=([^\0\x00-\x1f]{4,20})/i);
     if (d) pushYear(d[1]);
@@ -316,7 +321,7 @@ export const parseFileMeta = (b: Uint8Array): FileMeta => {
 const GENERATIVE_ERA_YEAR = 2023;
 
 export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
-  let meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null };
+  let meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null, uncompressed: false };
   let tagBytes = 0;
   try {
     const header = new Uint8Array(await file.slice(0, Math.min(file.size, 4 * 1024 * 1024)).arrayBuffer());
