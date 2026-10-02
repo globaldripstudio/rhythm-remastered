@@ -54,9 +54,18 @@ export interface ProbBlock {
   topMarkers: TopMarker[];
 }
 
+export interface FileMeta {
+  nativeSampleRate: number | null;
+  year: number | null;
+  encoder: string | null;
+}
+
 export interface AISongCheckResult {
   durationSec: number;
   sampleRate: number;
+  meta?: FileMeta;
+  trim?: { startSec: number; endSec: number };
+  preAiEra?: boolean;
   spectral: ProbBlock;
   temporal: ProbBlock;
   overall: ProbBlock;
@@ -182,12 +191,146 @@ const vote = (value: number, humanCenter: number, aiCenter: number): number => {
   return Math.max(-1, Math.min(1, t * 2 - 1));
 };
 
+// Reads the container header (before any browser resampling) and basic tags.
+const readText = (b: Uint8Array, start: number, end: number): string => {
+  if (end <= start) return "";
+  const enc = b[start];
+  const body = b.subarray(start + 1, end);
+  try {
+    if (enc === 1 || enc === 2) return new TextDecoder(enc === 1 ? "utf-16" : "utf-16be").decode(body).replace(/\0/g, "").trim();
+    if (enc === 3) return new TextDecoder("utf-8").decode(body).replace(/\0/g, "").trim();
+    return new TextDecoder("latin1").decode(body).replace(/\0/g, "").trim();
+  } catch {
+    return "";
+  }
+};
+
+export const parseFileMeta = (b: Uint8Array): FileMeta => {
+  const meta: FileMeta = { nativeSampleRate: null, year: null, encoder: null };
+  const str = (o: number, n: number) => String.fromCharCode(...b.subarray(o, o + n));
+  const years: number[] = [];
+  const pushYear = (s: string) => {
+    const m = s.match(/(19|20)\d{2}/);
+    if (m) years.push(parseInt(m[0], 10));
+  };
+  // WAV
+  if (b.length > 12 && str(0, 4) === "RIFF" && str(8, 4) === "WAVE") {
+    const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
+    let o = 12;
+    while (o + 8 <= b.length) {
+      const id = str(o, 4);
+      const size = dv.getUint32(o + 4, true);
+      if (id === "fmt " && o + 16 <= b.length) meta.nativeSampleRate = dv.getUint32(o + 12, true);
+      if (id === "LIST" && str(o + 8, 4) === "INFO") {
+        let p = o + 12;
+        const end = Math.min(b.length, o + 8 + size);
+        while (p + 8 <= end) {
+          const sid = str(p, 4);
+          const ss = dv.getUint32(p + 4, true);
+          const val = new TextDecoder("latin1").decode(b.subarray(p + 8, Math.min(end, p + 8 + ss))).replace(/\0/g, "").trim();
+          if (sid === "ICRD") pushYear(val);
+          if (sid === "ISFT") meta.encoder = val;
+          p += 8 + ss + (ss & 1);
+        }
+      }
+      o += 8 + size + (size & 1);
+    }
+  }
+  // FLAC
+  else if (b.length > 22 && str(0, 4) === "fLaC") {
+    meta.nativeSampleRate = (b[18] << 12) | (b[19] << 4) | (b[20] >> 4);
+    const txt = new TextDecoder("utf-8").decode(b.subarray(0, Math.min(b.length, 65536)));
+    const d = txt.match(/DATE=([^\0\x00-\x1f]{4,20})/i);
+    if (d) pushYear(d[1]);
+    const e = txt.match(/ENCODER=([^\x00-\x1f]{1,60})/i);
+    if (e) meta.encoder = e[1];
+  } else {
+    // MP3 (optional ID3v2)
+    let o = 0;
+    if (b.length > 10 && str(0, 3) === "ID3") {
+      const ver = b[3];
+      const tagSize = ((b[6] & 0x7f) << 21) | ((b[7] & 0x7f) << 14) | ((b[8] & 0x7f) << 7) | (b[9] & 0x7f);
+      let p = 10;
+      const end = Math.min(b.length, 10 + tagSize);
+      while (p + 10 <= end && ver >= 3) {
+        const id = str(p, 4);
+        if (!/^[A-Z0-9]{4}$/.test(id)) break;
+        const size = ver === 4
+          ? ((b[p + 4] & 0x7f) << 21) | ((b[p + 5] & 0x7f) << 14) | ((b[p + 6] & 0x7f) << 7) | (b[p + 7] & 0x7f)
+          : (b[p + 4] << 24) | (b[p + 5] << 16) | (b[p + 6] << 8) | b[p + 7];
+        if (size <= 0) break;
+        const fs = p + 10;
+        const fe = Math.min(end, fs + size);
+        if (id === "TDRC" || id === "TYER" || id === "TDOR" || id === "TORY") pushYear(readText(b, fs, fe));
+        if ((id === "TENC" || id === "TSSE") && !meta.encoder) meta.encoder = readText(b, fs, fe) || null;
+        p = fe;
+      }
+      o = 10 + tagSize;
+    }
+    const SR = [[44100, 48000, 32000], [22050, 24000, 16000], [11025, 12000, 8000]];
+    for (let i = o; i < Math.min(b.length - 4, o + 65536); i++) {
+      if (b[i] === 0xff && (b[i + 1] & 0xe0) === 0xe0) {
+        const verBits = (b[i + 1] >> 3) & 3; // 3=MPEG1, 2=MPEG2, 0=MPEG2.5
+        const layer = (b[i + 1] >> 1) & 3;
+        const srIdx = (b[i + 2] >> 2) & 3;
+        const brIdx = b[i + 2] >> 4;
+        if (verBits === 1 || layer === 0 || srIdx === 3 || brIdx === 15 || brIdx === 0) continue;
+        meta.nativeSampleRate = SR[verBits === 3 ? 0 : verBits === 2 ? 1 : 2][srIdx];
+        break;
+      }
+    }
+    // LAME tag fallback for encoder
+    if (!meta.encoder) {
+      const txt = new TextDecoder("latin1").decode(b.subarray(0, Math.min(b.length, 200000)));
+      const m = txt.match(/LAME\d\.\d+/);
+      if (m) meta.encoder = m[0];
+    }
+  }
+  if (years.length) meta.year = Math.min(...years);
+  if (meta.nativeSampleRate !== null && (meta.nativeSampleRate < 4000 || meta.nativeSampleRate > 384000)) meta.nativeSampleRate = null;
+  return meta;
+};
+
+// Public release of mainstream generative music models (Suno v1 / Udio).
+const GENERATIVE_ERA_YEAR = 2023;
+
 export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
+  let meta: FileMeta = { nativeSampleRate: null, year: null, encoder: null };
+  try {
+    meta = parseFileMeta(new Uint8Array(await file.slice(0, 512 * 1024).arrayBuffer()));
+  } catch {
+    /* ignore */
+  }
   const buffer = await decodeAudio(file);
   const sr = buffer.sampleRate;
-  const dur = buffer.duration;
-  const left = buffer.getChannelData(0);
-  const right = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : left;
+  const fullLeft = buffer.getChannelData(0);
+  const fullRight = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : fullLeft;
+
+  // ===== Trim leading / trailing silence: analyse only where there is signal =====
+  const tw = Math.floor(sr * 0.05);
+  let peakDb = -120;
+  const winDb: number[] = [];
+  for (let i = 0; i + tw <= fullLeft.length; i += tw) {
+    let s = 0;
+    for (let k = 0; k < tw; k++) {
+      const v = 0.5 * (fullLeft[i + k] + fullRight[i + k]);
+      s += v * v;
+    }
+    const d = 10 * Math.log10(s / tw + 1e-12);
+    winDb.push(d);
+    if (d > peakDb) peakDb = d;
+  }
+  const thr = Math.min(-50, peakDb - 40);
+  let first = winDb.findIndex((d) => d > thr);
+  let last = winDb.length - 1;
+  while (last > 0 && winDb[last] <= thr) last--;
+  if (first < 0) { first = 0; last = winDb.length - 1; }
+  let startS = Math.max(0, (first - 1) * tw);
+  let endS = Math.min(fullLeft.length, (last + 2) * tw);
+  if (endS - startS < sr * 3) { startS = 0; endS = fullLeft.length; }
+  const left = fullLeft.subarray(startS, endS);
+  const right = fullRight.subarray(startS, endS);
+  const dur = left.length / sr;
 
   const mono = new Float32Array(left.length);
   for (let i = 0; i < left.length; i++) mono[i] = 0.5 * (left[i] + right[i]);
@@ -595,7 +738,8 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // Each marker → vote in [-1, +1]. Positive = AI-like.
   type Marker = { id: MarkerId; v: number; w: number };
   const sMarkersAll: Marker[] = [
-    { id: "flatnessStd", v: vote(flatnessStd, 0.12, 0.025), w: 1.0 },
+    // Recalibrated: sustained harmonic material (pads, 808s) naturally sits ~0.02–0.05.
+    { id: "flatnessStd", v: vote(flatnessStd, 0.05, 0.01), w: 1.0 },
     { id: "hfCutoff", v: vote(hfCutoff, 18000, 14000), w: 0.7 },
     { id: "hfEnergyRatio", v: vote(hfEnergyRatio, 0.04, 0.003), w: 0.6 },
     { id: "stereoCorr", v: vote(stereoCorr, 0.55, 0.98), w: 0.5 },
@@ -606,7 +750,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // On lossy-compressed files, bandwidth markers measure the codec, not
   // the source — exclude them so an MP3 can't mimic an AI signature.
   const sMarkers = compressionDetected
-    ? sMarkersAll.filter((m) => m.id !== "hfCutoff" && m.id !== "rolloff85")
+    ? sMarkersAll.filter((m) => m.id !== "hfCutoff" && m.id !== "rolloff85" && m.id !== "hfEnergyRatio")
     : sMarkersAll;
   const tMarkers: Marker[] = [
     { id: "onsetCv", v: vote(onsetCv, 0.5, 0.12), w: 1.2 },
