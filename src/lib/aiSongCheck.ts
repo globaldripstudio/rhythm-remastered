@@ -365,14 +365,14 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     { hz: 17000, label: "MP3 ~160 kbps / AAC" },
     { hz: 18000, label: "MP3 ~192 kbps / AAC" },
     { hz: 18500, label: "AAC ~192 kbps" },
-    { hz: 20000, label: "MP3 ~320 kbps / Opus" },
+    { hz: 20000, label: "MP3 / AAC / Opus" },
   ];
   const nyquist = sr / 2;
-  const matchedCut = CODEC_CUTS.find((c) => Math.abs(medCutoff - c.hz) <= 600);
+  const matchedCut = CODEC_CUTS.find((c) => Math.abs(medCutoff - c.hz) <= 700);
   const compressionDetected =
     medCutoff > 8000 &&
     medCutoff < nyquist * 0.97 &&
-    medDrop > 25 &&
+    medDrop > 15 &&
     medFloor < 0.01 &&
     matchedCut !== undefined;
   const compression: CompressionInfo = {
