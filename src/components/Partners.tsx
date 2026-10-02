@@ -119,7 +119,7 @@ const Partners = () => {
         <div className="partner-carousel overflow-hidden">
           <div className="partner-carousel-track flex w-max">
             {[0, 1].map((copy) => (
-              <div key={copy} className="partner-carousel-set flex shrink-0 gap-3 pr-3 sm:gap-4 sm:pr-4 md:gap-6 md:pr-6">
+              <div key={copy} className="partner-carousel-set shrink-0 gap-3 pr-3 sm:gap-4 sm:pr-4 md:gap-6 md:pr-6">
                 {partners.map((partner, index) =>
                   <button
                     key={`${copy}-${partner.name}`}
