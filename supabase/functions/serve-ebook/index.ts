@@ -42,6 +42,15 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Admin and reader spaces are sealed from each other.
+    const { data: isAdmin } = await supabaseAdmin.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    if (isAdmin) {
+      return new Response(JSON.stringify({ error: "Compte administrateur non autorisé dans le lecteur" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data: purchase, error: purchaseError } = await supabaseAdmin
       .from("ebook_purchases")
       .select("id")
