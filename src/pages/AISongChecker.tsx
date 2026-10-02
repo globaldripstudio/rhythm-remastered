@@ -377,7 +377,7 @@ const AISongChecker = () => {
       />
       <ToolkitHeader current={"aisong" as any} />
 
-      <main className="container mx-auto px-4 py-8 sm:py-12">
+      <main className="container mx-auto px-4 py-8 sm:px-6 sm:py-12">
         <Breadcrumbs items={[{ name: L.title, path: "/ai-song-checker" }]} />
 
         <div className="mx-auto max-w-3xl text-center">
@@ -398,7 +398,7 @@ const AISongChecker = () => {
           <p>{L.how}</p>
         </div>
 
-        <div className="mx-auto mt-8 max-w-3xl">
+        <div className="mt-8">
           {!result && !isAnalyzing && (
             <div
               onDragOver={(e) => {

@@ -1,51 +1,22 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Bot, Drum, Gauge, KeyRound, Music2, Music4 } from "lucide-react";
 import ContactCTA from "@/components/ContactCTA";
 
 type ToolKey = "loudness" | "keybpm" | "tempo" | "chords" | "audio2midi" | "aisong";
 
-const ALL_TOOLS: Record<ToolKey, { to: string; icon: typeof Gauge; title: string; description: string }> = {
-  loudness: {
-    to: "/loudness",
-    icon: Gauge,
-    title: "Loudness Analyzer LUFS",
-    description: "Mesure LUFS, true peak et dynamique de votre master en ligne.",
-  },
-  keybpm: {
-    to: "/key-bpm-finder",
-    icon: KeyRound,
-    title: "Key & BPM Finder",
-    description: "Détection de tonalité, tempo et notation Camelot pour DJs et producteurs.",
-  },
-  tempo: {
-    to: "/tap-tempo-metronome",
-    icon: Drum,
-    title: "Tap Tempo & Métronome",
-    description: "Tap tempo, métronome et calculateur BPM/délais en un seul outil.",
-  },
-  chords: {
-    to: "/chord-progression",
-    icon: Music2,
-    title: "Accords, gammes & modes",
-    description: "Générateur de progressions, piano et manche de guitare interactifs.",
-  },
-  audio2midi: {
-    to: "/audio-to-midi",
-    icon: Music4,
-    title: "Audio → MIDI",
-    description: "Conversion polyphonique 100 % locale, prête à importer dans votre DAW.",
-  },
-  aisong: {
-    to: "/ai-song-checker",
-    icon: Bot,
-    title: "AI Song Checker",
-    description: "Détecte si un morceau est IA, humain ou hybride via 16 marqueurs acoustiques, 100 % en local.",
-  },
+const ALL_TOOLS: Record<ToolKey, { to: string; icon: typeof Gauge }> = {
+  loudness: { to: "/loudness", icon: Gauge },
+  keybpm: { to: "/key-bpm-finder", icon: KeyRound },
+  tempo: { to: "/tap-tempo-metronome", icon: Drum },
+  chords: { to: "/chord-progression", icon: Music2 },
+  audio2midi: { to: "/audio-to-midi", icon: Music4 },
+  aisong: { to: "/ai-song-checker", icon: Bot },
 };
 
 interface ToolResourcesProps {
   current: ToolKey;
-  /** Heading title (defaults to "Continuer avec le toolkit"). */
+  /** Heading title (defaults to the translated "Continue with the toolkit"). */
   title?: string;
 }
 
@@ -53,7 +24,8 @@ interface ToolResourcesProps {
  * Cross-sell block placed at the bottom of every tool page. Boosts internal
  * linking + funnels visitors toward studio services.
  */
-const ToolResources = ({ current, title = "Continuer avec le toolkit" }: ToolResourcesProps) => {
+const ToolResources = ({ current, title }: ToolResourcesProps) => {
+  const { t } = useTranslation();
   const others = (Object.keys(ALL_TOOLS) as ToolKey[]).filter((k) => k !== current);
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,18 +50,18 @@ const ToolResources = ({ current, title = "Continuer avec le toolkit" }: ToolRes
     >
       <div>
         <h2 id="tool-resources-title" className="text-xl font-bold sm:text-2xl">
-          {title}
+          {title ?? t("toolkit.resources.title")}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tous les outils sont gratuits, fonctionnent dans le navigateur et complètent les{" "}
+          {t("toolkit.resources.introPre")}
           <a
             href="/#services"
             onClick={goToServices}
             className="text-primary underline-offset-4 hover:underline"
           >
-            services studio Global Drip
-          </a>{" "}
-          (mixage, mastering, sound design).
+            {t("toolkit.resources.introLink")}
+          </a>
+          {t("toolkit.resources.introPost")}
         </p>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -105,9 +77,11 @@ const ToolResources = ({ current, title = "Continuer avec le toolkit" }: ToolRes
               <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-foreground group-hover:text-primary">
-                  {tool.title}
+                  {t(`toolkit.resources.tools.${key}.title`)}
                 </p>
-                <p className="mt-1 text-xs leading-snug text-muted-foreground">{tool.description}</p>
+                <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                  {t(`toolkit.resources.tools.${key}.description`)}
+                </p>
               </div>
             </Link>
           );
