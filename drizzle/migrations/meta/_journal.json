@@ -8,6 +8,13 @@
       "when": 1790923443542,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790929355831,
+      "tag": "0001_remove_redundant_ebook_public_policy",
+      "breakpoints": true
     }
   ]
 }
