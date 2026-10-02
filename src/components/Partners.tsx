@@ -4,8 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import aupaTradersLogo from "@/assets/aupa-traders-macro-forex.png.asset.json";
 
 const partners = [
+{
+  name: "Aupa Traders",
+  logo: aupaTradersLogo.url,
+  url: "https://www.youtube.com/watch?v=NIEd0tHLy74",
+  videos: [
+    { title: "Aupa Traders — Macro Forex", url: "https://www.youtube.com/embed/NIEd0tHLy74" }
+  ],
+  credits: [
+    { role: "Filmmakers", name: "Théo BACHELIER & Thibault RIABOFF" },
+    { role: "Monteurs", name: "Théo BACHELIER & Thibault RIABOFF & Chloé BACHELIER" },
+    { role: "Sound Design/mixage", name: "Guillaume SURGET", highlight: true },
+    { role: "Miniature", name: "Plass PSD" },
+  ]
+},
 {
   name: "Type 7",
   logo: "/lovable-uploads/TYPE_7_white.png",
@@ -93,6 +108,36 @@ const Partners = () => {
   const { t } = useTranslation();
   const [selectedPartner, setSelectedPartner] = useState<typeof partners[0] | null>(null);
 
+  const renderPartnerCard = (partner: typeof partners[0], copy: number, index: number) => (
+    <button
+      key={`${copy}-${partner.name}`}
+      onClick={() => setSelectedPartner(partner)}
+      className="partners-card block shrink-0"
+      aria-hidden={copy === 1 ? true : undefined}
+      tabIndex={copy === 1 ? -1 : undefined}
+    >
+      <Card
+        className="group flex h-full min-h-[64px] cursor-pointer items-center justify-center p-3 transition-all duration-300 hover:scale-105 hover:shadow-lg sm:min-h-[72px] sm:p-4 md:min-h-[88px] md:p-6"
+        style={{ animationDelay: `${index * 0.1}s` }}
+      >
+        <div className="flex h-8 w-full items-center justify-center overflow-hidden opacity-60 transition-opacity group-hover:opacity-100 sm:h-10 md:h-12">
+          <img
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            className={`max-h-8 max-w-full object-contain grayscale transition-all duration-300 group-hover:grayscale-0 ${
+              partner.name === "Type 7" ? "scale-[0.65]" :
+              partner.name === "Pulsor Agency" ? "translate-x-2 translate-y-0.5 scale-[3]" :
+              partner.name === "Ultrack Agency" ? "scale-110" :
+              partner.name === "Ambit Components" ? "-translate-y-0.5" :
+              partner.name === "Aupa Traders" ? "scale-125" : ""}`
+            }
+            loading="lazy"
+          />
+        </div>
+      </Card>
+    </button>
+  );
+
   return (
     <section className="py-10 sm:py-12 md:py-16 bg-muted/5">
       <div className="container mx-auto px-4 sm:px-6">
@@ -102,34 +147,14 @@ const Partners = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
-          {partners.map((partner, index) =>
-          <button
-            key={partner.name}
-            onClick={() => setSelectedPartner(partner)}
-            className="block w-full">
-
-              <Card
-              className="p-3 sm:p-4 md:p-6 flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-pointer animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}>
-
-                <div className="w-full h-8 sm:h-10 md:h-12 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity overflow-hidden">
-                    <img
-                  src={partner.logo}
-                  alt={`${partner.name} logo`}
-                  className={`max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 ${
-                  partner.name === "Type 7" ? "scale-[0.65]" :
-                  partner.name === "Pulsor Agency" ? "scale-[3] translate-x-2 translate-y-0.5" :
-                  partner.name === "Ultrack Agency" ? "scale-110" :
-                  partner.name === "Ambit Components" ? "-translate-y-0.5" : ""}`
-                  }
-                  style={{ maxHeight: '32px' }}
-                  loading="lazy" />
-
-                </div>
-              </Card>
-            </button>
-          )}
+        <div className="partners-carousel overflow-hidden" aria-label={t('partners.title')}>
+          <div className="partners-track flex w-max">
+            {[0, 1].map((copy) => (
+              <div key={copy} className="partners-group flex shrink-0 gap-3 pr-3 sm:gap-4 sm:pr-4 md:gap-6 md:pr-6">
+                {partners.map((partner, index) => renderPartnerCard(partner, copy, index))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -156,6 +181,7 @@ const Partners = () => {
                   selectedPartner.name === "Type 7" ? "scale-[0.8]" :
                   selectedPartner.name === "Pulsor Agency" ? "scale-[3.5]" :
                   selectedPartner.name === "Ultrack Agency" ? "scale-125" :
+                  selectedPartner.name === "Aupa Traders" ? "scale-125" :
                   ""}`
                   }
                   style={{ maxHeight: '48px' }} />

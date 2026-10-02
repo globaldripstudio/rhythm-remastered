@@ -185,6 +185,47 @@ All colors MUST be HSL for perfect theming.
     animation: highlight-pulse 1.5s ease-out;
   }
 
+  .partners-card {
+    width: calc((100vw - 2rem - 0.75rem) / 2);
+  }
+
+  .partners-track {
+    animation: partners-scroll 46s linear infinite;
+    will-change: transform;
+  }
+
+  .partners-carousel:hover .partners-track,
+  .partners-carousel:focus-within .partners-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes partners-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (min-width: 640px) {
+    .partners-card {
+      width: calc((100vw - 3rem - 2rem) / 3);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .partners-card {
+      width: calc((min(100vw, 1280px) - 3rem - 7.5rem) / 6);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partners-track {
+      animation: none;
+    }
+
+    .partners-carousel {
+      overflow-x: auto;
+    }
+  }
+
   .service-card {
     background: var(--gradient-hero);
     border: 1px solid hsl(var(--border));
