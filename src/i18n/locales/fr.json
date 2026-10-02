@@ -1575,6 +1575,25 @@
         "long": "AI Song Checker",
         "short": "AI Check"
       }
+    },
+    "resources": {
+      "title": "Continuer avec le toolkit",
+      "introPre": "Tous les outils sont gratuits, fonctionnent dans le navigateur et complètent les ",
+      "introLink": "services studio Global Drip",
+      "introPost": " (mixage, mastering, sound design).",
+      "tools": {
+        "loudness": { "title": "Loudness Analyzer LUFS", "description": "Mesure LUFS, true peak et dynamique de votre master en ligne." },
+        "keybpm": { "title": "Key & BPM Finder", "description": "Détection de tonalité, tempo et notation Camelot pour DJs et producteurs." },
+        "tempo": { "title": "Tap Tempo & Métronome", "description": "Tap tempo, métronome et calculateur BPM/délais en un seul outil." },
+        "chords": { "title": "Accords, gammes & modes", "description": "Générateur de progressions, piano et manche de guitare interactifs." },
+        "audio2midi": { "title": "Audio → MIDI", "description": "Conversion polyphonique 100 % locale, prête à importer dans votre DAW." },
+        "aisong": { "title": "AI Song Checker", "description": "Détecte si un morceau est IA, humain ou hybride via 16 marqueurs acoustiques, 100 % en local." }
+      }
+    },
+    "cta": {
+      "title": "Vous aussi, donnez vie à votre projet au studio",
+      "description": "Enregistrement, mixage, mastering — contactez-nous pour discuter de votre projet et obtenir un devis personnalisé.",
+      "button": "Demander un devis"
     }
   },
   "audio2midi": {
