@@ -549,10 +549,14 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     if (below > pMax - 90 && drop > bestDrop) { bestDrop = drop; bestBin = c; }
   }
   const peakCutHz = bestBin > 0 ? (bestBin * sr) / FFT : 0;
-  const peakDetected = bestBin > 0 && bestDrop > 35;
+  // 30 dB threshold: loud sub-bass mixes can soften the measured brickwall drop
+  // (e.g. 32.8 dB on a true 20 kHz MP3 cutoff) — 35 dB was too strict.
+  const peakDetected = bestBin > 0 && bestDrop > 30;
 
   const compressionDetected = peakDetected || frameDetected;
-  const cutHz = peakDetected ? peakCutHz : medCutoff;
+  // Prefer the peak-spectrum cutoff for display whenever a wall was located:
+  // the per-frame median is heavily biased by sub-bass content.
+  const cutHz = bestBin > 0 ? peakCutHz : medCutoff;
   const guess =
     CODEC_CUTS.reduce((a, b) => (Math.abs(b.hz - cutHz) < Math.abs(a.hz - cutHz) ? b : a)).label;
   const compression: CompressionInfo = {
