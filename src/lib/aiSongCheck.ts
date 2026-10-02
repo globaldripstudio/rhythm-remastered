@@ -557,7 +557,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // ============== SCORING ==============
   // Each marker → vote in [-1, +1]. Positive = AI-like.
   type Marker = { id: MarkerId; v: number; w: number };
-  const sMarkers: Marker[] = [
+  const sMarkersAll: Marker[] = [
     { id: "flatnessStd", v: vote(flatnessStd, 0.12, 0.025), w: 1.0 },
     { id: "hfCutoff", v: vote(hfCutoff, 18000, 14000), w: 0.7 },
     { id: "hfEnergyRatio", v: vote(hfEnergyRatio, 0.04, 0.003), w: 0.6 },
@@ -566,6 +566,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     { id: "phaseCoherence", v: vote(phaseCoherence, 1.6, 0.6), w: 1.1 },
     { id: "rolloff85", v: vote(rolloff85, 9000, 4500), w: 0.4 },
   ];
+  // On lossy-compressed files, bandwidth markers measure the codec, not
+  // the source — exclude them so an MP3 can't mimic an AI signature.
+  const sMarkers = compressionDetected
+    ? sMarkersAll.filter((m) => m.id !== "hfCutoff" && m.id !== "rolloff85")
+    : sMarkersAll;
   const tMarkers: Marker[] = [
     { id: "onsetCv", v: vote(onsetCv, 0.5, 0.12), w: 1.2 },
     { id: "rmsMicro", v: vote(rmsMicro, 7, 2.5), w: 1.1 },
@@ -627,7 +632,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const qualityIssues: QualityIssue[] = [];
   if (dur < 10) qualityIssues.push("shortFile");
   if (sr < 32000) qualityIssues.push("lowSampleRate");
-  if (hfCutoff < 13000 && hfEnergyRatio < 0.0015) qualityIssues.push("lowBandwidth");
+  if (hfCutoff < 13000 && hfEnergyRatio < 0.0015 && !compressionDetected) qualityIssues.push("lowBandwidth");
   if (noiseFloorDb > -30) qualityIssues.push("noisy");
   if (stereoCorr > 0.995) qualityIssues.push("monoOnly");
 
@@ -647,6 +652,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     overall,
     confidence,
     qualityIssues,
+    compression,
     features: {
       spectralFlatnessMean: flatnessMean,
       spectralFlatnessStd: flatnessStd,
