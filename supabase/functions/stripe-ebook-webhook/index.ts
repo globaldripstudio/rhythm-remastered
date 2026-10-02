@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { provisionCustomer, sendAccessEmail } from "../_shared/ebook-access.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -79,6 +80,19 @@ serve(async (req) => {
       }
 
       console.log(`Ebook purchase recorded for: ${customerEmail}`);
+
+      // Provision the reader account with a fresh access code and email it.
+      const email = customerEmail.toLowerCase();
+      const provisioned = await provisionCustomer(supabaseAdmin, email);
+      if ("error" in provisioned) {
+        console.error("Provisioning failed:", provisioned.error);
+      } else {
+        try {
+          await sendAccessEmail(email, provisioned.code, "https://www.globaldripstudio.fr");
+        } catch (e) {
+          console.error("Access email failed:", e);
+        }
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
