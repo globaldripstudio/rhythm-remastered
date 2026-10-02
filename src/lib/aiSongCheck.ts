@@ -533,16 +533,20 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     if (pDb[i] > pMax) pMax = pDb[i];
   }
   const minBin = Math.floor((13000 * FFT) / sr);
-  const maxBin = Math.min(half - Math.round((600 * FFT) / sr), Math.floor((nyquist * 0.97 * FFT) / sr));
+  // Leave room for the wide "above" window (1–3 kHz past the edge).
+  const maxBin = Math.min(half - Math.round((3100 * FFT) / sr), Math.floor((nyquist * 0.97 * FFT) / sr));
   let bestDrop = 0;
   let bestBin = -1;
   for (let c = minBin; c <= maxBin; c++) {
     let below = 0;
     for (let i = c - 6; i < c; i++) below += pDb[i];
     below /= 6;
+    // Wide comparison band 1–3 kHz above the edge: codec roll-offs are often
+    // gradual (energy lingers just past the cutoff), so a narrow band right
+    // above the edge underestimates the true drop.
     let above = 0;
     let n = 0;
-    for (let i = c + Math.round((100 * FFT) / sr); i < Math.min(half, c + Math.round((550 * FFT) / sr)); i++) { above += pDb[i]; n++; }
+    for (let i = c + Math.round((1000 * FFT) / sr); i < Math.min(half, c + Math.round((3000 * FFT) / sr)); i++) { above += pDb[i]; n++; }
     above /= Math.max(1, n);
     const drop = below - above;
     // require content below the edge to be meaningful (within 90 dB of peak)
