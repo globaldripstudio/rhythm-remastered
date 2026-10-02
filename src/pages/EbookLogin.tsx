@@ -22,11 +22,20 @@ const EbookLogin = () => {
     const checkExistingSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Check if user has a purchase
-        const { data: purchase } = await supabase
-          .from("ebook_purchases")
-          .select("id")
+        const { data: adminRole } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .eq("role", "admin")
           .maybeSingle();
+        // Admin sessions stay out of the reader space.
+        const { data: purchase } = adminRole
+          ? { data: null }
+          : await supabase
+              .from("ebook_purchases")
+              .select("id")
+              .eq("email", (session.user.email ?? "").toLowerCase())
+              .maybeSingle();
         
         if (purchase) {
           navigate("/ebook/reader", { replace: true });
@@ -67,6 +76,7 @@ const EbookLogin = () => {
       const { data: purchase } = await supabase
         .from("ebook_purchases")
         .select("id")
+        .eq("email", (signIn.user.email ?? "").toLowerCase())
         .maybeSingle();
 
       if (!purchase) {
