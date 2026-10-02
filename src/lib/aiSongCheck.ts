@@ -200,6 +200,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const flatnessVals: number[] = [];
   const hfCutoffs: number[] = [];
   const rolloff85Vals: number[] = [];
+  // Lossy-codec detection: per-frame edge steepness at the cutoff and
+  // residual energy above it. A brickwall lowpass (MP3/AAC/Opus) drops
+  // tens of dB within a few bins and leaves a near-silent floor above.
+  const edgeDropsDb: number[] = [];
+  const aboveFloorRatios: number[] = [];
   let totalEnergy = 0;
   let hfEnergy = 0;
   const hf16Bin = Math.floor((16000 * FFT) / sr);
@@ -278,6 +283,27 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
       }
     }
     hfCutoffs.push((cutoffBin * sr) / FFT);
+
+    // Edge steepness: dB drop from the cutoff bin to ~5 bins above it,
+    // and residual energy above the cutoff relative to the frame peak.
+    if (maxM > 1e-9 && cutoffBin < FFT / 2 - 10) {
+      const ref = mags[cutoffBin];
+      let above = 0;
+      let aboveN = 0;
+      for (let i = cutoffBin + 2; i < Math.min(FFT / 2, cutoffBin + 8); i++) {
+        above += mags[i];
+        aboveN++;
+      }
+      const aboveMean = aboveN > 0 ? above / aboveN : 0;
+      edgeDropsDb.push(20 * Math.log10((ref + 1e-9) / (aboveMean + 1e-9)));
+      let tail = 0;
+      let tailN = 0;
+      for (let i = cutoffBin + 8; i < FFT / 2; i++) {
+        tail += mags[i];
+        tailN++;
+      }
+      aboveFloorRatios.push(tailN > 0 ? tail / tailN / maxM : 0);
+    }
 
     // Rolloff 85% (frequency below which 85% of cumulative energy lies)
     const target85 = arith * 0.85;
