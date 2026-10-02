@@ -283,11 +283,13 @@ All colors MUST be HSL for perfect theming.
   }
 
   .partner-carousel-set {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     width: 350vw;
   }
 
   .partner-carousel-item {
-    width: calc((100% - 4.5rem) / 7);
+    width: 100%;
   }
 
   @media (min-width: 640px) {
@@ -295,18 +297,11 @@ All colors MUST be HSL for perfect theming.
       width: calc(700% / 3);
     }
 
-    .partner-carousel-item {
-      width: calc((100% - 6rem) / 7);
-    }
   }
 
   @media (min-width: 1024px) {
     .partner-carousel-set {
       width: calc(700% / 6);
-    }
-
-    .partner-carousel-item {
-      width: calc((100% - 9rem) / 7);
     }
   }
 

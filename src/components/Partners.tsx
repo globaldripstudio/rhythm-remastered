@@ -4,12 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import aupaTradersLogo from "@/assets/aupa-traders-macro-forex.png.asset.json";
 
 const partners = [
 {
   name: "Aupa Traders",
-  logo: aupaTradersLogo.url,
+  logo: "/lovable-uploads/aupa-traders-macro-forex.png",
   url: "https://www.youtube.com/watch?v=NIEd0tHLy74",
   videos: [
     { title: "Aupa Traders — Macro Forex", url: "https://www.youtube.com/embed/NIEd0tHLy74" }
