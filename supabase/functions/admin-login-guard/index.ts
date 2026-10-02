@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
   );
 
   // Purge passive (≤1 ligne supprimée par appel en moyenne)
-  await supabase.rpc("purge_old_login_attempts").catch(() => {});
+  try { await supabase.rpc("purge_old_login_attempts"); } catch { /* ignore */ }
 
   // Helper: vérifie si l'IP est actuellement bloquée
   const isBlocked = async (): Promise<{ blocked: boolean; reason?: string; until?: string | null }> => {
