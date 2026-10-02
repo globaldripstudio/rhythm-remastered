@@ -593,7 +593,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   }
   const minBin = Math.floor((13000 * FFT) / sr);
   // Leave room for the wide "above" window (1–3 kHz past the edge).
-  const maxBin = Math.min(half - Math.round((3100 * FFT) / sr), Math.floor((nyquist * 0.97 * FFT) / sr));
+  // Resampling guard: when the browser upsampled the file (e.g. 44.1 kHz
+  // source on a 48 kHz device), the source Nyquist creates a hard spectral
+  // edge that is NOT a codec wall — never search above it.
+  const nativeNyq = meta.nativeSampleRate !== null && meta.nativeSampleRate < sr ? meta.nativeSampleRate / 2 : nyquist;
+  const maxBin = Math.min(half - Math.round((3100 * FFT) / sr), Math.floor((Math.min(nyquist, nativeNyq * 0.97) * FFT) / sr));
   let bestDrop = 0;
   let bestBin = -1;
   for (let c = minBin; c <= maxBin; c++) {
