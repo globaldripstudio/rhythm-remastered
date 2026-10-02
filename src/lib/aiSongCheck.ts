@@ -205,6 +205,10 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // tens of dB within a few bins and leaves a near-silent floor above.
   const edgeDropsDb: number[] = [];
   const aboveFloorRatios: number[] = [];
+  // Global peak spectrum (max magnitude per bin over the whole track):
+  // a codec brickwall shows up here unambiguously, even when individual
+  // frames have little HF content (808-heavy mixes, sparse hats...).
+  const peakSpec = new Float64Array(FFT / 2);
   let totalEnergy = 0;
   let hfEnergy = 0;
   const hf16Bin = Math.floor((16000 * FFT) / sr);
@@ -283,6 +287,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
       }
     }
     hfCutoffs.push((cutoffBin * sr) / FFT);
+    for (let i = 1; i < FFT / 2; i++) if (mags[i] > peakSpec[i]) peakSpec[i] = mags[i];
 
     // Edge steepness: dB drop from the cutoff bin to ~5 bins above it,
     // and residual energy above the cutoff relative to the frame peak.
@@ -369,16 +374,48 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   ];
   const nyquist = sr / 2;
   const matchedCut = CODEC_CUTS.find((c) => Math.abs(medCutoff - c.hz) <= 700);
-  const compressionDetected =
+  const frameDetected =
     medCutoff > 8000 &&
     medCutoff < nyquist * 0.97 &&
     medDrop > 15 &&
     medFloor < 0.01 &&
     matchedCut !== undefined;
+
+  // Peak-spectrum brickwall detection (primary, robust).
+  const half = FFT / 2;
+  const pDb = new Float64Array(half);
+  let pMax = -Infinity;
+  for (let i = 1; i < half; i++) {
+    pDb[i] = 20 * Math.log10(peakSpec[i] + 1e-12);
+    if (pDb[i] > pMax) pMax = pDb[i];
+  }
+  const minBin = Math.floor((13000 * FFT) / sr);
+  const maxBin = Math.min(half - 12, Math.floor((nyquist * 0.97 * FFT) / sr));
+  let bestDrop = 0;
+  let bestBin = -1;
+  for (let c = minBin; c <= maxBin; c++) {
+    let below = 0;
+    for (let i = c - 6; i < c; i++) below += pDb[i];
+    below /= 6;
+    let above = 0;
+    let n = 0;
+    for (let i = c + 3; i < half; i++) { above += pDb[i]; n++; }
+    above /= Math.max(1, n);
+    const drop = below - above;
+    // require content below the edge to be meaningful (within 90 dB of peak)
+    if (below > pMax - 90 && drop > bestDrop) { bestDrop = drop; bestBin = c; }
+  }
+  const peakCutHz = bestBin > 0 ? (bestBin * sr) / FFT : 0;
+  const peakDetected = bestBin > 0 && bestDrop > 25;
+
+  const compressionDetected = peakDetected || frameDetected;
+  const cutHz = peakDetected ? peakCutHz : medCutoff;
+  const guess =
+    CODEC_CUTS.reduce((a, b) => (Math.abs(b.hz - cutHz) < Math.abs(a.hz - cutHz) ? b : a)).label;
   const compression: CompressionInfo = {
     detected: compressionDetected,
-    codecGuess: compressionDetected ? matchedCut!.label : null,
-    cutoffHz: medCutoff,
+    codecGuess: compressionDetected ? guess : null,
+    cutoffHz: cutHz,
   };
 
   // Mel-band variance: average across bands of (std/mean) — coefficient of variation
