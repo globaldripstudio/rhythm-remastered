@@ -36,6 +36,12 @@ export type QualityIssue =
   | "noisy"
   | "monoOnly";
 
+export interface CompressionInfo {
+  detected: boolean;
+  codecGuess: string | null;
+  cutoffHz: number;
+}
+
 export type Confidence = "high" | "medium" | "low";
 
 export interface ProbBlock {
@@ -56,6 +62,7 @@ export interface AISongCheckResult {
   overall: ProbBlock;
   confidence: Confidence;
   qualityIssues: QualityIssue[];
+  compression: CompressionInfo;
   features: {
     spectralFlatnessMean: number;
     spectralFlatnessStd: number;
@@ -193,6 +200,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const flatnessVals: number[] = [];
   const hfCutoffs: number[] = [];
   const rolloff85Vals: number[] = [];
+  // Lossy-codec detection: per-frame edge steepness at the cutoff and
+  // residual energy above it. A brickwall lowpass (MP3/AAC/Opus) drops
+  // tens of dB within a few bins and leaves a near-silent floor above.
+  const edgeDropsDb: number[] = [];
+  const aboveFloorRatios: number[] = [];
   let totalEnergy = 0;
   let hfEnergy = 0;
   const hf16Bin = Math.floor((16000 * FFT) / sr);
@@ -272,6 +284,27 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     }
     hfCutoffs.push((cutoffBin * sr) / FFT);
 
+    // Edge steepness: dB drop from the cutoff bin to ~5 bins above it,
+    // and residual energy above the cutoff relative to the frame peak.
+    if (maxM > 1e-9 && cutoffBin < FFT / 2 - 10) {
+      const ref = mags[cutoffBin];
+      let above = 0;
+      let aboveN = 0;
+      for (let i = cutoffBin + 2; i < Math.min(FFT / 2, cutoffBin + 8); i++) {
+        above += mags[i];
+        aboveN++;
+      }
+      const aboveMean = aboveN > 0 ? above / aboveN : 0;
+      edgeDropsDb.push(20 * Math.log10((ref + 1e-9) / (aboveMean + 1e-9)));
+      let tail = 0;
+      let tailN = 0;
+      for (let i = cutoffBin + 8; i < FFT / 2; i++) {
+        tail += mags[i];
+        tailN++;
+      }
+      aboveFloorRatios.push(tailN > 0 ? tail / tailN / maxM : 0);
+    }
+
     // Rolloff 85% (frequency below which 85% of cumulative energy lies)
     const target85 = arith * 0.85;
     let cum = 0;
@@ -313,6 +346,40 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const hfCutoff = mean(hfCutoffs);
   const hfEnergyRatio = totalEnergy > 0 ? hfEnergy / totalEnergy : 0;
   const rolloff85 = mean(rolloff85Vals);
+
+  // ===== Lossy-codec detection =====
+  // A codec lowpass is a brickwall: steep drop (> 25 dB within ~5 bins)
+  // at a characteristic frequency, with a near-silent floor above.
+  // Natural/AI bandwidth limits roll off progressively instead.
+  const median = (a: number[]) => {
+    if (a.length === 0) return 0;
+    const s = a.slice().sort((x, y) => x - y);
+    return s[Math.floor(s.length / 2)];
+  };
+  const medDrop = median(edgeDropsDb);
+  const medFloor = median(aboveFloorRatios);
+  const medCutoff = median(hfCutoffs);
+  const CODEC_CUTS: { hz: number; label: string }[] = [
+    { hz: 15000, label: "MP3 ~96-128 kbps" },
+    { hz: 16000, label: "MP3 ~128 kbps" },
+    { hz: 17000, label: "MP3 ~160 kbps / AAC" },
+    { hz: 18000, label: "MP3 ~192 kbps / AAC" },
+    { hz: 18500, label: "AAC ~192 kbps" },
+    { hz: 20000, label: "MP3 / AAC / Opus" },
+  ];
+  const nyquist = sr / 2;
+  const matchedCut = CODEC_CUTS.find((c) => Math.abs(medCutoff - c.hz) <= 700);
+  const compressionDetected =
+    medCutoff > 8000 &&
+    medCutoff < nyquist * 0.97 &&
+    medDrop > 15 &&
+    medFloor < 0.01 &&
+    matchedCut !== undefined;
+  const compression: CompressionInfo = {
+    detected: compressionDetected,
+    codecGuess: compressionDetected ? matchedCut!.label : null,
+    cutoffHz: medCutoff,
+  };
 
   // Mel-band variance: average across bands of (std/mean) — coefficient of variation
   const melCv = mean(
@@ -490,7 +557,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // ============== SCORING ==============
   // Each marker → vote in [-1, +1]. Positive = AI-like.
   type Marker = { id: MarkerId; v: number; w: number };
-  const sMarkers: Marker[] = [
+  const sMarkersAll: Marker[] = [
     { id: "flatnessStd", v: vote(flatnessStd, 0.12, 0.025), w: 1.0 },
     { id: "hfCutoff", v: vote(hfCutoff, 18000, 14000), w: 0.7 },
     { id: "hfEnergyRatio", v: vote(hfEnergyRatio, 0.04, 0.003), w: 0.6 },
@@ -499,6 +566,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     { id: "phaseCoherence", v: vote(phaseCoherence, 1.6, 0.6), w: 1.1 },
     { id: "rolloff85", v: vote(rolloff85, 9000, 4500), w: 0.4 },
   ];
+  // On lossy-compressed files, bandwidth markers measure the codec, not
+  // the source — exclude them so an MP3 can't mimic an AI signature.
+  const sMarkers = compressionDetected
+    ? sMarkersAll.filter((m) => m.id !== "hfCutoff" && m.id !== "rolloff85")
+    : sMarkersAll;
   const tMarkers: Marker[] = [
     { id: "onsetCv", v: vote(onsetCv, 0.5, 0.12), w: 1.2 },
     { id: "rmsMicro", v: vote(rmsMicro, 7, 2.5), w: 1.1 },
@@ -560,7 +632,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const qualityIssues: QualityIssue[] = [];
   if (dur < 10) qualityIssues.push("shortFile");
   if (sr < 32000) qualityIssues.push("lowSampleRate");
-  if (hfCutoff < 13000 && hfEnergyRatio < 0.0015) qualityIssues.push("lowBandwidth");
+  if (hfCutoff < 13000 && hfEnergyRatio < 0.0015 && !compressionDetected) qualityIssues.push("lowBandwidth");
   if (noiseFloorDb > -30) qualityIssues.push("noisy");
   if (stereoCorr > 0.995) qualityIssues.push("monoOnly");
 
@@ -580,6 +652,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     overall,
     confidence,
     qualityIssues,
+    compression,
     features: {
       spectralFlatnessMean: flatnessMean,
       spectralFlatnessStd: flatnessStd,
