@@ -489,7 +489,7 @@ const AISongChecker = () => {
                         {L.confidenceTitle} : {L.confidence[c]}
                       </div>
                       <p className="text-xs text-muted-foreground">{L.confidenceHelp[c]}</p>
-                      {result.compression.detected && (
+                      {result.compression?.detected && (
                         <div className="mt-3 flex items-start gap-2 rounded-md border border-sky-500/30 bg-sky-500/5 p-2.5 text-xs text-sky-300">
                           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                           <span>
