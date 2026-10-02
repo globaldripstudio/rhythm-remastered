@@ -390,7 +390,7 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     if (pDb[i] > pMax) pMax = pDb[i];
   }
   const minBin = Math.floor((13000 * FFT) / sr);
-  const maxBin = Math.min(half - 12, Math.floor((nyquist * 0.97 * FFT) / sr));
+  const maxBin = Math.min(half - Math.round((600 * FFT) / sr), Math.floor((nyquist * 0.97 * FFT) / sr));
   let bestDrop = 0;
   let bestBin = -1;
   for (let c = minBin; c <= maxBin; c++) {
@@ -399,14 +399,14 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     below /= 6;
     let above = 0;
     let n = 0;
-    for (let i = c + 3; i < Math.min(half, c + 10); i++) { above += pDb[i]; n++; }
+    for (let i = c + Math.round((100 * FFT) / sr); i < Math.min(half, c + Math.round((550 * FFT) / sr)); i++) { above += pDb[i]; n++; }
     above /= Math.max(1, n);
     const drop = below - above;
     // require content below the edge to be meaningful (within 90 dB of peak)
     if (below > pMax - 90 && drop > bestDrop) { bestDrop = drop; bestBin = c; }
   }
   const peakCutHz = bestBin > 0 ? (bestBin * sr) / FFT : 0;
-  const peakDetected = bestBin > 0 && bestDrop > 25;
+  const peakDetected = bestBin > 0 && bestDrop > 35;
 
   const compressionDetected = peakDetected || frameDetected;
   const cutHz = peakDetected ? peakCutHz : medCutoff;
