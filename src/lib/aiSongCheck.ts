@@ -314,9 +314,13 @@ const GENERATIVE_ERA_YEAR = 2023;
 
 export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   let meta: FileMeta = { nativeSampleRate: null, bitrateKbps: null, year: null, encoder: null };
+  let tagBytes = 0;
   try {
     const header = new Uint8Array(await file.slice(0, Math.min(file.size, 4 * 1024 * 1024)).arrayBuffer());
     meta = parseFileMeta(header);
+    if (header.length >= 10 && String.fromCharCode(...header.subarray(0, 3)) === "ID3") {
+      tagBytes = 10 + (((header[6] & 0x7f) << 21) | ((header[7] & 0x7f) << 14) | ((header[8] & 0x7f) << 7) | (header[9] & 0x7f));
+    }
     // Large embedded artwork can put the first audio frame beyond the initial
     // read. Probe directly after the declared ID3 tag instead of trusting the
     // browser-decoded rate, which may have been resampled by the audio device.
@@ -611,6 +615,17 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const cutHz = compressionDetected && bestBin > 0 ? peakCutHz : hfCutoff;
   const guess =
     CODEC_CUTS.reduce((a, b) => (Math.abs(b.hz - cutHz) < Math.abs(a.hz - cutHz) ? b : a)).label;
+  // Fallback bitrate when no consecutive MPEG frames certified the header
+  // value (sloppy converter containers): estimate from payload size/duration,
+  // excluding ID3 tags so embedded artwork cannot inflate the estimate.
+  let bitrateKbps = meta.bitrateKbps;
+  if (bitrateKbps === null) {
+    const durationSec = fullLeft.length / sr;
+    if (durationSec > 1) {
+      const est = Math.round(((file.size - tagBytes) * 8) / (durationSec * 1000));
+      if (est >= 32 && est <= 400) bitrateKbps = est;
+    }
+  }
   // A 15–16.4 kHz source boundary inside a >=160 kbps MP3 is not explained by
   // that bitrate alone. Treat it as surviving acoustic evidence (often a 32 kHz
   // generative source), while keeping the later MP3 conversion as file context.
@@ -618,8 +633,8 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
     compressionDetected &&
     peakCutHz >= 14800 &&
     peakCutHz <= 16400 &&
-    meta.bitrateKbps !== null &&
-    meta.bitrateKbps >= 160;
+    bitrateKbps !== null &&
+    bitrateKbps >= 160;
   const compression: CompressionInfo = {
     detected: compressionDetected,
     codecGuess: compressionDetected ? guess : null,
@@ -899,8 +914,11 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   // pure-human files whose other domain is simply ambiguous.
   const intrS = hybridScore(spec.ai, spec.human) * clamp01((temp.human - temp.ai - 0.15) * 3);
   const intrT = hybridScore(temp.ai, temp.human) * clamp01((spec.human - spec.ai - 0.15) * 3);
-  const hybridRaw = Math.max(disagreement, 0.55 * Math.max(intrS, intrT));
-  const hY = clamp01(sigmoid(12 * (hybridRaw - 0.25)) * Math.min(1, priorAI * 2));
+  // A clear intrinsic signal (>= 0.30) is trusted at face value; a weak one is
+  // discounted to avoid manufacturing hybrids on merely ambiguous pure files.
+  const intrMax = Math.max(intrS, intrT);
+  const hybridRaw = Math.max(disagreement, intrMax >= 0.3 ? intrMax : 0.55 * intrMax);
+  const hY = clamp01(sigmoid(12 * (hybridRaw - 0.2)) * Math.min(1, priorAI * 2));
   const aiP = pAI * (1 - hY);
   const huP = (1 - pAI) * (1 - hY);
 
