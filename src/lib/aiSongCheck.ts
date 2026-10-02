@@ -558,9 +558,10 @@ export const analyzeForAI = async (file: File): Promise<AISongCheckResult> => {
   const peakDetected = bestBin > 0 && bestDrop > 30;
 
   const compressionDetected = peakDetected || frameDetected;
-  // Prefer the peak-spectrum cutoff for display whenever a wall was located:
-  // the per-frame median is heavily biased by sub-bass content.
-  const cutHz = bestBin > 0 ? peakCutHz : medCutoff;
+  // Prefer the peak-spectrum cutoff for display when a codec wall was found:
+  // the per-frame median is heavily biased by sub-bass content. Without a
+  // detected wall, fall back to the per-frame mean (no brickwall to report).
+  const cutHz = compressionDetected && bestBin > 0 ? peakCutHz : hfCutoff;
   const guess =
     CODEC_CUTS.reduce((a, b) => (Math.abs(b.hz - cutHz) < Math.abs(a.hz - cutHz) ? b : a)).label;
   const compression: CompressionInfo = {
