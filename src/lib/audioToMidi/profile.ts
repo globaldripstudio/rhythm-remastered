@@ -15,10 +15,10 @@ export interface ProfileThresholds {
 }
 
 export const PROFILE_PRESETS: Record<Exclude<AudioProfile, "custom">, ProfileThresholds> = {
-  "mono-clean":  { onsetThreshold: 0.55, frameThreshold: 0.40, minNoteDurationMs: 80 },
-  "piano-clean": { onsetThreshold: 0.65, frameThreshold: 0.45, minNoteDurationMs: 100 },
-  "piano-dirty": { onsetThreshold: 0.78, frameThreshold: 0.55, minNoteDurationMs: 150 },
-  "dense-pad":   { onsetThreshold: 0.60, frameThreshold: 0.50, minNoteDurationMs: 180 },
+  "mono-clean":  { onsetThreshold: 0.50, frameThreshold: 0.35, minNoteDurationMs: 70 },
+  "piano-clean": { onsetThreshold: 0.50, frameThreshold: 0.30, minNoteDurationMs: 60 },
+  "piano-dirty": { onsetThreshold: 0.62, frameThreshold: 0.40, minNoteDurationMs: 90 },
+  "dense-pad":   { onsetThreshold: 0.55, frameThreshold: 0.35, minNoteDurationMs: 110 },
 };
 
 export interface ProfileEstimate {
