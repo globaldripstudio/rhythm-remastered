@@ -1820,7 +1820,15 @@
   "buy": {
     "cta": "Buy",
     "errorTitle": "Checkout unavailable",
-    "errorDesc": "Checkout could not open. Please try again or contact us."
+    "errorDesc": "Checkout could not open. Please try again or contact us.",
+    "book": "Book",
+    "confirmTitle": "How your order works",
+    "confirmIntro": "Before payment, here are the steps:",
+    "step1": "Secure payment via Stripe (card, Apple Pay, Google Pay).",
+    "step2": "You receive a confirmation email, then we contact you to collect your files.",
+    "step3": "We work on your track and deliver the result, with the revisions included in the offer.",
+    "continue": "Continue to secure payment",
+    "question": "A question before ordering? Let's talk first"
   },
   "offers": {
     "audio2midi": {

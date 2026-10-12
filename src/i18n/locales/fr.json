@@ -1820,7 +1820,15 @@
   "buy": {
     "cta": "Acheter",
     "errorTitle": "Paiement indisponible",
-    "errorDesc": "Le paiement n'a pas pu s'ouvrir. Réessayez ou contactez-nous."
+    "errorDesc": "Le paiement n'a pas pu s'ouvrir. Réessayez ou contactez-nous.",
+    "book": "Réserver",
+    "confirmTitle": "Comment se déroule votre commande",
+    "confirmIntro": "Avant le paiement, voici les étapes, simplement :",
+    "step1": "Paiement sécurisé via Stripe (carte, Apple Pay, Google Pay).",
+    "step2": "Vous recevez un e-mail de confirmation, puis nous vous contactons pour la réception de vos fichiers.",
+    "step3": "Nous travaillons votre titre et vous livrons le résultat, avec échanges pour les ajustements prévus dans l'offre.",
+    "continue": "Continuer vers le paiement sécurisé",
+    "question": "Une question avant de commander ? Échangeons d'abord"
   },
   "offers": {
     "audio2midi": {
