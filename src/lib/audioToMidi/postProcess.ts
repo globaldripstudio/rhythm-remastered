@@ -59,8 +59,7 @@ export function passCompleteChords(
   const added: NoteEvent[] = [];
   for (const c of chords) {
     const segStart = c.startSec;
-    const segEnd = c.startSec + (c as any).durationSec !== undefined ? c.startSec + (c as any).durationSec : (c as any).endSec;
-    const end = Number.isFinite(segEnd) ? segEnd : (c as any).endSec;
+    const end = c.endSec;
     if (!(end - segStart >= 0.25)) continue;
     const inside = notes.filter((n) => n.startSec >= segStart - 0.05 && n.startSec < end);
     if (inside.length < 2) continue;
