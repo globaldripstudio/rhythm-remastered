@@ -20,6 +20,12 @@ export interface PostProcessOptions {
   monophonic?: boolean;
   chordAware?: boolean;
   chords?: ChordSegment[];
+  /** Complete detected chords with notes clearly present in the model frames. */
+  completeChords?: boolean;
+  /** Basic Pitch frame activations (needed by completeChords). */
+  frames?: number[][];
+  /** Align note ends to the 16th-note grid of the tempo. */
+  quantizeDurations?: boolean;
   bpm?: number | null;
   bpmConfidence?: number;
   tonic?: string | null;     // e.g. "A"
@@ -34,6 +40,74 @@ export interface PostProcessTrace {
   tonalFilter: { removed: number; aborted: boolean; skipped: boolean };
   chordAware?: { removed: number; aborted: boolean; skipped: boolean };
   monophonic?: { removed: number; trimmed: number };
+  completeChords?: { added: number; skipped: boolean };
+  quantizeDurations?: { adjusted: number; skipped: boolean };
+}
+
+const FRAME_SEC = 256 / 22050;
+const MIDI_OFFSET = 21;
+
+/** Pass G — add chord tones that are clearly sounding (frame evidence) but missing from the MIDI. */
+export function passCompleteChords(
+  notes: NoteEvent[],
+  chords: ChordSegment[],
+  frames: number[][],
+  minActivation = 0.2,
+): { notes: NoteEvent[]; added: number } {
+  if (!notes.length || !chords.length || !frames.length) return { notes, added: 0 };
+  const nBins = frames[0]?.length ?? 0;
+  const added: NoteEvent[] = [];
+  for (const c of chords) {
+    const segStart = c.startSec;
+    const segEnd = c.startSec + (c as any).durationSec !== undefined ? c.startSec + (c as any).durationSec : (c as any).endSec;
+    const end = Number.isFinite(segEnd) ? segEnd : (c as any).endSec;
+    if (!(end - segStart >= 0.25)) continue;
+    const inside = notes.filter((n) => n.startSec >= segStart - 0.05 && n.startSec < end);
+    if (inside.length < 2) continue;
+    const present = new Set(inside.map((n) => ((n.midi % 12) + 12) % 12));
+    const lo = Math.min(...inside.map((n) => n.midi));
+    const hi = Math.max(...inside.map((n) => n.midi));
+    const onset = Math.min(...inside.map((n) => n.startSec));
+    const durs = inside.map((n) => n.durationSec).sort((a, b) => a - b);
+    const dur = durs[Math.floor(durs.length / 2)];
+    const vel = Math.min(...inside.map((n) => n.velocity)) * 0.85;
+    const f0 = Math.max(0, Math.floor(onset / FRAME_SEC));
+    const f1 = Math.min(frames.length - 1, Math.floor((onset + dur) / FRAME_SEC));
+    if (f1 <= f0) continue;
+    c.pitchClasses.forEach((pc) => {
+      if (present.has(pc)) return;
+      let best = -1, bestAct = 0;
+      for (let m = lo - 2; m <= hi + 2; m++) {
+        if (((m % 12) + 12) % 12 !== pc) continue;
+        const b = m - MIDI_OFFSET;
+        if (b < 0 || b >= nBins) continue;
+        let sum = 0;
+        for (let f = f0; f <= f1; f++) sum += frames[f][b] ?? 0;
+        const act = sum / (f1 - f0 + 1);
+        if (act > bestAct) { bestAct = act; best = m; }
+      }
+      if (best >= 0 && bestAct >= minActivation) {
+        added.push({ midi: best, startSec: onset, durationSec: dur, velocity: Math.max(0.1, vel) });
+      }
+    });
+  }
+  if (!added.length) return { notes, added: 0 };
+  return { notes: [...notes, ...added].sort((a, b) => a.startSec - b.startSec), added: added.length };
+}
+
+/** Pass H — snap note ends to the 16th grid (never shorter than one 16th). */
+export function passQuantizeDurations(notes: NoteEvent[], bpm: number): { notes: NoteEvent[]; adjusted: number } {
+  if (!notes.length || bpm <= 0) return { notes, adjusted: 0 };
+  const step = 60 / bpm / 4;
+  let adjusted = 0;
+  const out = notes.map((n) => {
+    const end = n.startSec + n.durationSec;
+    const qEnd = Math.max(n.startSec + step, Math.round(end / step) * step);
+    if (Math.abs(qEnd - end) < 1e-4) return n;
+    adjusted++;
+    return { ...n, durationSec: qEnd - n.startSec };
+  });
+  return { notes: out, adjusted };
 }
 
 const MAX_REMOVAL_RATIO = 0.30;
@@ -235,7 +309,7 @@ function passChordAware(notes: NoteEvent[], chords: ChordSegment[]): { notes: No
     if (c.pitchClasses.has(pc)) { kept.push(n); continue; }
     // Out of chord — keep if salient.
     if (n.velocity >= velThreshold) { kept.push(n); continue; }
-    if (n.durationSec >= 0.200) { kept.push(n); continue; }
+    if (n.durationSec >= 0.150) { kept.push(n); continue; }
     // Drop
   }
   const removed = notes.length - kept.length;
@@ -297,10 +371,26 @@ export function runPostProcessPipeline(
     }
   }
 
+  if (opts.completeChords && !opts.monophonic) {
+    if (opts.chords?.length && opts.frames?.length) {
+      const r = passCompleteChords(cur, opts.chords, opts.frames);
+      cur = r.notes;
+      trace.completeChords = { added: r.added, skipped: false };
+    } else trace.completeChords = { added: 0, skipped: true };
+  }
+
   if (opts.monophonic) {
     const r = passMonophonic(cur);
     cur = r.notes;
     trace.monophonic = { removed: r.removed, trimmed: r.trimmed };
+  }
+
+  if (opts.quantizeDurations) {
+    if (opts.bpm && opts.bpm > 0) {
+      const r = passQuantizeDurations(cur, opts.bpm);
+      cur = r.notes;
+      trace.quantizeDurations = { adjusted: r.adjusted, skipped: false };
+    } else trace.quantizeDurations = { adjusted: 0, skipped: true };
   }
 
   if (typeof window !== "undefined" && window.localStorage?.getItem("audio2midiDebug") === "1") {
