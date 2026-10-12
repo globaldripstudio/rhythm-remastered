@@ -1582,12 +1582,30 @@
       "introLink": "Global Drip studio services",
       "introPost": " (mixing, mastering, sound design).",
       "tools": {
-        "loudness": { "title": "Loudness Analyzer LUFS", "description": "Measure LUFS, true peak and dynamics of your master online." },
-        "keybpm": { "title": "Key & BPM Finder", "description": "Key, tempo and Camelot notation detection for DJs and producers." },
-        "tempo": { "title": "Tap Tempo & Metronome", "description": "Tap tempo, metronome and BPM/delay calculator in one tool." },
-        "chords": { "title": "Chords, scales & modes", "description": "Progression generator with interactive piano and guitar fretboard." },
-        "audio2midi": { "title": "Audio → MIDI", "description": "100% local polyphonic conversion, ready to import into your DAW." },
-        "aisong": { "title": "AI Song Checker", "description": "Detects whether a track is AI, human or hybrid via 16 acoustic markers, 100% local." }
+        "loudness": {
+          "title": "Loudness Analyzer LUFS",
+          "description": "Measure LUFS, true peak and dynamics of your master online."
+        },
+        "keybpm": {
+          "title": "Key & BPM Finder",
+          "description": "Key, tempo and Camelot notation detection for DJs and producers."
+        },
+        "tempo": {
+          "title": "Tap Tempo & Metronome",
+          "description": "Tap tempo, metronome and BPM/delay calculator in one tool."
+        },
+        "chords": {
+          "title": "Chords, scales & modes",
+          "description": "Progression generator with interactive piano and guitar fretboard."
+        },
+        "audio2midi": {
+          "title": "Audio → MIDI",
+          "description": "100% local polyphonic conversion, ready to import into your DAW."
+        },
+        "aisong": {
+          "title": "AI Song Checker",
+          "description": "Detects whether a track is AI, human or hybrid via 16 acoustic markers, 100% local."
+        }
       }
     },
     "cta": {
@@ -1714,7 +1732,9 @@
       "traceSnapped": "{{count}} notes snapped",
       "traceNoChange": "No effect on this file",
       "traceAborted": "Aborted (30% safeguard)",
-      "traceSkipped": "Skipped (low confidence)"
+      "traceSkipped": "Skipped (low confidence)",
+      "quantizeDurations": "Snap note lengths to tempo",
+      "quantizeDurationsHelp": "Aligns note ends to the 16th-note grid of the detected or entered tempo."
     }
   },
   "chordTools": {
@@ -1795,5 +1815,34 @@
       "title": "Free local Audio → MIDI converter — polyphonic | Global Drip Studio",
       "description": "Convert any audio file (WAV, MP3, FLAC) to MIDI right in your browser. Polyphonic detection via Spotify Basic Pitch. 100% free and private."
     }
+  },
+  "buy": {
+    "cta": "Buy",
+    "errorTitle": "Checkout unavailable",
+    "errorDesc": "Checkout could not open. Please try again or contact us."
+  },
+  "offers": {
+    "audio2midi": {
+      "title": "Bring your beat to life in the studio",
+      "intro": "Your MIDI is ready. If you want a pro finish on your instrumental, our fixed-price services can be ordered online — listen to the examples in each card."
+    },
+    "loudness": {
+      "title": "A master made in a real studio",
+      "intro": "Listen to our before/after examples in each card. If you like what you hear, order online at a fixed price."
+    },
+    "aisong": {
+      "title": "Produce your single with the studio",
+      "intro": "From beat to final master: listen to the singles we produced in the Single Pack card."
+    },
+    "chords": {
+      "title": "Produce your single with the studio",
+      "intro": "Got your progression? Listen to the singles we produced in the Single Pack card."
+    }
+  },
+  "paymentService": {
+    "title": "Thank you for your order!",
+    "desc": "Your payment is confirmed and a receipt has been emailed to you. Now send us your files (WAV or stems, WeTransfer / Drive links welcome) with your order name to the address below. We get back to you within one business day to start the project.",
+    "send": "Send my files",
+    "home": "Back to home"
   }
 }
