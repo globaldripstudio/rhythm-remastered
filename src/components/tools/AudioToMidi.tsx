@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Switch } from "@/components/ui/switch";
 import {
   ChevronDown,
   Download,
@@ -31,6 +32,7 @@ import {
   type ProfileThresholds,
 } from "@/lib/audioToMidi/profile";
 import { runPostProcessPipeline } from "@/lib/audioToMidi/postProcess";
+import { analyzeAudioFile } from "@/lib/audioAnalysis";
 import { analyzeMusicalContext, reconcileKeyWithNotes, type MusicalContext } from "@/lib/audioToMidi/musicalContext";
 import { detectChords, type ChordSegment } from "@/lib/audioToMidi/chordDetection";
 import { formatChord } from "@/lib/audioToMidi/chordDetection";
@@ -101,6 +103,8 @@ const AudioToMidi = ({
   const [editingKey, setEditingKey] = useState(false);
   const [editingBpm, setEditingBpm] = useState(false);
   const [bpmDraft, setBpmDraft] = useState<string>("");
+  const [framesCache, setFramesCache] = useState<number[][]>([]);
+  const [quantizeDurations, setQuantizeDurations] = useState(false);
   const [pp] = useState({
     octaveGhost: true,
     hardenedMerge: true,
@@ -120,6 +124,9 @@ const AudioToMidi = ({
         tonalFilter: pp.tonalFilter,
         chordAware: pp.chordAware,
         chords,
+        completeChords: true,
+        frames: framesCache,
+        quantizeDurations,
         monophonic: profile === "mono-clean",
         bpm: bpmResult?.bpm ?? null,
         bpmConfidence: bpmResult?.confidence ?? 0,
@@ -127,7 +134,7 @@ const AudioToMidi = ({
         mode: keyResult?.mode ?? null,
         keyConfidence: keyResult?.confidence ?? 0,
       }),
-    [rawNotesCache, pp, keyResult, bpmResult, chords, profile],
+    [rawNotesCache, framesCache, quantizeDurations, pp, keyResult, bpmResult, chords, profile],
   );
 
 
@@ -321,6 +328,8 @@ const AudioToMidi = ({
       // Step 1 — full musical context: decode + HPSS + BPM + key + chords.
       // Skipped when we're only re-running for a profile change.
       let ctx: MusicalContext | null = null;
+      // Hidden pass through the Key & BPM Finder engine (more robust global key/tempo).
+      const keyBpmPromise = preserve ? Promise.resolve(null) : analyzeAudioFile(target).catch(() => null);
       if (!preserve) {
         try {
           ctx = await analyzeMusicalContext(target, (p) => {
@@ -369,6 +378,7 @@ const AudioToMidi = ({
           minNoteDurationMs: useThresholds.minNoteDurationMs,
           includePitchBends: includeBends,
           skipDefaultMerge: true,
+          melodiaTrick: (overrideThresholds ? profile : pickedProfile) === "mono-clean",
         },
         setProgress,
         harmonicForBp,
@@ -380,8 +390,16 @@ const AudioToMidi = ({
       let effectiveChords = chords;
 
       if (!preserve) {
-        effectiveKey = ctx ? reconcileKeyWithNotes(ctx.key, result.notes) : null;
-        effectiveBpm = ctx?.bpm ?? null;
+        const kb = await keyBpmPromise;
+        const baseKey = kb && (!ctx || kb.key.confidence >= ctx.key.confidence * 0.9)
+          ? { tonic: kb.key.tonic, mode: kb.key.mode, confidence: Math.max(kb.key.confidence, ctx?.key.confidence ?? 0) }
+          : ctx?.key ?? null;
+        const baseBpm = kb && kb.bpm.bpm > 0 && (!ctx || kb.bpm.confidence >= ctx.bpm.confidence * 0.9)
+          ? { bpm: kb.bpm.bpm, confidence: Math.max(kb.bpm.confidence, ctx?.bpm.confidence ?? 0) }
+          : ctx?.bpm ?? null;
+        if (ctx && baseBpm) ctx = { ...ctx, bpm: baseBpm };
+        effectiveKey = baseKey ? reconcileKeyWithNotes(baseKey, result.notes) : null;
+        effectiveBpm = baseBpm;
         effectiveChords = ctx?.chords ?? [];
 
         setKeyResult(effectiveKey);
@@ -403,6 +421,7 @@ const AudioToMidi = ({
         setEditingBpm(false);
       }
 
+      setFramesCache(result.frames);
       setRawNotesCache(result.notes);
       setDurationSec(result.durationSec);
       setDisplayPercent(100);
@@ -414,6 +433,9 @@ const AudioToMidi = ({
         tonalFilter: pp.tonalFilter,
         chordAware: pp.chordAware,
         chords: effectiveChords,
+        completeChords: true,
+        frames: result.frames,
+        quantizeDurations,
         monophonic: pickedProfile === "mono-clean",
         bpm: effectiveBpm?.bpm ?? null,
         bpmConfidence: effectiveBpm?.confidence ?? 0,
@@ -931,6 +953,13 @@ const AudioToMidi = ({
                       ))}
                     </div>
                   </div>
+                  <label className="flex cursor-pointer items-center justify-between gap-3 text-sm">
+                    <span>
+                      <span className="block font-medium text-foreground">{t("audio2midi.advanced.quantizeDurations")}</span>
+                      <span className="block text-xs text-muted-foreground">{t("audio2midi.advanced.quantizeDurationsHelp")}</span>
+                    </span>
+                    <Switch checked={quantizeDurations} onCheckedChange={setQuantizeDurations} />
+                  </label>
                 </div>
               )}
 
