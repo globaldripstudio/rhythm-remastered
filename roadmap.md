@@ -13,4 +13,4 @@
 - [x] Créer le dépôt privé post-paiement et l'e-mail de confirmation avec lien de commande (envoi confirmé via Resend ; domaine d’envoi dédié restant à configurer).
 - [x] Ajouter dans l'administration le téléchargement, la suppression et l'espace de stockage restant en Go et en %.
 - [x] Supprimer le défilement horizontal du menu d'administration.
-- [x] Corriger la régression Audio → MIDI sur les arpèges et ajouter les tests associés.
+- [ ] Audio → MIDI : précision des arpèges — premier essai annulé, à reprendre au calibrage avec les extraits de référence.

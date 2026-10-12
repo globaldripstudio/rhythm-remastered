@@ -169,9 +169,6 @@ export async function audioToMidiNotes(
     processed = merged;
   }
 
-  if (opts.extendSustain) {
-    processed = extendNoteSustain(processed, frames, opts.frameThreshold);
-  }
 
   // Drop notes shorter than minNoteDurationMs
   const minSec = opts.minNoteDurationMs / 1000;
