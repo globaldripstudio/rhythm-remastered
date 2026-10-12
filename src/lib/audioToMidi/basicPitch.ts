@@ -171,6 +171,8 @@ export async function audioToMidiNotes(
   }
 
 
+
+
   // Drop notes shorter than minNoteDurationMs
   const minSec = opts.minNoteDurationMs / 1000;
   const notes = processed
