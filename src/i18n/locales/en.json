@@ -363,7 +363,8 @@
       "fileTooLarge": "File too large",
       "fileTooLargeDesc": "Maximum file size is 10 MB.",
       "fileTypeError": "Unsupported file type",
-      "fileTypeErrorDesc": "Accepted formats: PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP."
+      "fileTypeErrorDesc": "Accepted formats: PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP.",
+      "packSingleNoFiles": "No files are needed for the Single Pack: we can start from scratch. Just describe your project and we'll get back to you."
     },
     "info": {
       "title": "Contact information",
@@ -1837,7 +1838,9 @@
     "chords": {
       "title": "Produce your single with the studio",
       "intro": "Got your progression? Listen to the singles we produced in the Single Pack card."
-    }
+    },
+    "discuss": "Discuss my project",
+    "packSingleNoFiles": "No files needed: we can start from scratch — a simple chat to begin."
   },
   "paymentService": {
     "title": "Thank you for your order!",

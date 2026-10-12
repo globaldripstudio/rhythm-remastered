@@ -14,7 +14,6 @@ const SERVICE_PRICES: Record<string, string> = {
   "mixage-mastering-express": "price_1UPcJmKdiXkFQk1fK2jwquSM",
   "stem-mastering": "price_1UPcJoKdiXkFQk1f9zF08Q1A",
   "mixage-hybride": "price_1UPcJoKdiXkFQk1fMJFKUY8H",
-  "pack-single": "price_1UPcJpKdiXkFQk1fK1XbngfY",
 };
 
 const ALLOWED_ORIGINS = ["https://www.globaldripstudio.fr", "https://globaldripstudio.fr"];

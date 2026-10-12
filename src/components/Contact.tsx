@@ -37,6 +37,19 @@ const Contact = () => {
   });
   const { toast } = useToast();
 
+  // Preselect a service from ?service=… (e.g. Pack Single from a tool page) or a 'select-service' event.
+  useEffect(() => {
+    const apply = (id: string | null) => {
+      if (!id) return;
+      setFormData((f) => ({ ...f, service: id }));
+      setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
+    };
+    apply(new URLSearchParams(window.location.search).get('service'));
+    const onSelect = (e: Event) => apply((e as CustomEvent<string>).detail);
+    window.addEventListener('select-service', onSelect);
+    return () => window.removeEventListener('select-service', onSelect);
+  }, []);
+
   useEffect(() => {
     const handleHighlight = () => {
       setHighlightPhone(true);
@@ -170,6 +183,11 @@ const Contact = () => {
                 </div>
                 <div>
                   <Label htmlFor="attachment">{t('contact.form.attachment')}</Label>
+                  {formData.service === 'pack-single' && (
+                    <p className="mt-2 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm text-foreground">
+                      {t('contact.form.packSingleNoFiles')}
+                    </p>
+                  )}
                   <div className="mt-2">
                     {attachment ? (
                       <div className="flex items-center gap-2 p-3 bg-muted rounded-md">

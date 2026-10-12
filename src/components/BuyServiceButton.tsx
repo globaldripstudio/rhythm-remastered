@@ -11,7 +11,6 @@ export const BUYABLE_SERVICE_IDS = [
   "mixage-mastering-express",
   "stem-mastering",
   "mixage-hybride",
-  "pack-single",
 ] as const;
 
 export const isBuyableService = (id: string) => (BUYABLE_SERVICE_IDS as readonly string[]).includes(id);

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import ServiceModal from "@/components/ServiceModal";
-import BuyServiceButton from "@/components/BuyServiceButton";
+import BuyServiceButton, { isBuyableService } from "@/components/BuyServiceButton";
+import { useNavigate } from "react-router-dom";
 import { servicesData } from "@/components/Services";
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
  */
 const ServiceOfferBox = ({ context, serviceIds, className = "" }: Props) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState<typeof servicesData[0] | null>(null);
   const services = serviceIds
     .map((id) => servicesData.find((s) => s.id === id))
@@ -39,11 +41,20 @@ const ServiceOfferBox = ({ context, serviceIds, className = "" }: Props) => {
             <p className="mt-1 flex-1 text-xs leading-relaxed text-muted-foreground">
               {t(`services.data.${s.id}.description`, s.description)}
             </p>
+            {s.id === "pack-single" && (
+              <p className="mt-2 text-xs font-medium text-foreground">{t("offers.packSingleNoFiles")}</p>
+            )}
             <div className="mt-3 grid grid-cols-2 gap-2">
               <Button variant="outline" size="sm" onClick={() => setOpen(s)}>
                 {t("services.moreInfo")}
               </Button>
-              <BuyServiceButton size="sm" serviceId={s.id} source={context} />
+              {isBuyableService(s.id) ? (
+                <BuyServiceButton size="sm" serviceId={s.id} source={context} />
+              ) : (
+                <Button size="sm" onClick={() => navigate(`/?service=${s.id}#contact`)}>
+                  {t("offers.discuss")}
+                </Button>
+              )}
             </div>
           </div>
         ))}

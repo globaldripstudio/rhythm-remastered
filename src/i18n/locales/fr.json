@@ -363,7 +363,8 @@
       "fileTooLarge": "Fichier trop volumineux",
       "fileTooLargeDesc": "La taille maximale est de 10 Mo.",
       "fileTypeError": "Type de fichier non supporté",
-      "fileTypeErrorDesc": "Formats acceptés : PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP."
+      "fileTypeErrorDesc": "Formats acceptés : PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP.",
+      "packSingleNoFiles": "Aucun fichier n'est nécessaire pour le Pack Single : on peut partir de zéro. Décrivez simplement votre projet, nous vous recontactons."
     },
     "info": {
       "title": "Informations de contact",
@@ -1837,7 +1838,9 @@
     "chords": {
       "title": "Produire votre single avec le studio",
       "intro": "Votre grille est posée ? Écoutez les singles réalisés dans la fiche Pack Single."
-    }
+    },
+    "discuss": "Parler de mon projet",
+    "packSingleNoFiles": "Aucun fichier à fournir : on peut partir de zéro, simple échange pour commencer."
   },
   "paymentService": {
     "title": "Merci pour votre commande !",
