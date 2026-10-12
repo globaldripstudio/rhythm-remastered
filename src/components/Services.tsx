@@ -1,3 +1,4 @@
+import BuyServiceButton, { isBuyableService } from "@/components/BuyServiceButton";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -357,8 +358,9 @@ const Services = () => {
             )}
           </ul>
 
+          <div className={isBuyableService(service.id) ? "grid grid-cols-2 gap-2" : ""}>
           <Button
-            className="w-full group-hover:studio-button transition-all duration-300 text-sm sm:text-base"
+            className="w-full group-hover:studio-button transition-all duration-300 text-xs sm:text-sm px-2"
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
@@ -368,6 +370,10 @@ const Services = () => {
             {t('services.moreInfo')}
             <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2 transition-transform group-hover:translate-x-1" />
           </Button>
+            {isBuyableService(service.id) && (
+              <BuyServiceButton serviceId={service.id} source="card" className="w-full text-xs sm:text-sm px-2" />
+            )}
+          </div>
         </CardContent>
 
         {/* Glow Effect on Hover */}
