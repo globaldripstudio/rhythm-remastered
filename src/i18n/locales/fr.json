@@ -113,7 +113,7 @@
         "details": "Notre service essentiel s'adresse principalement aux artistes travaillant sur des instrumentales. Offrez vous le luxe d'un mixage et mastering professionnel tout numérique à coût réduit.",
         "badgeText": "Essentiel",
         "category": "Production",
-        "duration": "4 heures",
+        "duration": "24-48h (4 h de travail studio)",
         "process": "Analyse → Mixage → Mastering → Révisions → Livraison finale",
         "included": [
           "Mixage professionnel instru + multipistes voix",
@@ -1826,7 +1826,13 @@
     "confirmIntro": "Avant le paiement, voici les étapes, simplement :",
     "step1": "Paiement sécurisé via Stripe (carte, Apple Pay, Google Pay).",
     "step2": "Vous recevez un lien privé pour déposer vos fichiers directement sur le site, jusqu’à 2 Go par fichier.",
-    "step3": "Nous réalisons la prestation dans le délai annoncé, avec le nombre de révisions indiqué dans l’offre.",
+    "step3": "Livraison sous {{turnaround}}, avec {{count}} révision incluse.",
+    "step3_other": "Livraison sous {{turnaround}}, avec {{count}} révisions incluses.",
+    "step3Fallback": "Nous réalisons la prestation dans le délai et avec les révisions indiqués dans l’offre.",
+    "turnarounds": {
+      "oneToTwoDays": "24 à 48 h",
+      "threeToFiveDays": "3 à 5 jours"
+    },
     "continue": "Continuer vers le paiement sécurisé",
     "question": "Une question avant de commander ? Échangeons d'abord"
   },

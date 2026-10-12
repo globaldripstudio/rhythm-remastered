@@ -44,7 +44,7 @@ export const servicesData = [
   badgeText: "Essentiel",
   badgeColor: "bg-emerald-500",
   category: "Production",
-  duration: "4 heures",
+  duration: "24-48h (4 h de travail studio)",
   included: [
   "Mixage professionnel instru + multipistes voix",
   "Mastering full numérique",

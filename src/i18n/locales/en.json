@@ -113,7 +113,7 @@
         "details": "Our essential service is primarily aimed at artists working on instrumentals. Get the luxury of professional all-digital mixing and mastering at a reduced cost.",
         "badgeText": "Essential",
         "category": "Production",
-        "duration": "4 hours",
+        "duration": "24–48h (4 studio work hours)",
         "process": "Analysis → Mixing → Mastering → Revisions → Final delivery",
         "included": [
           "Professional instrumental + vocal multi-track mixing",
@@ -1826,7 +1826,13 @@
     "confirmIntro": "Before payment, here are the steps:",
     "step1": "Secure payment via Stripe (card, Apple Pay, Google Pay).",
     "step2": "You receive a private link to upload your files directly on the website, up to 2 GB per file.",
-    "step3": "We complete the service within the stated turnaround, with the number of revisions shown in the offer.",
+    "step3_one": "Delivery within {{turnaround}}, with {{count}} revision included.",
+    "step3_other": "Delivery within {{turnaround}}, with {{count}} revisions included.",
+    "step3Fallback": "We complete the service within the turnaround and revisions shown in the offer.",
+    "turnarounds": {
+      "oneToTwoDays": "24 to 48 hours",
+      "threeToFiveDays": "3 to 5 days"
+    },
     "continue": "Continue to secure payment",
     "question": "A question before ordering? Let's talk first"
   },
