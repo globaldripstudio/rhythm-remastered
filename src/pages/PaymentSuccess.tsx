@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { CheckCircle, UploadCloud, Home, Loader2 } from "lucide-react";
+import { CheckCircle, UploadCloud, Home, Loader2, Mail } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
