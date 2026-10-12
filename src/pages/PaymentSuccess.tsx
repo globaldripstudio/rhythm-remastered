@@ -1,17 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle, Mail, Home } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle, UploadCloud, Home, Loader2, Mail } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
-const STUDIO_EMAIL = "globaldripstudio@gmail.com";
+import { supabase } from "@/integrations/supabase/client";
 
 const PaymentSuccess = () => {
   const [params] = useSearchParams();
   const { t } = useTranslation();
   const service = params.get("service");
+  const sessionId = params.get("session_id");
+  const [uploadLink, setUploadLink] = useState<string | null>(null);
+  const [preparing, setPreparing] = useState(Boolean(service && sessionId));
+
+  useEffect(() => {
+    if (!service || !sessionId) return;
+    supabase.functions.invoke("service-order-files", { body: { action: "initialize", sessionId, origin: window.location.origin } })
+      .then(({ data, error }) => {
+        if (!error && data?.orderId && data?.token) setUploadLink(`/service-files?order=${encodeURIComponent(data.orderId)}&token=${encodeURIComponent(data.token)}`);
+      })
+      .finally(() => setPreparing(false));
+  }, [service, sessionId]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,12 +39,7 @@ const PaymentSuccess = () => {
                 <h1 className="text-3xl font-bold mb-4 text-foreground">{t("paymentService.title")}</h1>
                 <p className="text-lg text-muted-foreground mb-8">{t("paymentService.desc")}</p>
                 <div className="space-y-4">
-                  <a href={`mailto:${STUDIO_EMAIL}?subject=${encodeURIComponent(`Commande ${t(`services.data.${service}.title`, service)}`)}`}>
-                    <Button className="studio-button w-full" size="lg">
-                      <Mail className="w-4 h-4 mr-2" />
-                      {t("paymentService.send")} — {STUDIO_EMAIL}
-                    </Button>
-                  </a>
+                  {preparing ? <Button className="studio-button w-full" size="lg" disabled><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("paymentService.preparing")}</Button> : uploadLink ? <Link to={uploadLink}><Button className="studio-button w-full" size="lg"><UploadCloud className="mr-2 h-4 w-4" />{t("paymentService.send")}</Button></Link> : <p className="text-sm text-muted-foreground">{t("paymentService.emailFallback")}</p>}
                   <Link to="/">
                     <Button variant="outline">
                       <Home className="w-4 h-4 mr-2" />
@@ -59,7 +66,7 @@ const PaymentSuccess = () => {
                   </Link>
                   <p className="text-sm text-muted-foreground">
                     Vous n'avez pas reçu l'email ? Contactez-nous à{" "}
-                    <a href={`mailto:${STUDIO_EMAIL}`} className="text-primary hover:underline">{STUDIO_EMAIL}</a>
+                    <a href="mailto:globaldripstudio@gmail.com" className="text-primary hover:underline">globaldripstudio@gmail.com</a>
                   </p>
                   <Link to="/">
                     <Button variant="outline"><Home className="w-4 h-4 mr-2" />Retour à l'accueil</Button>

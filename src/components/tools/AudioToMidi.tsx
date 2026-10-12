@@ -1050,7 +1050,7 @@ const AudioToMidi = ({
         const withOffer = (
           <>
             {playerNode}
-            <ServiceOfferBox context="audio2midi" serviceIds={["mixage-mastering-express", "stem-mastering"]} className="mt-6" />
+            <ServiceOfferBox context="audio2midi" serviceIds={["composition", "pack-single"]} className="mt-6" />
           </>
         );
         return slot ? createPortal(withOffer, slot) : withOffer;

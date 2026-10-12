@@ -608,7 +608,7 @@ const ChordProgression = () => {
             </div>
           </section>
 
-          <ServiceOfferBox context="chords" serviceIds={["pack-single"]} className="mt-8" />
+          <ServiceOfferBox context="chords" serviceIds={["composition", "pack-single"]} className="mt-8" />
           <ToolResources current="chords" />
         </section>
       </main>

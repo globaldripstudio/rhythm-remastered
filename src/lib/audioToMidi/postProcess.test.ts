@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { passCompleteChords, passQuantizeDurations } from "./postProcess";
+import { passCompleteChords, passQuantizeDurations, runPostProcessPipeline } from "./postProcess";
 import { extendNoteSustain, BP_FRAME_SEC } from "./sustain";
 import type { ChordSegment } from "./chordDetection";
 
@@ -41,5 +41,25 @@ describe("audio→midi post-process", () => {
   it("snaps note ends to the 16th grid at 120 BPM", () => {
     const { notes } = passQuantizeDurations([{ midi: 60, startSec: 0, durationSec: 0.3, velocity: 1 }], 120);
     expect(notes[0].durationSec).toBeCloseTo(0.25, 5);
+  });
+  it("keeps distinct repeated arpeggio attacks", () => {
+    const input = [
+      { midi: 64, startSec: 0, durationSec: 0.08, velocity: 0.7 },
+      { midi: 64, startSec: 0.12, durationSec: 0.08, velocity: 0.72 },
+    ];
+    const { notes, trace } = runPostProcessPipeline(input, { octaveGhost: false, hardenedMerge: true, snapToGrid: false, tonalFilter: false });
+    expect(notes).toHaveLength(2);
+    expect(trace.hardenedMerge.removed).toBe(0);
+  });
+  it("still collapses an almost identical duplicate detection", () => {
+    const input = [
+      { midi: 64, startSec: 0, durationSec: 0.08, velocity: 0.7 },
+      { midi: 64, startSec: 0.09, durationSec: 0.05, velocity: 0.71 },
+      { midi: 67, startSec: 0.2, durationSec: 0.1, velocity: 0.8 },
+      { midi: 71, startSec: 0.4, durationSec: 0.1, velocity: 0.8 },
+    ];
+    const { notes } = runPostProcessPipeline(input, { octaveGhost: false, hardenedMerge: true, snapToGrid: false, tonalFilter: false });
+    expect(notes).toHaveLength(3);
+    expect(notes.filter((note) => note.midi === 64)).toHaveLength(1);
   });
 });

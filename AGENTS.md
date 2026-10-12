@@ -5,3 +5,5 @@
 - Re-encoding metadata is contextual only; AI scoring prioritizes corroborating acoustic markers that survive lossy conversion.- Ebook reader accounts are provisioned server-side only (Stripe webhook / admin `ebook-grant`) with a generated access code; admin-role accounts are refused by the reader and serve-ebook, keeping admin and customer spaces sealed.
 - Fixed-price studio services are sold through the `create-service-payment` function, whose server-side id→price map is the only allowlist; the client `BUYABLE_SERVICE_IDS` list must match it, so prices can never be chosen by the browser.
 - Audio→MIDI note-ending and chord-completion logic lives in pure modules (`sustain.ts`, `postProcess.ts`) without browser globals, so it stays unit-testable with Vitest.
+- Paid service files use order-scoped private uploads and admin-only signed downloads/deletes, so large customer files never pass through function memory or public storage.
+- Stripe service fulfillment is initialized idempotently from both the verified webhook and success page, so closing the checkout redirect cannot lose the customer upload email.

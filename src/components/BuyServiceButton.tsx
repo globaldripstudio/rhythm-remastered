@@ -93,7 +93,18 @@ const BuyServiceButton = ({ serviceId, source, className, variant, children, ...
     }
   };
 
-  const steps = [t("buy.step1"), t("buy.step2"), t("buy.step3")];
+  const serviceTerms: Record<string, { turnaround: string; revisions: number }> = {
+    "mixage-mastering": { turnaround: t("buy.turnarounds.threeToFiveDays"), revisions: 3 },
+    "mixage-mastering-express": { turnaround: t("buy.turnarounds.oneToTwoDays"), revisions: 2 },
+    "stem-mastering": { turnaround: t("buy.turnarounds.oneToTwoDays"), revisions: 2 },
+    "mixage-hybride": { turnaround: t("buy.turnarounds.threeToFiveDays"), revisions: 2 },
+  };
+  const terms = serviceTerms[serviceId];
+  const steps = [
+    t("buy.step1"),
+    t("buy.step2"),
+    terms ? t("buy.step3", { turnaround: terms.turnaround, count: terms.revisions }) : t("buy.step3Fallback"),
+  ];
 
   return (
     <>

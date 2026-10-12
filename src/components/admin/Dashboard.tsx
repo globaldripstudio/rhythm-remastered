@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   LogOut, Calendar, Users, Home, BarChart3, CreditCard, 
-  LayoutDashboard, Bell, ChevronDown, Globe, BookOpen, Scissors, ShieldAlert, ShieldCheck
+  LayoutDashboard, Bell, ChevronDown, Globe, BookOpen, Scissors, ShieldAlert, ShieldCheck, FolderLock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -29,6 +29,7 @@ import EbookManager from './EbookManager';
 import StemSplitter from './StemSplitter';
 import AuditLog from './AuditLog';
 import SecurityPanel from './SecurityPanel';
+import OrderFilesManager from './OrderFilesManager';
 
 
 const Dashboard = () => {
@@ -48,7 +49,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
       <header className="border-b border-primary/20 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3">
@@ -101,8 +102,8 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="-mx-3 mb-4 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mb-6 sm:px-0">
-          <TabsList className="inline-grid min-w-max grid-cols-10 h-auto p-1 sm:w-full">
+          <div className="mb-4 sm:mb-6">
+          <TabsList className="grid h-auto w-full grid-cols-3 p-1 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-11">
             <TabsTrigger value="overview" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <LayoutDashboard className="w-4 h-4" />
               <span className="hidden sm:inline">Vue d'ensemble</span>
@@ -122,6 +123,10 @@ const Dashboard = () => {
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">E-book</span>
               <span className="sm:hidden">📖</span>
+            </TabsTrigger>
+            <TabsTrigger value="order-files" className="flex min-w-0 items-center gap-1.5 px-2 py-2.5 text-xs sm:gap-2 sm:py-3 sm:text-sm">
+              <FolderLock className="w-4 h-4" />
+              <span>Fichiers</span>
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex min-w-20 items-center gap-1.5 px-2 py-2.5 text-xs sm:min-w-0 sm:gap-2 sm:py-3 sm:text-sm">
               <Calendar className="w-4 h-4" />
@@ -186,6 +191,10 @@ const Dashboard = () => {
 
           <TabsContent value="ebook">
             <EbookManager />
+          </TabsContent>
+
+          <TabsContent value="order-files">
+            <OrderFilesManager />
           </TabsContent>
 
           <TabsContent value="calendar">

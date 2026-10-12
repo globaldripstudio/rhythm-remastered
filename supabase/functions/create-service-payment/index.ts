@@ -53,7 +53,7 @@ serve(async (req) => {
       locale: lang,
       phone_number_collection: { enabled: true },
       metadata: { service_id: serviceId },
-      success_url: `${validOrigin}/payment-success?service=${encodeURIComponent(serviceId)}`,
+      success_url: `${validOrigin}/payment-success?service=${encodeURIComponent(serviceId)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${validOrigin}${lang === "en" ? "/en" : "/"}#services`,
     });
     return json({ url: session.url });
