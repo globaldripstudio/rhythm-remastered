@@ -1,69 +1,64 @@
 # Audio → MIDI : fiabiliser l'outil et transformer son trafic en clients
 
-## 1. Ce que disent vos données (90 derniers jours, base du site)
+## 1. Ce que disent vos données (90 derniers jours)
 
 | Indicateur | Valeur | Lecture |
 | :--- | :--- | :--- |
-| Sessions sur /audio-to-midi | **1 644** (1 971 vues) | Vous avez raison : c'est de loin la 1re porte d'entrée |
-| /key-bpm-finder | 224 | 7x moins |
-| /ai-song-checker | 164 | 10x moins (outil récent) |
-| /loudness (FR + EN) | 151 | 11x moins |
-| Page d'accueil / | 614 | |
-| /services + /contact | **30** au total | Presque personne n'atteint l'offre |
-| Clics « Devis » depuis l'encart de l'outil MIDI | 16 | ~1 % des visiteurs MIDI |
-| Formulaires de contact envoyés | **2** en 90 jours (8 depuis mars) | |
+| Sessions sur /audio-to-midi | **1 644** | 1re porte d'entrée, de très loin |
+| /key-bpm-finder · /ai-song-checker · /loudness | 224 · 164 · 151 | 7 à 11x moins |
+| /services + /contact | **30** | Presque personne n'atteint l'offre |
+| Clics « Devis » depuis l'outil MIDI | 16 | ~1 % des visiteurs MIDI |
+| Formulaires envoyés | **2** (8 depuis mars) | |
 | Ventes e-book payées | **0** | |
-| Origine | USA 1 065, France 529, Belgique 146, Allemagne 116, Brésil 64… | **~75 % hors France** |
+| Visiteurs hors France | **~75 %** (USA 1 065 sessions) | Public mondial, anglophone |
 
-Évolution mensuelle des sessions MIDI : mai 82 → juin 173 → juillet 624 → août 693 → septembre 412 → octobre (12 jours) 154. Le pic d'été retombe : la qualité de l'outil et la fidélisation comptent maintenant.
+Sessions MIDI par mois : mai 82 → juillet 624 → août 693 → septembre 412 → octobre (12 j) 154. Après l'outil MIDI, les visiteurs restent dans les autres outils ; seuls 128 passent par l'accueil.
 
-Parcours après l'outil MIDI : seulement 128 sessions vont ensuite sur l'accueil ; les autres restent dans les outils (accords 67, loudness 61, key-bpm 58). **Les visiteurs MIDI sont des beatmakers et compositeurs du monde entier, anglophones, qui cherchent un outil gratuit — pas un studio à Paris.** Leur vendre une séance studio en présentiel ne peut pas fonctionner ; il faut une offre en ligne, en dollars/euros, achetable en 2 clics.
+## 2. Améliorations Audio → MIDI (validées)
 
-## 2. Pourquoi l'outil « coupe » les notes et rate des notes d'accords
+Principe : **un seul moteur, fiable sur tout type d'audio** (full prod, piano, sample, mono ou polyphonique), sans second modèle ni choix supplémentaire pour l'utilisateur.
 
-Causes identifiées dans les réglages actuels (pas dans le modèle lui-même) :
+- **A. Réglages adaptés automatiquement + analyse tonalité/tempo cachée** : l'audio passe d'abord, sans que ce soit affiché, par le même moteur que le Key & BPM Finder. Tonalité et tempo fiables sont ainsi connus avant la retranscription. Le profil sonore (dense, accords, mélodie seule) est détecté automatiquement et ajuste les seuils : plus de notes internes d'accords conservées, option « mélodie » désactivée hors son monophonique.
+- **B. Tenue de note fidèle au son d'origine** : une note dure tant qu'elle sonne réellement dans l'audio ; tolérance aux micro-coupures (réverbération, vibrato) ; comportement calé sur le profil détecté (note piquée reste courte, nappe reste longue).
+- **C. Complétion des accords** : une note de l'accord détecté, clairement présente dans le son mais absente du MIDI, est réinsérée avec la même durée que ses voisines. On ne supprime plus de notes longues jugées « hors accord ».
+- **D. Option « caler les durées sur le tempo »** (désactivée par défaut), basée sur le tempo détecté ou saisi.
+- **E. Calibrage ensemble** : je prépare un banc de mesure automatique (notes trouvées, notes en trop, justesse des durées). Vous fournissez quelques extraits avec leur MIDI exact ; on règle les seuils ensemble, chiffres à l'appui, avant mise en ligne.
 
-1. **Seuils trop stricts** : seuil de début de note 0,70 et seuil de tenue 0,45, contre 0,5 / 0,3 recommandés par Spotify. Une note tenue dont l'énergie décroît passe sous 0,45 et s'arrête trop tôt ; les notes internes d'un accord (plus faibles) n'atteignent jamais 0,70 et disparaissent.
-2. **Option « mélodie » activée** dans l'extraction : elle favorise une ligne principale et supprime des notes simultanées — exactement le symptôme « accords incomplets ».
-3. **Durée minimale 120 ms** et fusion des notes répétées : utile contre le bruit, mais efface les notes brèves des accords arpégés.
-4. **Filtres de nettoyage** (tonalité, accords) qui peuvent retirer jusqu'à 30 % des notes : si la détection d'accord se trompe, de vraies notes sont jetées.
+## 3. Conversion
 
-Les benchmarks publics confirment que la fin des notes est le point faible de tous les modèles de ce type ; le début des notes est fiable [3](https://scorestarling.com/blog/ai-music-transcription-accuracy). On peut donc corriger la tenue nous-mêmes à partir des données de tenue que le modèle fournit déjà.
+1. **Encart après chaque conversion MIDI** (FR/EN selon la langue) qui propose directement les offres adaptées à un beatmaker/compositeur au lieu de l'actuel « Devis ».
+2. **Paiement en ligne des offres à prix fixe** via Stripe, aux prix déjà affichés sur la page d'accueil (Mixage + Mastering 250 €, Essentiel 140 €, Mixage hybride 190 €, Stem Mastering 60 €…). Après paiement, le client reçoit un email avec les instructions d'envoi de ses fichiers.
+3. **Remplacement proposé de l'aimant à prospects** (zéro travail pour vous) : case facultative « Recevoir mon fichier MIDI et sa grille d'accords par email ». Tout est automatique : l'email part avec le fichier généré par l'outil, quelle que soit sa durée, et l'adresse rejoint votre liste de contacts. Si cela ne vous convient pas, on abandonne ce point.
+4. Abandonné (essai gratuit).
+5. **Loudness Analyzer** : je suis d'accord. Après analyse, un encart contextuel renvoie vers les cartes « Mixage + Mastering » et « Mastering », avec un message lié au résultat (ex. « votre titre est à −9 LUFS, trop fort pour Spotify : un mastering adapté corrige cela »). Même logique possible pour l'AI Song Checker.
 
-### Améliorations proposées (dans l'ordre, sans changer de modèle)
+## 4. Rapport comparatif : votre site face aux studios en ligne qui convertissent
 
-- **A. Recalibrer les seuils par profil sonore** (piano/accords, guitare, voix/mélodie, synthé) au lieu d'un réglage unique ; désactiver l'option « mélodie » sauf en profil mono.
-- **B. Tenue de note fidèle** : prolonger chaque note tant que le modèle la « voit » encore sonner, avec un seuil de fin plus bas que le seuil de début (hystérésis), et tolérer de courtes chutes (< 80 ms) dues à la réverbération ou au vibrato.
-- **C. Complétion des accords** : quand un accord est détecté avec bonne confiance et qu'une de ses notes est fortement présente dans le spectre mais absente du MIDI, la réinsérer avec la même durée que les autres notes de l'accord (jamais l'inverse : on n'efface plus de notes « hors accord » tenues).
-- **D. Option « quantifier la durée »** : aligner les fins de notes sur la grille du BPM détecté (désactivée par défaut).
-- **E. Banc de test** : 8 à 10 extraits de référence (accords plaqués piano, arpèges guitare, mélodie voix, nappe synthé) avec leur MIDI exact, mesure automatique du taux de notes trouvées, des notes en trop et de la justesse des durées, pour prouver chaque amélioration chiffres à l'appui avant mise en ligne.
+| Critère | Global Drip Studio | Maxcren | Major Mixing | Razik Mastering |
+| :--- | :--- | :--- | :--- | :--- |
+| Prix affichés | Oui, en €, libellés FR | 49 $ master, 99 $ mix+master [2](https://maxcren.com/mixing-mastering) | 79 $ à 540 $ par titre [1](https://majormixing.com/pricing/) | Non visible sur la page d'essai |
+| Achat direct | **Non** : toute réservation renvoie au formulaire de contact | Prix fixe par single, devis pour EP/album [2](https://maxcren.com/mixing-mastering) | Commande par titre | Envoi du fichier puis échange |
+| Ce qui est inclus | Détails dans une fenêtre | Délai 2–4 jours, 1 révision [2](https://maxcren.com/mixing-mastering) | **6 révisions, 2–3 jours, week-ends inclus** [1](https://majormixing.com/pricing/) | Livraison 24 h [5](https://razikmastering.com/free-mastering-sample/) |
+| Preuve sociale | Partenaires, crédits | « Une vraie personne, pas un preset » | **4,8★ sur 300+ avis** [1](https://majormixing.com/pricing/) | « 100 % ingénieurs humains » |
+| Outil gratuit relié à l'offre | Outils excellents mais déconnectés de l'achat | — | — | **Analyseur de loudness placé sur la page de l'offre** [5](https://razikmastering.com/free-mastering-sample/) |
+| Langue / devise | FR d'abord, € | EN, $ | EN, $ | EN |
 
-Option plus lourde, à décider plus tard : un second modèle spécialisé piano (meilleur sur les tenues), proposé uniquement en profil « Piano ».
+Constats radicaux :
+- **Votre problème n'est ni le prix ni la qualité : c'est l'absence de bouton « Acheter ».** Vos prix sont dans la fourchette des concurrents, mais un visiteur américain doit remplir un formulaire et attendre une réponse. Les concurrents vendent un titre en quelques clics.
+- **Le message « humain, pas un algorithme »** est l'argument central chez tous. Vous avez mieux : un vrai studio hybride analogique, des crédits réels, et des outils gratuits reconnus. Il faut le dire au moment où l'utilisateur obtient son résultat.
+- **Délai et nombre de révisions affichés en gros** rassurent un acheteur à distance ; c'est absent de vos cartes.
+- **Les avis clients chiffrés** manquent : récolter quelques avis Google auprès de vos clients passés serait un gain fort et rapide.
 
-## 3. Convertir ce trafic mondial — constats du marché et mesures radicales
-
-Ce que font les studios en ligne qui convertissent :
-- **Prix fixes affichés par titre**, en dollars : Maxcren 49 $ master / 99 $ mix+master [2](https://maxcren.com/mixing-mastering) ; Major Mixing 79 $ à 540 $, révisions et délai inscrits [1](https://majormixing.com/pricing/).
-- **Essai gratuit sans carte ni compte** : 30 s masterisées gratuitement [3](https://maxcren.com/free-mastering-sample), échantillon en 24 h [5](https://razikmastering.com/free-mastering-sample/).
-- **L'outil gratuit est branché directement sur l'offre** : Razik place un analyseur de loudness juste sur sa page d'essai gratuit [5](https://razikmastering.com/free-mastering-sample/).
-- **Preuve sociale chiffrée** (notes, crédits, « vrais ingénieurs, pas d'algorithme »).
-
-Mesures proposées pour votre site :
-1. **Après chaque conversion MIDI, un encart contextuel** (en anglais pour les visiteurs non français) : « Votre idée mérite une vraie prod — mix/master à prix fixe » plutôt que l'actuel « Devis ».
-2. **Offre en ligne à prix fixe payable par Stripe** (vous avez déjà Stripe) : par ex. Master 49 €, Mix + Master 129 €, Beat / arrangement à partir de votre MIDI, avec délai et révisions affichés.
-3. **Aimant à prospects** : « Recevez votre fichier MIDI nettoyé + un pack de 5 grilles d'accords » contre un email → liste pour relances et promos.
-4. **Essai gratuit** : « 30 secondes de votre titre masterisées gratuitement » depuis les pages loudness et AI checker.
-5. **Page dédiée « Online mixing & mastering »** en anglais, liée depuis tous les outils, avec avant/après audio (vos comparateurs existants) et crédits.
-6. **Mesure** : suivre le chemin outil → encart → offre → paiement dans votre dashboard.
-
-## Questions à trancher avant de construire
-- Prix et formules exacts que vous acceptez de proposer en ligne (les montants ci-dessus sont des exemples).
-- Acceptez-vous de proposer un essai gratuit de 30 s (temps de travail pour vous) ?
-- Ordre de livraison : je recommande d'abord la partie 2 (A, B, C, E), puis l'offre en ligne et l'encart post-conversion.
+## Prochaines étapes
+1. Partie 2 (A, B, C, D) + banc de mesure, puis calibrage ensemble (E).
+2. Encart post-conversion MIDI et encart post-analyse Loudness.
+3. Paiement Stripe des offres à prix fixe, avec délai et révisions affichés sur les cartes.
+4. Point 3 seulement si vous le validez.
 
 ## Détails techniques
-- `basicPitch.ts` : seuils par profil (onset 0,5 / frame 0,3 en polyphonique), `melodiaTrick` false hors mono, `minNoteDuration` 60 ms en polyphonique ; garder les matrices `frames` pour le post-traitement.
-- Nouvelle passe `extendSustain` dans `postProcess.ts` : prolongation sur la matrice de frames avec seuil de fin ≈ 0,6 × seuil frame et tolérance de trous de 3–4 frames.
-- Nouvelle passe `completeChords` : réinsertion des pitch classes de l'accord présentes dans le chroma/frames > seuil, dans le registre de l'accord ; `passChordAware` ne retire plus de notes > 150 ms.
-- Banc de test Vitest + fichiers de référence dans le projet, métriques onset F1 et onset+offset F1 (tolérances 50 ms / 20 %).
-- Conversion : nouveau composant d'encart post-résultat i18n FR/EN, produits Stripe à prix fixe, page offre en ligne, événements analytics `midi_offer_view` / `midi_offer_click` / `checkout_start`.
+- Réutiliser le moteur tonalité/BPM de KeyBpmFinder (extrait en module partagé) en amont de `audioToMidiNotes`, en remplacement de l'estimation actuelle de `musicalContext.ts`.
+- `basicPitch.ts` : seuils dérivés du profil auto (densité polyphonique estimée sur les frames), `melodiaTrick` uniquement si monophonique, conservation des matrices frames/onsets.
+- `postProcess.ts` : passe `extendSustain` (hystérésis sur frames, trous ≤ 3–4 frames), passe `completeChords`, `passChordAware` ne retire plus les notes > 150 ms, passe optionnelle `quantizeDurations`.
+- Banc de test Vitest : onset F1 et onset+offset F1 (tolérances 50 ms / 20 %).
+- Stripe : produits/prix pour chaque carte à prix fixe, réutilisation de `create-payment`, email de confirmation avec instructions d'envoi ; événements analytics `offer_view`, `offer_click`, `checkout_start`.
+- Encarts i18n FR/EN dans AudioToMidi et Loudness, liens vers les fenêtres des cartes existantes.
