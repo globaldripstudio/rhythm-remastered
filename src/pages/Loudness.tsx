@@ -1,3 +1,4 @@
+import ServiceOfferBox from "@/components/tools/ServiceOfferBox";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AUDIO_ACCEPT, isLikelyAudioFile } from "@/lib/audioFileInput";
 import { Download, FileAudio, Gauge, Info, Loader2, Music2, Upload, Waves } from "lucide-react";
@@ -1082,6 +1083,7 @@ const Loudness = () => {
             </div>
           </section>
 
+          {result && <ServiceOfferBox context="loudness" serviceIds={["mixage-mastering", "stem-mastering"]} className="mt-8" />}
           <ToolResources current="loudness" />
         </section>
       </main>
