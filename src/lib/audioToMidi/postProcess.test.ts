@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { passCompleteChords, passQuantizeDurations } from "./postProcess";
-import { extendNoteSustain, BP_FRAME_SEC } from "./basicPitch";
+import { extendNoteSustain, BP_FRAME_SEC } from "./sustain";
 import type { ChordSegment } from "./chordDetection";
 
 const frames = (n: number, active: Record<number, number>) =>
