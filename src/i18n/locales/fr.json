@@ -363,7 +363,8 @@
       "fileTooLarge": "Fichier trop volumineux",
       "fileTooLargeDesc": "La taille maximale est de 10 Mo.",
       "fileTypeError": "Type de fichier non supporté",
-      "fileTypeErrorDesc": "Formats acceptés : PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP."
+      "fileTypeErrorDesc": "Formats acceptés : PDF, audio (MP3, WAV, FLAC...), images (JPG, PNG), ZIP.",
+      "packSingleNoFiles": "Aucun fichier n'est nécessaire pour le Pack Single : on peut partir de zéro. Décrivez simplement votre projet, nous vous recontactons."
     },
     "info": {
       "title": "Informations de contact",
@@ -1582,12 +1583,30 @@
       "introLink": "services studio Global Drip",
       "introPost": " (mixage, mastering, sound design).",
       "tools": {
-        "loudness": { "title": "Loudness Analyzer LUFS", "description": "Mesure LUFS, true peak et dynamique de votre master en ligne." },
-        "keybpm": { "title": "Key & BPM Finder", "description": "Détection de tonalité, tempo et notation Camelot pour DJs et producteurs." },
-        "tempo": { "title": "Tap Tempo & Métronome", "description": "Tap tempo, métronome et calculateur BPM/délais en un seul outil." },
-        "chords": { "title": "Accords, gammes & modes", "description": "Générateur de progressions, piano et manche de guitare interactifs." },
-        "audio2midi": { "title": "Audio → MIDI", "description": "Conversion polyphonique 100 % locale, prête à importer dans votre DAW." },
-        "aisong": { "title": "AI Song Checker", "description": "Détecte si un morceau est IA, humain ou hybride via 16 marqueurs acoustiques, 100 % en local." }
+        "loudness": {
+          "title": "Loudness Analyzer LUFS",
+          "description": "Mesure LUFS, true peak et dynamique de votre master en ligne."
+        },
+        "keybpm": {
+          "title": "Key & BPM Finder",
+          "description": "Détection de tonalité, tempo et notation Camelot pour DJs et producteurs."
+        },
+        "tempo": {
+          "title": "Tap Tempo & Métronome",
+          "description": "Tap tempo, métronome et calculateur BPM/délais en un seul outil."
+        },
+        "chords": {
+          "title": "Accords, gammes & modes",
+          "description": "Générateur de progressions, piano et manche de guitare interactifs."
+        },
+        "audio2midi": {
+          "title": "Audio → MIDI",
+          "description": "Conversion polyphonique 100 % locale, prête à importer dans votre DAW."
+        },
+        "aisong": {
+          "title": "AI Song Checker",
+          "description": "Détecte si un morceau est IA, humain ou hybride via 16 marqueurs acoustiques, 100 % en local."
+        }
       }
     },
     "cta": {
@@ -1714,7 +1733,9 @@
       "traceSnapped": "{{count}} notes recalées",
       "traceNoChange": "Aucun effet sur ce fichier",
       "traceAborted": "Annulée (garde-fou 30 %)",
-      "traceSkipped": "Ignorée (confiance insuffisante)"
+      "traceSkipped": "Ignorée (confiance insuffisante)",
+      "quantizeDurations": "Caler les durées sur le tempo",
+      "quantizeDurationsHelp": "Aligne la fin des notes sur la grille (double-croches) du tempo détecté ou saisi."
     }
   },
   "chordTools": {
@@ -1795,5 +1816,36 @@
       "title": "Audio → MIDI gratuit & local — convertisseur polyphonique | Global Drip Studio",
       "description": "Convertis n'importe quel fichier audio (WAV, MP3, FLAC) en MIDI directement dans ton navigateur. Détection polyphonique via Spotify Basic Pitch. 100% gratuit et privé."
     }
+  },
+  "buy": {
+    "cta": "Acheter",
+    "errorTitle": "Paiement indisponible",
+    "errorDesc": "Le paiement n'a pas pu s'ouvrir. Réessayez ou contactez-nous."
+  },
+  "offers": {
+    "audio2midi": {
+      "title": "Donnez vie à votre instru en studio",
+      "intro": "Votre MIDI est prêt. Si vous souhaitez un rendu pro de votre instrumentale, nos offres à prix fixe sont disponibles en ligne — écoutez les exemples dans chaque fiche."
+    },
+    "loudness": {
+      "title": "Un master réalisé en studio",
+      "intro": "Écoutez nos exemples avant/après dans chaque fiche. Si le rendu vous parle, la commande se fait en ligne, à prix fixe."
+    },
+    "aisong": {
+      "title": "Produire votre single avec le studio",
+      "intro": "Du beat au master final : écoutez les singles réalisés dans la fiche Pack Single."
+    },
+    "chords": {
+      "title": "Produire votre single avec le studio",
+      "intro": "Votre grille est posée ? Écoutez les singles réalisés dans la fiche Pack Single."
+    },
+    "discuss": "Parler de mon projet",
+    "packSingleNoFiles": "Aucun fichier à fournir : on peut partir de zéro, simple échange pour commencer."
+  },
+  "paymentService": {
+    "title": "Merci pour votre commande !",
+    "desc": "Votre paiement est confirmé et un reçu vous a été envoyé par email. Envoyez-nous maintenant vos fichiers (WAV ou stems, liens WeTransfer / Drive acceptés) avec le nom de votre commande à l'adresse ci-dessous. Nous revenons vers vous sous 24 h ouvrées pour lancer le projet.",
+    "send": "Envoyer mes fichiers",
+    "home": "Retour à l'accueil"
   }
 }

@@ -1,3 +1,4 @@
+import BuyServiceButton, { isBuyableService } from "@/components/BuyServiceButton";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
@@ -399,6 +400,12 @@ const ServiceModalContent = ({ service, onClose, isMobile = false }: { service: 
                 >
                   {t('services.cta.bookNow')}
                 </Button>
+                {service.id === 'pack-single' && (
+                  <p className="mt-3 text-xs sm:text-sm text-foreground">{t('offers.packSingleNoFiles')}</p>
+                )}
+                {isBuyableService(service.id) && (
+                  <BuyServiceButton serviceId={service.id} source="modal" variant="outline" className="mt-2 w-full" />
+                )}
               </div>
             </CardContent>
           </Card>

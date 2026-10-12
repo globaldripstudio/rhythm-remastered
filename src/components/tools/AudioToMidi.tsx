@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Switch } from "@/components/ui/switch";
+import ServiceOfferBox from "@/components/tools/ServiceOfferBox";
 import {
   ChevronDown,
   Download,
@@ -1046,7 +1047,13 @@ const AudioToMidi = ({
             </CardContent>
           </Card>
         );
-        return slot ? createPortal(playerNode, slot) : playerNode;
+        const withOffer = (
+          <>
+            {playerNode}
+            <ServiceOfferBox context="audio2midi" serviceIds={["mixage-mastering-express", "stem-mastering"]} className="mt-6" />
+          </>
+        );
+        return slot ? createPortal(withOffer, slot) : withOffer;
       })()}
     </div>
   );

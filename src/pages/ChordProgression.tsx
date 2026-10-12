@@ -1,3 +1,4 @@
+import ServiceOfferBox from "@/components/tools/ServiceOfferBox";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -607,6 +608,7 @@ const ChordProgression = () => {
             </div>
           </section>
 
+          <ServiceOfferBox context="chords" serviceIds={["pack-single"]} className="mt-8" />
           <ToolResources current="chords" />
         </section>
       </main>

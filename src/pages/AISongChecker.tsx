@@ -1,3 +1,4 @@
+import ServiceOfferBox from "@/components/tools/ServiceOfferBox";
 import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -601,6 +602,7 @@ const AISongChecker = () => {
             <p>{L.reliability}</p>
           </div>
 
+          {result && !isAnalyzing && <ServiceOfferBox context="aisong" serviceIds={["pack-single"]} className="mt-8" />}
           <ToolResources current="aisong" />
 
           <div className="mt-10 text-center">
