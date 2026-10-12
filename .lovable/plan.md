@@ -22,15 +22,24 @@ Principe : **un seul moteur, fiable sur tout type d'audio** (full prod, piano, s
 - **B. Tenue de note fidèle au son d'origine** : une note dure tant qu'elle sonne réellement dans l'audio ; tolérance aux micro-coupures (réverbération, vibrato) ; comportement calé sur le profil détecté (note piquée reste courte, nappe reste longue).
 - **C. Complétion des accords** : une note de l'accord détecté, clairement présente dans le son mais absente du MIDI, est réinsérée avec la même durée que ses voisines. On ne supprime plus de notes longues jugées « hors accord ».
 - **D. Option « caler les durées sur le tempo »** (désactivée par défaut), basée sur le tempo détecté ou saisi.
-- **E. Calibrage ensemble** : je prépare un banc de mesure automatique (notes trouvées, notes en trop, justesse des durées). Vous fournissez quelques extraits avec leur MIDI exact ; on règle les seuils ensemble, chiffres à l'appui, avant mise en ligne.
+- **E. Calibrage ensemble : en suspens** jusqu'à ce que vous puissiez fournir des extraits audio et leur MIDI exact. Le banc de mesure sera prêt pour ce moment-là.
 
 ## 3. Conversion
 
-1. **Encart après chaque conversion MIDI** (FR/EN selon la langue) qui propose directement les offres adaptées à un beatmaker/compositeur au lieu de l'actuel « Devis ».
-2. **Paiement en ligne des offres à prix fixe** via Stripe, aux prix déjà affichés sur la page d'accueil (Mixage + Mastering 250 €, Essentiel 140 €, Mixage hybride 190 €, Stem Mastering 60 €…). Après paiement, le client reçoit un email avec les instructions d'envoi de ses fichiers.
-3. **Remplacement proposé de l'aimant à prospects** (zéro travail pour vous) : case facultative « Recevoir mon fichier MIDI et sa grille d'accords par email ». Tout est automatique : l'email part avec le fichier généré par l'outil, quelle que soit sa durée, et l'adresse rejoint votre liste de contacts. Si cela ne vous convient pas, on abandonne ce point.
+Ton général des encarts : professionnel et disponible, jamais moralisateur. Aucun jugement sur le résultat de l'utilisateur ; on montre notre travail (cartes, lecteurs avant/après) et on laisse l'envie d'acheter venir de l'écoute.
+
+1. **Encart après chaque conversion MIDI** (FR/EN) : offre beatmaker mise en avant (voir plus bas), lecteur d'exemple, boutons « Plus d'infos » et « Acheter ».
+2. **Double bouton Stripe sur les offres à prix fixe** (Mixage + Mastering 250 €, Essentiel 140 €, Mixage hybride 190 €, Stem Mastering 60 €, Pack Single 690 €) :
+   - sur la carte : « Plus d'infos » à gauche, « Acheter » à droite, même ligne, mise en page inchangée ;
+   - dans la fenêtre détaillée : un bouton « Acheter » en plus de l'actuel « Réserver / Devis ».
+   - Les offres « Sur devis » ou à l'heure gardent uniquement le parcours actuel.
+   - Après paiement : page de confirmation + email avec les instructions d'envoi des fichiers.
+3. Abandonné (aimant à prospects).
 4. Abandonné (essai gratuit).
-5. **Loudness Analyzer** : je suis d'accord. Après analyse, un encart contextuel renvoie vers les cartes « Mixage + Mastering » et « Mastering », avec un message lié au résultat (ex. « votre titre est à −9 LUFS, trop fort pour Spotify : un mastering adapté corrige cela »). Même logique possible pour l'AI Song Checker.
+5. **Loudness Analyzer** : après analyse, encart sobre « Besoin d'un master pro ? » qui ouvre les cartes « Mixage + Mastering » et « Stem Mastering » (aucune carte « Mastering » seule n'existe aujourd'hui ; Stem Mastering est la plus proche), avec leurs lecteurs d'exemple.
+6. **Pack Single après l'AI Song Checker et en bas de l'outil Accords & gammes**, même format d'encart.
+
+Offre beatmaker après Audio → MIDI : **Mixage + Mastering | Essentiel (140 €)** en principal — elle est conçue pour les instrumentales en .wav —, avec **Stem Mastering (60 €)** comme alternative d'entrée de gamme.
 
 ## 4. Rapport comparatif : votre site face aux studios en ligne qui convertissent
 
@@ -50,10 +59,9 @@ Constats radicaux :
 - **Les avis clients chiffrés** manquent : récolter quelques avis Google auprès de vos clients passés serait un gain fort et rapide.
 
 ## Prochaines étapes
-1. Partie 2 (A, B, C, D) + banc de mesure, puis calibrage ensemble (E).
-2. Encart post-conversion MIDI et encart post-analyse Loudness.
-3. Paiement Stripe des offres à prix fixe, avec délai et révisions affichés sur les cartes.
-4. Point 3 seulement si vous le validez.
+1. Partie 2 (A, B, C, D) + banc de mesure ; calibrage (E) plus tard.
+2. Boutons « Acheter » Stripe sur les cartes et dans les fenêtres des offres à prix fixe.
+3. Encarts après Audio → MIDI, Loudness, AI Song Checker et Accords & gammes.
 
 ## Détails techniques
 - Réutiliser le moteur tonalité/BPM de KeyBpmFinder (extrait en module partagé) en amont de `audioToMidiNotes`, en remplacement de l'estimation actuelle de `musicalContext.ts`.
