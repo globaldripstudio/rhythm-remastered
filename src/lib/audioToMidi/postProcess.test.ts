@@ -55,8 +55,11 @@ describe("audio→midi post-process", () => {
     const input = [
       { midi: 64, startSec: 0, durationSec: 0.08, velocity: 0.7 },
       { midi: 64, startSec: 0.09, durationSec: 0.05, velocity: 0.71 },
+      { midi: 67, startSec: 0.2, durationSec: 0.1, velocity: 0.8 },
+      { midi: 71, startSec: 0.4, durationSec: 0.1, velocity: 0.8 },
     ];
     const { notes } = runPostProcessPipeline(input, { octaveGhost: false, hardenedMerge: true, snapToGrid: false, tonalFilter: false });
-    expect(notes).toHaveLength(1);
+    expect(notes).toHaveLength(3);
+    expect(notes.filter((note) => note.midi === 64)).toHaveLength(1);
   });
 });
