@@ -15,6 +15,13 @@
       "when": 1790929355831,
       "tag": "0001_remove_redundant_ebook_public_policy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791787155474,
+      "tag": "0002_create_service_orders_and_files",
+      "breakpoints": true
     }
   ]
 }

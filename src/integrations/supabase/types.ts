@@ -296,6 +296,80 @@ export type Database = {
         }
         Relationships: []
       }
+      service_order_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          id: string
+          order_id: string
+          size_bytes: number
+          status: string
+          storage_path: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          id?: string
+          order_id: string
+          size_bytes?: number
+          status?: string
+          storage_path: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          id?: string
+          order_id?: string
+          size_bytes?: number
+          status?: string
+          storage_path?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_order_files_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_orders: {
+        Row: {
+          access_token_hash: string
+          created_at: string
+          customer_email: string
+          id: string
+          service_id: string
+          status: string
+          stripe_session_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_token_hash: string
+          created_at?: string
+          customer_email: string
+          id?: string
+          service_id: string
+          status?: string
+          stripe_session_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_token_hash?: string
+          created_at?: string
+          customer_email?: string
+          id?: string
+          service_id?: string
+          status?: string
+          stripe_session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_analytics: {
         Row: {
           button_name: string | null
