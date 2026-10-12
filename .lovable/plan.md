@@ -46,6 +46,15 @@ Rendre les quatre achats à prix fixe transparents avant paiement, puis offrir u
 - Tester les fenêtres et boutons sur ordinateur et mobile, le dépôt multi-fichiers, le cas supérieur à 2 Go, les quatre emplacements post-outil et les deux langues.
 - Vérifier le paiement en environnement de test, la réception de l’e-mail, l’ouverture du lien privé et la visibilité des fichiers côté studio.
 
+## 6. Précision Audio→MIDI sur les arpèges
+- Corriger la régression sans ajouter de profil ou de réglage visible : l’outil reste adaptatif pour piano, full production, samples et sources mono/polyphoniques.
+- La cause la plus probable dans le traitement actuel est confirmée par le code : un signal peu simultané peut être classé « mono-clean » ; ce profil active ensuite un traitement monophonique strict qui élimine les chevauchements et raccourcit les tenues. Un arpège, pourtant polyphonique dans le temps, peut donc perdre des notes ou son legato.
+- Enrichir la détection automatique avec une mesure temporelle : attaques successives sur plusieurs hauteurs, chevauchement des queues de notes et persistance harmonique. Cette mesure distinguera une vraie ligne monophonique d’un arpège à faible polyphonie instantanée.
+- Neutraliser le traitement monophonique strict dès qu’une signature d’arpège est détectée, tout en conservant les seuils adaptés au timbre et au niveau de bruit.
+- Rendre les filtres tonal et accord-aware moins destructifs sur les notes brèves d’un arpège : une note cohérente avec les activations du modèle et la trajectoire mélodico-harmonique doit être conservée même si elle tombe près d’une frontière d’accord.
+- Préserver les attaques séparées d’une même hauteur et prolonger leurs queues uniquement jusqu’à une nouvelle attaque réellement distincte, afin de retrouver le legato sans fusionner les motifs répétés.
+- Ajouter des tests synthétiques d’arpèges ascendants, descendants, avec pédale et notes répétées, puis comparer avant/après le nombre de notes, leurs débuts et leurs durées. Le calibrage final sur les exemples audio/MIDI réels restera suspendu jusqu’à leur disponibilité.
+
 ## Détails techniques
 - Les prix restent exclusivement déterminés par la liste serveur existante ; le navigateur ne choisit jamais un montant.
 - Les commandes et jetons d’envoi seront stockés dans des tables privées, inaccessibles directement aux visiteurs ; les opérations publiques passeront par des fonctions serveur limitées et validées.
