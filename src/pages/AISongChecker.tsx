@@ -602,7 +602,7 @@ const AISongChecker = () => {
             <p>{L.reliability}</p>
           </div>
 
-          {result && !isAnalyzing && <ServiceOfferBox context="aisong" serviceIds={["pack-single"]} className="mt-8" />}
+          {result && !isAnalyzing && <ServiceOfferBox context="aisong" serviceIds={["composition", "pack-single"]} className="mt-8" />}
           <ToolResources current="aisong" />
 
           <div className="mt-10 text-center">

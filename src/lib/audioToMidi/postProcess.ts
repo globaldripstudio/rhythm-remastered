@@ -165,7 +165,7 @@ function passOctaveGhost(notes: NoteEvent[]): { notes: NoteEvent[]; removed: num
   return { notes: filtered, removed, aborted: false };
 }
 
-/** Pass B — merge same-pitch notes with compatible velocities (ratio ≤ 2×) within 60 ms. */
+/** Pass B — merge only near-identical duplicate detections, never distinct arpeggio attacks. */
 function passHardenedMerge(notes: NoteEvent[]): { notes: NoteEvent[]; removed: number; aborted: boolean } {
   if (notes.length === 0) return { notes, removed: 0, aborted: false };
   const byPitch = new Map<number, NoteEvent[]>();
@@ -184,7 +184,7 @@ function passHardenedMerge(notes: NoteEvent[]): { notes: NoteEvent[]; removed: n
       const curEnd = cur.startSec + cur.durationSec;
       const gap = n.startSec - curEnd;
       const velRatio = Math.max(cur.velocity, n.velocity) / Math.max(0.01, Math.min(cur.velocity, n.velocity));
-      if (gap < 0.060 && velRatio <= 2.0) {
+      if (gap < 0.030 && velRatio <= 1.3) {
         const newEnd = Math.max(curEnd, n.startSec + n.durationSec);
         cur.durationSec = newEnd - cur.startSec;
         cur.velocity = Math.max(cur.velocity, n.velocity);

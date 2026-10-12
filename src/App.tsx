@@ -26,6 +26,7 @@ import TapTempoMetronome from "./pages/TapTempoMetronome";
 import ChordProgression from "./pages/ChordProgression";
 import AudioToMidi from "./pages/AudioToMidi";
 import AISongChecker from "./pages/AISongChecker";
+import ServiceFiles from "./pages/ServiceFiles";
 import Admin from "./pages/Admin";
 import LangLock from "./components/LangLock";
 import LangAwareRedirect from "./components/LangAwareRedirect";
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="/bpm-finder" element={<Navigate to="/key-bpm-finder" replace />} />
             <Route path="/key-finder" element={<Navigate to="/key-bpm-finder" replace />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/service-files" element={<ServiceFiles />} />
             <Route path="/admin" element={<Admin />} />
             
             {/* Redirections anciennes URLs (lang-aware) */}

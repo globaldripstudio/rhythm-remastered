@@ -155,7 +155,7 @@
           "Hybrid analog/digital mixing",
           "Balance, dynamics, space, automation",
           "Overall mix coherence",
-          "3 revisions included"
+          "2 revisions included"
         ],
         "deliverables": [
           "Stereo mix WAV 24bit",
@@ -1825,15 +1825,15 @@
     "confirmTitle": "How your order works",
     "confirmIntro": "Before payment, here are the steps:",
     "step1": "Secure payment via Stripe (card, Apple Pay, Google Pay).",
-    "step2": "You receive a confirmation email, then we contact you to collect your files.",
-    "step3": "We work on your track and deliver the result, with the revisions included in the offer.",
+    "step2": "You receive a private link to upload your files directly on the website, up to 2 GB per file.",
+    "step3": "We complete the service within the stated turnaround, with the number of revisions shown in the offer.",
     "continue": "Continue to secure payment",
     "question": "A question before ordering? Let's talk first"
   },
   "offers": {
     "audio2midi": {
       "title": "Bring your beat to life in the studio",
-      "intro": "Your MIDI is ready. If you want a pro finish on your instrumental, our fixed-price services can be ordered online — listen to the examples in each card."
+      "intro": "Your MIDI is ready. The studio can develop your instrumental or build your single with you — hear the examples in each card."
     },
     "loudness": {
       "title": "A master made in a real studio",
@@ -1841,19 +1841,21 @@
     },
     "aisong": {
       "title": "Produce your single with the studio",
-      "intro": "From beat to final master: listen to the singles we produced in the Single Pack card."
+      "intro": "From beat to final master: discover Beatmaking and the Single Pack, then hear our work in each card."
     },
     "chords": {
       "title": "Produce your single with the studio",
-      "intro": "Got your progression? Listen to the singles we produced in the Single Pack card."
+      "intro": "Got your progression? The studio can create the beat or produce the complete single with you."
     },
     "discuss": "Discuss my project",
     "packSingleNoFiles": "No files needed: we can start from scratch — a simple chat to begin."
   },
   "paymentService": {
     "title": "Thank you for your order!",
-    "desc": "Your payment is confirmed and a receipt has been emailed to you. Now send us your files (WAV or stems, WeTransfer / Drive links welcome) with your order name to the address below. We get back to you within one business day to start the project.",
-    "send": "Send my files",
+    "desc": "Your payment is confirmed. Your private space lets you upload this order’s files directly on the website, without an external transfer link.",
+    "send": "Open my private upload space",
+    "preparing": "Preparing your private space…",
+    "emailFallback": "Your receipt also includes your private link. If it takes a while to arrive, contact the studio.",
     "home": "Back to home"
   }
 }

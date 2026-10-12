@@ -101,7 +101,7 @@ export const servicesData = [
   "Mixage hybride analogique/numérique",
   "Équilibre, dynamique, espace, automation",
   "Cohérence globale du mix",
-  "3 révisions incluses"],
+  "2 révisions incluses"],
   antiMalentendu: true,
   process: "Analyse → Mixage hybride → Révisions → Livraison",
   details: "Service de mixage seul, sans mastering. Idéal si vous avez déjà un ingénieur de mastering ou si vous souhaitez un mixage hybride de qualité professionnelle.",

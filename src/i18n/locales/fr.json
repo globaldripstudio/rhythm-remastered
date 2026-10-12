@@ -155,7 +155,7 @@
           "Mixage hybride analogique/numérique",
           "Équilibre, dynamique, espace, automation",
           "Cohérence globale du mix",
-          "3 révisions incluses"
+          "2 révisions incluses"
         ],
         "deliverables": [
           "Mix stéréo WAV 24bit",
@@ -1825,15 +1825,15 @@
     "confirmTitle": "Comment se déroule votre commande",
     "confirmIntro": "Avant le paiement, voici les étapes, simplement :",
     "step1": "Paiement sécurisé via Stripe (carte, Apple Pay, Google Pay).",
-    "step2": "Vous recevez un e-mail de confirmation, puis nous vous contactons pour la réception de vos fichiers.",
-    "step3": "Nous travaillons votre titre et vous livrons le résultat, avec échanges pour les ajustements prévus dans l'offre.",
+    "step2": "Vous recevez un lien privé pour déposer vos fichiers directement sur le site, jusqu’à 2 Go par fichier.",
+    "step3": "Nous réalisons la prestation dans le délai annoncé, avec le nombre de révisions indiqué dans l’offre.",
     "continue": "Continuer vers le paiement sécurisé",
     "question": "Une question avant de commander ? Échangeons d'abord"
   },
   "offers": {
     "audio2midi": {
       "title": "Donnez vie à votre instru en studio",
-      "intro": "Votre MIDI est prêt. Si vous souhaitez un rendu pro de votre instrumentale, nos offres à prix fixe sont disponibles en ligne — écoutez les exemples dans chaque fiche."
+      "intro": "Votre MIDI est prêt. Le studio peut développer votre instrumentale ou construire votre single avec vous — écoutez les exemples dans chaque fiche."
     },
     "loudness": {
       "title": "Un master réalisé en studio",
@@ -1841,19 +1841,21 @@
     },
     "aisong": {
       "title": "Produire votre single avec le studio",
-      "intro": "Du beat au master final : écoutez les singles réalisés dans la fiche Pack Single."
+      "intro": "Du beat au master final : découvrez nos offres Beatmaking et Pack Single, puis écoutez les réalisations dans chaque fiche."
     },
     "chords": {
       "title": "Produire votre single avec le studio",
-      "intro": "Votre grille est posée ? Écoutez les singles réalisés dans la fiche Pack Single."
+      "intro": "Votre progression est posée ? Le studio peut créer le beat ou produire le single complet avec vous."
     },
     "discuss": "Parler de mon projet",
     "packSingleNoFiles": "Aucun fichier à fournir : on peut partir de zéro, simple échange pour commencer."
   },
   "paymentService": {
     "title": "Merci pour votre commande !",
-    "desc": "Votre paiement est confirmé et un reçu vous a été envoyé par email. Envoyez-nous maintenant vos fichiers (WAV ou stems, liens WeTransfer / Drive acceptés) avec le nom de votre commande à l'adresse ci-dessous. Nous revenons vers vous sous 24 h ouvrées pour lancer le projet.",
-    "send": "Envoyer mes fichiers",
+    "desc": "Votre paiement est confirmé. Votre espace privé permet de déposer les fichiers de cette commande directement sur le site, sans lien externe.",
+    "send": "Accéder à mon espace de dépôt",
+    "preparing": "Préparation de votre espace privé…",
+    "emailFallback": "Votre reçu contient également votre lien privé. Si celui-ci tarde à arriver, contactez le studio.",
     "home": "Retour à l'accueil"
   }
 }
