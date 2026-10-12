@@ -131,10 +131,11 @@ export async function audioToMidiNotes(
     velocity: Math.max(0.1, Math.min(1, n.amplitude)),
   }));
 
-  // Dedupe on the model's original note boundaries. Sustain extension must run
-  // afterwards, otherwise reverb tails make genuine repeated arpeggio attacks
-  // look like overlapping duplicates.
   let processed: NoteEvent[] = rawNotes;
+
+  if (opts.extendSustain) {
+    processed = extendNoteSustain(processed, frames, opts.frameThreshold);
+  }
 
   if (!opts.skipDefaultMerge) {
     // Dedupe: merge same-pitch notes that overlap or are <120ms apart
