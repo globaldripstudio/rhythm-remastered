@@ -10,7 +10,7 @@
 - [x] Encarts d'offres après Audio → MIDI, Loudness, AI Song Checker et Accords & gammes.
 - [x] Mixage hybride : afficher 2 révisions sur la carte et dans la fenêtre avant paiement.
 - [x] Après Audio → MIDI, AI Song Checker et Accords & gammes : proposer Beatmaking et Pack Single.
-- [x] Créer le dépôt privé post-paiement et l'e-mail de confirmation avec lien de commande.
+- [x] Créer le dépôt privé post-paiement et l'e-mail de confirmation avec lien de commande (envoi confirmé via Resend ; domaine d’envoi dédié restant à configurer).
 - [x] Ajouter dans l'administration le téléchargement, la suppression et l'espace de stockage restant en Go et en %.
 - [x] Supprimer le défilement horizontal du menu d'administration.
 - [x] Corriger la régression Audio → MIDI sur les arpèges et ajouter les tests associés.
