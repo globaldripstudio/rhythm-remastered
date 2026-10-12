@@ -1,4 +1,4 @@
-import BuyServiceButton, { isBuyableService } from "@/components/BuyServiceButton";
+import BuyServiceButton, { isBuyableService, isBookableService, BookServiceButton } from "@/components/BuyServiceButton";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -358,7 +358,7 @@ const Services = () => {
             )}
           </ul>
 
-          <div className={isBuyableService(service.id) ? "grid grid-cols-2 gap-2" : ""}>
+          <div className={isBuyableService(service.id) || isBookableService(service.id) ? "grid grid-cols-2 gap-2" : ""}>
           <Button
             className="w-full group-hover:studio-button transition-all duration-300 text-xs sm:text-sm px-2"
             variant="outline"
@@ -372,6 +372,9 @@ const Services = () => {
           </Button>
             {isBuyableService(service.id) && (
               <BuyServiceButton serviceId={service.id} source="card" className="w-full text-xs sm:text-sm px-2" />
+            )}
+            {isBookableService(service.id) && (
+              <BookServiceButton className="w-full text-xs sm:text-sm px-2" />
             )}
           </div>
         </CardContent>
