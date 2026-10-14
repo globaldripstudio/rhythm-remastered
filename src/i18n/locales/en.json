@@ -877,6 +877,30 @@
       }
     }
   },
+  "boutique": {
+    "seo": {
+      "title": "Shop — Sound Design Training | Global Drip Studio",
+      "description": "Official Global Drip Studio shop: the sound design training for videographers and editors. Instant PDF access after payment."
+    },
+    "badge": "Shop",
+    "title": "Sound Design Training for Videographers and Editors",
+    "subtitle": "The only product available right now: a field manual to become fully autonomous on audio, with concrete checklists and workflows.",
+    "meta1": "Operations Manual",
+    "meta1Desc": "5-week training to become 100% autonomous on audio",
+    "meta2": "Works with every editing suite",
+    "meta2Desc": "Native methods for Premiere Pro, Final Cut Pro, DaVinci Resolve, CapCut",
+    "meta3": "No useless jargon",
+    "meta3Desc": "Just what you need to know, right when you need it",
+    "price": "€59",
+    "immediateAccess": "Instant access",
+    "feat1": "Downloadable PDF",
+    "feat2": "Free updates",
+    "buy": "Buy now — €59",
+    "buying": "Loading...",
+    "secure": "Secure payment via Stripe • Instant delivery by email",
+    "details": "See the full product page",
+    "error": "Payment could not be created. Please try again."
+  },
   "ebook": {
     "badge": "Premium Training",
     "title": "Sound Design Training for Videographers and Editors",

@@ -16,6 +16,7 @@ import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
 import Ebook from "./pages/Ebook";
+import Boutique from "./pages/Boutique";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import EbookLogin from "./pages/EbookLogin";
 import EbookReader from "./pages/EbookReader";
