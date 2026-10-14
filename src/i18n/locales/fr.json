@@ -885,13 +885,13 @@
     },
     "badge": "Formation PDF + ressources audio",
     "title": "Formation au Sound Design pour Vidéastes et Monteurs",
-    "subtitle": "La première formation audio pensée exclusivement pour la vidéo. Des méthodes concrètes, des checklists et des workflows pour faire sonner vos images dès cette semaine.",
+    "subtitle": "La première formation audio pensée exclusivement pour les vidéastes et monteurs. Comprendre ce que le son apporte à vos images, et savoir le traiter vous-même quand le projet le permet.",
     "meta1": "Manuel d'opérabilité",
-    "meta1Desc": "5 semaines de formation pour devenir 100% autonome sur la partie audio",
+    "meta1Desc": "Un plan d'entraînement sur 5 semaines, un exercice par chapitre",
     "meta2": "Adapté tous logiciels",
     "meta2Desc": "Méthodes natives pour Premiere Pro, Final Cut Pro, DaVinci Resolve, CapCut",
-    "meta3": "Pas de jargon inutile",
-    "meta3Desc": "Juste ce qu'il faut savoir, au bon moment",
+    "meta3": "Notions expliquées clairement",
+    "meta3Desc": "Chaque terme technique relié à un usage concret au montage",
     "price": "89 €",
     "immediateAccess": "Accès immédiat",
     "feat1": "PDF téléchargeable",
@@ -900,7 +900,8 @@
     "buying": "Chargement...",
     "secure": "Paiement sécurisé par Stripe • Livraison immédiate par email",
     "details": "Voir la fiche détaillée",
-    "error": "Erreur lors de la création du paiement. Veuillez réessayer."
+    "error": "Erreur lors de la création du paiement. Veuillez réessayer.",
+    "tagline": "Du tournage à la finition : méthodes concrètes, workflows et checklists pour un son professionnel."
   },
   "ebook": {
     "badge": "Formation Premium",
@@ -1893,18 +1894,18 @@
     "pains": {
       "title": "Ce que cette formation règle",
       "items": [
-        "Des heures perdues en post-production sur l'audio",
-        "Des coupes approximatives et des « pocs » disgracieux",
-        "Un rendu sonore qui change d'une scène à l'autre",
-        "Des mix qui saturent à l'export"
+        "Au tournage : gain mal réglé, micro mal placé, pas de room tone. Les problèmes partent dès la captation.",
+        "Au montage : coupes sèches, « pocs », pas de fades ni de J/L-cuts, pistes désorganisées.",
+        "Au mix : niveaux qui changent d'une scène à l'autre, voix couverte par la musique, master qui sature.",
+        "À la livraison : volume incohérent selon la plateforme, pas de stems ni de version M&E, aucun contrôle qualité."
       ]
     },
     "includes": {
       "title": "Ce que vous recevez",
       "items": [
         "Formation PDF de 70 pages, téléchargeable et imprimable",
-        "Exemples audio à écouter dans presque tous les chapitres",
-        "Samples prêts à l'emploi pour le sound design (sweeps et impacts)",
+        "Exemples d'écoute A/B dans presque tous les chapitres",
+        "Mini pack de samples prêts à l'emploi (risers et impacts)",
         "2 cheatsheets imprimables",
         "Un plan d'entraînement sur 5 semaines, avec des objectifs pour chaque semaine",
         "Ressources audio téléchargeables et écoutables en ligne"
@@ -1926,7 +1927,7 @@
         "Travailler avec un ingénieur du son / sound designer (optionnel)",
         "Dépannage & contrôle qualité"
       ],
-      "annexes": "Annexes : checklists imprimables, glossaire concis, plan d'entraînement (5 semaines)"
+      "annexes": "Annexes : checklists imprimables, glossaire concis, étude de cas, plan d'entraînement (5 semaines)"
     },
     "audience": {
       "title": "Pour qui ?",
@@ -1935,6 +1936,23 @@
     "contact": {
       "title": "Une question avant de commander ?",
       "text": "Écrivez-nous, nous vous répondons personnellement :"
+    },
+    "promise": {
+      "title": "La promesse",
+      "text": "Comprendre pourquoi le son compte autant que l'image, puis acquérir une méthode reproductible pour livrer vous-même une bande-son propre et maîtrisée sur les projets qui le permettent."
+    },
+    "approach": {
+      "title": "L'approche",
+      "text": "Un langage pensé pour les vidéastes : chaque notion et chaque terme technique est expliqué clairement, puis appliqué pas à pas dans Premiere Pro, Final Cut Pro, DaVinci Resolve et CapCut. Un chapitre par étape, un exercice pour valider. Les 25 techniques prêtes à tourner indiquent aussi des plugins tiers pour aller plus loin."
+    },
+    "author": {
+      "title": "L'auteur",
+      "text": "Guillaume Surget, ingénieur du son et sound designer chez Global Drip Studio. Il a travaillé sur des projets pour Porsche (Type7), Canyon Bicycles, Ambit Components, Pulsor Agency et Ultrack Agency, aux côtés de vidéastes professionnels. La formation est née de leurs questions de terrain."
+    },
+    "preview": {
+      "title": "Aperçu",
+      "subtitle": "Couverture, sommaire et introduction. Cliquez pour agrandir.",
+      "alt": "Page {{n}} de la formation"
     }
   }
 }
