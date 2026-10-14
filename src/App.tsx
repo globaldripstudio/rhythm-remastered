@@ -70,6 +70,8 @@ const App = () => (
             <Route path="/cgv" element={<CGV />} />
             <Route path="/ebook" element={<LangLock lang="fr"><Ebook /></LangLock>} />
             <Route path="/en/ebook" element={<LangLock lang="en"><Ebook /></LangLock>} />
+            <Route path="/boutique" element={<LangLock lang="fr"><Boutique /></LangLock>} />
+            <Route path="/en/shop" element={<LangLock lang="en"><Boutique /></LangLock>} />
             <Route path="/ebook/login" element={<EbookLogin />} />
             <Route path="/ebook/reader" element={<EbookReader />} />
             <Route path="/loudness" element={<LoudnessFr />} />

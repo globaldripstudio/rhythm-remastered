@@ -76,12 +76,9 @@ const Header = () => {
             <span className="text-muted-foreground/50">|</span>
             <Link to={lp("/projets")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.projects')}</Link>
             <Link to={lp("/blog")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.blog')}</Link>
-            <span className="relative inline-flex items-center cursor-not-allowed mr-1">
-              <span className="text-muted-foreground/50 text-sm lg:text-base">{t('nav.shop')}</span>
-              <span className="absolute -top-3 -right-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium leading-none text-primary-foreground whitespace-nowrap">
-                {t('nav.shopSoon')}
-              </span>
-            </span>
+            <Link to={lp("/boutique")} className="nav-link text-sm lg:text-base text-muted-foreground">
+              {t('nav.shop')}
+            </Link>
             <span className="text-muted-foreground/50">|</span>
             {/* Toolkit dropdown — opens on hover, no click needed */}
             <div className="relative group">
