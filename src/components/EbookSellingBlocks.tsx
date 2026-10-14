@@ -166,11 +166,20 @@ const EbookSellingBlocks = () => {
       </div>
 
       <Card className="p-6 bg-card/50 border-border/50">
-        <h2 className="text-xl font-bold mb-3 text-foreground flex items-center gap-2">
-          <User className="w-5 h-5 text-primary" />
-          {t("ebookSell.author.title")}
-        </h2>
-        <p className="text-muted-foreground leading-relaxed">{t("ebookSell.author.text")}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold mb-3 text-foreground flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              {t("ebookSell.author.title")}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">{t("ebookSell.author.text")}</p>
+          </div>
+          <img
+            src="/lovable-uploads/logo-blanc-sans-fond.png"
+            alt="Global Drip Studio"
+            className="h-10 sm:h-12 object-contain flex-shrink-0 opacity-90"
+          />
+        </div>
       </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
