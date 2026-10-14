@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, Compass, Mail, Target, User, Users } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, Compass, Languages, Mail, Target, User, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const PREVIEW_PAGES = [1, 2, 3, 4, 5].map((n) => ({ n, src: `/ebook-preview/p-0${n}.jpg` }));
 
