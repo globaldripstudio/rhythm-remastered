@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { AlertTriangle, Check, Compass, Mail, Target, User, Users } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, Compass, Mail, Target, User, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const PREVIEW_PAGES = [1, 2, 3, 4, 5].map((n) => ({ n, src: `/ebook-preview/p-0${n}.jpg` }));
@@ -71,14 +71,40 @@ const EbookSellingBlocks = () => {
           ))}
         </div>
         <Dialog open={open !== null} onOpenChange={(o) => !o && setOpen(null)}>
-          <DialogContent className="max-w-3xl p-2 bg-card">
+          <DialogContent
+            className="max-w-3xl p-2 bg-card"
+            onKeyDown={(e) => {
+              if (open === null) return;
+              if (e.key === "ArrowLeft") setOpen(open > 1 ? open - 1 : PREVIEW_PAGES.length);
+              if (e.key === "ArrowRight") setOpen(open < PREVIEW_PAGES.length ? open + 1 : 1);
+            }}
+          >
             <DialogTitle className="sr-only">{t("ebookSell.preview.alt", { n: open ?? 1 })}</DialogTitle>
             {open !== null && (
-              <img
-                src={`/ebook-preview/p-0${open}.jpg`}
-                alt={t("ebookSell.preview.alt", { n: open })}
-                className="w-full h-auto max-h-[85vh] object-contain"
-              />
+              <div className="relative">
+                <img
+                  src={`/ebook-preview/p-0${open}.jpg`}
+                  alt={t("ebookSell.preview.alt", { n: open })}
+                  className="w-full h-auto max-h-[85vh] object-contain"
+                />
+                <button
+                  onClick={() => setOpen(open > 1 ? open - 1 : PREVIEW_PAGES.length)}
+                  aria-label={t("ebookSell.preview.prev")}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-2 text-foreground hover:bg-background transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={() => setOpen(open < PREVIEW_PAGES.length ? open + 1 : 1)}
+                  aria-label={t("ebookSell.preview.next")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-2 text-foreground hover:bg-background transition-colors"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+                <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-background/80 px-3 py-1 text-sm text-foreground tabular-nums">
+                  {open} / {PREVIEW_PAGES.length}
+                </span>
+              </div>
             )}
           </DialogContent>
         </Dialog>
