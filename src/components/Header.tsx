@@ -76,8 +76,11 @@ const Header = () => {
             <span className="text-muted-foreground/50">|</span>
             <Link to={lp("/projets")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.projects')}</Link>
             <Link to={lp("/blog")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.blog')}</Link>
-            <Link to={lp("/boutique")} className="nav-link text-sm lg:text-base text-muted-foreground">
+            <Link to={lp("/boutique")} className="nav-link inline-flex items-start gap-1 text-sm lg:text-base text-muted-foreground">
               {t('nav.shop')}
+              <span className="[-webkit-text-fill-color:currentColor] -mt-1 rounded-full bg-primary/15 px-1.5 py-px text-[8px] font-semibold uppercase tracking-wide text-primary ring-1 ring-primary/30">
+                {t('nav.shopNew')}
+              </span>
             </Link>
             <span className="text-muted-foreground/50">|</span>
             {/* Toolkit dropdown — opens on hover, no click needed */}
@@ -243,7 +246,7 @@ const Header = () => {
 
               <Link to={lp("/projets")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.projects')}</Link>
               <Link to={lp("/blog")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.blog')}</Link>
-              <Link to={lp("/boutique")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.shop')}</Link>
+              <Link to={lp("/boutique")} className="py-2.5 px-2 rounded-md nav-link inline-flex items-start gap-1.5 text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.shop')}<span className="[-webkit-text-fill-color:currentColor] -mt-1 rounded-full bg-primary/15 px-1.5 py-px text-[8px] font-semibold uppercase tracking-wide text-primary ring-1 ring-primary/30">{t('nav.shopNew')}</span></Link>
 
               <div className="mt-2 rounded-xl border border-border bg-muted/20 p-2">
                 <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
