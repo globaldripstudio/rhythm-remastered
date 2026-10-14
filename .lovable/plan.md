@@ -23,6 +23,16 @@ Accroche = résultat concret, preuve = kit complet, argument de fond = l'unique 
 
 **Bloc « Pour qui »** (court) : vidéastes et monteurs en priorité; convient aussi aux créateurs de contenu et aux débutants en audio. Aucune base requise.
 
+**Bloc « Ce que cette formation règle »** (tiré de l'introduction, ton factuel) : heures perdues en post-production, coupes approximatives, « pocs » disgracieux, son qui change d'une scène à l'autre, mix qui saturent.
+
+**Bloc « Au programme »** (aperçu du sommaire, repliable) :
+- Design sonore créatif : ambiances, silence et dynamique, ponctuation des titres, reverb/pitch/reverse, layering
+- 25 techniques prêtes à tourner
+- Export et livrables : cibles LUFS/True Peak, formats, stems, contrôle qualité, piste M&E, ADR
+- Travailler avec un ingénieur du son
+- Dépannage, templates et étude de cas
+- Annexes : checklists imprimables, glossaire, plan d'entraînement sur 5 semaines
+
 **Les 3 atouts existants** conservés et reformulés (5 semaines pour devenir autonome / Premiere Pro, Final Cut, DaVinci, CapCut / sans jargon inutile).
 
 **Bloc prix** : 89 €, « Accès immédiat après paiement », « Mises à jour gratuites », bouton « Obtenir la formation — 89 € ».
