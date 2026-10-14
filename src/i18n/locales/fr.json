@@ -1952,7 +1952,9 @@
     "preview": {
       "title": "Aperçu",
       "subtitle": "Couverture, sommaire et introduction. Cliquez pour agrandir.",
-      "alt": "Page {{n}} de la formation"
+      "alt": "Page {{n}} de la formation",
+      "prev": "Page précédente",
+      "next": "Page suivante"
     }
   }
 }

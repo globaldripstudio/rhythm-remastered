@@ -1952,7 +1952,9 @@
     "preview": {
       "title": "Preview",
       "subtitle": "Cover, table of contents and introduction. Click to enlarge.",
-      "alt": "Training page {{n}}"
+      "alt": "Training page {{n}}",
+      "prev": "Previous page",
+      "next": "Next page"
     }
   }
 }
