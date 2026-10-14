@@ -1,14 +1,36 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, Check, Mail, Users } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AlertTriangle, Check, Compass, Mail, Target, User, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+const PREVIEW_PAGES = [1, 2, 3, 4, 5].map((n) => ({ n, src: `/ebook-preview/p-0${n}.jpg` }));
 
 /** Shared sales sections for the ebook (Boutique + Ebook pages). */
 const EbookSellingBlocks = () => {
   const { t } = useTranslation();
   const list = (key: string) => t(key, { returnObjects: true }) as string[];
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <div className="max-w-5xl mx-auto mt-16 space-y-12">
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="p-6 bg-card/50 border-primary/30">
+          <h2 className="text-xl font-bold mb-3 text-foreground flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            {t("ebookSell.promise.title")}
+          </h2>
+          <p className="text-foreground leading-relaxed">{t("ebookSell.promise.text")}</p>
+        </Card>
+        <Card className="p-6 bg-card/50 border-border/50">
+          <h2 className="text-xl font-bold mb-3 text-foreground flex items-center gap-2">
+            <Compass className="w-5 h-5 text-primary" />
+            {t("ebookSell.approach.title")}
+          </h2>
+          <p className="text-muted-foreground leading-relaxed">{t("ebookSell.approach.text")}</p>
+        </Card>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6 bg-card/50 border-border/50">
           <h2 className="text-xl font-bold mb-4 text-foreground">{t("ebookSell.pains.title")}</h2>
@@ -35,6 +57,34 @@ const EbookSellingBlocks = () => {
       </div>
 
       <div>
+        <h2 className="text-2xl font-bold mb-2 text-foreground">{t("ebookSell.preview.title")}</h2>
+        <p className="text-muted-foreground mb-6">{t("ebookSell.preview.subtitle")}</p>
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+          {PREVIEW_PAGES.map(({ n, src }) => (
+            <button
+              key={n}
+              onClick={() => setOpen(n)}
+              className="rounded-md overflow-hidden border border-border/50 hover:border-primary/60 transition-colors"
+            >
+              <img src={src} alt={t("ebookSell.preview.alt", { n })} loading="lazy" className="w-full h-auto" />
+            </button>
+          ))}
+        </div>
+        <Dialog open={open !== null} onOpenChange={(o) => !o && setOpen(null)}>
+          <DialogContent className="max-w-3xl p-2 bg-card">
+            <DialogTitle className="sr-only">{t("ebookSell.preview.alt", { n: open ?? 1 })}</DialogTitle>
+            {open !== null && (
+              <img
+                src={`/ebook-preview/p-0${open}.jpg`}
+                alt={t("ebookSell.preview.alt", { n: open })}
+                className="w-full h-auto max-h-[85vh] object-contain"
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div>
         <h2 className="text-2xl font-bold mb-2 text-foreground">{t("ebookSell.program.title")}</h2>
         <p className="text-muted-foreground mb-6">{t("ebookSell.program.subtitle")}</p>
         <ol className="grid sm:grid-cols-2 gap-3">
@@ -47,6 +97,14 @@ const EbookSellingBlocks = () => {
         </ol>
         <p className="text-sm text-muted-foreground mt-4">{t("ebookSell.program.annexes")}</p>
       </div>
+
+      <Card className="p-6 bg-card/50 border-border/50">
+        <h2 className="text-xl font-bold mb-3 text-foreground flex items-center gap-2">
+          <User className="w-5 h-5 text-primary" />
+          {t("ebookSell.author.title")}
+        </h2>
+        <p className="text-muted-foreground leading-relaxed">{t("ebookSell.author.text")}</p>
+      </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6 bg-card/50 border-border/50">

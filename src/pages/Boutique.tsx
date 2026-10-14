@@ -16,7 +16,6 @@ const Boutique = () => {
   const { pathname } = useLocation();
   const lang = getLangFromPath(pathname);
   const homePath = lang === "en" ? "/en" : "/";
-  const detailsPath = lang === "en" ? "/en/ebook" : "/ebook";
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleLanguage = () => {
@@ -100,6 +99,7 @@ const Boutique = () => {
               {t("boutique.badge")}
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">{t("boutique.title")}</h1>
+            <p className="text-primary font-medium mb-3">{t("boutique.tagline")}</p>
             <p className="text-lg text-muted-foreground mb-10 max-w-2xl leading-relaxed">{t("boutique.subtitle")}</p>
 
             <Card className="p-6 md:p-10 bg-card/50 backdrop-blur border-border/50">
@@ -166,11 +166,6 @@ const Boutique = () => {
                   </Button>
 
                   <p className="text-sm text-muted-foreground text-center mt-4">{t("boutique.secure")}</p>
-                  <div className="text-center mt-4">
-                    <Link to={detailsPath} className="text-sm text-primary hover:underline">
-                      {t("boutique.details")}
-                    </Link>
-                  </div>
                 </div>
               </div>
             </Card>
