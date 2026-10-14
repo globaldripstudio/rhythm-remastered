@@ -149,7 +149,7 @@ const Ebook = () => {
 
                 <div className="bg-muted/30 rounded-xl p-6 mb-6 border border-border/50">
                   <div className="flex items-baseline justify-between mb-3">
-                    <span className="text-4xl font-bold text-foreground">59€</span>
+                    <span className="text-4xl font-bold text-foreground">89€</span>
                     <span className="text-sm text-muted-foreground">Accès immédiat</span>
                   </div>
                   <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
@@ -175,7 +175,7 @@ const Ebook = () => {
                   ) : (
                     <>
                       <Download className="w-5 h-5 mr-2" />
-                      Acheter maintenant — 59€
+                      Acheter maintenant — 89€
                     </>
                   )}
                 </Button>
