@@ -10,12 +10,51 @@ const PREVIEW_PAGES = [1, 2, 3, 4, 5].map((n) => ({ n, src: `/ebook-preview/p-0$
 
 /** Shared sales sections for the ebook (Boutique + Ebook pages). */
 const EbookSellingBlocks = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const list = (key: string) => t(key, { returnObjects: true }) as string[];
   const [open, setOpen] = useState<number | null>(null);
+  const isEnglish = i18n.language?.startsWith("en");
+
+  const scrollToContact = () => {
+    const target = document.getElementById("contact");
+    if (!target) return false;
+    const y = target.getBoundingClientRect().top + window.pageYOffset - 100;
+    window.scrollTo({ top: y, behavior: "smooth" });
+    return true;
+  };
+
+  const goToContact = () => {
+    if (location.pathname === "/" || location.pathname === "/en") {
+      scrollToContact();
+      return;
+    }
+    navigate(isEnglish ? "/en" : "/");
+    const start = Date.now();
+    const tick = () => {
+      if (scrollToContact()) return;
+      if (Date.now() - start > 1500) return;
+      requestAnimationFrame(tick);
+    };
+    tick();
+  };
 
   return (
     <div className="max-w-5xl mx-auto mt-16 space-y-12">
+      {isEnglish && (
+        <Card className="p-6 md:p-8 border-2 border-primary bg-primary/10">
+          <h2 className="text-xl md:text-2xl font-bold mb-3 text-foreground flex items-center gap-2">
+            <Languages className="w-6 h-6 text-primary" />
+            {t("ebookSell.frenchOnly.title")}
+          </h2>
+          <p className="text-foreground leading-relaxed mb-2">{t("ebookSell.frenchOnly.text")}</p>
+          <p className="text-muted-foreground leading-relaxed mb-5">{t("ebookSell.frenchOnly.translate")}</p>
+          <Button className="studio-button" onClick={goToContact}>
+            {t("ebookSell.frenchOnly.cta")}
+          </Button>
+        </Card>
+      )}
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6 bg-card/50 border-primary/30">
           <h2 className="text-xl font-bold mb-3 text-foreground flex items-center gap-2">
