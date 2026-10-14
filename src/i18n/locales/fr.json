@@ -877,6 +877,30 @@
       }
     }
   },
+  "boutique": {
+    "seo": {
+      "title": "Boutique — Formation au Sound Design | Global Drip Studio",
+      "description": "Boutique officielle du Global Drip Studio : la formation au sound design pour vidéastes et monteurs. Accès immédiat au PDF après paiement."
+    },
+    "badge": "Boutique",
+    "title": "Formation au Sound Design pour Vidéastes et Monteurs",
+    "subtitle": "Le seul produit disponible à ce jour : un manuel de terrain pour devenir autonome sur la partie audio, avec des checklists et des workflows concrets.",
+    "meta1": "Manuel d'opérabilité",
+    "meta1Desc": "5 semaines de formation pour devenir 100% autonome sur la partie audio",
+    "meta2": "Adapté tous logiciels",
+    "meta2Desc": "Méthodes natives pour Premiere Pro, Final Cut Pro, DaVinci Resolve, CapCut",
+    "meta3": "Pas de jargon inutile",
+    "meta3Desc": "Juste ce qu'il faut savoir, au bon moment",
+    "price": "59 €",
+    "immediateAccess": "Accès immédiat",
+    "feat1": "PDF téléchargeable",
+    "feat2": "Mises à jour gratuites",
+    "buy": "Acheter maintenant — 59 €",
+    "buying": "Chargement...",
+    "secure": "Paiement sécurisé par Stripe • Livraison immédiate par email",
+    "details": "Voir la fiche détaillée",
+    "error": "Erreur lors de la création du paiement. Veuillez réessayer."
+  },
   "ebook": {
     "badge": "Formation Premium",
     "title": "Formation au Sound Design pour Vidéastes et Monteurs",

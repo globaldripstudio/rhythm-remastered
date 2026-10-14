@@ -11,6 +11,7 @@ export const FR_TO_EN: Record<string, string> = {
   "/": "/en",
   "/projets": "/en/projects",
   "/ebook": "/en/ebook",
+  "/boutique": "/en/shop",
   "/blog": "/en/blog",
   "/loudness": "/en/loudness",
 };
