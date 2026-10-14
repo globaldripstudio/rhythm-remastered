@@ -885,13 +885,13 @@
     },
     "badge": "PDF training + audio resources",
     "title": "Sound Design Training for Videographers and Editors",
-    "subtitle": "The first audio training designed exclusively for video. Concrete methods, checklists and workflows to make your footage sound right this week.",
+    "subtitle": "The first audio training designed exclusively for videographers and editors. Understand what sound brings to your footage, and handle it yourself when the project allows.",
     "meta1": "Operations Manual",
-    "meta1Desc": "5-week training to become 100% autonomous on audio",
+    "meta1Desc": "A 5-week training plan, one exercise per chapter",
     "meta2": "Works with every editing suite",
     "meta2Desc": "Native methods for Premiere Pro, Final Cut Pro, DaVinci Resolve, CapCut",
-    "meta3": "No useless jargon",
-    "meta3Desc": "Just what you need to know, right when you need it",
+    "meta3": "Concepts explained clearly",
+    "meta3Desc": "Every technical term tied to a concrete use in the edit",
     "price": "€89",
     "immediateAccess": "Instant access",
     "feat1": "Downloadable PDF",
@@ -900,7 +900,8 @@
     "buying": "Loading...",
     "secure": "Secure payment via Stripe • Instant delivery by email",
     "details": "See the full product page",
-    "error": "Payment could not be created. Please try again."
+    "error": "Payment could not be created. Please try again.",
+    "tagline": "From shoot to final delivery: concrete methods, workflows and checklists for professional sound."
   },
   "ebook": {
     "badge": "Premium Training",
@@ -1893,18 +1894,18 @@
     "pains": {
       "title": "What this training fixes",
       "items": [
-        "Hours lost on audio in post-production",
-        "Rough cuts and ugly clicks and pops",
-        "Sound that changes from one scene to the next",
-        "Mixes that clip on export"
+        "On set: wrong gain, poorly placed mic, no room tone. Problems start at the capture stage.",
+        "In the edit: hard cuts, pops, no fades or J/L-cuts, messy tracks.",
+        "In the mix: levels that change from scene to scene, voice buried under the music, a clipping master.",
+        "At delivery: inconsistent loudness across platforms, no stems or M&E version, no quality control."
       ]
     },
     "includes": {
       "title": "What you get",
       "items": [
         "70-page PDF training, downloadable and printable",
-        "Audio examples to listen to in almost every chapter",
-        "Ready-to-use sound design samples (sweeps and impacts)",
+        "A/B listening examples in almost every chapter",
+        "Mini pack of ready-to-use samples (risers and impacts)",
         "2 printable cheat sheets",
         "A 5-week training plan with goals for each week",
         "Audio resources you can download and stream online"
@@ -1926,7 +1927,7 @@
         "Working with a sound engineer / sound designer (optional)",
         "Troubleshooting & quality control"
       ],
-      "annexes": "Appendices: printable checklists, concise glossary, training plan (5 weeks)"
+      "annexes": "Appendices: printable checklists, concise glossary, case study, training plan (5 weeks)"
     },
     "audience": {
       "title": "Who is it for?",
@@ -1935,6 +1936,23 @@
     "contact": {
       "title": "A question before you order?",
       "text": "Write to us, we reply personally:"
+    },
+    "promise": {
+      "title": "The promise",
+      "text": "Understand why sound matters as much as the picture, then build a repeatable method to deliver a clean, controlled soundtrack yourself on the projects that allow it."
+    },
+    "approach": {
+      "title": "The approach",
+      "text": "Written for videographers: every concept and technical term is explained clearly, then applied step by step in Premiere Pro, Final Cut Pro, DaVinci Resolve and CapCut. One chapter per step, one exercise to validate it. The 25 ready-to-use techniques also point to third-party plugins to go further."
+    },
+    "author": {
+      "title": "The author",
+      "text": "Guillaume Surget, sound engineer and sound designer at Global Drip Studio. He has worked on projects for Porsche (Type7), Canyon Bicycles, Ambit Components, Pulsor Agency and Ultrack Agency, alongside professional videographers. The training grew out of their questions in the field."
+    },
+    "preview": {
+      "title": "Preview",
+      "subtitle": "Cover, table of contents and introduction. Click to enlarge.",
+      "alt": "Training page {{n}}"
     }
   }
 }
