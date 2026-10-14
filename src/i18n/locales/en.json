@@ -1955,6 +1955,12 @@
       "alt": "Training page {{n}}",
       "prev": "Previous page",
       "next": "Next page"
+    },
+    "frenchOnly": {
+      "title": "Important: this training is in French only",
+      "text": "The full training (70-page PDF, audio examples, sample pack and printable cheatsheets) is currently available in French only. The audio concepts, workflows and checklists apply to any editing software, but the content itself is written in French.",
+      "translate": "Interested in an English version? Tell us through the contact form — your requests directly help us decide whether to translate the training.",
+      "cta": "Ask a question / request an English version"
     }
   }
 }

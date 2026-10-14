@@ -1955,6 +1955,12 @@
       "alt": "Page {{n}} de la formation",
       "prev": "Page précédente",
       "next": "Page suivante"
+    },
+    "frenchOnly": {
+      "title": "Important : cette formation existe uniquement en français",
+      "text": "La formation complète (PDF de 70 pages, exemples audio, pack de samples et cheatsheets imprimables) est disponible en français uniquement.",
+      "translate": "Intéressé par une version anglaise ? Dites-le-nous via le formulaire de contact.",
+      "cta": "Poser une question / demander une version anglaise"
     }
   }
 }
