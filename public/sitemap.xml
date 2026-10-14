@@ -85,6 +85,24 @@
        <xhtml:link rel="alternate" hreflang="x-default" href="https://www.globaldripstudio.fr/ebook"/>
   </url>
   <url>
+    <loc>https://www.globaldripstudio.fr/boutique</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://www.globaldripstudio.fr/boutique"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://www.globaldripstudio.fr/en/shop"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://www.globaldripstudio.fr/boutique"/>
+  </url>
+  <url>
+    <loc>https://www.globaldripstudio.fr/en/shop</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+       <xhtml:link rel="alternate" hreflang="fr" href="https://www.globaldripstudio.fr/boutique"/>
+       <xhtml:link rel="alternate" hreflang="en" href="https://www.globaldripstudio.fr/en/shop"/>
+       <xhtml:link rel="alternate" hreflang="x-default" href="https://www.globaldripstudio.fr/boutique"/>
+  </url>
+  <url>
     <loc>https://www.globaldripstudio.fr/loudness</loc>
     <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>

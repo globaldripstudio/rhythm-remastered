@@ -150,6 +150,36 @@ export const howToSchema = (name: string, steps: HowToStep[]) => ({
   })),
 });
 
+export interface EbookProductSchemaInput {
+  name: string;
+  description: string;
+  path: string;
+  price: string;
+  inLanguage: string;
+}
+
+export const ebookProductSchema = (p: EbookProductSchemaInput) => ({
+  "@context": "https://schema.org",
+  "@type": "Book",
+  "@id": `${SITE}${p.path}#book`,
+  name: p.name,
+  description: p.description,
+  url: `${SITE}${p.path}`,
+  image: `${SITE}/lovable-uploads/ebook-cover.jpg`,
+  bookFormat: "https://schema.org/EBook",
+  inLanguage: p.inLanguage,
+  numberOfPages: 70,
+  author: { "@type": "Person", name: "Guillaume Surget", worksFor: { "@id": `${SITE}/#organization` } },
+  publisher: { "@id": `${SITE}/#organization` },
+  offers: {
+    "@type": "Offer",
+    url: `${SITE}${p.path}`,
+    price: p.price,
+    priceCurrency: "EUR",
+    availability: "https://schema.org/InStock",
+  },
+});
+
 export interface ArticleSchemaInput {
   title: string;
   description: string;
