@@ -243,12 +243,7 @@ const Header = () => {
 
               <Link to={lp("/projets")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.projects')}</Link>
               <Link to={lp("/blog")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.blog')}</Link>
-              <span className="py-2.5 px-2 relative inline-flex items-center cursor-not-allowed">
-                <span className="text-muted-foreground/50">{t('nav.shop')}</span>
-                <span className="ml-2 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                  {t('nav.shopSoon')}
-                </span>
-              </span>
+              <Link to={lp("/boutique")} className="py-2.5 px-2 rounded-md nav-link text-muted-foreground hover:bg-primary/10" onClick={closeMenu}>{t('nav.shop')}</Link>
 
               <div className="mt-2 rounded-xl border border-border bg-muted/20 p-2">
                 <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
