@@ -76,9 +76,9 @@ const Header = () => {
             <span className="text-muted-foreground/50">|</span>
             <Link to={lp("/projets")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.projects')}</Link>
             <Link to={lp("/blog")} className="nav-link text-sm lg:text-base text-muted-foreground">{t('nav.blog')}</Link>
-            <Link to={lp("/boutique")} className="nav-link inline-flex items-start gap-1 text-sm lg:text-base text-muted-foreground">
+            <Link to={lp("/boutique")} className="nav-link inline-flex items-start gap-1.5 text-sm lg:text-base text-muted-foreground">
               {t('nav.shop')}
-              <span className="[-webkit-text-fill-color:currentColor] -mt-1 rounded-full bg-primary/15 px-1.5 py-px text-[8px] font-semibold uppercase tracking-wide text-primary ring-1 ring-primary/30">
+              <span className="[-webkit-text-fill-color:currentColor] -mt-2 rounded-full bg-primary/15 px-1.5 py-px text-[8px] font-semibold uppercase tracking-wide text-primary ring-1 ring-primary/30">
                 {t('nav.shopNew')}
               </span>
             </Link>
