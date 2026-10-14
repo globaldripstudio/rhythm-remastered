@@ -166,7 +166,7 @@ const EbookSellingBlocks = () => {
       </div>
 
       <Card className="p-6 bg-card/50 border-border/50">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold mb-3 text-foreground flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
