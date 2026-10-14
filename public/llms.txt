@@ -16,6 +16,8 @@ Global Drip Studio accompagne artistes, labels, réalisateurs et studios de jeu 
 - [Blog (EN)](/en/blog): Articles on audio production and sound design.
 - [Ebook (FR)](/ebook): Formation mixage audio.
 - [Ebook (EN)](/en/ebook): Audio mixing course.
+- [Boutique (FR)](/boutique): Formation au sound design pour vidéastes et monteurs (PDF 70 pages, exemples audio, checklists).
+- [Shop (EN)](/en/shop): Sound design training for videographers and editors (French content).
 - [Loudness Analyzer (FR)](/loudness): Analyseur LUFS / loudness gratuit en ligne.
 - [Loudness Analyzer (EN)](/en/loudness): Free online LUFS / loudness analyzer.
 - [Key & BPM Finder](/key-bpm-finder): Détection de tonalité et tempo en ligne.

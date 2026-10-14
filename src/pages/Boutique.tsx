@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 import { getLangFromPath, mirrorPath } from "@/lib/localizedRoutes";
 import EbookSellingBlocks from "@/components/EbookSellingBlocks";
+import { breadcrumbSchema, ebookProductSchema } from "@/lib/seo/schemas";
 
 const Boutique = () => {
   const { t, i18n } = useTranslation();
@@ -57,6 +58,19 @@ const Boutique = () => {
           { hrefLang: "fr", path: "/boutique" },
           { hrefLang: "en", path: "/en/shop" },
           { hrefLang: "x-default", path: "/boutique" },
+        ]}
+        jsonLd={[
+          ebookProductSchema({
+            name: t("boutique.title"),
+            description: t("boutique.seo.description"),
+            path: lang === "en" ? "/en/shop" : "/boutique",
+            price: "89",
+            inLanguage: "fr",
+          }),
+          breadcrumbSchema([
+            { name: lang === "en" ? "Home" : "Accueil", path: homePath },
+            { name: lang === "en" ? "Shop" : "Boutique", path: lang === "en" ? "/en/shop" : "/boutique" },
+          ]),
         ]}
       />
       {/* Header — same standalone style as the Ebook page */}
