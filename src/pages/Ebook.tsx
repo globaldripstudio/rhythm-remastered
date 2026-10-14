@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 import { getLangFromPath } from "@/lib/localizedRoutes";
+import EbookSellingBlocks from "@/components/EbookSellingBlocks";
 
 const Ebook = () => {
   const { t, i18n } = useTranslation();
@@ -194,6 +195,7 @@ const Ebook = () => {
               Monter vos vidéos plus vite, démystifier l'aspect sonore, devenir autonome et précis à ce sujet, et faire enfin sonner vos images.
             </p>
           </div>
+          <EbookSellingBlocks />
         </div>
       </section>
     </div>

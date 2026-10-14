@@ -881,11 +881,11 @@
   "boutique": {
     "seo": {
       "title": "Boutique — Formation au Sound Design | Global Drip Studio",
-      "description": "Boutique officielle du Global Drip Studio : la formation au sound design pour vidéastes et monteurs. Accès immédiat au PDF après paiement."
+      "description": "Formation sound design en PDF pour vidéastes et monteurs : 70 pages, exemples audio, samples, checklists imprimables et plan sur 5 semaines. Accès immédiat."
     },
-    "badge": "Boutique",
+    "badge": "Formation PDF + ressources audio",
     "title": "Formation au Sound Design pour Vidéastes et Monteurs",
-    "subtitle": "Le seul produit disponible à ce jour : un manuel de terrain pour devenir autonome sur la partie audio, avec des checklists et des workflows concrets.",
+    "subtitle": "La première formation audio pensée exclusivement pour la vidéo. Des méthodes concrètes, des checklists et des workflows pour faire sonner vos images dès cette semaine.",
     "meta1": "Manuel d'opérabilité",
     "meta1Desc": "5 semaines de formation pour devenir 100% autonome sur la partie audio",
     "meta2": "Adapté tous logiciels",
@@ -896,7 +896,7 @@
     "immediateAccess": "Accès immédiat",
     "feat1": "PDF téléchargeable",
     "feat2": "Mises à jour gratuites",
-    "buy": "Acheter maintenant — 89 €",
+    "buy": "Obtenir la formation — 89 €",
     "buying": "Chargement...",
     "secure": "Paiement sécurisé par Stripe • Livraison immédiate par email",
     "details": "Voir la fiche détaillée",
@@ -965,8 +965,8 @@
       "description": "Nos services de mixage, mastering hybride, production musicale et sound design. Tarifs transparents et devis personnalisés."
     },
     "ebook": {
-      "title": "Formation Mixage Audio | Global Drip Studio",
-      "description": "Apprenez les techniques de mixage professionnel avec notre formation complète. Guide pratique par Global Drip Studio."
+      "title": "Formation Sound Design pour Vidéastes | Global Drip",
+      "description": "Formation PDF de 70 pages pour vidéastes et monteurs : exemples audio, samples, checklists imprimables, plan sur 5 semaines. Premiere, Final Cut, DaVinci, CapCut."
     },
     "mentionsLegales": {
       "title": "Mentions Légales | Global Drip Studio",
@@ -1888,5 +1888,53 @@
     "preparing": "Préparation de votre espace privé…",
     "emailFallback": "Votre reçu contient également votre lien privé. Si celui-ci tarde à arriver, contactez le studio.",
     "home": "Retour à l'accueil"
+  },
+  "ebookSell": {
+    "pains": {
+      "title": "Ce que cette formation règle",
+      "items": [
+        "Des heures perdues en post-production sur l'audio",
+        "Des coupes approximatives et des « pocs » disgracieux",
+        "Un rendu sonore qui change d'une scène à l'autre",
+        "Des mix qui saturent à l'export"
+      ]
+    },
+    "includes": {
+      "title": "Ce que vous recevez",
+      "items": [
+        "Formation PDF de 70 pages, téléchargeable et imprimable",
+        "Exemples audio à écouter dans presque tous les chapitres",
+        "Samples prêts à l'emploi pour le sound design (sweeps et impacts)",
+        "2 cheatsheets imprimables",
+        "Un plan d'entraînement sur 5 semaines, avec des objectifs pour chaque semaine",
+        "Ressources audio téléchargeables et écoutables en ligne"
+      ]
+    },
+    "program": {
+      "title": "Au programme",
+      "subtitle": "Des bases de l'audio jusqu'à la livraison professionnelle.",
+      "chapters": [
+        "Mettre le son au service de l'image (notions clés)",
+        "Les fondamentaux (sans école d'ingé son)",
+        "Captation terrain (gagner à l'enregistrement)",
+        "Hygiène de montage (gestes qui changent tout)",
+        "Outils natifs par logiciel",
+        "Mettre son projet à tempo",
+        "Design sonore créatif (du « propre » au « puissant »)",
+        "25 techniques prêtes à tourner",
+        "Export, normalisation et livrables",
+        "Travailler avec un ingénieur du son / sound designer (optionnel)",
+        "Dépannage & contrôle qualité"
+      ],
+      "annexes": "Annexes : checklists imprimables, glossaire concis, plan d'entraînement (5 semaines)"
+    },
+    "audience": {
+      "title": "Pour qui ?",
+      "text": "Pensée pour les vidéastes et les monteurs, elle convient aussi aux créateurs de contenu et aux débutants en audio. Aucune base requise. Méthodes appliquées dans Premiere Pro, Final Cut Pro, DaVinci Resolve et CapCut."
+    },
+    "contact": {
+      "title": "Une question avant de commander ?",
+      "text": "Écrivez-nous, nous vous répondons personnellement :"
+    }
   }
 }

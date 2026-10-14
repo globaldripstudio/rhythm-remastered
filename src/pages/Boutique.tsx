@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
 import { getLangFromPath, mirrorPath } from "@/lib/localizedRoutes";
+import EbookSellingBlocks from "@/components/EbookSellingBlocks";
 
 const Boutique = () => {
   const { t, i18n } = useTranslation();
@@ -173,6 +174,12 @@ const Boutique = () => {
                 </div>
               </div>
             </Card>
+          </div>
+          <EbookSellingBlocks />
+          <div className="max-w-md mx-auto mt-12">
+            <Button size="lg" className="w-full studio-button text-lg h-14" onClick={handlePurchase} disabled={isLoading}>
+              {isLoading ? t("boutique.buying") : t("boutique.buy")}
+            </Button>
           </div>
         </div>
       </section>

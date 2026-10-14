@@ -7,6 +7,8 @@
 - [x] Audio → MIDI : tenue des notes, complétion des accords, tonalité/tempo via le moteur Key & BPM, option calage des durées.
 - [ ] Calibrage Audio → MIDI avec extraits de référence — en attente des fichiers audio + MIDI de l'utilisateur.
 - [x] Ouvrir la « Boutique » du menu : page dédiée (/boutique, /en/shop) vendant l'e-book via Stripe.
+- [x] Repositionner la Boutique : contenu reçu, programme complet, public, contact.
+- [ ] Aperçu des pages 1 à 5 du PDF — en attente du fichier PDF.
 - [x] Boutique : badge « nouveau » / « New » en haut à droite du lien de menu ; e-book passé à 89 € (page, fiche, Stripe).
 - [x] Boutons « Acheter » (Stripe) sur cartes et fiches des offres à prix fixe ; Pack Single en « envoi puis échange », sans fichier requis.
 - [x] Encarts d'offres après Audio → MIDI, Loudness, AI Song Checker et Accords & gammes.
