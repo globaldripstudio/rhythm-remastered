@@ -881,11 +881,11 @@
   "boutique": {
     "seo": {
       "title": "Shop — Sound Design Training | Global Drip Studio",
-      "description": "Official Global Drip Studio shop: the sound design training for videographers and editors. Instant PDF access after payment."
+      "description": "Sound design PDF training for videographers and editors: 70 pages, audio examples, samples, printable checklists and a 5-week plan. Instant access."
     },
-    "badge": "Shop",
+    "badge": "PDF training + audio resources",
     "title": "Sound Design Training for Videographers and Editors",
-    "subtitle": "The only product available right now: a field manual to become fully autonomous on audio, with concrete checklists and workflows.",
+    "subtitle": "The first audio training designed exclusively for video. Concrete methods, checklists and workflows to make your footage sound right this week.",
     "meta1": "Operations Manual",
     "meta1Desc": "5-week training to become 100% autonomous on audio",
     "meta2": "Works with every editing suite",
@@ -896,7 +896,7 @@
     "immediateAccess": "Instant access",
     "feat1": "Downloadable PDF",
     "feat2": "Free updates",
-    "buy": "Buy now — €89",
+    "buy": "Get the training — €89",
     "buying": "Loading...",
     "secure": "Secure payment via Stripe • Instant delivery by email",
     "details": "See the full product page",
@@ -965,8 +965,8 @@
       "description": "Our mixing, hybrid mastering, music production and sound design services. Transparent pricing and custom quotes."
     },
     "ebook": {
-      "title": "Audio Mixing Course | Global Drip Studio",
-      "description": "Learn professional mixing techniques with our comprehensive course. Practical guide by Global Drip Studio."
+      "title": "Sound Design Training for Videographers | Global Drip",
+      "description": "70-page PDF training for videographers and editors: audio examples, samples, printable checklists, 5-week plan. Premiere, Final Cut, DaVinci, CapCut."
     },
     "mentionsLegales": {
       "title": "Legal Notice | Global Drip Studio",
@@ -1888,5 +1888,53 @@
     "preparing": "Preparing your private space…",
     "emailFallback": "Your receipt also includes your private link. If it takes a while to arrive, contact the studio.",
     "home": "Back to home"
+  },
+  "ebookSell": {
+    "pains": {
+      "title": "What this training fixes",
+      "items": [
+        "Hours lost on audio in post-production",
+        "Rough cuts and ugly clicks and pops",
+        "Sound that changes from one scene to the next",
+        "Mixes that clip on export"
+      ]
+    },
+    "includes": {
+      "title": "What you get",
+      "items": [
+        "70-page PDF training, downloadable and printable",
+        "Audio examples to listen to in almost every chapter",
+        "Ready-to-use sound design samples (sweeps and impacts)",
+        "2 printable cheat sheets",
+        "A 5-week training plan with goals for each week",
+        "Audio resources you can download and stream online"
+      ]
+    },
+    "program": {
+      "title": "What's inside",
+      "subtitle": "From audio basics to professional delivery.",
+      "chapters": [
+        "Putting sound at the service of the picture (key concepts)",
+        "The fundamentals (no sound engineering school needed)",
+        "Field recording (win it at the capture stage)",
+        "Editing hygiene (habits that change everything)",
+        "Native tools for each editing software",
+        "Putting your project on tempo",
+        "Creative sound design (from “clean” to “powerful”)",
+        "25 ready-to-use techniques",
+        "Export, normalization and deliverables",
+        "Working with a sound engineer / sound designer (optional)",
+        "Troubleshooting & quality control"
+      ],
+      "annexes": "Appendices: printable checklists, concise glossary, training plan (5 weeks)"
+    },
+    "audience": {
+      "title": "Who is it for?",
+      "text": "Designed for videographers and editors, it also suits content creators and audio beginners. No prior knowledge needed. Methods applied in Premiere Pro, Final Cut Pro, DaVinci Resolve and CapCut."
+    },
+    "contact": {
+      "title": "A question before you order?",
+      "text": "Write to us, we reply personally:"
+    }
   }
 }
