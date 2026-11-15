@@ -16,7 +16,6 @@ import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import CGV from "./pages/CGV";
 import NotFound from "./pages/NotFound";
 import Ebook from "./pages/Ebook";
-import Boutique from "./pages/Boutique";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import EbookLogin from "./pages/EbookLogin";
 import EbookReader from "./pages/EbookReader";
@@ -70,8 +69,8 @@ const App = () => (
             <Route path="/cgv" element={<CGV />} />
             <Route path="/ebook" element={<LangLock lang="fr"><Ebook /></LangLock>} />
             <Route path="/en/ebook" element={<LangLock lang="en"><Ebook /></LangLock>} />
-            <Route path="/boutique" element={<LangLock lang="fr"><Boutique /></LangLock>} />
-            <Route path="/en/shop" element={<LangLock lang="en"><Boutique /></LangLock>} />
+            <Route path="/boutique" element={<Navigate to="/" replace />} />
+            <Route path="/en/shop" element={<Navigate to="/en" replace />} />
             <Route path="/ebook/login" element={<EbookLogin />} />
             <Route path="/ebook/reader" element={<EbookReader />} />
             <Route path="/loudness" element={<LoudnessFr />} />

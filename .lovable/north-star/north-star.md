@@ -6,4 +6,4 @@ Les artistes et vidéastes obtiennent une musique et une bande-son au son profes
 
 ## Indicateur
 
-Prestations studio et formations payées via le paiement en ligne chaque mois
+Prestations studio payées via le paiement en ligne chaque mois
